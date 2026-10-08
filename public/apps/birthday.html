@@ -875,7 +875,7 @@ function renderUpcoming() {
     Object.keys(birthdayData).forEach(k => {
         birthdayData[k].forEach(item => {
             const info = daysUntil(item.month, item.day);
-            if (info.days >= 0 && info.days <= 14) upcoming.push({ ...item, ...info });
+            if (info.days >= 0 && info.days <= 7) upcoming.push({ ...item, ...info });
         });
     });
     upcoming.sort((a, b) => a.days - b.days);
