@@ -1,5 +1,5 @@
 // ==========================================
-// Y-HUB APP — app.js (v4 — Event & Birthday)
+// Y-HUB APP — app.js (v5 — Fix Birthday)
 // ==========================================
 
 // 1. ICON SVG
@@ -306,7 +306,13 @@ async function loadEventData() {
     const todayStr2 = `${dd}/${mm}/${yyyy}`;
     const dayMonthStr = `${dd}/${mm}`;
 
+    // Mapping nama bulan Indonesia
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const todayMonthName = monthNames[today.getMonth()];
+    const todayDay = String(today.getDate()).padStart(2, '0');
+
     try {
+        // === EVENT & SERAGAM ===
         const dataES = await fetchCSV(EVENT_CSV);
         let foundEvent = "Tidak ada";
         let foundSeragam = "Tidak ada";
@@ -325,13 +331,26 @@ async function loadEventData() {
         if (eventEl) eventEl.innerText = foundEvent;
         if (seragamEl) seragamEl.innerText = foundSeragam;
 
+        // === BIRTHDAY (format "12 Des", "14 Jul", dst) ===
         const dataB = await fetchCSV(BIRTHDAY_CSV);
         let bdays = [];
+        
         dataB.forEach((row, index) => {
             if (index === 0) return;
-            let bDate = row[1] ? row[1].trim() : "";
-            if (bDate.includes(dayMonthStr)) {
-                bdays.push(row[0]);
+            const nama = row[0] ? row[0].trim() : "";
+            const tglLahir = row[1] ? row[1].trim() : "";
+            
+            if (!nama || !tglLahir) return;
+            
+            // Parse "12 Des" → day=12, month=Des
+            const parts = tglLahir.split(/\s+/);
+            if (parts.length < 2) return;
+            
+            const day = parts[0].padStart(2, '0');
+            const monthName = parts[1].substring(0, 3); // "Des"
+            
+            if (day === todayDay && monthName === todayMonthName) {
+                bdays.push(nama);
             }
         });
         
