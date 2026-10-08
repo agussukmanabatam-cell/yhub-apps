@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#db1d75">
+    <title>Breakdown PDM</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff5f8 0%, #fef7f3 50%, #f5f7ff 100%);
+            margin: 0; padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .num { font-family: 'Plus Jakarta Sans', sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        #progressCircle { transition: stroke-dashoffset .9s cubic-bezier(.32,.72,0,1), stroke .4s ease; }
+        .bar-fill { transition: height .6s cubic-bezier(.32,.72,0,1); }
+
+        /* Kartu dengan tint lembut + border berwarna */
+        .card-soft {
+            border-radius: 28px;
+            box-shadow: 0 2px 12px -4px rgba(219, 29, 117, 0.06), 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .skeleton-text {
+            color: transparent !important;
+            background: linear-gradient(90deg, #fce7f3 25%, #fdf2f8 50%, #fce7f3 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+            display: inline-block;
+            min-width: 60px;
+            min-height: 10px;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Floating blobs dekorasi header */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-start min-h-screen">
+
+<div class="w-full max-w-[480px] min-h-screen flex flex-col relative shadow-2xl overflow-hidden" style="background: linear-gradient(160deg, #fff5f8 0%, #fef7f3 40%, #f7f5ff 100%);">
+
+    <!-- ==================== HEADER ==================== -->
+    <div class="relative bg-gradient-to-br from-[#f472b6] via-[#db1d75] to-[#a3125a] text-white px-5 pt-7 pb-8 rounded-b-[32px] shadow-[0_10px_30px_-10px_rgba(219,29,117,0.4)] z-10 shrink-0 overflow-hidden">
+        <!-- Dekorasi lembut -->
+        <div class="blob w-32 h-32 -top-10 -right-8" style="background: #fbbf24;"></div>
+        <div class="blob w-28 h-28 top-8 -left-6" style="background: #a78bfa;"></div>
+
+        <div class="relative flex items-center gap-2.5 mb-1">
+            <div class="w-9 h-9 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border border-white/20">
+                <i class="fa-solid fa-chart-pie text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <h1 class="font-heading class="text-[19px] font-extrabold tracking-tight leading-none" style="font-family:'Plus Jakarta Sans',sans-serif;">Breakdown PDM</h1>
+                <p id="dateInfo" class="text-[11px] opacity-85 mt-1 font-medium">Memuat tanggal...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CONTENT ==================== -->
+    <div class="flex-1 px-4 pt-4 space-y-4 overflow-y-auto pb-32 -mt-4 relative z-10">
+
+        <!-- ============ HERO: Progress ============ -->
+        <div class="card-soft px-5 pt-5 pb-6 border border-pink-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #fff5f9 100%);">
+            <div class="flex items-center gap-2 mb-5">
+                <div class="w-6 h-6 rounded-lg bg-pink-100 flex items-center justify-center">
+                    <i class="fa-solid fa-bullseye text-[10px] text-pink-500"></i>
+                </div>
+                <h3 class="font-heading class="text-[11px] font-extrabold text-pink-500/80 uppercase tracking-[0.12em]">Progress Bulan Ini</h3>
+            </div>
+
+            <div class="flex items-center gap-5">
+                <div class="relative w-[112px] h-[112px] flex-shrink-0">
+                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 112 112">
+                        <circle cx="56" cy="56" r="46" stroke="#fce7f3" stroke-width="9" fill="transparent" />
+                        <circle id="progressCircle" cx="56" cy="56" r="46" stroke="#f472b6" stroke-width="9" fill="transparent"
+                                stroke-dasharray="289" stroke-dashoffset="289" stroke-linecap="round" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span id="txtPersen" class="num text-[22px] font-black text-gray-700 leading-none">0%</span>
+                        <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-1">tercapai</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 min-w-0 space-y-3">
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-[11px] text-pink-400/80 font-bold uppercase tracking-wide">Target Bulan</span>
+                        <span id="txtTotalTarget" class="num text-[13px] font-extrabold text-gray-700">0</span>
+                    </div>
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-[11px] text-pink-400/80 font-bold uppercase tracking-wide">Dicapai</span>
+                        <span id="txtTotalDicapai" class="num text-[13px] font-extrabold text-pink-600">0</span>
+                    </div>
+                    <div class="flex justify-between items-baseline border-t border-dashed border-pink-100 pt-2">
+                        <span class="text-[11px] text-pink-400/80 font-bold uppercase tracking-wide">Rata-rata</span>
+                        <span id="txtRataRata" class="num text-[13px] font-extrabold text-gray-700">0</span>
+                    </div>
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-[11px] text-pink-400/80 font-bold uppercase tracking-wide">Target s/d hari ini</span>
+                        <span id="txtTargetHariIni" class="num text-[13px] font-extrabold text-gray-500">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ INPUT DATA ============ -->
+        <div class="card-soft px-5 pt-5 pb-6 border border-sky-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-sky-100 flex items-center justify-center">
+                        <i class="fa-solid fa-pen-to-square text-[10px] text-sky-500"></i>
+                    </div>
+                    <h3 class="font-heading class="text-[11px] font-extrabold text-sky-600/80 uppercase tracking-[0.12em]">Input Data</h3>
+                </div>
+                <button id="clearInputBtn" onclick="clearInputs()" class="text-[10px] font-bold text-gray-400 hover:text-rose-500 transition px-2 py-1 rounded-md" style="display:none;">
+                    <i class="fa-solid fa-xmark mr-0.5"></i>Hapus
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[10px] text-sky-500/80 font-bold uppercase tracking-wide">Target / hari</label>
+                    <div class="flex items-center gap-2 mt-1.5 px-3 py-2.5 rounded-2xl border-2 border-sky-100 focus-within:border-sky-300 transition" style="background: linear-gradient(135deg, #f0f9ff, #ffffff);">
+                        <i class="fa-solid fa-flag text-sky-400 text-[11px] flex-shrink-0"></i>
+                        <input type="number" id="inputTarget" placeholder="0" inputmode="numeric"
+                            class="num w-full bg-transparent text-[17px] font-black text-gray-700 outline-none placeholder-gray-300">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] text-pink-500/80 font-bold uppercase tracking-wide">Akumulasi</label>
+                    <div class="flex items-center gap-2 mt-1.5 px-3 py-2.5 rounded-2xl border-2 border-pink-100 focus-within:border-pink-300 transition" style="background: linear-gradient(135deg, #fff5f9, #ffffff);">
+                        <i class="fa-solid fa-bottle-water text-pink-400 text-[11px] flex-shrink-0"></i>
+                        <input type="number" id="inputAkumulasi" placeholder="0" inputmode="numeric"
+                            class="num w-full bg-transparent text-[17px] font-black text-gray-700 outline-none placeholder-gray-300">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ LOG HARIAN ============ -->
+        <div class="card-soft px-5 pt-5 pb-6 border border-orange-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #fffbf5 50%, #fff5f9 100%);">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-orange-100 flex items-center justify-center">
+                        <i class="fa-solid fa-fire text-[10px] text-orange-500"></i>
+                    </div>
+                    <h3 class="font-heading class="text-[11px] font-extrabold text-orange-500/80 uppercase tracking-[0.12em]">Log Harian</h3>
+                </div>
+                <div id="streakBadge" class="num text-[10px] font-extrabold bg-gray-100 text-gray-400 px-2.5 py-1 rounded-full">
+                    🔥 0 hari
+                </div>
+            </div>
+
+            <!-- Grafik 7 hari -->
+            <div class="relative mb-5">
+                <div class="h-24 flex items-end gap-1.5 relative">
+                    <div id="targetLine" class="absolute left-0 right-0 border-t-2 border-dashed border-pink-300 pointer-events-none" style="bottom: 0%;">
+                        <div class="absolute -top-2 right-0 text-[8px] font-extrabold text-pink-400 bg-white px-1 rounded">target</div>
+                    </div>
+                    <div id="chartBars" class="flex items-end gap-1.5 w-full h-full relative z-10"></div>
+                </div>
+                <div id="chartLabels" class="flex justify-between mt-1.5"></div>
+            </div>
+
+            <!-- Input hari ini -->
+            <div class="flex items-center gap-2 mb-3">
+                <div class="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-2xl border-2 border-amber-100 focus-within:border-amber-300 transition" style="background: linear-gradient(135deg, #fffbeb, #ffffff);">
+                    <i class="fa-solid fa-plus text-amber-500 text-[11px] flex-shrink-0"></i>
+                    <input type="number" id="inputToday" placeholder="Catat hari ini..." inputmode="numeric"
+                        class="num w-full bg-transparent text-[15px] font-extrabold text-gray-700 outline-none placeholder-gray-300">
+                    <span class="text-[9px] font-extrabold text-amber-600 uppercase tracking-wide flex-shrink-0">btl</span>
+                </div>
+                <button id="saveTodayBtn" onclick="saveToday()" class="w-[46px] h-[46px] bg-gradient-to-br from-amber-300 to-orange-400 text-white rounded-2xl flex items-center justify-center shadow-[0_4px_12px_-3px_rgba(251,146,60,0.4)] hover:brightness-105 active:scale-95 transition flex-shrink-0">
+                    <i class="fa-solid fa-check text-base"></i>
+                </button>
+            </div>
+
+            <!-- Info & sync -->
+            <div class="flex items-center justify-between pt-3 border-t border-dashed border-orange-100">
+                <div class="min-w-0">
+                    <p class="text-[9px] font-extrabold text-orange-400/80 uppercase tracking-wide">Total Log Bulan Ini</p>
+                    <p id="txtLogTotal" class="num text-[14px] font-extrabold text-gray-700 mt-0.5">0 btl</p>
+                </div>
+                <button id="syncBtn" onclick="syncFromLog()" class="text-[10px] font-extrabold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl transition active:scale-95">
+                    <i class="fa-solid fa-rotate mr-1"></i>Sinkron ke Akumulasi
+                </button>
+            </div>
+        </div>
+
+        <!-- ============ KALENDER MINI ============ -->
+        <div class="card-soft px-5 pt-5 pb-5 border border-violet-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-violet-100 flex items-center justify-center">
+                        <i class="fa-solid fa-calendar-days text-[10px] text-violet-500"></i>
+                    </div>
+                    <h3 class="font-heading class="text-[11px] font-extrabold text-violet-500/80 uppercase tracking-[0.12em]">Hari Kerja</h3>
+                </div>
+                <span id="txtSisaHari" class="num text-[10px] font-extrabold bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full border border-emerald-100">0 hari</span>
+            </div>
+
+            <p id="monthLabel" class="text-[12px] font-extrabold text-gray-600 mb-2.5"></p>
+
+            <div class="grid grid-cols-7 gap-1 mb-1">
+                <div class="text-[9px] font-extrabold text-violet-300 text-center py-1">M</div>
+                <div class="text-[9px] font-extrabold text-violet-300 text-center py-1">S</div>
+                <div class="text-[9px] font-extrabold text-violet-300 text-center py-1">S</div>
+                <div class="text-[9px] font-extrabold text-violet-300 text-center py-1">R</div>
+                <div class="text-[9px] font-extrabold text-violet-300 text-center py-1">K</div>
+                <div class="text-[9px] font-extrabold text-violet-300 text-center py-1">J</div>
+                <div class="text-[9px] font-extrabold text-rose-300 text-center py-1">S</div>
+            </div>
+            <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+
+            <div class="flex items-center gap-2.5 flex-wrap mt-3 pt-3 border-t border-dashed border-violet-100 text-[9px] font-bold text-gray-400">
+                <div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-pink-400"></div><span>Hari ini</span></div>
+                <div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-emerald-300"></div><span>Capai target</span></div>
+                <div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-amber-100"></div><span>Sudah lewat</span></div>
+                <div class="flex items-center gap-1"><div class="w-3 h-3 rounded border border-gray-200"></div><span>Akan datang</span></div>
+                <div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-rose-100"></div><span>Minggu</span></div>
+            </div>
+        </div>
+
+        <!-- ============ STATUS & PDM ============ -->
+        <div id="statusCard" class="card-soft px-5 pt-5 pb-6 border border-teal-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-6 h-6 rounded-lg bg-teal-100 flex items-center justify-center">
+                    <i id="statusIcon" class="fa-solid fa-fire text-[10px] text-teal-500"></i>
+                </div>
+                <h3 class="font-heading class="text-[11px] font-extrabold text-teal-500/80 uppercase tracking-[0.12em]">PDM Minimal</h3>
+            </div>
+
+            <div id="statusBody" class="rounded-2xl px-4 py-4 text-center transition-colors duration-300" style="background: linear-gradient(135deg, #f0fdfa, #ffffff); border: 1px solid #ccfbf1;">
+                <div class="flex items-center justify-center gap-1 mb-1">
+                    <span id="txtPdmMinimal" class="num text-[28px] font-black text-teal-500 leading-none">0</span>
+                    <span class="text-[11px] font-extrabold text-teal-600/70">btl/hari</span>
+                </div>
+                <p class="text-[10px] text-gray-400 italic mb-3">*Hari ini tidak dihitung sebagai sisa pembagi</p>
+
+                <span id="badgePdmStatus" class="inline-block text-[11px] font-extrabold px-3 py-1.5 rounded-full" style="background: #ccfbf1; color: #0f766e;">
+                    ✅ Aman, bisa santai!
+                </span>
+
+                <p id="txtMessage" class="text-[11px] font-bold text-teal-600 leading-relaxed mt-3">
+                    🎉 Luar biasa! Kamu sudah melebihi target. Tetap semangat! ✨
+                </p>
+            </div>
+
+            <div id="proyeksiBox" class="mt-3 rounded-2xl px-4 py-3 flex items-center gap-3" style="background: linear-gradient(135deg, #eef2ff, #ffffff); border: 1px dashed #c7d2fe;">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe);">
+                    <i class="fa-solid fa-arrow-trend-up text-indigo-500 text-[11px]"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-[9px] font-extrabold text-indigo-400/80 uppercase tracking-wide">Proyeksi Akhir Bulan</p>
+                    <p id="txtProyeksi" class="num text-[13px] font-extrabold text-gray-700 mt-0.5">—</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ SIMULASI WHAT-IF ============ -->
+        <div class="card-soft px-5 pt-5 pb-6 border border-fuchsia-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #fdf4ff 100%);">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-fuchsia-100 flex items-center justify-center">
+                        <i class="fa-solid fa-flask text-[10px] text-fuchsia-500"></i>
+                    </div>
+                    <h3 class="font-heading class="text-[11px] font-extrabold text-fuchsia-500/80 uppercase tracking-[0.12em]">Simulasi Target</h3>
+                </div>
+                <button id="resetSimBtn" onclick="resetSimulation()" class="text-[10px] font-bold text-gray-400 hover:text-fuchsia-500 transition px-2 py-1 rounded-md" style="display:none;">
+                    <i class="fa-solid fa-rotate-left mr-0.5"></i>Reset
+                </button>
+            </div>
+
+            <p class="text-[11px] text-gray-500 leading-relaxed mb-4">
+                Coba ubah target untuk melihat <strong class="text-gray-700">PDM yang dibutuhkan</strong> — tanpa mengubah target asli.
+            </p>
+
+            <div class="flex items-center gap-2 mb-4">
+                <div class="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-2xl border-2 border-fuchsia-100 focus-within:border-fuchsia-300 transition" style="background: linear-gradient(135deg, #fdf4ff, #ffffff);">
+                    <i class="fa-solid fa-flag text-fuchsia-400 text-[11px] flex-shrink-0"></i>
+                    <input type="number" id="inputSim" placeholder="Target simulasi..." inputmode="numeric"
+                        class="num w-full bg-transparent text-[15px] font-extrabold text-gray-700 outline-none placeholder-gray-300">
+                    <span class="text-[9px] font-extrabold text-fuchsia-500 uppercase tracking-wide flex-shrink-0">btl/hari</span>
+                </div>
+                <button onclick="useSimAsTarget()" id="useSimBtn" class="text-[10px] font-extrabold text-white bg-gradient-to-br from-fuchsia-400 to-purple-500 px-3 py-2.5 rounded-2xl hover:brightness-105 active:scale-95 transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                    Pakai
+                </button>
+            </div>
+
+            <div id="simResult" class="rounded-2xl px-4 py-4 transition-colors duration-300" style="background: linear-gradient(135deg, #faf5ff, #ffffff); border: 1px solid #f3e8ff;">
+                <p class="text-[11px] text-gray-400 font-semibold text-center">Masukkan target simulasi untuk melihat hasil</p>
+            </div>
+        </div>
+
+        <div class="h-2"></div>
+    </div>
+
+    <!-- ==================== BOTTOM BAR ==================== -->
+    <div class="absolute bottom-0 left-0 right-0 bg-white/85 backdrop-blur-lg px-4 pt-3 pb-5 border-t border-pink-100/60 flex items-center gap-2 z-20">
+        <button onclick="bagikanKeWhatsApp()" class="flex-1 text-white font-extrabold py-3.5 rounded-2xl flex justify-center items-center gap-2 shadow-[0_8px_24px_-8px_rgba(16,185,129,0.5)] hover:brightness-105 active:scale-[0.98] transition" style="background: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);">
+            <i class="fa-brands fa-whatsapp text-lg"></i>
+            <span class="text-[14px]">Kirim WhatsApp</span>
+        </button>
+        <button onclick="copyToClipboard()" title="Salin teks" class="w-[52px] h-[52px] bg-white border border-sky-200 rounded-2xl flex items-center justify-center text-sky-500 hover:bg-sky-50 active:scale-95 transition">
+            <i class="fa-solid fa-copy text-base"></i>
+        </button>
+        <button id="clearBtn" onclick="resetAll()" title="Reset" class="w-[52px] h-[52px] bg-white border border-rose-200 rounded-2xl flex items-center justify-center text-rose-400 hover:bg-rose-50 active:scale-95 transition">
+            <i class="fa-solid fa-trash-can text-base"></i>
+        </button>
+    </div>
+
+    <!-- ==================== TOAST ==================== -->
+    <div id="toast" class="absolute bottom-28 left-1/2 -translate-x-1/2 text-white text-xs px-5 py-3 rounded-full shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none z-50 whitespace-nowrap" style="background: linear-gradient(135deg, #db1d75, #a3125a);">
+        ✅
+    </div>
+
+</div>
+
+<script>
+/* ============================================================
+ * CONFIG & HELPERS
+ * ============================================================ */
+const LS_KEY = 'pdm_data_v1';
+const LS_LOG = 'pdm_daily_log_v1';
+const $ = id => document.getElementById(id);
+const fmtNum = (() => { const f = new Intl.NumberFormat('id-ID'); return n => f.format(n); })();
+const haptic = (ms = 10) => { try { navigator.vibrate?.(ms); } catch(_){} };
+const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"];
+const DAYS_SHORT = ["Sen","Sel","Rab","Kam","Jum","Sab","Min"];
+
+const inputTarget = $('inputTarget');
+const inputAkumulasi = $('inputAkumulasi');
+const inputToday = $('inputToday');
+const inputSim = $('inputSim');
+
+function dateKey(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+}
+
+/* ============================================================
+ * STORAGE
+ * ============================================================ */
+function saveState() {
+    try {
+        localStorage.setItem(LS_KEY, JSON.stringify({
+            t: inputTarget.value,
+            a: inputAkumulasi.value,
+        }));
+    } catch(_) {}
+}
+function loadState() {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return;
+        const obj = JSON.parse(raw);
+        if (obj.t) inputTarget.value = obj.t;
+        if (obj.a) inputAkumulasi.value = obj.a;
+        if (obj.t || obj.a) $('clearInputBtn').style.display = 'inline-block';
+    } catch(_) {}
+}
+function clearInputs() {
+    haptic(12);
+    inputTarget.value = '';
+    inputAkumulasi.value = '';
+    saveState();
+    $('clearInputBtn').style.display = 'none';
+    calculateDashboard();
+}
+
+let dailyLog = {};
+function loadLog() {
+    try {
+        const raw = localStorage.getItem(LS_LOG);
+        if (!raw) { dailyLog = {}; return; }
+        dailyLog = JSON.parse(raw) || {};
+    } catch(_) { dailyLog = {}; }
+}
+function saveLog() {
+    try { localStorage.setItem(LS_LOG, JSON.stringify(dailyLog)); } catch(_) {}
+}
+
+/* ============================================================
+ * DAILY LOG ACTIONS
+ * ============================================================ */
+function saveToday() {
+    const val = parseInt(inputToday.value);
+    if (isNaN(val) || val < 0) {
+        showToast('Isi angka dulu ya ✋');
+        return;
+    }
+    const key = dateKey(new Date());
+    dailyLog[key] = val;
+    saveLog();
+    haptic(15);
+    inputToday.value = '';
+    inputToday.blur();
+    showToast('Tersimpan: ' + fmtNum(val) + ' btl ✨');
+    calculateDashboard();
+}
+
+function syncFromLog() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    const prefix = `${y}-${String(m + 1).padStart(2, '0')}-`;
+    let total = 0;
+    Object.keys(dailyLog).forEach(k => {
+        if (k.startsWith(prefix)) total += (dailyLog[k] || 0);
+    });
+    if (total <= 0) {
+        showToast('Belum ada log bulan ini 📭');
+        return;
+    }
+    haptic(15);
+    inputAkumulasi.value = total;
+    saveState();
+    $('clearInputBtn').style.display = 'inline-block';
+    calculateDashboard();
+    showToast('Akumulasi = ' + fmtNum(total) + ' btl dari log ✅');
+}
+
+function getStreak(targetPerHari) {
+    if (!targetPerHari || targetPerHari <= 0) return 0;
+    const today = new Date();
+    const todayKey = dateKey(today);
+    const todayVal = dailyLog[todayKey];
+    const todayHasRecord = todayKey in dailyLog;
+
+    let streak = 0;
+    if (todayHasRecord) {
+        if (todayVal >= targetPerHari) streak = 1;
+        else return 0;
+    }
+    for (let i = 1; i < 90; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        if (d.getDay() === 0) continue;
+        const key = dateKey(d);
+        const val = dailyLog[key];
+        if (val !== undefined && val >= targetPerHari) streak++;
+        else break;
+    }
+    return streak;
+}
+
+/* ============================================================
+ * KALENDER MINI
+ * ============================================================ */
+function renderCalendar(y, m, today, daysInMonth, targetPerHari) {
+    $('monthLabel').innerText = `${MONTHS[m]} ${y}`;
+    const firstDay = new Date(y, m, 1).getDay();
+    const grid = $('calendarGrid');
+    let html = '';
+
+    const firstCol = (firstDay + 6) % 7;
+    for (let i = 0; i < firstCol; i++) html += `<div></div>`;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dow = new Date(y, m, d).getDay();
+        const isSunday = dow === 0;
+        const isToday = d === today;
+        const isPast = d < today;
+        const key = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const logVal = dailyLog[key];
+        const hitTarget = !isSunday && targetPerHari > 0 && logVal !== undefined && logVal >= targetPerHari;
+
+        let style = 'height: 28px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border-radius: 8px; font-family: "Plus Jakarta Sans", sans-serif; font-variant-numeric: tabular-nums; ';
+        let content = d;
+
+        if (isToday) {
+            style += 'background: linear-gradient(135deg, #f9a8d4, #ec4899); color: white; box-shadow: 0 4px 10px -2px rgba(236,72,153,0.4);';
+        } else if (hitTarget) {
+            style += 'background: linear-gradient(135deg, #a7f3d0, #6ee7b7); color: white; box-shadow: 0 4px 10px -2px rgba(110,231,183,0.4);';
+        } else if (isSunday) {
+            style += 'background: linear-gradient(135deg, #ffe4e6, #fecdd3); color: #fda4af;';
+        } else if (logVal !== undefined) {
+            style += 'background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e;';
+        } else if (isPast) {
+            style += 'background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #94a3b8;';
+        } else {
+            style += 'background: white; border: 1px solid #e2e8f0; color: #64748b;';
+        }
+
+        html += `<div style="${style}">${content}</div>`;
+    }
+    grid.innerHTML = html;
+}
+
+/* ============================================================
+ * ANIMATED NUMBERS
+ * ============================================================ */
+const animFrames = new WeakMap();
+function animateNumber(el, to, dur = 500, suffix = '') {
+    const from = parseInt(el.dataset.val || '0', 10);
+    if (from === to) { el.innerText = fmtNum(to) + suffix; el.dataset.val = to; return; }
+
+    const prev = animFrames.get(el);
+    if (prev) cancelAnimationFrame(prev);
+
+    const start = performance.now();
+    const step = now => {
+        const p = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const cur = Math.round(from + (to - from) * eased);
+        el.innerText = fmtNum(cur) + suffix;
+        if (p < 1) animFrames.set(el, requestAnimationFrame(step));
+        else el.dataset.val = to;
+    };
+    animFrames.set(el, requestAnimationFrame(step));
+}
+
+/* ============================================================
+ * CHART — 7 hari
+ * ============================================================ */
+function renderChart(targetPerHari) {
+    const bars = $('chartBars');
+    const labels = $('chartLabels');
+    const targetLine = $('targetLine');
+
+    const days = [];
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        days.push(d);
+    }
+
+    const values = days.map(d => dailyLog[dateKey(d)] || 0);
+    const maxVal = Math.max(targetPerHari, ...values, 1);
+
+    bars.innerHTML = '';
+    labels.innerHTML = '';
+
+    days.forEach((d, i) => {
+        const v = values[i];
+        const isToday = i === 6;
+        const isSunday = d.getDay() === 0;
+        const hitTarget = !isSunday && targetPerHari > 0 && v >= targetPerHari;
+        const pct = Math.max(v > 0 ? 6 : 0, (v / maxVal) * 100);
+
+        const col = document.createElement('div');
+        col.className = 'flex-1 h-full flex items-end relative';
+
+        let barStyle = 'width: 100%; border-radius: 8px 8px 4px 4px; transition: height .6s cubic-bezier(.32,.72,0,1); ';
+
+        if (isToday) {
+            barStyle += 'background: linear-gradient(180deg, #f9a8d4 0%, #ec4899 100%); box-shadow: 0 4px 10px -3px rgba(236,72,153,0.35);';
+        } else if (hitTarget) {
+            barStyle += 'background: linear-gradient(180deg, #a7f3d0 0%, #34d399 100%); box-shadow: 0 4px 10px -3px rgba(52,211,153,0.3);';
+        } else if (v > 0) {
+            barStyle += 'background: linear-gradient(180deg, #fde68a 0%, #fbbf24 100%); box-shadow: 0 4px 10px -3px rgba(251,191,36,0.3);';
+        } else if (isSunday) {
+            barStyle += 'background: linear-gradient(180deg, #fecdd3 0%, #fda4af 100%);';
+        } else {
+            barStyle += 'background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);';
+        }
+
+        col.innerHTML = `<div style="${barStyle} height: ${pct}%"></div>`;
+        bars.appendChild(col);
+
+        const lbl = document.createElement('div');
+        lbl.className = 'flex-1 text-center text-[9px] font-extrabold ' + (isToday ? 'text-pink-500' : 'text-gray-400');
+        const dow = (d.getDay() + 6) % 7;
+        lbl.innerText = DAYS_SHORT[dow];
+        labels.appendChild(lbl);
+    });
+
+    const targetPct = targetPerHari > 0 ? Math.min(100, (targetPerHari / maxVal) * 100) : 0;
+    targetLine.style.bottom = targetPct + '%';
+    targetLine.style.display = targetPerHari > 0 ? 'block' : 'none';
+}
+
+/* ============================================================
+ * MAIN CALCULATE
+ * ============================================================ */
+function calculateDashboard() {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    $('dateInfo').innerText = `${currentDay} ${MONTHS_SHORT[currentMonth]} ${currentYear} · Hari ke-${currentDay} dari ${daysInMonth}`;
+
+    const targetPerHari = parseFloat(inputTarget.value) || 0;
+    const akumulasi = parseFloat(inputAkumulasi.value) || 0;
+
+    const totalTargetBulanIni = targetPerHari * daysInMonth;
+    const targetSampaiHariIni = targetPerHari * currentDay;
+    const rataRata = currentDay > 0 ? Math.round(akumulasi / currentDay) : 0;
+
+    let sisaHariKerja = 0;
+    for (let i = currentDay + 1; i <= daysInMonth; i++) {
+        const d = new Date(currentYear, currentMonth, i);
+        if (d.getDay() !== 0) sisaHariKerja++;
+    }
+
+    const sisaTarget = totalTargetBulanIni - akumulasi;
+    let pdmMinimal = 0;
+    if (sisaHariKerja > 0) pdmMinimal = Math.max(0, Math.ceil(sisaTarget / sisaHariKerja));
+    else if (sisaTarget > 0) pdmMinimal = Math.max(0, sisaTarget);
+
+    const selisih = akumulasi - targetSampaiHariIni;
+
+    let persentase = totalTargetBulanIni > 0 ? (akumulasi / totalTargetBulanIni) * 100 : 0;
+    const persenRaw = persentase;
+    if (persentase > 100) persentase = 100;
+
+    animateNumber($('txtTotalTarget'), Math.round(totalTargetBulanIni), 500, ' btl');
+    animateNumber($('txtTotalDicapai'), Math.round(akumulasi), 500, ' btl');
+    animateNumber($('txtRataRata'), rataRata, 500, ' /hari');
+    animateNumber($('txtTargetHariIni'), Math.round(targetSampaiHariIni), 500, ' btl');
+    animateNumber($('txtPdmMinimal'), pdmMinimal, 500);
+    $('txtPersen').innerText = Math.round(persenRaw) + '%';
+
+    // Circular progress — pastel adaptive
+    const keliling = 289;
+    const offset = keliling - (persentase / 100) * keliling;
+    const circ = $('progressCircle');
+    circ.style.strokeDashoffset = offset;
+    if (persenRaw >= 100)       circ.setAttribute('stroke', '#34d399');
+    else if (persenRaw >= 75)   circ.setAttribute('stroke', '#f472b6');
+    else if (persenRaw >= 40)   circ.setAttribute('stroke', '#fbbf24');
+    else                        circ.setAttribute('stroke', '#fb7185');
+
+    renderCalendar(currentYear, currentMonth, currentDay, daysInMonth, targetPerHari);
+    $('txtSisaHari').innerText = `${sisaHariKerja} hari`;
+
+    renderChart(targetPerHari);
+
+    // Streak badge — pastel
+    const streak = getStreak(targetPerHari);
+    const streakBadge = $('streakBadge');
+    if (streak === 0) {
+        streakBadge.className = "num text-[10px] font-extrabold bg-gray-100 text-gray-400 px-2.5 py-1 rounded-full";
+        streakBadge.innerText = "🔥 0 hari";
+    } else if (streak < 3) {
+        streakBadge.className = "num text-[10px] font-extrabold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full";
+        streakBadge.innerText = `🔥 ${streak} hari`;
+    } else if (streak < 7) {
+        streakBadge.className = "num text-[10px] font-extrabold bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full";
+        streakBadge.innerText = `🔥 ${streak} hari`;
+    } else {
+        streakBadge.className = "num text-[10px] font-extrabold text-white px-2.5 py-1 rounded-full shadow-sm";
+        streakBadge.style.background = 'linear-gradient(135deg, #f9a8d4, #fb923c)';
+        streakBadge.innerText = `🔥 ${streak} hari!`;
+    }
+
+    const prefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-`;
+    let logTotal = 0;
+    Object.keys(dailyLog).forEach(k => {
+        if (k.startsWith(prefix)) logTotal += (dailyLog[k] || 0);
+    });
+    $('txtLogTotal').innerText = fmtNum(logTotal) + ' btl';
+
+    // Status card — pastel
+    const statusBody = $('statusBody');
+    const badge = $('badgePdmStatus');
+    const msg = $('txtMessage');
+    const statusIcon = $('statusIcon');
+
+    if (selisih > 0) {
+        statusBody.style.background = 'linear-gradient(135deg, #f0fdfa, #ffffff)';
+        statusBody.style.border = '1px solid #ccfbf1';
+        $('txtPdmMinimal').className = "num text-[28px] font-black text-teal-500 leading-none";
+        badge.style.background = '#ccfbf1'; badge.style.color = '#0f766e';
+        badge.innerHTML = "✅ Aman, bisa santai!";
+        msg.className = "text-[11px] font-bold text-teal-600 leading-relaxed mt-3";
+        msg.innerHTML = `🎉 Luar biasa! Kamu sudah melebihi target <strong>${fmtNum(selisih)} botol</strong>. Tetap semangat! ✨`;
+        statusIcon.className = "fa-solid fa-fire text-[10px] text-teal-500";
+    } else if (selisih < 0) {
+        statusBody.style.background = 'linear-gradient(135deg, #fff1f2, #ffffff)';
+        statusBody.style.border = '1px solid #fecdd3';
+        $('txtPdmMinimal').className = "num text-[28px] font-black text-rose-400 leading-none";
+        badge.style.background = '#ffe4e6'; badge.style.color = '#be123c';
+        badge.innerHTML = "⚠️ Harus lebih semangat ngejar!";
+        msg.className = "text-[11px] font-bold text-rose-500 leading-relaxed mt-3";
+        msg.innerHTML = `💪 Ayo kejar! Kamu tertinggal <strong>${fmtNum(Math.abs(selisih))} botol</strong> dari target hari ini. Pasti bisa! 🔥`;
+        statusIcon.className = "fa-solid fa-fire text-[10px] text-rose-400";
+    } else {
+        statusBody.style.background = 'linear-gradient(135deg, #eff6ff, #ffffff)';
+        statusBody.style.border = '1px solid #bfdbfe';
+        $('txtPdmMinimal').className = "num text-[28px] font-black text-sky-500 leading-none";
+        badge.style.background = '#dbeafe'; badge.style.color = '#1e40af';
+        badge.innerHTML = "👍 On Track! Tepat sasaran.";
+        msg.className = "text-[11px] font-bold text-sky-600 leading-relaxed mt-3";
+        msg.innerHTML = `🎯 Bagus! Pencapaianmu pas dengan target hari ini. Terus pertahankan ritmenya! ✨`;
+        statusIcon.className = "fa-solid fa-fire text-[10px] text-sky-500";
+    }
+
+    const proyeksi = Math.round(rataRata * daysInMonth);
+    const txtProyeksi = $('txtProyeksi');
+
+    if (akumulasi > 0 && targetPerHari > 0) {
+        const delta = proyeksi - totalTargetBulanIni;
+        txtProyeksi.innerHTML = `<strong>${fmtNum(proyeksi)} botol</strong> · ${delta >= 0 ? '+' : ''}${fmtNum(delta)} dari target`;
+        txtProyeksi.className = `num text-[13px] font-extrabold mt-0.5 ${delta >= 0 ? 'text-emerald-600' : 'text-amber-600'}`;
+    } else {
+        txtProyeksi.innerText = '—';
+        txtProyeksi.className = 'num text-[13px] font-extrabold text-gray-400 mt-0.5';
+    }
+
+    updateSimulation();
+}
+
+/* ============================================================
+ * SIMULASI WHAT-IF
+ * ============================================================ */
+function updateSimulation() {
+    const simTarget = parseFloat(inputSim.value) || 0;
+    const targetPerHari = parseFloat(inputTarget.value) || 0;
+    const resultBox = $('simResult');
+    const useBtn = $('useSimBtn');
+
+    if (simTarget <= 0) {
+        resultBox.style.background = 'linear-gradient(135deg, #faf5ff, #ffffff)';
+        resultBox.style.border = '1px solid #f3e8ff';
+        resultBox.innerHTML = `<p class="text-[11px] text-gray-400 font-semibold text-center">Masukkan target simulasi untuk melihat hasil</p>`;
+        $('resetSimBtn').style.display = 'none';
+        useBtn.disabled = true;
+        return;
+    }
+
+    $('resetSimBtn').style.display = 'inline-block';
+    useBtn.disabled = false;
+
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const akumulasi = parseFloat(inputAkumulasi.value) || 0;
+
+    const totalTargetSim = simTarget * daysInMonth;
+    const sisaTargetSim = totalTargetSim - akumulasi;
+
+    let sisaHariKerja = 0;
+    for (let i = currentDay + 1; i <= daysInMonth; i++) {
+        const d = new Date(currentYear, currentMonth, i);
+        if (d.getDay() !== 0) sisaHariKerja++;
+    }
+
+    const pdmSim = sisaHariKerja > 0 ? Math.max(0, Math.ceil(sisaTargetSim / sisaHariKerja)) : Math.max(0, sisaTargetSim);
+    const rataRataNow = currentDay > 0 ? Math.round(akumulasi / currentDay) : 0;
+
+    const totalTargetNow = targetPerHari * daysInMonth;
+    const sisaTargetNow = totalTargetNow - akumulasi;
+    const pdmNow = sisaHariKerja > 0 ? Math.max(0, Math.ceil(sisaTargetNow / sisaHariKerja)) : Math.max(0, sisaTargetNow);
+    const deltaPdm = pdmSim - pdmNow;
+
+    let insight, bgGrad, borderCol, txtCol;
+    if (simTarget < targetPerHari) {
+        bgGrad = 'linear-gradient(135deg, #f0fdf4, #ffffff)'; borderCol = '#bbf7d0'; txtCol = 'text-emerald-500';
+        if (deltaPdm <= 0) insight = `Lebih santai ${Math.abs(deltaPdm)} btl/hari dari target sekarang. Aman!`;
+        else insight = `PDM tetap ${pdmSim} btl/hari. Tidak banyak berubah.`;
+    } else if (simTarget === targetPerHari) {
+        bgGrad = 'linear-gradient(135deg, #eff6ff, #ffffff)'; borderCol = '#bfdbfe'; txtCol = 'text-sky-500';
+        insight = `Sama dengan target sekarang. PDM ${pdmSim} btl/hari.`;
+    } else {
+        if (rataRataNow > 0 && pdmSim <= rataRataNow * 1.1) {
+            bgGrad = 'linear-gradient(135deg, #f0fdf4, #ffffff)'; borderCol = '#bbf7d0'; txtCol = 'text-emerald-500';
+            insight = `Masih realistis! PDM (${pdmSim}) masih di sekitar rata-rata kamu (${rataRataNow}).`;
+        } else if (rataRataNow > 0 && pdmSim <= rataRataNow * 1.3) {
+            bgGrad = 'linear-gradient(135deg, #fffbeb, #ffffff)'; borderCol = '#fde68a'; txtCol = 'text-amber-500';
+            insight = `Menantang! PDM (${pdmSim}) ~${Math.round((pdmSim / rataRataNow - 1) * 100)}% di atas rata-rata kamu. Perlu usaha ekstra.`;
+        } else {
+            bgGrad = 'linear-gradient(135deg, #fff1f2, #ffffff)'; borderCol = '#fecdd3'; txtCol = 'text-rose-400';
+            insight = `Cukup agresif! PDM (${pdmSim}) jauh di atas rata-rata kamu. Pertimbangkan target bertahap.`;
+        }
+    }
+
+    const deltaLabel = deltaPdm > 0 ? `+${deltaPdm}` : (deltaPdm < 0 ? `${deltaPdm}` : '0');
+    const deltaColor = deltaPdm > 0 ? 'text-rose-500' : (deltaPdm < 0 ? 'text-emerald-500' : 'text-gray-400');
+
+    resultBox.style.background = bgGrad;
+    resultBox.style.border = `1px solid ${borderCol}`;
+    resultBox.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-extrabold text-gray-500 uppercase tracking-wide">PDM dengan Target ${fmtNum(simTarget)}</span>
+            <span class="num text-[10px] font-extrabold ${deltaColor}">${deltaLabel} vs sekarang</span>
+        </div>
+        <div class="flex items-baseline gap-1">
+            <span class="num text-[26px] font-black ${txtCol} leading-none">${fmtNum(pdmSim)}</span>
+            <span class="text-[10px] font-extrabold text-gray-500">btl/hari</span>
+        </div>
+        <p class="text-[11px] font-semibold text-gray-600 leading-relaxed mt-2.5">${insight}</p>
+    `;
+}
+
+function resetSimulation() {
+    haptic(10);
+    inputSim.value = '';
+    updateSimulation();
+}
+
+function useSimAsTarget() {
+    const simTarget = parseFloat(inputSim.value) || 0;
+    if (simTarget <= 0) return;
+    haptic(15);
+    inputTarget.value = simTarget;
+    saveState();
+    $('clearInputBtn').style.display = 'inline-block';
+    inputSim.value = '';
+    calculateDashboard();
+    showToast('Target diubah ke ' + fmtNum(simTarget) + ' btl/hari ✅');
+}
+
+/* ============================================================
+ * SHARE / COPY / RESET
+ * ============================================================ */
+function buildShareText() {
+    const today = new Date();
+    const d = today.getDate();
+    const m = today.getMonth();
+    const y = today.getFullYear();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+    const targetPerHari = parseFloat(inputTarget.value) || 0;
+    const akumulasi = parseFloat(inputAkumulasi.value) || 0;
+    const totalTarget = targetPerHari * daysInMonth;
+    const targetSampaiHariIni = targetPerHari * d;
+    const rataRata = d > 0 ? Math.round(akumulasi / d) : 0;
+
+    let sisaHariKerja = 0;
+    for (let i = d + 1; i <= daysInMonth; i++) {
+        if (new Date(y, m, i).getDay() !== 0) sisaHariKerja++;
+    }
+    const sisaTarget = totalTarget - akumulasi;
+    const pdmMinimal = sisaHariKerja > 0 ? Math.max(0, Math.ceil(sisaTarget / sisaHariKerja)) : Math.max(0, sisaTarget);
+
+    const selisih = akumulasi - targetSampaiHariIni;
+    const persen = totalTarget > 0 ? Math.min(100, Math.round((akumulasi / totalTarget) * 100)) : 0;
+    const proyeksi = Math.round(rataRata * daysInMonth);
+    const streak = getStreak(targetPerHari);
+
+    let statusEmoji, statusLabel, statusMsg;
+    if (selisih > 0) {
+        statusEmoji = '✅'; statusLabel = 'Aman, bisa santai!';
+        statusMsg = `Kamu sudah melebihi target ${fmtNum(selisih)} botol. Tetap semangat! ✨`;
+    } else if (selisih < 0) {
+        statusEmoji = '⚠️'; statusLabel = 'Harus lebih semangat ngejar!';
+        statusMsg = `Ayo kejar! Kamu tertinggal ${fmtNum(Math.abs(selisih))} botol dari target hari ini. 💪`;
+    } else {
+        statusEmoji = '👍'; statusLabel = 'On Track! Tepat sasaran.';
+        statusMsg = `Pencapaianmu pas dengan target hari ini. Terus pertahankan! ✨`;
+    }
+
+    let streakLine = '';
+    if (streak > 0) streakLine = `\n🔥 Streak: *${streak} hari berturut-turut*`;
+
+    return `*📊 Breakdown PDM*
+_${d} ${MONTHS_SHORT[m]} ${y} · Hari ke-${d} dari ${daysInMonth}_
+━━━━━━━━━━━━━━━━━━━━
+🎯 Target Bulan: *${fmtNum(totalTarget)} btl*
+📦 Dicapai: *${fmtNum(akumulasi)} btl* (${persen}%)
+📈 Rata-rata: *${fmtNum(rataRata)} btl/hari*
+🎯 Target s/d hari ini: ${fmtNum(targetSampaiHariIni)} btl${streakLine}
+━━━━━━━━━━━━━━━━━━━━
+🔥 *PDM Minimal: ${fmtNum(pdmMinimal)} btl/hari*
+${statusEmoji} _${statusLabel}_
+━━━━━━━━━━━━━━━━━━━━
+📅 Sisa ${sisaHariKerja} hari kerja
+📈 Proyeksi akhir bulan: *${fmtNum(proyeksi)} btl*
+
+💬 _"${statusMsg}"_`;
+}
+
+function bagikanKeWhatsApp() {
+    haptic(14);
+    const waUrl = 'https://wa.me/?text=' + encodeURIComponent(buildShareText());
+    const win = window.open(waUrl, '_blank');
+    if (!win) window.location.href = waUrl;
+}
+
+async function copyToClipboard() {
+    haptic(12);
+    const text = buildShareText();
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+        }
+        showToast('Teks disalin ke clipboard ✅');
+    } catch(_) {
+        showToast('Gagal menyalin 😕');
+    }
+}
+
+let resetArmed = false;
+let resetTimer = null;
+
+function resetClearBtnState() {
+    const btn = $('clearBtn');
+    if (!btn) return;
+    btn.classList.remove('bg-rose-400', 'text-white', 'border-rose-400');
+    btn.classList.add('bg-white', 'text-rose-400', 'border-rose-200');
+    btn.innerHTML = '<i class="fa-solid fa-trash-can text-base"></i>';
+}
+
+function resetAll() {
+    const btn = $('clearBtn');
+
+    if (!resetArmed) {
+        resetArmed = true;
+        haptic(15);
+        btn.classList.remove('bg-white', 'text-rose-400', 'border-rose-200');
+        btn.classList.add('bg-rose-400', 'text-white', 'border-rose-400');
+        btn.innerHTML = '<i class="fa-solid fa-check text-base"></i>';
+        showToast('Tap sekali lagi untuk reset 🗑️');
+        resetTimer = setTimeout(() => { resetArmed = false; resetClearBtnState(); }, 3000);
+        return;
+    }
+
+    clearTimeout(resetTimer);
+    resetArmed = false;
+    haptic(20);
+    resetClearBtnState();
+
+    inputTarget.value = '';
+    inputAkumulasi.value = '';
+    inputSim.value = '';
+    inputToday.value = '';
+    dailyLog = {};
+    $('clearInputBtn').style.display = 'none';
+
+    try {
+        localStorage.removeItem(LS_KEY);
+        localStorage.removeItem(LS_LOG);
+    } catch(_) {}
+
+    calculateDashboard();
+    showToast('Semua data direset ✨');
+}
+
+let toastTimer = null;
+function showToast(msg) {
+    const t = $('toast');
+    t.innerText = msg;
+    t.classList.remove('opacity-0');
+    clearTimeout(timerTimer);
+    var timerTimer;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.add('opacity-0'), 2000);
+}
+
+/* ============================================================
+ * EVENTS & BOOT
+ * ============================================================ */
+inputTarget.addEventListener('input', () => {
+    saveState();
+    $('clearInputBtn').style.display = (inputTarget.value || inputAkumulasi.value) ? 'inline-block' : 'none';
+    calculateDashboard();
+});
+inputAkumulasi.addEventListener('input', () => {
+    saveState();
+    $('clearInputBtn').style.display = (inputTarget.value || inputAkumulasi.value) ? 'inline-block' : 'none';
+    calculateDashboard();
+});
+inputSim.addEventListener('input', updateSimulation);
+inputToday.addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveToday();
+});
+
+loadState();
+loadLog();
+calculateDashboard();
+</script>
+</body>
+</html>

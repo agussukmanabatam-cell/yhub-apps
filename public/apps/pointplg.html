@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#db2777">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Point Pelanggan">
+    <meta name="description" content="Rekapitulasi Point Pelanggan & Leaderboard YL">
+    <title>Point Pelanggan</title>
+
+    <!-- ============ PERF: DNS + PRECONNECT ============ -->
+    <link rel="dns-prefetch" href="//docs.google.com">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- ============ PERF: FONT SUBSET + PRELOAD ============ -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Poppins:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Poppins:wght@500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Poppins:wght@500;600;700&display=swap"></noscript>
+
+    <!-- ============ PERF: TAILWIND INLINE CONFIG ============ -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Poppins"', 'system-ui', 'sans-serif'],
+                        poppins: ['"Poppins"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fdf2f8', 100: '#fce7f3', 200: '#fbcfe8',
+                            300: '#f472b6', 400: '#ec4899', 500: '#db2777', 600: '#be185d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- ============ PERF: FONTAWESOME NON-BLOCKING ============ -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <!-- ============ PERF: PAPA PARSE DEFERRED ============ -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <style>
+        /* ============ BASE ============ */
+        html { scroll-behavior: smooth; }
+        html, body {
+            margin: 0; padding: 0;
+            overflow-x: hidden;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Poppins', system-ui, sans-serif;
+            background-color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color .35s cubic-bezier(.16,1,.3,1), color .35s cubic-bezier(.16,1,.3,1);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeSpeed;
+        }
+        body.dark-mode { background-color: #0f172a; color: #e2e8f0; }
+        main { flex: 1; }
+
+        .custom-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* ============ PERF: SELECTIVE TRANSITION (bukan `*`) ============ */
+        .btn-tactile, .card-hover, .tab-btn, .modal-card, .toast-item {
+            transition: transform .22s cubic-bezier(.16,1,.3,1),
+                        opacity .22s cubic-bezier(.16,1,.3,1),
+                        box-shadow .22s cubic-bezier(.16,1,.3,1),
+                        background-color .3s cubic-bezier(.16,1,.3,1),
+                        border-color .3s cubic-bezier(.16,1,.3,1);
+            will-change: transform;
+        }
+        .btn-tactile:active { transform: scale(.96); }
+        .card-hover:hover { transform: translateY(-2px); }
+
+        /* ============ PERF: GPU ACCELERATION ============ */
+        .gpu { transform: translateZ(0); backface-visibility: hidden; }
+
+        /* ============ PERF: CONTENT-VISIBILITY ============ */
+        .cv-auto { content-visibility: auto; contain-intrinsic-size: 0 200px; }
+
+        /* ============ SKELETON SHIMMER ============ */
+        @keyframes shimmer {
+            0% { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 800px 100%;
+            animation: shimmer 1.4s infinite linear;
+            border-radius: 6px;
+        }
+        body.dark-mode .skeleton {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 800px 100%;
+        }
+        .skeleton-text { height: 10px; margin: 4px 0; }
+        .skeleton-title { height: 16px; width: 60%; margin-bottom: 6px; }
+        .skeleton-stat { height: 24px; width: 50%; margin: 4px 0; }
+
+        /* ============ FADE-IN UP ============ */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up {
+            animation: fadeInUp .4s cubic-bezier(.16,1,.3,1) backwards;
+        }
+
+        /* ============ TAB SWITCHER: SEGMENTED CONTROL ============ */
+        .tab-switcher {
+            position: relative;
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 14px;
+            padding: 4px;
+            gap: 2px;
+        }
+        body.dark-mode .tab-switcher { background: #1e293b; }
+
+        .tab-indicator {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            width: calc(50% - 5px);
+            border-radius: 11px;
+            background: linear-gradient(135deg, #db2777, #be185d);
+            box-shadow: 0 4px 12px rgba(219, 39, 119, .35);
+            transition: transform .38s cubic-bezier(.16,1,.3,1);
+            will-change: transform;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .tab-indicator.right { transform: translateX(calc(100% + 4px)); }
+
+        .tab-btn {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            padding: 9px 12px;
+            border-radius: 11px;
+            background: transparent;
+            border: none;
+            font-weight: 700;
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: color .28s cubic-bezier(.16,1,.3,1);
+            font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-btn.active { color: #fff; }
+        .tab-btn:not(.active):active { color: #db2777; }
+        body.dark-mode .tab-btn { color: #94a3b8; }
+        body.dark-mode .tab-btn.active { color: #fff; }
+        .tab-btn i { transition: transform .3s cubic-bezier(.16,1,.3,1); }
+        .tab-btn.active i { transform: scale(1.1); }
+
+        /* ============ RIPPLE EFFECT ============ */
+        .ripple-container { position: relative; overflow: hidden; }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: rippleAnim .6s cubic-bezier(.16,1,.3,1);
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* ============ TAB CONTENT TRANSITIONS ============ */
+        .tab-panel {
+            display: none;
+            opacity: 0;
+        }
+        .tab-panel.active {
+            display: block;
+            animation: tabSlideIn .42s cubic-bezier(.16,1,.3,1) forwards;
+        }
+        .tab-panel.slide-left { --slide-from: 20px; }
+        .tab-panel.slide-right { --slide-from: -20px; }
+        @keyframes tabSlideIn {
+            from { opacity: 0; transform: translateX(var(--slide-from, 0)) translateY(4px); }
+            to { opacity: 1; transform: translateX(0) translateY(0); }
+        }
+
+        /* ============ STAT CARD ============ */
+        .stat-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 12px 14px;
+            border: 1.5px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 68px;
+            transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s cubic-bezier(.16,1,.3,1);
+            will-change: transform;
+        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -8px rgba(0,0,0,.08); }
+        body.dark-mode .stat-card { background: #1e293b; border-color: #334155; }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.1;
+            font-variant-numeric: tabular-nums;
+            transition: color .2s ease;
+        }
+
+        /* ============ DARK MODE OVERRIDES ============ */
+        body.dark-mode .bg-white { background-color: #1e293b !important; }
+        body.dark-mode .bg-slate-50 { background-color: #0f172a !important; }
+        body.dark-mode .bg-slate-100 { background-color: #334155 !important; }
+        body.dark-mode .bg-slate-100\/70 { background-color: #334155 !important; }
+        body.dark-mode .bg-slate-50\/50 { background-color: #1e293b !important; }
+        body.dark-mode .bg-slate-50\/80 { background-color: #1e293b !important; }
+        body.dark-mode .bg-pink-50 { background-color: #831843 !important; }
+        body.dark-mode .bg-pink-50\/40 { background-color: rgba(131,24,67,.3) !important; }
+        body.dark-mode .bg-pink-50\/30 { background-color: rgba(131,24,67,.2) !important; }
+        body.dark-mode .bg-pink-50\/70 { background-color: rgba(131,24,67,.4) !important; }
+        body.dark-mode .bg-pink-100 { background-color: #9f1239 !important; }
+        body.dark-mode .bg-pink-100\/90 { background-color: #9f1239 !important; }
+        body.dark-mode .bg-pink-100\/70 { background-color: #9f1239 !important; }
+        body.dark-mode .bg-brand-50 { background-color: rgba(219,39,119,.2) !important; }
+        body.dark-mode .bg-orange-50\/70 { background-color: rgba(120,53,15,.3) !important; }
+        body.dark-mode .bg-orange-50\/80 { background-color: rgba(120,53,15,.3) !important; }
+        body.dark-mode .bg-orange-100 { background-color: rgba(120,53,15,.5) !important; }
+        body.dark-mode .bg-emerald-50 { background-color: rgba(6,78,59,.4) !important; }
+        body.dark-mode .bg-emerald-100 { background-color: rgba(6,78,59,.6) !important; }
+        body.dark-mode .bg-amber-50 { background-color: rgba(120,53,15,.4) !important; }
+        body.dark-mode .bg-blue-50 { background-color: rgba(30,58,138,.4) !important; }
+        body.dark-mode .bg-amber-100 { background-color: rgba(120,53,15,.5) !important; }
+        body.dark-mode .bg-amber-200\/30 { background-color: rgba(120,53,15,.2) !important; }
+        body.dark-mode .bg-white\/70 { background-color: rgba(30,41,59,.7) !important; }
+
+        body.dark-mode .text-slate-800 { color: #f1f5f9 !important; }
+        body.dark-mode .text-slate-700 { color: #e2e8f0 !important; }
+        body.dark-mode .text-slate-600 { color: #cbd5e1 !important; }
+        body.dark-mode .text-slate-500 { color: #94a3b8 !important; }
+        body.dark-mode .text-slate-400 { color: #94a3b8 !important; }
+        body.dark-mode .text-brand-600 { color: #f472b6 !important; }
+        body.dark-mode .text-brand-500 { color: #f472b6 !important; }
+        body.dark-mode .text-emerald-700 { color: #6ee7b7 !important; }
+        body.dark-mode .text-emerald-800 { color: #a7f3d0 !important; }
+        body.dark-mode .text-orange-800 { color: #fdba74 !important; }
+        body.dark-mode .text-orange-950 { color: #fed7aa !important; }
+        body.dark-mode .text-amber-600 { color: #fcd34d !important; }
+        body.dark-mode .text-amber-700 { color: #fcd34d !important; }
+        body.dark-mode .text-amber-900 { color: #fcd34d !important; }
+        body.dark-mode .text-amber-950 { color: #fde68a !important; }
+
+        body.dark-mode .border-slate-200 { border-color: #334155 !important; }
+        body.dark-mode .border-slate-100 { border-color: #1e293b !important; }
+        body.dark-mode .border-slate-200\/80 { border-color: #334155 !important; }
+        body.dark-mode .border-slate-200\/60 { border-color: #334155 !important; }
+        body.dark-mode .border-pink-100 { border-color: #831843 !important; }
+        body.dark-mode .border-pink-200 { border-color: #831843 !important; }
+        body.dark-mode .border-pink-100\/60 { border-color: #831843 !important; }
+        body.dark-mode .border-pink-300 { border-color: #be185d !important; }
+        body.dark-mode .border-pink-400 { border-color: #db2777 !important; }
+        body.dark-mode .border-orange-200 { border-color: #7c2d12 !important; }
+        body.dark-mode .border-orange-200\/80 { border-color: #7c2d12 !important; }
+        body.dark-mode .border-emerald-200 { border-color: #065f46 !important; }
+        body.dark-mode .border-amber-200 { border-color: #78350f !important; }
+        body.dark-mode .border-amber-200\/60 { border-color: #78350f !important; }
+        body.dark-mode .border-amber-200\/80 { border-color: #78350f !important; }
+        body.dark-mode .border-amber-300 { border-color: #d97706 !important; }
+        body.dark-mode .divide-slate-100 > * + * { border-color: #1e293b !important; }
+
+        body.dark-mode .from-slate-50 { --tw-gradient-from: #1e293b !important; }
+        body.dark-mode .to-white { --tw-gradient-to: #1e293b !important; }
+        body.dark-mode .from-pink-50 { --tw-gradient-from: #831843 !important; }
+        body.dark-mode .from-pink-50\/70 { --tw-gradient-from: rgba(131,24,67,.4) !important; }
+        body.dark-mode .from-orange-50\/70 { --tw-gradient-from: rgba(120,53,15,.3) !important; }
+        body.dark-mode .from-pink-100\/90 { --tw-gradient-from: #9f1239 !important; }
+        body.dark-mode .from-amber-50 { --tw-gradient-from: rgba(120,53,15,.4) !important; }
+        body.dark-mode .to-orange-50 { --tw-gradient-to: rgba(120,53,15,.3) !important; }
+
+        body.dark-mode input, body.dark-mode select, body.dark-mode textarea {
+            background-color: #334155 !important;
+            color: #f1f5f9 !important;
+            border-color: #475569 !important;
+        }
+        body.dark-mode input::placeholder { color: #94a3b8 !important; }
+        body.dark-mode .bg-pink-50\/50 { background-color: rgba(131,24,67,.3) !important; }
+        body.dark-mode .bg-pink-50\/30 { background-color: rgba(131,24,67,.2) !important; }
+        body.dark-mode .hover\:bg-pink-50:hover { background-color: rgba(131,24,67,.4) !important; }
+        body.dark-mode .hover\:bg-slate-200:hover { background-color: #475569 !important; }
+        body.dark-mode .hover\:bg-pink-50\/60:hover { background-color: rgba(131,24,67,.4) !important; }
+
+        /* ============ CONNECTION BADGE ============ */
+        .conn-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            transition: all .3s;
+        }
+        .conn-badge.online {
+            background: rgba(16, 185, 129, .2);
+            color: #a7f3d0;
+            border: 1px solid rgba(16, 185, 129, .4);
+        }
+        .conn-badge.offline {
+            background: rgba(239, 68, 68, .2);
+            color: #fecaca;
+            border: 1px solid rgba(239, 68, 68, .4);
+        }
+        .conn-badge .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulseDot 2s infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
+        }
+
+        /* ============ LEADERBOARD CARDS ============ */
+        .leader-card {
+            transition: transform .28s cubic-bezier(.16,1,.3,1), box-shadow .28s cubic-bezier(.16,1,.3,1);
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+        .leader-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 28px -10px rgba(219, 39, 119, .28);
+        }
+        .leader-card.rank-1 {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: #f59e0b;
+        }
+        body.dark-mode .leader-card.rank-1 {
+            background: linear-gradient(135deg, rgba(245,158,11,.3), rgba(217,119,6,.2)) !important;
+        }
+        .leader-card.rank-2 {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-color: #94a3b8;
+        }
+        body.dark-mode .leader-card.rank-2 {
+            background: linear-gradient(135deg, rgba(148,163,184,.2), rgba(100,116,139,.15)) !important;
+        }
+        .leader-card.rank-3 {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+            border-color: #ea580c;
+        }
+        body.dark-mode .leader-card.rank-3 {
+            background: linear-gradient(135deg, rgba(234,88,12,.3), rgba(194,65,12,.2)) !important;
+        }
+        .leader-card.rank-1::before,
+        .leader-card.rank-2::before,
+        .leader-card.rank-3::before {
+            content: '';
+            position: absolute;
+            top: -30%; right: -10%;
+            width: 120px; height: 120px;
+            background: rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        body.dark-mode .leader-card.rank-1::before,
+        body.dark-mode .leader-card.rank-2::before,
+        body.dark-mode .leader-card.rank-3::before {
+            background: rgba(255, 255, 255, .05);
+        }
+
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 3px 7px;
+            border-radius: 7px;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+        .achievement-top-point { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .achievement-top-customer { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+        .achievement-top-efficiency { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+
+        /* ============ PWA BANNER ============ */
+        .pwa-banner {
+            transform: translateY(-110%);
+            transition: transform .45s cubic-bezier(.16,1,.3,1);
+            will-change: transform;
+        }
+        .pwa-banner.show { transform: translateY(0); }
+
+        /* ============ THEME TOGGLE ============ */
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .2);
+            border: 1px solid rgba(255, 255, 255, .3);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background-color .22s, transform .22s cubic-bezier(.16,1,.3,1);
+        }
+        .theme-toggle:hover { background: rgba(255, 255, 255, .3); transform: scale(1.05); }
+        .theme-toggle:active { transform: scale(.94); }
+        .theme-toggle i { transition: transform .5s cubic-bezier(.16,1,.3,1); }
+        .theme-toggle.rotating i { transform: rotate(360deg) scale(1.1); }
+
+        /* ============ RIPPLE BUTTON ============ */
+        .ripple-effect-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ============ MODAL BACKDROP ============ */
+        .modal-backdrop {
+            backdrop-filter: blur(6px) saturate(1.2);
+            -webkit-backdrop-filter: blur(6px) saturate(1.2);
+        }
+
+        /* ============ TAB SKELETON ============ */
+        .tab-skeleton {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        /* ============ STAT COUNTER ANIMATION ============ */
+        .stat-value.counting { color: #db2777; }
+
+        /* ============ REDUCED MOTION ============ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
+
+        /* ============ PRINT ============ */
+        @media print {
+            header, footer, button, .no-print { display: none !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased font-sans">
+
+    <!-- ============ PWA INSTALL BANNER ============ -->
+    <div id="pwaInstallBanner" class="pwa-banner fixed top-0 left-0 right-0 z-[60] p-2 px-3 bg-gradient-to-r from-brand-500 to-pink-500 shadow-lg">
+        <div class="max-w-7xl mx-auto flex items-center gap-2">
+            <div class="w-9 h-9 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white flex-shrink-0">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-white text-[11px] font-bold leading-tight">Install "Point Pelanggan"</p>
+                <p class="text-pink-100 text-[9px] leading-tight">Akses lebih cepat & bisa offline</p>
+            </div>
+            <button onclick="dismissPwaBanner()" class="text-white/80 hover:text-white text-xs px-2 py-1 flex-shrink-0">
+                Nanti
+            </button>
+            <button onclick="installPwa()" class="bg-white text-brand-600 font-bold text-[11px] px-3 py-1.5 rounded-lg flex-shrink-0 shadow-md flex items-center gap-1 btn-tactile">
+                <i class="fa-solid fa-download text-[10px]"></i> Install
+            </button>
+        </div>
+    </div>
+
+    <header class="bg-gradient-to-r from-pink-500 via-brand-500 to-rose-500 text-white shadow-xl rounded-b-[1.5rem] sm:rounded-b-[2.5rem] pb-6 pt-4 px-3 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white shadow-inner flex-shrink-0">
+                        <i class="fa-solid font-bold fa-star-half-stroke text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-2xl font-extrabold font-poppins tracking-tight">Point Pelanggan</h1>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <p class="text-[10px] sm:text-xs text-pink-100 font-medium">Rekapitulasi Total Point & Data Customer</p>
+                            <span id="connBadge" class="conn-badge online">
+                                <span class="dot"></span>
+                                <span id="connText">Online</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <button onclick="toggleTheme()" id="themeToggleBtn" class="theme-toggle btn-tactile" title="Ganti tema">
+                        <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
+                    </button>
+                    <button onclick="sync()" id="btnSyncHeader" class="flex-1 sm:flex-none px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl text-[11px] sm:text-xs shadow-md flex items-center justify-center gap-1 whitespace-nowrap btn-tactile">
+                        <i class="fa-solid fa-arrows-rotate" id="syncIcon"></i>
+                        <span>Sync</span>
+                    </button>
+                    <button onclick="openPasswordModal()" class="flex-1 sm:flex-none px-2.5 py-1.5 bg-white text-brand-600 font-semibold rounded-xl text-[11px] sm:text-xs hover:bg-pink-50 shadow-md flex items-center justify-center gap-1 whitespace-nowrap btn-tactile">
+                        <i class="fa-solid fa-file-csv text-brand-500"></i> CSV
+                    </button>
+                    <button onclick="resetFilters()" class="flex-1 sm:flex-none px-2.5 py-1.5 bg-white/20 hover:bg-white/30 text-white font-medium rounded-xl text-[11px] sm:text-xs flex items-center justify-center gap-1 whitespace-nowrap btn-tactile" title="Reset Filters">
+                        <i class="fa-solid fa-arrows-rotate"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 -mt-2 sm:mt-4 w-full pb-6">
+
+        <!-- ============ TAB SWITCHER (SEGMENTED CONTROL) ============ -->
+        <div class="tab-switcher ripple-effect-btn mb-3" id="tabSwitcher">
+            <div class="tab-indicator" id="tabIndicator"></div>
+            <button id="tabBtnPelanggan" onclick="switchTab('pelanggan', this)" class="tab-btn active" data-tab="pelanggan">
+                <i class="fa-solid fa-users"></i>
+                <span>Pelanggan</span>
+            </button>
+            <button id="tabBtnLeaderboard" onclick="switchTab('leaderboard', this)" class="tab-btn" data-tab="leaderboard">
+                <i class="fa-solid fa-trophy"></i>
+                <span>Leaderboard YL</span>
+            </button>
+        </div>
+
+        <!-- ============ TAB: PELANGGAN ============ -->
+        <div id="tabContentPelanggan" class="tab-panel active">
+
+            <!-- STATS -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-3">
+                <div class="stat-card cv-auto">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Pelanggan</p>
+                        <h3 id="statTotalCustomer" class="stat-value text-slate-800 mt-0.5">0</h3>
+                        <p class="text-[9px] sm:text-[10px] text-pink-500 font-medium mt-0.5">Register Transaksi</p>
+                    </div>
+                    <div class="w-8 h-8 sm:w-12 sm:h-12 bg-pink-50 text-brand-500 rounded-xl sm:rounded-2xl flex items-center justify-center text-sm sm:text-xl flex-shrink-0">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card cv-auto">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Point</p>
+                        <h3 id="statTotalPoint" class="stat-value text-brand-600 mt-0.5">0</h3>
+                        <p class="text-[9px] sm:text-[10px] text-emerald-600 font-medium mt-0.5">Sum Point</p>
+                    </div>
+                    <div class="w-8 h-8 sm:w-12 sm:h-12 bg-amber-50 text-amber-500 rounded-xl sm:rounded-2xl flex items-center justify-center text-sm sm:text-xl flex-shrink-0">
+                        <i class="fa-solid fa-coins"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card cv-auto">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Center Aktif</p>
+                        <h3 id="statTotalCenter" class="stat-value text-slate-800 mt-0.5">0</h3>
+                        <p class="text-[9px] sm:text-[10px] text-slate-400 font-medium mt-0.5">Center Bandung V</p>
+                    </div>
+                    <div class="w-8 h-8 sm:w-12 sm:h-12 bg-blue-50 text-blue-500 rounded-xl sm:rounded-2xl flex items-center justify-center text-sm sm:text-xl flex-shrink-0">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card cv-auto">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Total YL</p>
+                        <h3 id="statTotalYL" class="stat-value text-slate-800 mt-0.5">0</h3>
+                        <p class="text-[9px] sm:text-[10px] text-slate-400 font-medium mt-0.5">YL Bandung V</p>
+                    </div>
+                    <div class="w-8 h-8 sm:w-12 sm:h-12 bg-orange-50 text-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center text-sm sm:text-xl flex-shrink-0">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTER -->
+            <div class="bg-orange-50/70 rounded-2xl p-3 sm:p-4 shadow-sm border border-orange-200/80 mb-3 cv-auto">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-filter text-orange-500 text-xs sm:text-sm"></i>
+                    <h2 class="text-xs sm:text-sm font-bold text-orange-950">Filter Data (Center, YL & Pelanggan)</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-orange-800 uppercase mb-1">1. Pilih Center</label>
+                        <div onclick="openCenterModal()" id="centerTriggerBox" class="w-full bg-white border border-orange-200 text-slate-700 text-xs rounded-xl p-2.5 font-medium cursor-pointer shadow-sm flex items-center justify-between hover:border-pink-400 transition-colors">
+                            <span id="selectedCenterLabel" class="truncate">-- Semua Center --</span>
+                            <i id="centerChevron" class="fa-solid fa-chevron-down text-orange-400 text-xs flex-shrink-0 transition-transform duration-300"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-orange-800 uppercase mb-1">2. Nama YL (PIC)</label>
+                        <div onclick="openYLModal()" id="ylTriggerBox" class="w-full bg-white border border-orange-200 text-slate-700 text-xs rounded-xl p-2.5 font-medium cursor-pointer shadow-sm flex items-center justify-between hover:border-pink-400 transition-colors">
+                            <span id="selectedYLLabel" class="truncate">-- Semua YL --</span>
+                            <i id="ylChevron" class="fa-solid fa-chevron-down text-orange-400 text-xs flex-shrink-0 transition-transform duration-300"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-orange-800 uppercase mb-1">3. Cari Pelanggan</label>
+                        <div class="relative">
+                            <input type="text" id="inputSearch" placeholder="Ketik nama pelanggan..." class="w-full bg-white border border-orange-200 text-slate-700 text-xs rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-orange-400 p-2.5 pl-8 font-medium shadow-sm">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-orange-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden mb-4 cv-auto">
+                <div class="p-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gradient-to-r from-slate-50 to-white">
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-bold text-slate-800">Daftar Pelanggan & Total Point</h3>
+                        <p class="text-[10px] text-slate-400">Autosort Point tertinggi</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100/70 text-slate-600 text-[10px] uppercase tracking-wider border-b border-slate-200/60">
+                                <th class="py-2 px-2 font-bold text-center w-8">No</th>
+                                <th class="py-2 px-2 font-bold">Nama Pelanggan</th>
+                                <th class="py-2 px-2 font-bold">Center</th>
+                                <th class="py-2 px-2 font-bold">Nama YL</th>
+                                <th class="py-2 px-1 font-bold text-center">Trx</th>
+                                <th class="py-2 px-2 font-bold text-right">Total Point</th>
+                                <th class="py-2 px-2 font-bold text-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-100 text-xs">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="tableSkeleton" class="tab-skeleton">
+                    <div class="skeleton skeleton-title" style="width: 40%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 70%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 75%;"></div>
+                </div>
+
+                <div id="emptyState" class="hidden py-8 text-center">
+                    <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-2 text-lg">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-700">Data Tidak Ditemukan</h4>
+                    <p class="text-[10px] text-slate-400 max-w-xs mx-auto mt-0.5">Coba sesuaikan kata kunci pencarian atau ubah filter Center & YL Anda.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ TAB: LEADERBOARD ============ -->
+        <div id="tabContentLeaderboard" class="tab-panel">
+
+            <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-3 sm:p-4 shadow-sm border border-amber-200/80 mb-3 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-amber-200/30 rounded-full -mr-8 -mt-8"></div>
+                <div class="relative">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 bg-gradient-to-tr from-amber-400 to-orange-500 text-white rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                                <i class="fa-solid fa-trophy text-base"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-bold text-amber-950 font-poppins">Leaderboard YL</h2>
+                                <p class="text-[10px] text-amber-700 font-medium">Ranking kombinasi Point (60%) & Pelanggan (40%)</p>
+                            </div>
+                        </div>
+                        <button onclick="shareLeaderboard()" class="px-2.5 py-1.5 bg-white text-amber-700 hover:bg-amber-100 border border-amber-300 rounded-xl font-bold text-[10px] shadow-sm flex items-center gap-1 flex-shrink-0 btn-tactile">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <span class="hidden sm:inline">Bagikan</span>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-1.5 mt-3">
+                        <div class="bg-white/70 backdrop-blur-sm rounded-xl p-2 border border-amber-200 text-center">
+                            <p class="text-[9px] text-amber-700 font-bold uppercase">Total YL</p>
+                            <p id="statLeaderTotalYL" class="text-base font-extrabold text-amber-900 mt-0.5 tabular-nums">0</p>
+                        </div>
+                        <div class="bg-white/70 backdrop-blur-sm rounded-xl p-2 border border-amber-200 text-center">
+                            <p class="text-[9px] text-amber-700 font-bold uppercase">Total Point</p>
+                            <p id="statLeaderTotalPoint" class="text-base font-extrabold text-amber-900 mt-0.5 tabular-nums">0</p>
+                        </div>
+                        <div class="bg-white/70 backdrop-blur-sm rounded-xl p-2 border border-amber-200 text-center">
+                            <p class="text-[9px] text-amber-700 font-bold uppercase">Top Scorer</p>
+                            <p id="statLeaderTopName" class="text-[11px] font-extrabold text-amber-900 mt-0.5 truncate">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="leaderboardList" class="space-y-2">
+            </div>
+
+            <div id="leaderboardSkeleton" class="space-y-2 tab-skeleton">
+                <div class="bg-white rounded-2xl p-4 border border-slate-200">
+                    <div class="flex gap-3">
+                        <div class="skeleton w-12 h-12 rounded-2xl"></div>
+                        <div class="flex-1">
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 border border-slate-200">
+                    <div class="flex gap-3">
+                        <div class="skeleton w-12 h-12 rounded-2xl"></div>
+                        <div class="flex-1">
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="leaderboardEmpty" class="hidden py-12 text-center bg-white rounded-2xl border border-slate-200/80">
+                <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h4 class="text-sm font-bold text-slate-700">Belum Ada Data YL</h4>
+                <p class="text-[11px] text-slate-400 max-w-xs mx-auto mt-1">Sync data dari Google Sheets untuk melihat leaderboard.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="w-full py-4 text-center text-xs text-slate-400 font-medium border-t border-slate-100 mt-auto bg-white">
+        Jangan Lupa Tersenyum & Bahagia ✨
+    </footer>
+
+    <!-- ============ MODAL CENTER ============ -->
+    <div id="centerModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex flex-col justify-end sm:justify-center sm:items-center hidden opacity-0 transition-opacity duration-300">
+        <div id="centerModalCard" class="modal-card bg-white rounded-t-[2.5rem] sm:rounded-3xl w-full sm:max-w-md max-h-[85vh] flex flex-col shadow-2xl border-t sm:border border-pink-100 relative transform translate-y-full transition-transform duration-300 ease-out">
+            <div class="p-3.5 border-b border-pink-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-white flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-pink-100 text-brand-500 rounded-xl flex items-center justify-center text-xs shadow-inner">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <h3 class="text-xs font-bold text-slate-800">Pilih Nama Center</h3>
+                </div>
+                <button onclick="closeCenterModal()" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full flex items-center justify-center btn-tactile">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            <div id="centerListContainer" class="p-3 overflow-y-auto custom-scrollbar space-y-1.5 flex-grow text-xs"></div>
+        </div>
+    </div>
+
+    <!-- ============ MODAL YL ============ -->
+    <div id="ylModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex flex-col justify-end sm:justify-center sm:items-center hidden opacity-0 transition-opacity duration-300">
+        <div id="ylModalCard" class="modal-card bg-white rounded-t-[2.5rem] sm:rounded-3xl w-full sm:max-w-md max-h-[85vh] flex flex-col shadow-2xl border-t sm:border border-pink-100 relative transform translate-y-full transition-transform duration-300 ease-out">
+            <div class="p-3.5 border-b border-pink-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-white flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-pink-100 text-brand-500 rounded-xl flex items-center justify-center text-xs shadow-inner">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <h3 class="text-xs font-bold text-slate-800">Pilih Nama YL (PIC)</h3>
+                </div>
+                <button onclick="closeYLModal()" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full flex items-center justify-center btn-tactile">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            <div id="ylListContainer" class="p-3 overflow-y-auto custom-scrollbar space-y-1.5 flex-grow text-xs"></div>
+        </div>
+    </div>
+
+    <!-- ============ MODAL PASSWORD ============ -->
+    <div id="passwordModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center hidden p-3">
+        <div class="modal-card bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-pink-100 relative">
+            <button onclick="closePasswordModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-7 h-7 rounded-full flex items-center justify-center bg-slate-100 btn-tactile">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-pink-100 text-brand-500 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl shadow-inner">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-sm font-bold text-slate-800">Verifikasi Keamanan</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5">Masukkan password untuk mengakses menu Import / CSV</p>
+            </div>
+
+            <form onsubmit="handlePasswordSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Password Akses</label>
+                    <div class="relative">
+                        <input type="password" id="inputPassword" placeholder="Masukkan password..." class="w-full bg-pink-50/50 border border-pink-200 text-slate-700 text-xs rounded-xl focus:ring-2 focus:ring-brand-400 focus:border-brand-400 p-2.5 pr-9 font-medium">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400 hover:text-slate-600">
+                            <i class="fa-solid fa-eye text-xs" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                    <p id="passwordError" class="hidden text-[10px] text-rose-500 font-semibold mt-1 items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> <span>Password salah! Coba lagi.</span>
+                    </p>
+                </div>
+
+                <div class="flex gap-2 pt-1">
+                    <button type="button" onclick="closePasswordModal()" class="w-1/2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-xs btn-tactile">
+                        Batal
+                    </button>
+                    <button type="submit" class="w-1/2 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-md btn-tactile">
+                        Masuk
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============ MODAL CSV ============ -->
+    <div id="csvModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center hidden p-3">
+        <div class="modal-card bg-white rounded-3xl max-w-lg w-full p-5 shadow-2xl border border-pink-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="closeCsvModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-7 h-7 rounded-full flex items-center justify-center bg-slate-100 btn-tactile">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+
+            <div class="flex items-center gap-2.5 mb-3">
+                <div class="w-9 h-9 bg-brand-100 text-brand-500 rounded-xl flex items-center justify-center text-base">
+                    <i class="fa-solid fa-file-csv"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800">Hubungkan CSV / Google Sheet</h3>
+                    <p class="text-[10px] text-slate-500">Upload CSV atau Muat Data Sampel</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600">
+                <div class="p-2.5 bg-pink-50 rounded-xl border border-pink-200">
+                    <p class="font-semibold text-brand-600 mb-1 text-[11px]"><i class="fa-solid fa-circle-info"></i> Pemetaan Kolom Google Sheet (A..J):</p>
+                    <ul class="list-disc pl-4 space-y-0.5 text-[10px] text-slate-700">
+                        <li><b>Kolom B</b>: Nama Center</li>
+                        <li><b>Kolom D</b>: Nama YL</li>
+                        <li><b>Kolom E</b>: Match Index Key</li>
+                        <li><b>Kolom F</b>: Nama Pelanggan</li>
+                        <li><b>Kolom I</b>: Jumlah Point</li>
+                        <li><b>Kolom J</b>: Jumlah Transaksi (Trx)</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-[10px] uppercase">Option A: Link Google Sheet CSV</label>
+                    <div class="flex gap-1.5">
+                        <input type="text" id="googleSheetUrlInput" placeholder="URL Google Sheet CSV..." class="w-full bg-pink-50/30 border border-slate-200 rounded-xl p-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        <button onclick="syncFromModalInput()" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs whitespace-nowrap btn-tactile">
+                            Sync
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative flex py-0.5 items-center">
+                    <div class="flex-grow border-t border-slate-200"></div>
+                    <span class="flex-shrink mx-3 text-slate-400 font-semibold text-[9px] uppercase">Atau</span>
+                    <div class="flex-grow border-t border-slate-200"></div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-[10px] uppercase">Option B: Upload File CSV Lokal</label>
+                    <input type="file" id="csvFileInput" accept=".csv" class="w-full text-[11px] text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-semibold file:bg-brand-50 file:text-brand-600 hover:file:bg-brand-100 border border-slate-200 rounded-xl cursor-pointer">
+                </div>
+
+                <div class="relative flex py-0.5 items-center">
+                    <div class="flex-grow border-t border-slate-200"></div>
+                    <span class="flex-shrink mx-3 text-slate-400 font-semibold text-[9px] uppercase">Atau</span>
+                    <div class="flex-grow border-t border-slate-200"></div>
+                </div>
+
+                <div>
+                    <button onclick="loadDefaultData()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-center flex items-center justify-center gap-1.5 text-xs btn-tactile">
+                        <i class="fa-solid fa-rotate-left"></i> Gunakan Demo Data Bawaan
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+                <button onclick="closeCsvModal()" class="px-4 py-2 bg-brand-500 text-white font-bold rounded-xl hover:bg-brand-600 text-xs shadow-md btn-tactile">
+                    Selesai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MODAL DETAIL ============ -->
+    <div id="detailModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center hidden p-3">
+        <div class="modal-card bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-pink-100 relative overflow-hidden">
+            
+            <div class="p-4 border-b border-pink-100 flex-shrink-0 relative bg-gradient-to-r from-pink-50 to-white">
+                <button onclick="closeDetailModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-7 h-7 rounded-full flex items-center justify-center bg-white shadow-sm hover:bg-slate-100 btn-tactile">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 bg-gradient-to-tr from-pink-400 to-brand-500 text-white rounded-2xl flex items-center justify-center text-base shadow-md shadow-pink-200 flex-shrink-0">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div>
+                        <h3 id="modalCustomerName" class="text-sm font-bold text-slate-800">Nama Pelanggan</h3>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span id="modalTotalPoint" class="font-extrabold text-brand-600 text-[11px] bg-brand-50 border border-brand-200 px-1.5 py-0.5 rounded-lg">0 Point</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 space-y-3 overflow-y-auto custom-scrollbar flex-grow text-xs">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div class="bg-gradient-to-br from-pink-50/70 to-white p-3 rounded-2xl border border-pink-200/80 shadow-sm flex items-center gap-2.5">
+                        <div class="w-8 h-8 bg-pink-100 text-brand-500 rounded-xl flex items-center justify-center text-xs flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <span class="text-slate-400 block text-[9px] font-bold uppercase tracking-wider">Nama Center</span>
+                            <span id="modalCenterName" class="font-extrabold text-slate-800 block text-xs truncate mt-0.5">-</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-orange-50/70 to-white p-3 rounded-2xl border border-orange-200/80 shadow-sm flex items-center gap-2.5">
+                        <div class="w-8 h-8 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center text-xs flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <span class="text-slate-400 block text-[9px] font-bold uppercase tracking-wider">Nama YL (PIC)</span>
+                            <span id="modalYLName" class="font-extrabold text-slate-800 block text-xs truncate mt-0.5">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-gift text-brand-500 text-xs"></i>
+                            <h4 class="font-bold text-slate-800 text-xs">Pilihan Hadiah Souvenir</h4>
+                        </div>
+                        <div class="flex bg-pink-100/70 p-0.5 rounded-lg text-[9px] font-bold">
+                            <button id="tabRewardEligible" onclick="filterRewardsTab('eligible')" class="px-2 py-0.5 rounded-md bg-white text-brand-600 shadow-sm">Bisa Ditukar</button>
+                            <button id="tabRewardAll" onclick="filterRewardsTab('all')" class="px-2 py-0.5 rounded-md text-slate-500">Semua (20)</button>
+                        </div>
+                    </div>
+
+                    <div id="rewardListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1"></div>
+                    
+                    <div id="selectedRewardNote" class="hidden mt-2 p-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-[10px] items-center justify-between">
+                        <span class="flex items-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                            <span>Dipilih: <b id="selectedRewardNameText">-</b></span>
+                        </span>
+                        <button onclick="clearSelectedReward()" class="text-emerald-700 hover:text-emerald-900 underline text-[9px]">Batal</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-3 border-t border-pink-100 bg-slate-50/50 flex-shrink-0 grid grid-cols-3 gap-1.5">
+                <button onclick="copyDetailText()" class="py-2 px-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold rounded-xl text-[11px] flex items-center justify-center border border-emerald-200 shadow-sm btn-tactile">
+                    <span>Salin</span>
+                </button>
+                <button onclick="sendToWhatsApp()" class="py-2 px-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-[11px] flex items-center justify-center shadow-md shadow-emerald-200 btn-tactile">
+                    <span>WhatsApp</span>
+                </button>
+                <button onclick="closeDetailModal()" class="py-2 px-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-[11px] flex items-center justify-center shadow-sm btn-tactile">
+                    <span>Tutup</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============ TOAST ============ -->
+    <div id="toastNotification" class="fixed bottom-4 right-4 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900/90 text-white text-xs font-semibold px-3.5 py-2.5 rounded-2xl shadow-xl backdrop-blur-md flex items-center gap-2 border border-white/10">
+            <i class="fa-solid fa-circle-check text-emerald-400 text-sm" id="toastIcon"></i>
+            <span id="toastMessage">Pesan Toast</span>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // KONFIGURASI
+        // ============================================================
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTnLkr5oyixFCtMEC8M2pXmM_rfkJP7r7XABvpiMhdQ6HCmm4dpVACV0BEnpVyPJqWrf8Jd06SJWLG/pub?gid=1465813228&single=true&output=csv";
+        const CACHE_KEY = 'point_pelanggan_cache_v2';
+        const THEME_KEY = 'point_pelanggan_theme';
+        const PWA_DISMISS_KEY = 'point_pelanggan_pwa_dismissed';
+        const RANKING_WEIGHT_POINT = 0.6;
+        const RANKING_WEIGHT_CUSTOMER = 0.4;
+        const CUSTOMER_WEIGHT_MULTIPLIER = 100;
+
+        const defaultRawData = [
+            ["1", "Bandung Central", "-", "Siti Nurhaliza", "ID-001", "Ibu Anisa", "-", "-", "1500", "2"],
+            ["2", "Bandung Central", "-", "Siti Nurhaliza", "ID-002", "Bapak Budi", "-", "-", "400", "1"],
+            ["3", "Jakarta Selatan", "-", "Rina Wijaya", "ID-003", "Ibu Dewi", "-", "-", "2000", "3"],
+            ["4", "Jakarta Selatan", "-", "Rina Wijaya", "ID-003", "Ibu Dewi", "-", "-", "300", "1"],
+            ["5", "Surabaya Timur", "-", "Dewi Lestari", "ID-004", "Bapak Eko", "-", "-", "90", "1"],
+            ["6", "Bandung Central", "-", "Ahmad Hidayat", "ID-005", "Ibu Fitri", "-", "-", "250", "2"],
+            ["7", "Jakarta Selatan", "-", "Rina Wijaya", "ID-006", "Bapak Gani", "-", "-", "60", "1"]
+        ];
+
+        const YAKULT_REWARDS_CATALOG = [
+            { name: "STICKER YAKULT MAN", point: 60, icon: "fa-note-sticky" },
+            { name: "STICKER PACK YAKULTMAN CHAPTER 2", point: 70, icon: "fa-copy" },
+            { name: "BALLPOIN", point: 80, icon: "fa-pen" },
+            { name: "GANTUNGAN KUNCI KARET", point: 90, icon: "fa-key" },
+            { name: "STICKER PACK YAKULTMAN CHAPTER 1", point: 100, icon: "fa-tags" },
+            { name: "KIPAS TANGAN", point: 150, icon: "fa-fan" },
+            { name: "GANTUNGAN KUNCI", point: 150, icon: "fa-key" },
+            { name: "NOTES", point: 150, icon: "fa-book" },
+            { name: "BOTOL MINUM", point: 150, icon: "fa-bottle-water" },
+            { name: "TEMPAT SENDOK", point: 200, icon: "fa-utensils" },
+            { name: "MAGNET KULKAS", point: 200, icon: "fa-magnet" },
+            { name: "TEMPAT TISSUE", point: 250, icon: "fa-box" },
+            { name: "HANDUK", point: 250, icon: "fa-rug" },
+            { name: "TAS BELANJA", point: 300, icon: "fa-bag-shopping" },
+            { name: "COOLER BAG", point: 400, icon: "fa-box-archive" },
+            { name: "MUG", point: 400, icon: "fa-mug-hot" },
+            { name: "PAYUNG", point: 1000, icon: "fa-umbrella" },
+            { name: "TUMBLER STEEL BOWLING", point: 1500, icon: "fa-bottle-droplet" },
+            { name: "JAM DINDING", point: 1500, icon: "fa-clock" },
+            { name: "LUNCH BOX ECENTIO", point: 2000, icon: "fa-box-tissue" }
+        ];
+
+        let activeRawData = [];
+        let aggregatedCustomers = [];
+        let leaderboardData = [];
+        let activeCustomerDetailItem = null;
+        let selectedRewardItem = null;
+        let activeRewardTabFilter = 'eligible';
+        let activeTab = 'pelanggan';
+        let deferredInstallPrompt = null;
+
+        let selectedCenterValue = '';
+        let selectedYLValue = '';
+        let toastTimer = null;
+        let currentFilteredCustomers = [];
+        let dataHasRendered = false;
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function toTitleCase(str) {
+            return str.toLowerCase().replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+        }
+        function fmtNum(n) { return n.toLocaleString('id-ID'); }
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/[&<>"']/g, m => ({
+                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+            }[m]));
+        }
+        function debounce(fn, delay = 200) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        // ============================================================
+        // ANIMATED COUNTER
+        // ============================================================
+        function animateCounter(el, targetValue, duration = 600) {
+            if (!el) return;
+            const currentText = el.textContent.replace(/[^0-9-]/g, '');
+            const startValue = parseInt(currentText, 10) || 0;
+            if (startValue === targetValue) {
+                el.textContent = targetValue.toLocaleString('id-ID');
+                return;
+            }
+            const startTime = performance.now();
+            el.classList.add('counting');
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(startValue + (targetValue - startValue) * eased);
+                el.textContent = current.toLocaleString('id-ID');
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    el.classList.remove('counting');
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        // ============================================================
+        // DARK MODE
+        // ============================================================
+        function initTheme() {
+            let saved = localStorage.getItem(THEME_KEY);
+            if (!saved) {
+                saved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            if (saved === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.documentElement.classList.add('dark');
+                updateThemeIcon('sun');
+            } else {
+                updateThemeIcon('moon');
+            }
+        }
+        function toggleTheme() {
+            const btn = document.getElementById('themeToggleBtn');
+            btn.classList.add('rotating');
+            setTimeout(() => btn.classList.remove('rotating'), 500);
+
+            const isDark = document.body.classList.toggle('dark-mode');
+            document.documentElement.classList.toggle('dark', isDark);
+            localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark ? 'sun' : 'moon');
+            showToast(isDark ? '🌙 Mode gelap aktif' : '☀️ Mode terang aktif');
+        }
+        function updateThemeIcon(icon) {
+            const el = document.getElementById('themeIcon');
+            if (el) el.className = `fa-solid fa-${icon} text-sm`;
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem(THEME_KEY)) {
+                const isDark = e.matches;
+                document.body.classList.toggle('dark-mode', isDark);
+                document.documentElement.classList.toggle('dark', isDark);
+                updateThemeIcon(isDark ? 'sun' : 'moon');
+            }
+        });
+
+        // ============================================================
+        // PWA
+        // ============================================================
+        function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            if (location.protocol === 'file:') return;
+            const swCode = `
+                const CACHE_NAME = 'point-pelanggan-v2';
+                const urlsToCache = ['./'];
+                self.addEventListener('install', e => {
+                    e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(urlsToCache).catch(()=>{})));
+                    self.skipWaiting();
+                });
+                self.addEventListener('activate', e => {
+                    e.waitUntil(clients.claim());
+                });
+                self.addEventListener('fetch', e => {
+                    if (e.request.method !== 'GET') return;
+                    if (e.request.url.includes('docs.google.com')) {
+                        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                        return;
+                    }
+                    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+                });
+            `;
+            try {
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl).catch(err => console.warn('[PWA] SW failed:', err));
+            } catch (err) {}
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            if (!localStorage.getItem(PWA_DISMISS_KEY)) {
+                setTimeout(() => document.getElementById('pwaInstallBanner').classList.add('show'), 3000);
+            }
+        });
+        function dismissPwaBanner() {
+            document.getElementById('pwaInstallBanner').classList.remove('show');
+            localStorage.setItem(PWA_DISMISS_KEY, 'true');
+        }
+        async function installPwa() {
+            if (!deferredInstallPrompt) {
+                showToast('Install tidak tersedia. Coba dari menu browser.', true);
+                return;
+            }
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') showToast('✅ Aplikasi berhasil di-install!');
+            deferredInstallPrompt = null;
+            document.getElementById('pwaInstallBanner').classList.remove('show');
+        }
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('pwaInstallBanner').classList.remove('show');
+            showToast('✅ Aplikasi terinstall!');
+        });
+
+        // ============================================================
+        // ONLINE / OFFLINE
+        // ============================================================
+        function updateConnBadge() {
+            const badge = document.getElementById('connBadge');
+            const text = document.getElementById('connText');
+            if (!badge || !text) return;
+            if (navigator.onLine) {
+                badge.className = 'conn-badge online';
+                text.textContent = 'Online';
+            } else {
+                badge.className = 'conn-badge offline';
+                text.textContent = 'Offline';
+            }
+        }
+        window.addEventListener('online', () => {
+            updateConnBadge();
+            showToast('🌐 Kembali online — sync otomatis');
+            setTimeout(() => sync(), 800);
+        });
+        window.addEventListener('offline', () => {
+            updateConnBadge();
+            showToast('📴 Mode offline', true);
+        });
+
+        // ============================================================
+        // CACHE
+        // ============================================================
+        function saveCache(data) {
+            try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); }
+            catch(e) { console.warn('Cache save failed:', e); }
+        }
+        function loadCache() {
+            try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); }
+            catch(e) { return null; }
+        }
+
+        // ============================================================
+        // CSV MAPPING
+        // ============================================================
+        function mapCsvRows(rows) {
+            return rows.map(row => {
+                if (Array.isArray(row)) return row;
+                if (typeof row === 'object' && row !== null) {
+                    const keys = Object.keys(row);
+                    const colB = row[keys[1]] || row['Nama Center'] || row['Center'] || '';
+                    const colD = row[keys[3]] || row['Nama YL'] || row['YL'] || '';
+                    const colE = row[keys[4]] || '';
+                    const colF = row[keys[5]] || row['Nama Pelanggan'] || row['Pelanggan'] || '';
+                    const colI = row[keys[8]] || row['Jumlah Point'] || row['Point'] || row['Poin'] || '0';
+                    const colJ = row[keys[9]] || row['Jumlah Transaksi'] || row['Trx'] || '1';
+                    return ['', colB, '', colD, colE, colF, '', '', colI, colJ];
+                }
+                return [];
+            });
+        }
+
+        // ============================================================
+        // DATA AGGREGATION
+        // ============================================================
+        function processDataAggregation() {
+            const customerMap = new Map();
+
+            activeRawData.forEach(row => {
+                const center = (row[1] || '').toString().trim();
+                const yl = (row[3] || '').toString().trim();
+                const keyE = (row[4] || '').toString().trim();
+                const pelangganF = (row[5] || '').toString().trim();
+                const pointVal = parseInt((row[8] || '0').toString().replace(/[^0-9]/g, ''), 10) || 0;
+                const trxVal = parseInt((row[9] || '1').toString().replace(/[^0-9]/g, ''), 10) || 1;
+
+                if (!pelangganF && !keyE) return;
+
+                const matchKey = `${keyE.toLowerCase()}___${center.toLowerCase()}`;
+
+                if (customerMap.has(matchKey)) {
+                    const existing = customerMap.get(matchKey);
+                    existing.totalPoint += pointVal;
+                    existing.transactionCount += trxVal;
+                    if (!existing.yl && yl) existing.yl = yl;
+                    if (!existing.pelanggan && pelangganF) existing.pelanggan = pelangganF;
+                } else {
+                    customerMap.set(matchKey, {
+                        matchKey: keyE,
+                        pelanggan: pelangganF || keyE,
+                        center: center || 'Unassigned Center',
+                        yl: yl || 'Unassigned YL',
+                        totalPoint: pointVal,
+                        transactionCount: trxVal
+                    });
+                }
+            });
+
+            aggregatedCustomers = Array.from(customerMap.values())
+                .sort((a, b) => b.totalPoint - a.totalPoint);
+
+            calculateLeaderboard();
+            updateCenterOptions();
+            updateYLOptions();
+            updateStats();
+            renderTable();
+        }
+
+        // ============================================================
+        // LEADERBOARD
+        // ============================================================
+        function calculateLeaderboard() {
+            const ylMap = new Map();
+
+            aggregatedCustomers.forEach(item => {
+                const yl = item.yl || 'Unassigned YL';
+                if (!ylMap.has(yl)) {
+                    ylMap.set(yl, {
+                        yl: yl,
+                        totalPoint: 0,
+                        totalCustomers: 0,
+                        totalTransactions: 0,
+                        centers: new Set()
+                    });
+                }
+                const entry = ylMap.get(yl);
+                entry.totalPoint += item.totalPoint;
+                entry.totalCustomers += 1;
+                entry.totalTransactions += item.transactionCount;
+                if (item.center) entry.centers.add(item.center);
+            });
+
+            leaderboardData = Array.from(ylMap.values()).map(entry => {
+                const avgPoint = entry.totalCustomers > 0 
+                    ? Math.round(entry.totalPoint / entry.totalCustomers) 
+                    : 0;
+                const score = 
+                    (entry.totalPoint * RANKING_WEIGHT_POINT) + 
+                    (entry.totalCustomers * CUSTOMER_WEIGHT_MULTIPLIER * RANKING_WEIGHT_CUSTOMER);
+                return {
+                    yl: entry.yl,
+                    totalPoint: entry.totalPoint,
+                    totalCustomers: entry.totalCustomers,
+                    totalTransactions: entry.totalTransactions,
+                    avgPoint: avgPoint,
+                    score: Math.round(score),
+                    centers: Array.from(entry.centers).join(', ')
+                };
+            }).sort((a, b) => b.score - a.score);
+
+            if (leaderboardData.length > 0) {
+                const topPointYL = [...leaderboardData].sort((a,b) => b.totalPoint - a.totalPoint)[0];
+                const topCustomerYL = [...leaderboardData].sort((a,b) => b.totalCustomers - a.totalCustomers)[0];
+                const topEfficiencyYL = [...leaderboardData]
+                    .filter(l => l.totalCustomers >= 2)
+                    .sort((a,b) => b.avgPoint - a.avgPoint)[0];
+
+                leaderboardData.forEach(l => {
+                    l.achievements = [];
+                    if (topPointYL && l.yl === topPointYL.yl) l.achievements.push('top-point');
+                    if (topCustomerYL && l.yl === topCustomerYL.yl) l.achievements.push('top-customer');
+                    if (topEfficiencyYL && l.yl === topEfficiencyYL.yl) l.achievements.push('top-efficiency');
+                });
+            }
+        }
+
+        // ============================================================
+        // STATS
+        // ============================================================
+        function updateStats() {
+            const searchVal = document.getElementById('inputSearch').value.toLowerCase().trim();
+
+            const filtered = aggregatedCustomers.filter(item => {
+                const matchCenter = !selectedCenterValue || item.center === selectedCenterValue;
+                const matchYL = !selectedYLValue || item.yl === selectedYLValue;
+                const matchSearch = !searchVal || item.pelanggan.toLowerCase().includes(searchVal);
+                return matchCenter && matchYL && matchSearch;
+            });
+
+            const uniqueCustomers = new Set(filtered.map(i => i.matchKey.toLowerCase())).size;
+            const totalPoints = filtered.reduce((sum, i) => sum + i.totalPoint, 0);
+            const uniqueCenters = new Set(filtered.map(i => i.center)).size;
+            const uniqueYLs = new Set(filtered.map(i => i.yl)).size;
+
+            animateCounter(document.getElementById('statTotalCustomer'), uniqueCustomers);
+            animateCounter(document.getElementById('statTotalPoint'), totalPoints);
+            animateCounter(document.getElementById('statTotalCenter'), uniqueCenters);
+            animateCounter(document.getElementById('statTotalYL'), uniqueYLs);
+        }
+
+        // ============================================================
+        // TAB SWITCHING — SMOOTH SEGMENTED CONTROL
+        // ============================================================
+        function switchTab(tab, btnEl) {
+            if (activeTab === tab) return;
+            activeTab = tab;
+
+            // Ripple effect
+            if (btnEl) createRipple(btnEl);
+
+            // Indicator slide
+            const indicator = document.getElementById('tabIndicator');
+            if (tab === 'leaderboard') {
+                indicator.classList.add('right');
+            } else {
+                indicator.classList.remove('right');
+            }
+
+            // Button active states
+            const btnPelanggan = document.getElementById('tabBtnPelanggan');
+            const btnLeaderboard = document.getElementById('tabBtnLeaderboard');
+            if (tab === 'pelanggan') {
+                btnPelanggan.classList.add('active');
+                btnLeaderboard.classList.remove('active');
+            } else {
+                btnLeaderboard.classList.add('active');
+                btnPelanggan.classList.remove('active');
+            }
+
+            // Content transition
+            const panelPelanggan = document.getElementById('tabContentPelanggan');
+            const panelLeaderboard = document.getElementById('tabContentLeaderboard');
+
+            // Hide both
+            panelPelanggan.classList.remove('active', 'slide-left', 'slide-right');
+            panelLeaderboard.classList.remove('active', 'slide-left', 'slide-right');
+
+            // Show new panel with slide direction
+            const newPanel = tab === 'pelanggan' ? panelPelanggan : panelLeaderboard;
+            if (tab === 'pelanggan') {
+                newPanel.classList.add('slide-right');
+                renderTable();
+            } else {
+                newPanel.classList.add('slide-left');
+                renderLeaderboard();
+            }
+            
+            // Force reflow then activate
+            void newPanel.offsetWidth;
+            newPanel.classList.add('active');
+        }
+
+        // Ripple generator
+        function createRipple(el) {
+            const rect = el.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = rect.width / 2 - size / 2;
+            const y = rect.height / 2 - size / 2;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            el.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 700);
+        }
+
+        // ============================================================
+        // CENTER MODAL
+        // ============================================================
+        function openCenterModal() {
+            renderCenterList();
+            const modal = document.getElementById('centerModal');
+            const card = document.getElementById('centerModalCard');
+            const chevron = document.getElementById('centerChevron');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('translate-y-full');
+                if (chevron) chevron.classList.add('rotate-180');
+            }, 10);
+        }
+
+        function closeCenterModal() {
+            const modal = document.getElementById('centerModal');
+            const card = document.getElementById('centerModalCard');
+            const chevron = document.getElementById('centerChevron');
+
+            modal.classList.add('opacity-0');
+            card.classList.add('translate-y-full');
+            if (chevron) chevron.classList.remove('rotate-180');
+            
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function renderCenterList() {
+            const container = document.getElementById('centerListContainer');
+            const centers = Array.from(new Set(aggregatedCustomers.map(i => i.center))).filter(Boolean).sort();
+
+            container.innerHTML = '';
+
+            const allItem = document.createElement('div');
+            allItem.className = `p-3 rounded-xl cursor-pointer flex items-center justify-between border transition-all active:scale-98 ${
+                selectedCenterValue === '' 
+                    ? 'bg-pink-100/90 border-pink-300 text-brand-600 font-bold shadow-sm' 
+                    : 'bg-pink-50/40 hover:bg-pink-50 border-pink-100/60 text-slate-700 font-medium'
+            }`;
+            allItem.innerHTML = `
+                <span class="text-xs">-- Semua Center --</span>
+                ${selectedCenterValue === '' ? '<div class="w-4 h-4 rounded-full bg-brand-500 text-white flex items-center justify-center text-[9px] shadow-sm"><i class="fa-solid fa-check"></i></div>' : '<div class="w-4 h-4 rounded-full border border-slate-300"></div>'}
+            `;
+            allItem.onclick = () => {
+                selectedCenterValue = '';
+                document.getElementById('selectedCenterLabel').textContent = '-- Semua Center --';
+                selectedYLValue = '';
+                document.getElementById('selectedYLLabel').textContent = '-- Semua YL --';
+                closeCenterModal();
+                updateYLOptions();
+                renderTable();
+            };
+            container.appendChild(allItem);
+
+            centers.forEach(c => {
+                const isSelected = selectedCenterValue === c;
+                const item = document.createElement('div');
+                item.className = `p-3 rounded-xl cursor-pointer flex items-center justify-between border transition-all active:scale-98 ${
+                    isSelected 
+                        ? 'bg-pink-100/90 border-pink-300 text-brand-600 font-bold shadow-sm' 
+                        : 'bg-pink-50/40 hover:bg-pink-50 border-pink-100/60 text-slate-700 font-medium'
+                }`;
+                item.innerHTML = `
+                    <span class="text-xs">${escapeHtml(c)}</span>
+                    ${isSelected ? '<div class="w-4 h-4 rounded-full bg-brand-500 text-white flex items-center justify-center text-[9px] shadow-sm"><i class="fa-solid fa-check"></i></div>' : '<div class="w-4 h-4 rounded-full border border-slate-300"></div>'}
+                `;
+                item.onclick = () => {
+                    selectedCenterValue = c;
+                    document.getElementById('selectedCenterLabel').textContent = c;
+                    selectedYLValue = '';
+                    document.getElementById('selectedYLLabel').textContent = '-- Semua YL --';
+                    closeCenterModal();
+                    updateYLOptions();
+                    renderTable();
+                };
+                container.appendChild(item);
+            });
+        }
+
+        // ============================================================
+        // YL MODAL
+        // ============================================================
+        function openYLModal() {
+            renderYLList();
+            const modal = document.getElementById('ylModal');
+            const card = document.getElementById('ylModalCard');
+            const chevron = document.getElementById('ylChevron');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('translate-y-full');
+                if (chevron) chevron.classList.add('rotate-180');
+            }, 10);
+        }
+
+        function closeYLModal() {
+            const modal = document.getElementById('ylModal');
+            const card = document.getElementById('ylModalCard');
+            const chevron = document.getElementById('ylChevron');
+
+            modal.classList.add('opacity-0');
+            card.classList.add('translate-y-full');
+            if (chevron) chevron.classList.remove('rotate-180');
+            
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function renderYLList() {
+            const container = document.getElementById('ylListContainer');
+            const filteredForYL = selectedCenterValue 
+                ? aggregatedCustomers.filter(i => i.center === selectedCenterValue)
+                : aggregatedCustomers;
+
+            const yls = Array.from(new Set(filteredForYL.map(i => i.yl))).filter(Boolean).sort();
+
+            container.innerHTML = '';
+
+            const allItem = document.createElement('div');
+            allItem.className = `p-3 rounded-xl cursor-pointer flex items-center justify-between border transition-all active:scale-98 ${
+                selectedYLValue === '' 
+                    ? 'bg-pink-100/90 border-pink-300 text-brand-600 font-bold shadow-sm' 
+                    : 'bg-pink-50/40 hover:bg-pink-50 border-pink-100/60 text-slate-700 font-medium'
+            }`;
+            allItem.innerHTML = `
+                <span class="text-xs">-- Semua YL --</span>
+                ${selectedYLValue === '' ? '<div class="w-4 h-4 rounded-full bg-brand-500 text-white flex items-center justify-center text-[9px] shadow-sm"><i class="fa-solid fa-check"></i></div>' : '<div class="w-4 h-4 rounded-full border border-slate-300"></div>'}
+            `;
+            allItem.onclick = () => {
+                selectedYLValue = '';
+                document.getElementById('selectedYLLabel').textContent = '-- Semua YL --';
+                closeYLModal();
+                renderTable();
+            };
+            container.appendChild(allItem);
+
+            yls.forEach(y => {
+                const isSelected = selectedYLValue === y;
+                const item = document.createElement('div');
+                item.className = `p-3 rounded-xl cursor-pointer flex items-center justify-between border transition-all active:scale-98 ${
+                    isSelected 
+                        ? 'bg-pink-100/90 border-pink-300 text-brand-600 font-bold shadow-sm' 
+                        : 'bg-pink-50/40 hover:bg-pink-50 border-pink-100/60 text-slate-700 font-medium'
+                }`;
+                item.innerHTML = `
+                    <span class="text-xs">${escapeHtml(y)}</span>
+                    ${isSelected ? '<div class="w-4 h-4 rounded-full bg-brand-500 text-white flex items-center justify-center text-[9px] shadow-sm"><i class="fa-solid fa-check"></i></div>' : '<div class="w-4 h-4 rounded-full border border-slate-300"></div>'}
+                `;
+                item.onclick = () => {
+                    selectedYLValue = y;
+                    document.getElementById('selectedYLLabel').textContent = y;
+                    closeYLModal();
+                    renderTable();
+                };
+                container.appendChild(item);
+            });
+        }
+
+        function updateCenterOptions() {
+            if (selectedCenterValue) {
+                const centers = Array.from(new Set(aggregatedCustomers.map(i => i.center)));
+                if (!centers.includes(selectedCenterValue)) {
+                    selectedCenterValue = '';
+                    document.getElementById('selectedCenterLabel').textContent = '-- Semua Center --';
+                }
+            }
+        }
+
+        function updateYLOptions() {
+            if (selectedYLValue) {
+                const filteredForYL = selectedCenterValue 
+                    ? aggregatedCustomers.filter(i => i.center === selectedCenterValue)
+                    : aggregatedCustomers;
+                const yls = Array.from(new Set(filteredForYL.map(i => i.yl)));
+                if (!yls.includes(selectedYLValue)) {
+                    selectedYLValue = '';
+                    document.getElementById('selectedYLLabel').textContent = '-- Semua YL --';
+                }
+            }
+        }
+
+        // ============================================================
+        // TABLE RENDER
+        // ============================================================
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            const tableSkeleton = document.getElementById('tableSkeleton');
+            const emptyState = document.getElementById('emptyState');
+            const searchVal = document.getElementById('inputSearch').value.toLowerCase().trim();
+
+            const filtered = aggregatedCustomers.filter(item => {
+                const matchCenter = !selectedCenterValue || item.center === selectedCenterValue;
+                const matchYL = !selectedYLValue || item.yl === selectedYLValue;
+                const matchSearch = !searchVal || item.pelanggan.toLowerCase().includes(searchVal);
+                return matchCenter && matchYL && matchSearch;
+            });
+
+            currentFilteredCustomers = filtered;
+
+            // Skeleton logic: tampil saat data pertama belum siap
+            if (aggregatedCustomers.length === 0 && activeRawData.length > 0) {
+                tableSkeleton.style.display = 'flex';
+                tableBody.innerHTML = '';
+                emptyState.classList.add('hidden');
+                return;
+            } else {
+                tableSkeleton.style.display = 'none';
+            }
+
+            if (filtered.length === 0) {
+                tableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                updateStats();
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            // Render table
+            let html = '';
+            filtered.forEach((item, index) => {
+                let rankBadge = `${index + 1}`;
+                if (index === 0) rankBadge = '🥇';
+                else if (index === 1) rankBadge = '🥈';
+                else if (index === 2) rankBadge = '🥉';
+
+                html += `
+                    <tr class="hover:bg-slate-50/80 border-b border-slate-100 fade-in-up" style="animation-delay: ${Math.min(index * 15, 300)}ms">
+                        <td class="py-2 px-2 font-bold text-slate-500 text-[10px] text-center">${rankBadge}</td>
+                        <td class="py-2 px-2 font-bold text-slate-800 leading-tight">${escapeHtml(item.pelanggan)}</td>
+                        <td class="py-2 px-2 text-slate-600 font-medium text-[11px] whitespace-nowrap">${escapeHtml(item.center)}</td>
+                        <td class="py-2 px-2 text-slate-600 font-medium text-[11px] whitespace-nowrap">${escapeHtml(item.yl)}</td>
+                        <td class="py-2 px-1 text-slate-600 text-center font-semibold text-[11px]">${item.transactionCount}x</td>
+                        <td class="py-2 px-2 text-right font-extrabold text-brand-600 text-xs whitespace-nowrap">
+                            ${item.totalPoint.toLocaleString('id-ID')} <span class="text-[9px] text-slate-400 font-normal">Pt</span>
+                        </td>
+                        <td class="py-2 px-2 text-center">
+                            <button data-customer-index="${index}" class="view-detail-btn w-7 h-7 rounded-xl bg-pink-50 hover:bg-brand-500 hover:text-white text-brand-600 flex items-center justify-center mx-auto shadow-sm btn-tactile" title="Lihat Detail">
+                                <i class="fa-solid fa-eye text-xs"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tableBody.innerHTML = html;
+
+            // Attach event listeners (anti-XSS)
+            tableBody.querySelectorAll('.view-detail-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(e.currentTarget.dataset.customerIndex, 10);
+                    if (!isNaN(idx) && currentFilteredCustomers[idx]) {
+                        showDetail(currentFilteredCustomers[idx]);
+                    }
+                });
+            });
+
+            updateStats();
+            dataHasRendered = true;
+        }
+
+        // ============================================================
+        // LEADERBOARD RENDER
+        // ============================================================
+        function renderLeaderboard() {
+            const list = document.getElementById('leaderboardList');
+            const empty = document.getElementById('leaderboardEmpty');
+            const skeleton = document.getElementById('leaderboardSkeleton');
+
+            // Skeleton hanya saat data benar-benar belum siap
+            if (leaderboardData.length === 0 && aggregatedCustomers.length === 0) {
+                skeleton.style.display = 'flex';
+                list.innerHTML = '';
+                empty.classList.add('hidden');
+                return;
+            } else {
+                skeleton.style.display = 'none';
+            }
+
+            const totalYL = leaderboardData.length;
+            const totalPoint = leaderboardData.reduce((s, l) => s + l.totalPoint, 0);
+            const topName = leaderboardData.length > 0 ? leaderboardData[0].yl : '-';
+
+            animateCounter(document.getElementById('statLeaderTotalYL'), totalYL);
+            animateCounter(document.getElementById('statLeaderTotalPoint'), totalPoint);
+            document.getElementById('statLeaderTopName').textContent = topName;
+
+            if (leaderboardData.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            const medalEmoji = ['🥇', '🥈', '🥉'];
+
+            list.innerHTML = leaderboardData.map((l, index) => {
+                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
+                const medal = index < 3 ? medalEmoji[index] : `#${index + 1}`;
+                const achievementsHtml = (l.achievements || []).map(a => {
+                    if (a === 'top-point') return '<span class="achievement-badge achievement-top-point">🔥 Top Point</span>';
+                    if (a === 'top-customer') return '<span class="achievement-badge achievement-top-customer">👥 Top Pelanggan</span>';
+                    if (a === 'top-efficiency') return '<span class="achievement-badge achievement-top-efficiency">⭐ Top Efisiensi</span>';
+                    return '';
+                }).join('');
+
+                return `
+                    <div class="leader-card ${rankClass} bg-white rounded-2xl p-3 sm:p-4 shadow-sm border border-slate-200/80 fade-in-up" style="animation-delay: ${Math.min(index * 40, 400)}ms">
+                        <div class="flex items-start gap-3 relative">
+                            <div class="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-pink-400 to-brand-500 text-white flex items-center justify-center text-xl font-extrabold shadow-md">
+                                ${medal}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                    <h4 class="font-extrabold text-slate-800 text-sm truncate font-poppins">${escapeHtml(l.yl)}</h4>
+                                    ${achievementsHtml}
+                                </div>
+                                <p class="text-[10px] text-slate-500 font-medium mb-2 truncate">
+                                    <i class="fa-solid fa-store text-[9px]"></i> ${escapeHtml(l.centers || '-')}
+                                </p>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                                    <div class="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-200/60">
+                                        <p class="text-[9px] text-slate-500 font-bold uppercase">Pelanggan</p>
+                                        <p class="text-sm font-extrabold text-slate-800 tabular-nums">${l.totalCustomers}</p>
+                                    </div>
+                                    <div class="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-200/60">
+                                        <p class="text-[9px] text-slate-500 font-bold uppercase">Point</p>
+                                        <p class="text-sm font-extrabold text-brand-600 tabular-nums">${fmtNum(l.totalPoint)}</p>
+                                    </div>
+                                    <div class="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-200/60">
+                                        <p class="text-[9px] text-slate-500 font-bold uppercase">Rata-rata</p>
+                                        <p class="text-sm font-extrabold text-slate-700 tabular-nums">${fmtNum(l.avgPoint)}</p>
+                                    </div>
+                                    <div class="bg-amber-50 rounded-lg px-2 py-1.5 border border-amber-200/60">
+                                        <p class="text-[9px] text-amber-700 font-bold uppercase">Skor</p>
+                                        <p class="text-sm font-extrabold text-amber-700 tabular-nums">${fmtNum(l.score)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // SHARE LEADERBOARD
+        // ============================================================
+        function shareLeaderboard() {
+            if (leaderboardData.length === 0) {
+                showToast('Belum ada data untuk dibagikan', true);
+                return;
+            }
+
+            const medalEmoji = ['🥇', '🥈', '🥉'];
+            let text = `🏆 *LEADERBOARD YL*\n`;
+            text += `_Ranking kombinasi Point (${RANKING_WEIGHT_POINT*100}%) & Pelanggan (${RANKING_WEIGHT_CUSTOMER*100}%)_\n`;
+            text += `━━━━━━━━━━━━━━━━━\n\n`;
+
+            leaderboardData.slice(0, 10).forEach((l, index) => {
+                const medal = index < 3 ? medalEmoji[index] : `#${index + 1}`;
+                text += `${medal} *${l.yl}*\n`;
+                text += `   💰 ${fmtNum(l.totalPoint)} Point | 👥 ${l.totalCustomers} Pelanggan\n`;
+                text += `   📊 Rata-rata: ${fmtNum(l.avgPoint)} Pt | 🎯 Skor: ${fmtNum(l.score)}\n\n`;
+            });
+
+            if (leaderboardData.length > 10) {
+                text += `_...dan ${leaderboardData.length - 10} YL lainnya_\n\n`;
+            }
+
+            text += `━━━━━━━━━━━━━━━━━\n`;
+            text += `_ayo semangat kumpulkan point!_ 💪`;
+
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+            showToast('Membuka WhatsApp...');
+        }
+
+        // ============================================================
+        // SYNC (background, non-blocking)
+        // ============================================================
+        let isSyncing = false;
+        function sync(urlToSync) {
+            if (typeof Papa === 'undefined') {
+                setTimeout(() => sync(urlToSync), 300);
+                return;
+            }
+            if (isSyncing) return;
+            isSyncing = true;
+
+            const targetUrl = urlToSync || GOOGLE_SHEET_CSV_URL;
+            const syncIcon = document.getElementById('syncIcon');
+            if (syncIcon) syncIcon.classList.add('fa-spin');
+
+            Papa.parse(targetUrl, {
+                download: true,
+                skipEmptyLines: true,
+                worker: false,
+                complete: function(results) {
+                    isSyncing = false;
+                    if (syncIcon) syncIcon.classList.remove('fa-spin');
+                    if (results.data && results.data.length > 0) {
+                        const newData = mapCsvRows(results.data);
+                        activeRawData = newData;
+                        saveCache(newData);
+                        processDataAggregation();
+                        if (activeTab === 'leaderboard') renderLeaderboard();
+                        showToast(`✅ Data diperbarui (${newData.length} baris)`);
+                    }
+                },
+                error: function(err) {
+                    isSyncing = false;
+                    if (syncIcon) syncIcon.classList.remove('fa-spin');
+                    console.warn('Sync error:', err);
+                    showToast('Gagal sync. Pakai data cache.', true);
+                    const cached = loadCache();
+                    if (cached && cached.length > 0 && aggregatedCustomers.length === 0) {
+                        activeRawData = cached;
+                        processDataAggregation();
+                    }
+                }
+            });
+        }
+
+        function syncFromModalInput() {
+            const urlInput = document.getElementById('googleSheetUrlInput').value.trim();
+            if (urlInput) {
+                sync(urlInput);
+                closeCsvModal();
+            } else {
+                showToast('Masukkan URL Google Sheet CSV terlebih dahulu.', true);
+            }
+        }
+
+        function resetFilters() {
+            selectedCenterValue = '';
+            selectedYLValue = '';
+            document.getElementById('selectedCenterLabel').textContent = '-- Semua Center --';
+            document.getElementById('selectedYLLabel').textContent = '-- Semua YL --';
+            document.getElementById('inputSearch').value = '';
+            renderTable();
+            showToast('Filter telah direset.');
+        }
+
+        // ============================================================
+        // DETAIL MODAL
+        // ============================================================
+        function showDetail(item) {
+            activeCustomerDetailItem = item;
+            selectedRewardItem = null;
+            activeRewardTabFilter = 'eligible';
+            
+            document.getElementById('modalCustomerName').textContent = item.pelanggan;
+            document.getElementById('modalCenterName').textContent = item.center;
+            document.getElementById('modalYLName').textContent = item.yl;
+            document.getElementById('modalTotalPoint').textContent = item.totalPoint.toLocaleString('id-ID') + ' Point';
+
+            clearSelectedReward();
+            renderRewardsList();
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function filterRewardsTab(tab) {
+            activeRewardTabFilter = tab;
+            const tabEligible = document.getElementById('tabRewardEligible');
+            const tabAll = document.getElementById('tabRewardAll');
+
+            if (tab === 'eligible') {
+                tabEligible.className = "px-2 py-0.5 rounded-md bg-white text-brand-600 shadow-sm font-bold";
+                tabAll.className = "px-2 py-0.5 rounded-md text-slate-500 font-medium";
+            } else {
+                tabAll.className = "px-2 py-0.5 rounded-md bg-white text-brand-600 shadow-sm font-bold";
+                tabEligible.className = "px-2 py-0.5 rounded-md text-slate-500 font-medium";
+            }
+            renderRewardsList();
+        }
+
+        function renderRewardsList() {
+            if (!activeCustomerDetailItem) return;
+
+            const container = document.getElementById('rewardListContainer');
+            const userPoint = activeCustomerDetailItem.totalPoint || 0;
+            
+            let filteredRewards = YAKULT_REWARDS_CATALOG;
+            if (activeRewardTabFilter === 'eligible') {
+                filteredRewards = YAKULT_REWARDS_CATALOG.filter(r => userPoint >= r.point);
+            }
+
+            if (filteredRewards.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 py-4 text-center text-slate-400 bg-pink-50/30 rounded-xl border border-dashed border-pink-200">
+                        <i class="fa-solid fa-coins text-lg text-pink-300 mb-1"></i>
+                        <p class="text-[10px] font-semibold text-slate-500">Poin Belum Mencukupi</p>
+                        <p class="text-[9px] text-slate-400">Minimal butuh 60 Point.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filteredRewards.forEach(reward => {
+                const canAfford = userPoint >= reward.point;
+                const isSelected = selectedRewardItem && selectedRewardItem.name === reward.name;
+                const formattedName = toTitleCase(reward.name);
+
+                html += `
+                    <div data-reward-name="${escapeHtml(reward.name)}" data-can-afford="${canAfford}" class="reward-item p-2 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                        isSelected 
+                            ? 'bg-emerald-50 border-emerald-400 ring-2 ring-emerald-300' 
+                            : canAfford 
+                                ? 'bg-white hover:bg-pink-50/60 border-pink-200 text-slate-800 active:scale-98' 
+                                : 'bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed'
+                    }">
+                        <div class="flex items-center gap-2 overflow-hidden">
+                            <div class="w-6 h-6 rounded-lg ${canAfford ? 'bg-pink-100 text-brand-600' : 'bg-slate-200 text-slate-500'} flex items-center justify-center flex-shrink-0 text-[10px]">
+                                <i class="fa-solid ${reward.icon}"></i>
+                            </div>
+                            <div class="truncate">
+                                <h5 class="font-bold text-[10px] truncate text-slate-800">${escapeHtml(formattedName)}</h5>
+                                <span class="text-[9px] font-semibold ${canAfford ? 'text-emerald-600' : 'text-slate-400'}">${reward.point} Point</span>
+                            </div>
+                        </div>
+                        <div>
+                            ${
+                                isSelected 
+                                    ? '<span class="px-1.5 py-0.5 text-[8px] font-extrabold bg-emerald-500 text-white rounded-md">Dipilih</span>'
+                                    : canAfford 
+                                        ? '<span class="px-1.5 py-0.5 text-[8px] font-bold bg-emerald-100 text-emerald-700 rounded-md">Tukar</span>'
+                                        : `<span class="px-1.5 py-0.5 text-[8px] font-semibold bg-slate-200 text-slate-600 rounded-md">-${reward.point - userPoint}</span>`
+                            }
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            // Attach event listener
+            container.querySelectorAll('.reward-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const rewardName = el.dataset.rewardName;
+                    const canAfford = el.dataset.canAfford === 'true';
+                    const reward = YAKULT_REWARDS_CATALOG.find(r => r.name === rewardName);
+                    if (!reward) return;
+                    if (canAfford) {
+                        selectReward(reward);
+                    } else {
+                        const userPointNow = activeCustomerDetailItem.totalPoint || 0;
+                        showToast(`Kurang ${(reward.point - userPointNow).toLocaleString('id-ID')} Point lagi untuk ${toTitleCase(reward.name)}`, true);
+                    }
+                });
+            });
+        }
+
+        function selectReward(reward) {
+            if (selectedRewardItem && selectedRewardItem.name === reward.name) {
+                clearSelectedReward();
+            } else {
+                selectedRewardItem = reward;
+                const note = document.getElementById('selectedRewardNote');
+                note.classList.remove('hidden');
+                note.classList.add('flex');
+                document.getElementById('selectedRewardNameText').textContent = `${toTitleCase(reward.name)} (${reward.point} Point)`;
+                showToast(`Memilih: ${toTitleCase(reward.name)}`);
+            }
+            renderRewardsList();
+        }
+
+        function clearSelectedReward() {
+            selectedRewardItem = null;
+            const note = document.getElementById('selectedRewardNote');
+            note.classList.add('hidden');
+            note.classList.remove('flex');
+            renderRewardsList();
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // ============================================================
+        // BUILD MESSAGE
+        // ============================================================
+        function buildCustomerMessage() {
+            if (!activeCustomerDetailItem) return '';
+
+            const eligibleRewards = YAKULT_REWARDS_CATALOG.filter(r => activeCustomerDetailItem.totalPoint >= r.point);
+            let rewardText = "";
+
+            if (selectedRewardItem) {
+                rewardText = `\n🎁 *Hadiah Yang Ingin Ditukar:*\n• ${toTitleCase(selectedRewardItem.name)} (${selectedRewardItem.point} Point)\n`;
+            } else if (eligibleRewards.length > 0) {
+                rewardText = `\n🎁 *Hadiah Yang Bisa Ditukar (${eligibleRewards.length} Pilihan):*\n` + 
+                    eligibleRewards.map(r => `• ${toTitleCase(r.name)} (${r.point} Point)`).join('\n') + `\n`;
+            } else {
+                rewardText = `\n🎁 *Status Souvenir:* Belum cukup point (Min 60 Point)\n`;
+            }
+
+            return `*DETAIL POINT & SOUVENIR PELANGGAN*\n` +
+                `-------------------------\n` +
+                `*Nama Pelanggan:* ${activeCustomerDetailItem.pelanggan}\n` +
+                `*Center:* ${activeCustomerDetailItem.center}\n` +
+                `*Nama YL (PIC):* ${activeCustomerDetailItem.yl}\n` +
+                `*Total Point:* ${activeCustomerDetailItem.totalPoint.toLocaleString('id-ID')} Point\n` +
+                `-------------------------` +
+                rewardText +
+                `-------------------------\n` +
+                `*ayo kumpulkan botol dan tukar dengan sovenir menarik!*`;
+        }
+
+        async function copyDetailText() {
+            const textToCopy = buildCustomerMessage();
+            if (!textToCopy) return;
+
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(textToCopy);
+                    showToast('Teks berhasil disalin!');
+                } else {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = textToCopy;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showToast('Teks berhasil disalin!');
+                }
+            } catch (err) {
+                console.error('Copy error:', err);
+                showToast('Gagal menyalin teks.', true);
+            }
+        }
+
+        function sendToWhatsApp() {
+            const text = buildCustomerMessage();
+            if (!text) return;
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+            showToast('Membuka WhatsApp...');
+        }
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            if (!toast) return;
+
+            toastMsg.textContent = message;
+            if (isError) {
+                toastIcon.className = "fa-solid fa-circle-exclamation text-rose-400 text-sm";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-sm";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 2800);
+        }
+
+        // ============================================================
+        // PASSWORD & CSV
+        // ============================================================
+        function openPasswordModal() {
+            const pwdInput = document.getElementById('inputPassword');
+            const errorEl = document.getElementById('passwordError');
+            if (pwdInput) {
+                pwdInput.value = '';
+                pwdInput.type = 'password';
+            }
+            const icon = document.getElementById('togglePasswordIcon');
+            if (icon) icon.className = 'fa-solid fa-eye';
+            if (errorEl) {
+                errorEl.classList.add('hidden');
+                errorEl.classList.remove('flex');
+            }
+            document.getElementById('passwordModal').classList.remove('hidden');
+            setTimeout(() => { if (pwdInput) pwdInput.focus(); }, 100);
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+        }
+
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('inputPassword');
+            const icon = document.getElementById('togglePasswordIcon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                pwdInput.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        function handlePasswordSubmit(e) {
+            e.preventDefault();
+            const inputVal = document.getElementById('inputPassword').value;
+            const errorEl = document.getElementById('passwordError');
+            
+            // ⚠️ Password di klien — untuk produksi pindah ke server
+            if (inputVal === 'Tampomas24') {
+                closePasswordModal();
+                openCsvModal();
+            } else {
+                errorEl.classList.remove('hidden');
+                errorEl.classList.add('flex');
+                document.getElementById('inputPassword').focus();
+                document.getElementById('inputPassword').select();
+            }
+        }
+
+        function openCsvModal() {
+            document.getElementById('csvModal').classList.remove('hidden');
+        }
+
+        function closeCsvModal() {
+            document.getElementById('csvModal').classList.add('hidden');
+        }
+
+        // ============================================================
+        // INIT — CACHE-FIRST PAINT
+        // ============================================================
+        function bootApp() {
+            // 1. Theme dulu (paling cepat, avoid flash)
+            initTheme();
+
+            // 2. Connection badge
+            updateConnBadge();
+
+            // 3. URL input default
+            const urlInput = document.getElementById('googleSheetUrlInput');
+            if (urlInput) urlInput.value = GOOGLE_SHEET_CSV_URL;
+
+            // 4. CACHE-FIRST: load cache dulu, render instan
+            const cached = loadCache();
+            if (cached && cached.length > 0) {
+                activeRawData = cached;
+                processDataAggregation();
+                // Pastikan tab pelanggan aktif
+                if (activeTab === 'pelanggan') renderTable();
+            } else {
+                // Kalau tidak ada cache, pakai default data agar UI tidak kosong
+                activeRawData = [...defaultRawData];
+                processDataAggregation();
+            }
+
+            // 5. Register SW (async, tidak blocking)
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => registerServiceWorker());
+            } else {
+                setTimeout(registerServiceWorker, 1500);
+            }
+
+            // 6. Sync fresh di background (tidak blocking UI)
+            const startSync = () => sync(GOOGLE_SHEET_CSV_URL);
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(startSync, { timeout: 1000 });
+            } else {
+                setTimeout(startSync, 500);
+            }
+        }
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search debounced
+            const inputSearch = document.getElementById('inputSearch');
+            if (inputSearch) {
+                inputSearch.addEventListener('input', debounce(() => renderTable(), 180));
+            }
+
+            // CSV file input
+            const csvFileInput = document.getElementById('csvFileInput');
+            if (csvFileInput) {
+                csvFileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    Papa.parse(file, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            if (results.data && results.data.length > 0) {
+                                activeRawData = mapCsvRows(results.data);
+                                saveCache(activeRawData);
+                                processDataAggregation();
+                                closeCsvModal();
+                                showToast(`✅ Impor ${activeRawData.length} baris CSV.`);
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Escape close modal
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    ['centerModal','ylModal','passwordModal','csvModal','detailModal'].forEach(id => {
+                        const m = document.getElementById(id);
+                        if (m && !m.classList.contains('hidden')) m.classList.add('hidden');
+                    });
+                }
+            });
+        });
+
+        function loadDefaultData() {
+            activeRawData = [...defaultRawData];
+            saveCache(activeRawData);
+            processDataAggregation();
+            closeCsvModal();
+            showToast('Data demo dimuat.');
+        }
+
+        // Boot app
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bootApp);
+        } else {
+            bootApp();
+        }
+    </script>
+</body>
+</html>

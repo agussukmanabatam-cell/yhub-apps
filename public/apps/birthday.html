@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff5b8f">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Happy Birthday Widget</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Great+Vibes&family=Poppins:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background: linear-gradient(160deg, #fff1f5 0%, #fef3f5 50%, #f5f0ff 100%);
+        }
+        body {
+            display: flex; align-items: flex-start; justify-content: center;
+            padding: 20px 12px 40px;
+            overflow-x: hidden;
+        }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .font-greatvibes { font-family: 'Great Vibes', cursive; }
+        .font-caveat { font-family: 'Caveat', cursive; }
+        .num { font-family: 'Plus Jakarta Sans', sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+        .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        .card-gradient {
+            background:
+                radial-gradient(circle at 20% 0%, rgba(255, 182, 213, 0.35) 0%, transparent 45%),
+                radial-gradient(circle at 90% 100%, rgba(191, 219, 254, 0.3) 0%, transparent 40%),
+                linear-gradient(160deg, #ffffff 0%, #fff8fb 100%);
+        }
+
+        #fireworks-canvas {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .balloon {
+            position: absolute;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0.55; pointer-events: none;
+            animation: float 6s ease-in-out infinite; z-index: 2;
+        }
+        .balloon::after {
+            content: ''; position: absolute; bottom: -8px; left: 50%;
+            transform: translateX(-50%); width: 1px; height: 10px;
+            background: rgba(0,0,0,0.15);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50%      { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        @keyframes flameFlicker {
+            0%, 100% { transform: scale(1) translateY(0); opacity: 1; }
+            50%      { transform: scale(1.15) translateY(-1px); opacity: 0.9; }
+        }
+        .flame { animation: flameFlicker 0.8s ease-in-out infinite; transform-origin: center bottom; }
+        .flame:nth-child(2) { animation-delay: 0.15s; }
+        .flame:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes sparkleTwinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.7) rotate(0deg); }
+            50%      { opacity: 1;   transform: scale(1.2) rotate(20deg); }
+        }
+        .sparkle { animation: sparkleTwinkle 1.8s ease-in-out infinite; }
+
+        @keyframes namePulse {
+            0%, 100% { text-shadow: 0 0 0 rgba(255,91,143,0.4); }
+            50%      { text-shadow: 0 0 22px rgba(255,91,143,0.55); }
+        }
+        .name-glow { animation: namePulse 2.4s ease-in-out infinite; }
+
+        @keyframes cakeGlow {
+            0%, 100% { filter: drop-shadow(0 6px 18px rgba(255,91,143,0.25)); transform: scale(1); }
+            50%      { filter: drop-shadow(0 8px 28px rgba(255,91,143,0.45)); transform: scale(1.02); }
+        }
+        .cake-glow { animation: cakeGlow 3s ease-in-out infinite; }
+
+        /* Calendar */
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 3px; text-align: center;
+        }
+        .calendar-day {
+            padding: 7px 3px; font-size: 0.8rem; border-radius: 9px;
+            position: relative; font-weight: 600; transition: all 0.15s;
+            min-height: 32px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .calendar-day.has-birthday::after {
+            content: ''; position: absolute; bottom: 3px; left: 50%;
+            transform: translateX(-50%); width: 4px; height: 4px;
+            background-color: #ff5b8f; border-radius: 50%;
+        }
+        .calendar-day.today {
+            background: linear-gradient(135deg, #ff9ec1, #ff5b8f);
+            color: white; box-shadow: 0 3px 8px -2px rgba(255,91,143,0.5);
+        }
+        .calendar-day.today.has-birthday::after { background-color: white; }
+
+        .upcoming-item {
+            background: linear-gradient(135deg, #fff5f9, #ffffff);
+            border: 1px solid #ffe4ed;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .upcoming-item:hover { transform: translateY(-1px); box-shadow: 0 4px 12px -4px rgba(255,91,143,0.15); }
+        .upcoming-item.is-today {
+            background: linear-gradient(135deg, #ff9ec1, #ff5b8f);
+            border-color: transparent; color: white;
+        }
+        .upcoming-item.is-today .u-text { color: white !important; }
+
+        #status-toast { transition: opacity .3s, transform .3s; }
+        #status-toast.hidden-toast { opacity: 0; transform: translate(-50%, 10px); pointer-events: none; }
+        #status-toast.show-toast { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+
+        .above-bg { position: relative; z-index: 10; }
+
+        /* ============================================================
+           HIDDEN DOWNLOAD TEMPLATE
+           ============================================================ */
+        #download-card {
+            position: fixed;
+            left: -10000px;
+            top: 0;
+            width: 380px;
+            background: #ffffff;
+            border-radius: 32px;
+            overflow: hidden;
+            padding: 0;
+        }
+        #download-card .dots-bg {
+            background-color: #ffffff;
+            background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='1.3' fill='%23e5e7eb'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+        }
+
+        /* ============================================================
+           RESPONSIVE FULL SCREEN
+           ============================================================ */
+        #app-shell {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+            transition: max-width .3s ease;
+        }
+
+        /* Tablet */
+        @media (min-width: 640px) and (max-width: 1023px){
+            #app-shell{ max-width: 640px; }
+        }
+
+        /* Laptop / Desktop */
+        @media (min-width: 1024px){
+            body{
+                padding: 32px 32px 48px;
+                align-items: flex-start;
+            }
+            #app-shell{
+                max-width: 100%;
+                width: 100%;
+            }
+            /* Grid 12 kolom di dalam kartu — hanya jika ada konten pendukung */
+            .main-card-grid{
+                display: grid;
+                grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+                gap: 24px;
+                align-items: start;
+            }
+            .main-card-grid > .col-left{
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+            }
+            .main-card-grid > .col-right{
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+            /* Header & actions full width */
+            .header-full,
+            .actions-full{
+                grid-column: 1 / -1;
+            }
+            /* Kartu utama padding lebih lega */
+            .card-gradient{
+                padding: 28px 32px 32px !important;
+            }
+            /* Typography header lebih besar */
+            .main-card-grid .greeting-text{ font-size: 6rem; line-height: 0.92; }
+            /* Hero kue lebih lega */
+            #celebration-mode .relative{ height: 320px; }
+            #celebration-mode svg.cake-glow{ width: 280px; }
+            /* Preview calendar absolute tetap di kanan atas */
+            #calendar-popup{
+                right: 32px !important;
+                top: 88px !important;
+                width: 320px !important;
+            }
+        }
+
+        /* Monitor besar */
+        @media (min-width: 1440px){
+            body{ padding: 40px 40px 60px; }
+            #app-shell{ max-width: 1400px; }
+        }
+
+        /* Fullscreen state */
+        #app-shell:fullscreen,
+        #app-shell:-webkit-full-screen{
+            max-width: 100%;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body class="font-poppins no-scrollbar">
+
+<div id="app-shell">
+
+    <!-- ============================================================
+         ON-SCREEN FESTIVE CARD
+         ============================================================ -->
+    <div class="card-gradient rounded-[32px] p-5 pb-6 shadow-[0_20px_60px_-20px_rgba(255,91,143,0.35)] border border-pink-100 relative overflow-hidden">
+
+        <canvas id="fireworks-canvas" data-html2canvas-ignore></canvas>
+
+        <div class="balloon" style="width:40px;height:50px;background:linear-gradient(135deg,#ffd1e0,#ff9ec1);top:8%;left:6%;animation-delay:0s;"></div>
+        <div class="balloon" style="width:32px;height:42px;background:linear-gradient(135deg,#c7e3ff,#7eb8ff);top:22%;right:8%;animation-delay:1.2s;"></div>
+        <div class="balloon" style="width:28px;height:36px;background:linear-gradient(135deg,#fde68a,#fbbf24);bottom:14%;left:8%;animation-delay:2.4s;"></div>
+        <div class="balloon" style="width:36px;height:46px;background:linear-gradient(135deg,#ddd6fe,#a78bfa);bottom:8%;right:6%;animation-delay:3.6s;"></div>
+
+        <!-- WRAP: grid desktop -->
+        <div class="main-card-grid">
+
+            <!-- HEADER -->
+            <div class="header-full above-bg flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-sm">
+                        <i class="ph-bold ph-confetti text-white text-[15px]"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-pink-400 uppercase tracking-[0.15em] leading-none">Ulang Tahun</p>
+                        <p id="freshness-label" class="text-[9px] font-semibold text-gray-400 mt-0.5 leading-none">Memuat...</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5" data-html2canvas-ignore>
+                    <button onclick="refreshData(true)" id="refresh-btn" class="w-9 h-9 rounded-xl bg-white border border-pink-100 text-pink-400 hover:bg-pink-50 active:scale-95 transition flex items-center justify-center shadow-sm">
+                        <i class="ph-bold ph-arrows-clockwise text-[14px]"></i>
+                    </button>
+                    <button onclick="toggleCalendar()" class="w-9 h-9 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 text-white flex items-center justify-center shadow-sm hover:brightness-105 active:scale-95 transition">
+                        <i class="ph-bold ph-calendar-heart text-[15px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KOLOM KIRI: Typography + Hero -->
+            <div class="col-left">
+
+                <!-- TYPOGRAPHY -->
+                <div class="above-bg text-center mb-3">
+                    <h2 class="text-pink-400 font-bold text-[13px] tracking-[0.4em] m-0">H A P P Y</h2>
+                    <h1 class="greeting-text text-transparent bg-clip-text bg-gradient-to-br from-pink-400 via-rose-500 to-fuchsia-500 font-greatvibes text-[5rem] leading-none mt-1 drop-shadow-sm">birthday</h1>
+                </div>
+
+                <!-- HERO -->
+                <div id="hero-section" class="above-bg mb-4">
+                    <!-- Celebration mode -->
+                    <div id="celebration-mode" class="hidden">
+                        <div class="relative flex justify-center items-center h-[240px]">
+                            <div class="absolute w-40 h-40 rounded-full" style="background: radial-gradient(circle, rgba(255,155,190,0.45) 0%, transparent 70%); filter: blur(20px);"></div>
+
+                            <div class="sparkle absolute w-3 h-3" style="top:12%;left:14%;animation-delay:0s;">
+                                <svg viewBox="0 0 24 24" fill="#fcd34d"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+                            </div>
+                            <div class="sparkle absolute w-2.5 h-2.5" style="top:22%;right:12%;animation-delay:0.4s;">
+                                <svg viewBox="0 0 24 24" fill="#fb7185"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+                            </div>
+                            <div class="sparkle absolute w-2 h-2" style="bottom:24%;left:10%;animation-delay:0.8s;">
+                                <svg viewBox="0 0 24 24" fill="#7dd3fc"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+                            </div>
+                            <div class="sparkle absolute w-2.5 h-2.5" style="bottom:20%;right:10%;animation-delay:1.2s;">
+                                <svg viewBox="0 0 24 24" fill="#c4b5fd"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+                            </div>
+                            <div class="sparkle absolute w-2 h-2" style="top:42%;left:6%;animation-delay:1.6s;">
+                                <svg viewBox="0 0 24 24" fill="#f472b6"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+                            </div>
+                            <div class="sparkle absolute w-2 h-2" style="top:38%;right:6%;animation-delay:2s;">
+                                <svg viewBox="0 0 24 24" fill="#fcd34d"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+                            </div>
+
+                            <!-- Kue 3 tingkat megah -->
+                            <svg class="w-[220px] h-auto cake-glow relative z-10" viewBox="0 0 220 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <ellipse cx="110" cy="218" rx="90" ry="10" fill="rgba(255,155,190,0.28)"/>
+                                <path d="M30,210 L190,210 L190,160 L30,160 Z" fill="#fbcfe8"/>
+                                <rect x="30" y="170" width="160" height="6" fill="#fce7f3"/>
+                                <rect x="30" y="190" width="160" height="6" fill="#fce7f3"/>
+                                <path d="M30,160 Q45,172 60,160 Q75,172 90,160 Q105,172 120,160 Q135,172 150,160 Q165,172 180,160 Q190,172 190,160 L190,155 L30,155 Z" fill="#e81c6e"/>
+                                <circle cx="45" cy="200" r="3" fill="#fcd34d"/>
+                                <circle cx="80" cy="200" r="3" fill="#fcd34d"/>
+                                <circle cx="140" cy="200" r="3" fill="#fcd34d"/>
+                                <circle cx="175" cy="200" r="3" fill="#fcd34d"/>
+                                <path d="M50,160 L170,160 L170,110 L50,110 Z" fill="#f472b6"/>
+                                <path d="M50,110 Q63,122 76,110 Q89,122 102,110 Q115,122 128,110 Q141,122 154,110 Q167,122 170,110 L170,105 L50,105 Z" fill="#be185d"/>
+                                <path d="M75,110 L145,110 L145,70 L75,70 Z" fill="#fbcfe8"/>
+                                <path d="M75,70 Q85,80 95,70 Q105,80 115,70 Q125,80 135,70 Q145,80 145,70 L145,65 L75,65 Z" fill="#f472b6"/>
+                                <rect x="88" y="40" width="7" height="30" rx="2" fill="#fcd34d"/>
+                                <g class="flame">
+                                    <ellipse cx="91.5" cy="32" rx="5" ry="9" fill="#fbbf24"/>
+                                    <ellipse cx="91.5" cy="34" rx="3" ry="5.5" fill="#fef3c7"/>
+                                    <ellipse cx="91.5" cy="35" rx="1.5" ry="3" fill="#ffffff"/>
+                                </g>
+                                <rect x="106.5" y="32" width="7" height="38" rx="2" fill="#fcd34d"/>
+                                <g class="flame">
+                                    <ellipse cx="110" cy="23" rx="5.5" ry="10" fill="#fbbf24"/>
+                                    <ellipse cx="110" cy="25" rx="3.5" ry="6" fill="#fef3c7"/>
+                                    <ellipse cx="110" cy="26" rx="1.8" ry="3.2" fill="#ffffff"/>
+                                </g>
+                                <rect x="125" y="40" width="7" height="30" rx="2" fill="#fcd34d"/>
+                                <g class="flame">
+                                    <ellipse cx="128.5" cy="32" rx="5" ry="9" fill="#fbbf24"/>
+                                    <ellipse cx="128.5" cy="34" rx="3" ry="5.5" fill="#fef3c7"/>
+                                    <ellipse cx="128.5" cy="35" rx="1.5" ry="3" fill="#ffffff"/>
+                                </g>
+                                <circle cx="110" cy="55" r="5" fill="#ef4444"/>
+                                <circle cx="110" cy="55" r="2" fill="#fef2f2"/>
+                            </svg>
+                        </div>
+
+                        <div class="text-center mt-1">
+                            <p class="text-[10px] font-bold text-pink-400 uppercase tracking-[0.2em] mb-1">🎉 Selamat Ulang Tahun 🎉</p>
+                            <h2 id="birthday-names" class="name-glow text-[22px] font-extrabold text-pink-600 leading-tight px-2"></h2>
+                            <p id="wish-text" class="font-caveat text-[1.35rem] text-gray-600 leading-tight mt-2"></p>
+                        </div>
+                    </div>
+
+                    <!-- Countdown mode -->
+                    <div id="countdown-mode" class="hidden">
+                        <div class="rounded-3xl p-5 text-center border border-pink-100 relative overflow-hidden" style="background: linear-gradient(135deg, #fff5f9, #ffffff);">
+                            <div class="flex justify-center mb-2 relative">
+                                <div class="absolute w-20 h-20 rounded-full" style="background: radial-gradient(circle, rgba(255,155,190,0.3) 0%, transparent 70%); filter: blur(12px); top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                                <svg class="w-20 h-auto relative z-10" viewBox="0 0 220 240" fill="none">
+                                    <ellipse cx="110" cy="218" rx="90" ry="10" fill="rgba(255,155,190,0.28)"/>
+                                    <path d="M30,210 L190,210 L190,160 L30,160 Z" fill="#fbcfe8"/>
+                                    <path d="M30,160 Q45,172 60,160 Q75,172 90,160 Q105,172 120,160 Q135,172 150,160 Q165,172 180,160 Q190,172 190,160 L190,155 L30,155 Z" fill="#e81c6e"/>
+                                    <path d="M50,160 L170,160 L170,110 L50,110 Z" fill="#f472b6"/>
+                                    <path d="M50,110 Q63,122 76,110 Q89,122 102,110 Q115,122 128,110 Q141,122 154,110 Q167,122 170,110 L170,105 L50,105 Z" fill="#be185d"/>
+                                    <path d="M75,110 L145,110 L145,70 L75,70 Z" fill="#fbcfe8"/>
+                                    <path d="M75,70 Q85,80 95,70 Q105,80 115,70 Q125,80 135,70 Q145,80 145,70 L145,65 L75,65 Z" fill="#f472b6"/>
+                                    <rect x="106.5" y="32" width="7" height="38" rx="2" fill="#fcd34d"/>
+                                    <g class="flame">
+                                        <ellipse cx="110" cy="23" rx="5.5" ry="10" fill="#fbbf24"/>
+                                        <ellipse cx="110" cy="25" rx="3.5" ry="6" fill="#fef3c7"/>
+                                        <ellipse cx="110" cy="26" rx="1.8" ry="3.2" fill="#ffffff"/>
+                                    </g>
+                                </svg>
+                            </div>
+                            <p class="text-[10px] font-bold text-pink-400 uppercase tracking-[0.15em]">Ulang tahun berikutnya</p>
+                            <p id="next-name" class="text-[20px] font-extrabold text-gray-700 mt-1 leading-tight"></p>
+                            <div class="flex items-center justify-center gap-2 mt-2">
+                                <span id="next-countdown" class="num text-[26px] font-black text-pink-500 leading-none"></span>
+                                <span class="text-[11px] font-bold text-gray-400 uppercase">hari lagi</span>
+                            </div>
+                            <p id="next-date" class="text-[11px] font-semibold text-gray-400 mt-1"></p>
+                        </div>
+                    </div>
+
+                    <!-- Empty mode -->
+                    <div id="empty-mode" class="hidden">
+                        <div class="rounded-3xl p-6 text-center border-2 border-dashed border-pink-200">
+                            <i class="ph-bold ph-cake text-pink-300 text-[40px]"></i>
+                            <p class="text-[12px] font-bold text-gray-400 mt-2">Belum ada data ulang tahun</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KOLOM KANAN: Upcoming + Stats + Actions -->
+            <div class="col-right above-bg">
+
+                <!-- UPCOMING -->
+                <div id="upcoming-section" class="mb-4 hidden">
+                    <div class="flex items-center justify-between mb-2.5">
+                        <div class="flex items-center gap-2">
+                            <i class="ph-bold ph-clock-countdown text-pink-400 text-[13px]"></i>
+                            <p class="text-[10px] font-bold text-pink-400 uppercase tracking-[0.15em]">Segera Hadir</p>
+                        </div>
+                        <span id="upcoming-count" class="num text-[9px] font-bold text-pink-400 bg-pink-50 px-2 py-0.5 rounded-full">0 orang</span>
+                    </div>
+                    <div id="upcoming-list" class="space-y-1.5"></div>
+                </div>
+
+                <!-- STATS -->
+                <div id="stats-section" class="mb-4 hidden">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="rounded-2xl px-3 py-2.5 text-center border border-pink-100/80" style="background: linear-gradient(135deg, #fff0f6, #ffffff);">
+                            <p class="text-[9px] font-bold text-pink-400 uppercase tracking-wide">Bulan Ini</p>
+                            <p id="stat-month" class="num text-[18px] font-black text-pink-500 mt-0.5 leading-none">0</p>
+                            <p class="text-[8px] font-bold text-gray-400 mt-0.5">ulang tahun</p>
+                        </div>
+                        <div class="rounded-2xl px-3 py-2.5 text-center border border-violet-100/80" style="background: linear-gradient(135deg, #f5f0ff, #ffffff);">
+                            <p class="text-[9px] font-bold text-violet-400 uppercase tracking-wide">Tahun Ini</p>
+                            <p id="stat-year" class="num text-[18px] font-black text-violet-500 mt-0.5 leading-none">0</p>
+                            <p class="text-[8px] font-bold text-gray-400 mt-0.5">ulang tahun</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTIONS (ignore capture) -->
+                <div class="actions-full flex items-center gap-2" data-html2canvas-ignore>
+                    <button id="download-btn" onclick="downloadCard()" class="flex-1 bg-gradient-to-br from-sky-400 to-blue-500 text-white py-3 rounded-2xl font-bold text-[12px] flex items-center justify-center gap-1.5 shadow-[0_6px_16px_-6px_rgba(59,130,246,0.6)] hover:brightness-105 active:scale-[0.98] transition">
+                        <i class="ph-bold ph-download-simple text-[16px]"></i>
+                        <span id="download-text">UNDUH</span>
+                    </button>
+                    <button onclick="shareWhatsApp()" class="flex-1 bg-gradient-to-br from-emerald-400 to-teal-500 text-white py-3 rounded-2xl font-bold text-[12px] flex items-center justify-center gap-1.5 shadow-[0_6px_16px_-6px_rgba(16,185,129,0.6)] hover:brightness-105 active:scale-[0.98] transition">
+                        <i class="ph-bold ph-whatsapp-logo text-[16px]"></i>
+                        <span>SHARE WA</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CALENDAR POPUP -->
+        <div id="calendar-popup" class="absolute top-[72px] right-4 bg-white rounded-[24px] shadow-[0_20px_60px_-20px_rgba(255,91,143,0.4)] p-4 w-[280px] border border-pink-100 hidden z-50 transform transition-all duration-300 opacity-0 scale-95 no-scrollbar" data-html2canvas-ignore>
+            <div class="flex justify-between items-center mb-3">
+                <div>
+                    <p class="text-[10px] font-bold text-pink-400 uppercase tracking-wider">Kalender</p>
+                    <h3 class="font-extrabold text-gray-700 text-[14px] leading-tight" id="calendar-month-year">Bulan Tahun</h3>
+                </div>
+                <button onclick="toggleCalendar()" class="w-7 h-7 rounded-lg text-gray-400 hover:text-pink-500 hover:bg-pink-50 transition flex items-center justify-center">
+                    <i class="ph-bold ph-x text-[14px]"></i>
+                </button>
+            </div>
+            <div class="calendar-grid text-pink-300 font-extrabold mb-1.5 text-[10px]">
+                <div>M</div><div>S</div><div>S</div><div>R</div><div>K</div><div>J</div><div class="text-rose-400">S</div>
+            </div>
+            <div id="calendar-body" class="calendar-grid text-gray-700 text-[11px]"></div>
+            <div id="birthday-list-popup" class="mt-3 pt-3 border-t border-dashed border-pink-100 hidden">
+                <p class="text-[10px] font-bold text-pink-400 uppercase tracking-wide mb-1.5">Ulang Tahun <span id="selected-date-text" class="text-pink-500"></span></p>
+                <ul id="birthday-list-names" class="text-[12px] text-gray-700 font-semibold space-y-1"></ul>
+            </div>
+            <div class="flex items-center gap-2.5 flex-wrap mt-3 pt-3 border-t border-dashed border-pink-100 text-[8px] font-bold text-gray-400">
+                <div class="flex items-center gap-1"><div class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-pink-300 to-pink-500"></div><span>Hari ini</span></div>
+                <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-pink-400"></div><span>Ada ultah</span></div>
+            </div>
+        </div>
+
+        <!-- TOAST -->
+        <div id="status-toast" class="hidden-toast absolute bottom-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[11px] font-semibold px-4 py-2.5 rounded-full shadow-xl z-50 whitespace-nowrap" style="transform: translate(-50%, 10px);" data-html2canvas-ignore>
+            Status
+        </div>
+    </div>
+
+    <!-- ============================================================
+         HIDDEN DOWNLOAD TEMPLATE
+         ============================================================ -->
+    <div id="download-card" class="dots-bg">
+        <div class="px-7 pt-10 pb-10 flex flex-col items-center">
+
+            <div id="dl-pill" class="bg-[#ff5b8f] text-white px-6 py-2.5 rounded-2xl text-[13px] font-semibold tracking-wide shadow-[0_6px_16px_-6px_rgba(255,91,143,0.6)] mb-8">
+                Hari Ini Ulang Tahun
+            </div>
+
+            <p class="text-[#ff5b8f] font-bold text-[14px] tracking-[0.5em] m-0 pl-2">H A P P Y</p>
+            <h1 class="text-[#ff5b8f] font-greatvibes text-[5.2rem] leading-[0.95] mt-1 mb-3">birthday</h1>
+
+            <div class="relative w-full h-[210px] flex justify-center items-center my-2">
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 300 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M70,60 Q40,110 75,175" stroke="#60a5fa" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                    <path d="M238,105 L218,125 L238,145" stroke="#fb7185" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <circle cx="210" cy="78" r="3.5" fill="#34d399"/>
+                    <circle cx="88" cy="182" r="3" fill="#fcd34d"/>
+                    <circle cx="228" cy="170" r="3" fill="#fcd34d"/>
+                    <circle cx="60" cy="150" r="2.5" fill="#fb7185"/>
+                    <circle cx="245" cy="62" r="2.5" fill="#f472b6"/>
+                </svg>
+
+                <svg class="w-[175px] h-auto relative z-10" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="100" cy="178" rx="72" ry="9" fill="rgba(200,200,220,0.35)"/>
+                    <path d="M40,172 L160,172 L160,135 L40,135 Z" fill="#fbcfe8"/>
+                    <rect x="40" y="148" width="120" height="6" fill="#fce7f3"/>
+                    <rect x="40" y="162" width="120" height="5" fill="#fce7f3"/>
+                    <path d="M40,135 Q50,147 60,135 Q70,147 80,135 Q90,147 100,135 Q110,147 120,135 Q130,147 140,135 Q150,147 160,135 L160,128 L40,128 Z" fill="#e81c6e"/>
+                    <circle cx="40" cy="135" r="3.5" fill="#fcd34d"/>
+                    <circle cx="160" cy="135" r="3.5" fill="#fcd34d"/>
+                    <path d="M55,135 L145,135 L145,95 L55,95 Z" fill="#f9a8d4"/>
+                    <path d="M55,95 Q65,107 75,95 Q85,107 95,95 Q105,107 115,95 Q125,107 135,95 Q145,107 145,95 L145,88 L55,88 Z" fill="#be185d"/>
+                    <rect x="83" y="62" width="5" height="26" rx="1.5" fill="#fcd34d"/>
+                    <g class="flame">
+                        <ellipse cx="85.5" cy="54" rx="3.5" ry="6.5" fill="#fbbf24"/>
+                        <ellipse cx="85.5" cy="55.5" rx="2" ry="4" fill="#fef3c7"/>
+                        <ellipse cx="85.5" cy="56" rx="1" ry="2" fill="#ffffff"/>
+                    </g>
+                    <rect x="97.5" y="56" width="5" height="32" rx="1.5" fill="#fcd34d"/>
+                    <g class="flame">
+                        <ellipse cx="100" cy="47" rx="4" ry="7.5" fill="#fbbf24"/>
+                        <ellipse cx="100" cy="48.5" rx="2.3" ry="4.5" fill="#fef3c7"/>
+                        <ellipse cx="100" cy="49" rx="1.1" ry="2.2" fill="#ffffff"/>
+                    </g>
+                    <rect x="112" y="62" width="5" height="26" rx="1.5" fill="#fcd34d"/>
+                    <g class="flame">
+                        <ellipse cx="114.5" cy="54" rx="3.5" ry="6.5" fill="#fbbf24"/>
+                        <ellipse cx="114.5" cy="55.5" rx="2" ry="4" fill="#fef3c7"/>
+                        <ellipse cx="114.5" cy="56" rx="1" ry="2" fill="#ffffff"/>
+                    </g>
+                </svg>
+            </div>
+
+            <h2 id="dl-names" class="text-[22px] font-semibold text-gray-400 text-center leading-tight mt-3 mb-2 px-2">
+                Memuat...
+            </h2>
+
+            <p id="dl-wish" class="font-caveat text-[1.5rem] text-[#ff5b8f] text-center leading-tight mt-1 px-2">
+                Semoga Sehat Selalu dan Bahagia<br>Bersama Keluarga
+            </p>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* ============================================================
+ * CONFIG
+ * ============================================================ */
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCp3DY8YrJP9Bmy1eO6-w6LJzuUj5Iq9cVNnPiJKjpF91Hcei7o4Q5-2i7rTQbrcmT6hCHotfTmU5u/pub?gid=336207575&single=true&output=csv';
+const CACHE_KEY = 'bday_cache_v3';
+const CACHE_TTL = 1000 * 60 * 60 * 6;
+
+const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"];
+
+const WISHES = [
+    "Semoga Sehat Selalu dan Bahagia<br>Bersama Keluarga",
+    "Panjang Umur, Murah Rezeki, dan Selalu Dikelilingi Orang Baik",
+    "Semoga Semua Impianmu Terwujud Satu Per Satu",
+    "Bahagia Selalu, Sehat Terus, dan Sukses Berlimpah",
+    "Semoga Tahun Ini Penuh Berkah dan Kebahagiaan",
+    "Sehat, Bahagia, dan Selalu Bersinar Setiap Hari",
+];
+
+const $ = id => document.getElementById(id);
+const haptic = (ms = 10) => { try { navigator.vibrate?.(ms); } catch(_){} };
+
+let birthdayData = {};
+let allRows = [];
+
+const today = new Date();
+const currentMonth = today.getMonth();
+const currentYear = today.getFullYear();
+const currentDate = today.getDate();
+const todayKey = `${String(currentMonth + 1).padStart(2, '0')}-${String(currentDate).padStart(2, '0')}`;
+
+/* ============================================================
+ * FIREWORKS
+ * ============================================================ */
+function initFireworks() {
+    const canvas = $('fireworks-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H;
+
+    function resize() {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = canvas.width = Math.floor(rect.width * dpr);
+        H = canvas.height = Math.floor(rect.height * dpr);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const particles = [];
+    const rockets = [];
+    const COLORS = ['#ff5b8f', '#f472b6', '#fb7185', '#fbbf24', '#a78bfa', '#34d399', '#60a5fa', '#f87171'];
+
+    function launchRocket() {
+        const xRatio = 0.15 + Math.random() * 0.7;
+        rockets.push({
+            x: W * xRatio,
+            y: H + 10,
+            targetY: H * (0.2 + Math.random() * 0.25),
+            vy: -(H * 0.012) - Math.random() * (H * 0.004),
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        });
+    }
+
+    function explode(x, y, color) {
+        const count = 45 + Math.floor(Math.random() * 25);
+        const speedBase = (W * 0.0016);
+        for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.3;
+            const speed = speedBase * (0.7 + Math.random() * 0.9);
+            particles.push({
+                x, y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: 1, color,
+                size: (1.5 + Math.random() * 2) * (W / 700),
+            });
+        }
+    }
+
+    let lastRocketTime = 0;
+    let nextInterval = 1400;
+
+    function loop(t) {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0,0,0,0.14)';
+        ctx.fillRect(0, 0, W, H);
+        ctx.globalCompositeOperation = 'source-over';
+
+        if (t - lastRocketTime > nextInterval) {
+            launchRocket();
+            lastRocketTime = t;
+            nextInterval = 1400 + Math.random() * 1200;
+        }
+
+        for (let i = rockets.length - 1; i >= 0; i--) {
+            const r = rockets[i];
+            r.y += r.vy;
+            ctx.beginPath();
+            ctx.arc(r.x, r.y, 2 * (W / 700), 0, Math.PI * 2);
+            ctx.fillStyle = r.color;
+            ctx.fill();
+            if (r.y <= r.targetY) {
+                explode(r.x, r.y, r.color);
+                rockets.splice(i, 1);
+            }
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx; p.y += p.vy;
+            p.vy += (H * 0.00035);
+            p.vx *= 0.985; p.vy *= 0.985;
+            p.life -= 0.014;
+            if (p.life <= 0) { particles.splice(i, 1); continue; }
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+            ctx.globalAlpha = Math.max(0, p.life);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+        requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+    setTimeout(() => launchRocket(), 300);
+    setTimeout(() => launchRocket(), 900);
+    setTimeout(() => launchRocket(), 1700);
+}
+
+/* ============================================================
+ * CSV
+ * ============================================================ */
+function parseCSVRow(str) {
+    let arr = [], quote = false, col = '';
+    for (let i = 0; i < str.length; i++) {
+        let cc = str[i], nc = str[i+1];
+        if (cc === '"' && quote && nc === '"') { col += '"'; ++i; continue; }
+        if (cc === '"') { quote = !quote; continue; }
+        if (cc === ',' && !quote) { arr.push(col.trim()); col = ''; continue; }
+        col += cc;
+    }
+    arr.push(col.trim());
+    return arr;
+}
+
+function processCSV(csvText) {
+    birthdayData = {};
+    allRows = [];
+    const rows = csvText.split(/\r?\n/);
+
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i].trim();
+        if (!row) continue;
+        if (i === 0 && /nama|name|tanggal|date/i.test(row)) continue;
+
+        const columns = parseCSVRow(row);
+        if (columns.length < 2) continue;
+        const name = columns[0];
+        const dateStr = columns[1];
+        if (!name || !dateStr) continue;
+
+        let month, day;
+        let d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+            month = d.getMonth() + 1;
+            day = d.getDate();
+        } else {
+            const parts = dateStr.split(/[\/\-\.]/);
+            if (parts.length >= 2) {
+                day = parseInt(parts[0], 10);
+                month = parseInt(parts[1], 10);
+                if (isNaN(day) || isNaN(month)) continue;
+                if (month > 12) { const t = day; day = month; month = t; }
+            }
+        }
+        if (!month || !day) continue;
+
+        const dateKey = `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (!birthdayData[dateKey]) birthdayData[dateKey] = [];
+        if (!birthdayData[dateKey].some(x => x.name === name)) {
+            birthdayData[dateKey].push({ name, month, day });
+        }
+        allRows.push({ name, month, day });
+    }
+}
+
+/* ============================================================
+ * CACHE
+ * ============================================================ */
+function readCache() {
+    try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (!obj || !obj.text) return null;
+        return obj;
+    } catch(_) { return null; }
+}
+function writeCache(text) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ text, ts: Date.now() })); } catch(_) {}
+}
+function setFreshness(ts, stale) {
+    const d = new Date(ts);
+    const label = d.toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }).replace('.', ':');
+    $('freshness-label').innerText = stale ? `Offline · ${label}` : `Data ${label}`;
+    $('freshness-label').className = stale
+        ? 'text-[9px] font-semibold text-amber-500 mt-0.5 leading-none'
+        : 'text-[9px] font-semibold text-gray-400 mt-0.5 leading-none';
+}
+
+async function refreshData(force = false) {
+    if (!force) {
+        const c = readCache();
+        if (c) {
+            try {
+                processCSV(c.text);
+                renderAll();
+                setFreshness(c.ts, false);
+                if (Date.now() - c.ts > CACHE_TTL) silentRefresh();
+                return;
+            } catch(_) {}
+        }
+    }
+
+    $('freshness-label').innerText = 'Memuat data...';
+    $('refresh-btn').innerHTML = '<i class="ph-bold ph-spinner animate-spin text-[14px]"></i>';
+
+    try {
+        const res = await fetch(CSV_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const text = await res.text();
+        processCSV(text);
+        writeCache(text);
+        renderAll();
+        setFreshness(Date.now(), false);
+    } catch(err) {
+        const c = readCache();
+        if (c) {
+            try {
+                processCSV(c.text);
+                renderAll();
+                setFreshness(c.ts, true);
+            } catch(_) { showError(); }
+        } else showError();
+    } finally {
+        $('refresh-btn').innerHTML = '<i class="ph-bold ph-arrows-clockwise text-[14px]"></i>';
+    }
+}
+
+async function silentRefresh() {
+    try {
+        const res = await fetch(CSV_URL, { cache: 'no-store' });
+        if (!res.ok) return;
+        const text = await res.text();
+        writeCache(text);
+        processCSV(text);
+        renderAll();
+        setFreshness(Date.now(), false);
+    } catch(_) {}
+}
+
+function showError() {
+    $('freshness-label').innerText = 'Gagal memuat';
+    $('celebration-mode').classList.add('hidden');
+    $('countdown-mode').classList.add('hidden');
+    $('empty-mode').classList.remove('hidden');
+}
+
+/* ============================================================
+ * HELPERS
+ * ============================================================ */
+function daysUntil(month, day) {
+    const now = new Date();
+    const y = now.getFullYear();
+    let target = new Date(y, month - 1, day);
+    target.setHours(0,0,0,0);
+    const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (target < todayMid) target.setFullYear(y + 1);
+    return { days: Math.round((target - todayMid) / 86400000), target };
+}
+function pad2(n) { return String(n).padStart(2, '0'); }
+function getRandomWish() {
+    const seed = (currentYear * 372 + (currentMonth + 1) * 31 + currentDate);
+    return WISHES[seed % WISHES.length];
+}
+
+/* ============================================================
+ * RENDER
+ * ============================================================ */
+function renderAll() {
+    renderHero();
+    renderUpcoming();
+    renderStats();
+    generateCalendar();
+    renderDownloadCard();
+    if (birthdayData[todayKey]?.length) setTimeout(() => fireConfetti(), 400);
+}
+
+function renderHero() {
+    const todayNames = birthdayData[todayKey];
+    $('celebration-mode').classList.add('hidden');
+    $('countdown-mode').classList.add('hidden');
+    $('empty-mode').classList.add('hidden');
+
+    if (todayNames && todayNames.length > 0) {
+        $('celebration-mode').classList.remove('hidden');
+        $('birthday-names').innerText = todayNames.map(x => x.name).join(' & ');
+        $('wish-text').innerText = getRandomWish().replace(/<br\s*\/?>/gi, ' ');
+    } else {
+        let next = null;
+        Object.keys(birthdayData).forEach(k => {
+            birthdayData[k].forEach(item => {
+                const info = daysUntil(item.month, item.day);
+                if (!next || info.days < next.days) next = { ...info, name: item.name, month: item.month, day: item.day };
+            });
+        });
+        if (next && next.days <= 365) {
+            $('countdown-mode').classList.remove('hidden');
+            $('next-name').innerText = next.name;
+            $('next-countdown').innerText = next.days === 0 ? 'Hari ini!' : next.days;
+            $('next-date').innerText = `${next.day} ${MONTHS[next.month - 1]} ${next.target.getFullYear()}`;
+        } else $('empty-mode').classList.remove('hidden');
+    }
+}
+
+function renderUpcoming() {
+    const list = $('upcoming-list');
+    const section = $('upcoming-section');
+    list.innerHTML = '';
+    const upcoming = [];
+    Object.keys(birthdayData).forEach(k => {
+        birthdayData[k].forEach(item => {
+            const info = daysUntil(item.month, item.day);
+            if (info.days >= 0 && info.days <= 14) upcoming.push({ ...item, ...info });
+        });
+    });
+    upcoming.sort((a, b) => a.days - b.days);
+
+    if (upcoming.length === 0) { section.classList.add('hidden'); return; }
+    section.classList.remove('hidden');
+    $('upcoming-count').innerText = upcoming.length + ' orang';
+
+    upcoming.forEach(u => {
+        const isToday = u.days === 0;
+        const isTomorrow = u.days === 1;
+        const dayLabel = isToday ? 'Hari ini' : (isTomorrow ? 'Besok' : `${u.days} hari lagi`);
+        const item = document.createElement('div');
+        item.className = 'upcoming-item rounded-2xl px-3 py-2.5 flex items-center gap-3' + (isToday ? ' is-today' : '');
+        item.innerHTML = `
+            <div class="w-8 h-8 rounded-xl ${isToday ? 'bg-white/25' : 'bg-pink-100'} flex items-center justify-center flex-shrink-0">
+                <i class="ph-bold ph-cake ${isToday ? 'text-white' : 'text-pink-500'} text-[14px]"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="u-text text-[12px] font-extrabold ${isToday ? 'text-white' : 'text-gray-700'} truncate leading-tight">${u.name}</p>
+                <p class="u-text text-[10px] font-semibold ${isToday ? 'text-white/80' : 'text-gray-400'} mt-0.5 leading-tight">${u.day} ${MONTHS_SHORT[u.month - 1]}</p>
+            </div>
+            <span class="num text-[10px] font-extrabold ${isToday ? 'bg-white/25 text-white' : 'bg-pink-50 text-pink-500'} px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">${dayLabel}</span>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function renderStats() {
+    const section = $('stats-section');
+    if (allRows.length === 0) { section.classList.add('hidden'); return; }
+    section.classList.remove('hidden');
+    const monthKey = pad2(currentMonth + 1);
+    let monthCount = 0;
+    allRows.forEach(r => { if (pad2(r.month) === monthKey) monthCount++; });
+    $('stat-month').innerText = monthCount;
+    $('stat-year').innerText = allRows.length;
+}
+
+function generateCalendar() {
+    $('calendar-month-year').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+    const body = $('calendar-body');
+    body.innerHTML = '';
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    for (let i = 0; i < firstDay; i++) body.appendChild(document.createElement('div'));
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.textContent = i;
+        dayDiv.classList.add('calendar-day', 'cursor-pointer', 'hover:bg-pink-50');
+        const dateKey = `${pad2(currentMonth + 1)}-${pad2(i)}`;
+        if (birthdayData[dateKey]?.length > 0) dayDiv.classList.add('has-birthday');
+        if (i === currentDate) dayDiv.classList.add('today');
+        dayDiv.onclick = () => showBirthdayList(i, dateKey);
+        body.appendChild(dayDiv);
+    }
+}
+
+function showBirthdayList(day, dateKey) {
+    const listPopup = $('birthday-list-popup');
+    const listNames = $('birthday-list-names');
+    const names = birthdayData[dateKey];
+    if (names && names.length > 0) {
+        $('selected-date-text').textContent = `${day} ${MONTHS[currentMonth]}`;
+        listNames.innerHTML = '';
+        names.forEach(n => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span>${n.name}</span>`;
+            listNames.appendChild(li);
+        });
+        listPopup.classList.remove('hidden');
+    } else listPopup.classList.add('hidden');
+}
+
+function toggleCalendar() {
+    haptic(8);
+    const popup = $('calendar-popup');
+    if (popup.classList.contains('hidden')) {
+        popup.classList.remove('hidden');
+        requestAnimationFrame(() => popup.classList.remove('opacity-0', 'scale-95'));
+    } else {
+        popup.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+            popup.classList.add('hidden');
+            $('birthday-list-popup').classList.add('hidden');
+        }, 280);
+    }
+}
+
+/* ============================================================
+ * DOWNLOAD CARD
+ * ============================================================ */
+function renderDownloadCard() {
+    const todayNames = birthdayData[todayKey];
+    const pill = $('dl-pill');
+    const names = $('dl-names');
+    const wish = $('dl-wish');
+
+    if (todayNames && todayNames.length > 0) {
+        pill.innerText = 'Hari Ini Ulang Tahun';
+        names.innerText = todayNames.map(x => x.name).join(' & ');
+        names.className = 'text-[26px] font-bold text-[#ff5b8f] text-center leading-tight mt-3 mb-2 px-2';
+        wish.innerHTML = getRandomWish();
+        wish.className = 'font-caveat text-[1.5rem] text-[#ff5b8f] text-center leading-tight mt-1 px-2';
+    } else {
+        pill.innerText = 'Hari Ini Ulang Tahun';
+        names.innerText = 'Tidak ada yang ulang tahun hari ini';
+        names.className = 'text-[18px] font-semibold text-gray-400 text-center leading-tight mt-3 mb-2 px-2';
+        wish.innerHTML = 'Semoga Sehat Selalu dan Bahagia<br>Bersama Keluarga';
+        wish.className = 'font-caveat text-[1.5rem] text-[#ff5b8f] text-center leading-tight mt-1 px-2';
+    }
+}
+
+/* ============================================================
+ * CONFETTI
+ * ============================================================ */
+function fireConfetti() {
+    if (typeof confetti !== 'function') return;
+    const colors = ['#ff5b8f', '#f472b6', '#fb7185', '#fbbf24', '#a78bfa', '#34d399'];
+    confetti({ particleCount: 80, spread: 90, origin: { y: 0.35 }, colors, scalar: 0.9, gravity: 0.9, ticks: 200 });
+    setTimeout(() => {
+        confetti({ particleCount: 50, angle: 60, spread: 70, origin: { x: 0, y: 0.6 }, colors });
+        confetti({ particleCount: 50, angle: 120, spread: 70, origin: { x: 1, y: 0.6 }, colors });
+    }, 250);
+}
+
+/* ============================================================
+ * TOAST
+ * ============================================================ */
+let toastTimer = null;
+function showToast(msg) {
+    const t = $('status-toast');
+    t.innerText = msg;
+    t.classList.remove('hidden-toast');
+    t.classList.add('show-toast');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        t.classList.remove('show-toast');
+        t.classList.add('hidden-toast');
+    }, 2200);
+}
+
+/* ============================================================
+ * ACTIONS
+ * ============================================================ */
+async function downloadCard() {
+    const target = $('download-card');
+    const btn = $('download-btn');
+    const originalText = $('download-text').innerText;
+
+    haptic(12);
+    $('download-text').innerText = 'Memproses...';
+    btn.disabled = true;
+    btn.classList.add('opacity-75');
+
+    const popup = $('calendar-popup');
+    if (!popup.classList.contains('hidden')) toggleCalendar();
+
+    renderDownloadCard();
+
+    try {
+        const canvas = await html2canvas(target, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            logging: false,
+            allowTaint: true,
+            width: target.offsetWidth,
+            height: target.offsetHeight,
+            windowWidth: target.offsetWidth,
+            windowHeight: target.offsetHeight,
+        });
+        const link = document.createElement('a');
+        link.download = `Happy_Birthday_${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Kartu poster berhasil diunduh ✅');
+    } catch(err) {
+        console.error(err);
+        showToast('Gagal memproses gambar 😕');
+    } finally {
+        $('download-text').innerText = originalText;
+        btn.disabled = false;
+        btn.classList.remove('opacity-75');
+    }
+}
+
+function shareWhatsApp() {
+    haptic(12);
+    const todayNames = birthdayData[todayKey];
+    let text = '';
+    if (todayNames && todayNames.length > 0) {
+        const names = todayNames.map(x => x.name).join(' & ');
+        const wishPlain = getRandomWish().replace(/<br\s*\/?>/gi, ' ');
+        text = `🎂 *Happy Birthday!* 🎂\n\n🎉 Selamat ulang tahun untuk:\n*${names}*\n\n💬 _"${wishPlain}"_\n\n━━━━━━━━━━━━━━━\n🎈 Dari: YL Bandung V`;
+    } else {
+        let next = null;
+        Object.keys(birthdayData).forEach(k => {
+            birthdayData[k].forEach(item => {
+                const info = daysUntil(item.month, item.day);
+                if (!next || info.days < next.days) next = { ...info, name: item.name };
+            });
+        });
+        if (next) text = `📅 *Info Ulang Tahun*\n\nUlang tahun berikutnya:\n*${next.name}* — ${next.days} hari lagi 🎂\n\nJangan lupa ucapkan ya! ✨`;
+        else text = `📅 Tidak ada ulang tahun dalam waktu dekat.`;
+    }
+    const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
+    const win = window.open(waUrl, '_blank');
+    if (!win) window.location.href = waUrl;
+}
+
+/* ============================================================
+ * BOOT
+ * ============================================================ */
+initFireworks();
+refreshData();
+
+/* Redraw fireworks saat resize / fullscreen toggle */
+window.addEventListener('resize', () => {
+    setTimeout(() => { /* resize handler internal fireworks sudah handle */ }, 200);
+});
+document.addEventListener('fullscreenchange', () => {
+    setTimeout(() => { /* resize handler internal fireworks sudah handle */ }, 300);
+});
+</script>
+</body>
+</html>

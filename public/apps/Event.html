@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FF4D6D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Kalender Event Operasional</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+      },
+      colors: {
+        pinkbrand: '#FF4D6D',
+        pinkdark: '#C9184A',
+        pinksoft: '#FFF0F3',
+        pinklight: '#FFCCD5',
+        greensoft: '#ECFDF5',
+        greenbrand: '#059669',
+        greendark: '#047857',
+        softblue: '#EBF5FF',
+        bluebrand: '#2563EB',
+        softorange: '#FFF4E5',
+        orangebrand: '#EA580C',
+        softpink: '#FFE6EA',
+        pinkkategori: '#E11D48',
+      },
+      screens: {
+        xs: '420px',
+      }
+    }
+  }
+}
+</script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    -webkit-tap-highlight-color: transparent;
+    background: #FFFFFF;
+    color: #0f172a;
+    transition: background 0.3s, color 0.3s;
+  }
+  body.dark {
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+  h1, h2, h3, h4, .font-heading { font-family: 'Poppins', sans-serif; }
+  ::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
+  * { -ms-overflow-style: none; scrollbar-width: none; }
+  .num { font-family: 'Plus Jakarta Sans', sans-serif; font-variant-numeric: tabular-nums; }
+
+  .modal-backdrop { background-color: rgba(15, 23, 42, 0.55); backdrop-filter: blur(8px); }
+  
+  .popup-anim { animation: popupFade 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes popupFade {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Bottom sheet */
+  .sheet {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 100%);
+    width: 100%;
+    max-width: 640px;
+    max-height: 92vh;
+    background: #ffffff;
+    border-radius: 28px 28px 0 0;
+    transition: transform 0.32s cubic-bezier(.32,.72,0,1);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.25);
+  }
+  body.dark .sheet { background: #1e293b; }
+  .sheet.show { transform: translate(-50%, 0); }
+  .sheet-handle {
+    width: 40px; height: 4px;
+    border-radius: 2px;
+    background: #e2e8f0;
+    margin: 12px auto 4px;
+  }
+  body.dark .sheet-handle { background: #475569; }
+
+  /* Sheet backdrop */
+  .sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s;
+    z-index: 55;
+  }
+  .sheet-backdrop.show { opacity: 1; pointer-events: auto; }
+
+  /* Pulse for today */
+  @keyframes todayPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.5); }
+    50%      { box-shadow: 0 0 0 6px rgba(255, 77, 109, 0); }
+  }
+  .today-pulse { animation: todayPulse 2s ease-in-out infinite; }
+
+  /* Realized glow */
+  @keyframes realizedGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.35); }
+    50%      { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
+  }
+  .realized-glow { animation: realizedGlow 2.4s ease-in-out infinite; }
+
+  /* Toast */
+  #toastWrap {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+    max-width: 92vw;
+  }
+  .toast {
+    background: #0f172a;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 11px 20px;
+    border-radius: 999px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.28);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all 0.28s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { background: linear-gradient(135deg, #059669, #047857); }
+  .toast.error   { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+  .toast.info    { background: linear-gradient(135deg, #2563EB, #1e40af); }
+
+  /* Dark mode helper */
+  body.dark .dk-bg-white { background: #1e293b !important; }
+  body.dark .dk-text { color: #e2e8f0 !important; }
+  body.dark .dk-text-muted { color: #94a3b8 !important; }
+  body.dark .dk-border { border-color: #334155 !important; }
+  body.dark .dk-input { background: #0f172a !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+  body.dark .dk-slate { background: #0f172a !important; }
+
+  /* Hide scrollbar in bottom sheet */
+  .sheet-body { overflow-y: auto; flex: 1; }
+
+  /* Step indicator */
+  .step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    transition: all 0.3s;
+  }
+  .step-dot.active { background: #EA580C; color: white; box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.15); }
+  .step-dot.done { background: #059669; color: white; }
+  .step-dot.idle { background: #f1f5f9; color: #94a3b8; }
+  body.dark .step-dot.idle { background: #334155; color: #64748b; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+<!-- FIREBASE (module) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBmDu2wFOAUNR0-24Bj_lF30ekxtZi3l1U",
+    authDomain: "event-2027.firebaseapp.com",
+    databaseURL: "https://event-2027-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "event-2027",
+    storageBucket: "event-2027.firebasestorage.app",
+    messagingSenderId: "332666332349",
+    appId: "1:332666332349:web:7facbcc361232b27a843d4"
+  };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const eventsRef = ref(db, 'events');
+    window.fbDB = db;
+    window.fbEventsRef = eventsRef;
+    window.fbPush = push;
+    window.fbRemove = remove;
+    window.fbRef = ref;
+    window.fbUpdate = update;
+
+    onValue(eventsRef, (snapshot) => {
+      const data = snapshot.val();
+      const loaded = [];
+      if (data) Object.keys(data).forEach(k => loaded.push({ fbKey: k, ...data[k] }));
+      window.eventsList = loaded;
+      localStorage.setItem('kalender_events_data', JSON.stringify(loaded));
+      const el = document.getElementById('status-text');
+      if (el) el.textContent = 'Realtime · Tersinkron';
+      const dot = document.getElementById('status-indicator');
+      if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+      if (typeof window.renderApp === 'function') window.renderApp();
+    }, (error) => {
+      console.error('Firebase:', error);
+      const el = document.getElementById('status-text');
+      if (el) el.textContent = 'Mode offline · Pakai data cache';
+      const dot = document.getElementById('status-indicator');
+      if (dot) dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+    });
+  } catch (e) {
+    console.error(e);
+  }
+</script>
+
+<!-- ============ HEADER ============ -->
+<header class="sticky top-0 z-30 backdrop-blur-md border-b border-slate-100/80 transition-colors" 
+        style="background: rgba(255,255,255,0.88); padding-top: env(safe-area-inset-top);">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-pinkbrand to-pinkdark text-white flex items-center justify-center font-bold shadow-md shadow-pink-500/25 shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      </div>
+      <div class="min-w-0">
+        <h1 class="font-poppins text-base sm:text-lg font-bold leading-tight truncate">Kalender Event</h1>
+        <p id="headerSubtext" class="text-[10px] sm:text-[11px] text-slate-500 font-medium truncate">
+          Operasional · Bandung V
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <button onclick="toggleDarkMode()" title="Mode gelap" class="w-9 h-9 rounded-xl border border-slate-200 bg-white/70 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition active:scale-95 shrink-0">
+        <svg id="darkIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
+
+      <button onclick="openHistorySheet()" title="Riwayat realisasi" class="w-9 h-9 rounded-xl border border-slate-200 bg-white/70 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition active:scale-95 shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </button>
+
+      <button onclick="requestSettingsAuth()" title="Pengaturan" class="w-9 h-9 rounded-xl border border-slate-200 bg-white/70 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition active:scale-95 shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </button>
+
+      <button onclick="openAddModal()" class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs sm:text-sm font-bold px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl shadow-md shadow-emerald-500/25 transition active:scale-95 flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+        <span class="hidden xs:inline">Tambah</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ MAIN ============ -->
+<main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 space-y-4 w-full flex-1">
+
+  <!-- ===== TODAY CARD ===== -->
+  <div id="todayCard" class="rounded-2xl p-4 border-2 border-pink-200 bg-gradient-to-br from-pinksoft to-white relative overflow-hidden">
+    <div class="flex items-start justify-between gap-3 flex-wrap">
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-pinkdark bg-pinklight/60 px-2 py-0.5 rounded-md">Hari Ini</span>
+          <span id="todayDateLabel" class="text-[11px] font-bold text-slate-600"></span>
+        </div>
+        <h3 id="todayTitle" class="font-poppins text-lg font-extrabold text-slate-900 mt-1">Tidak ada kegiatan</h3>
+        <p id="todaySubtitle" class="text-xs text-slate-500 font-medium mt-0.5">Cek kalender untuk agenda lain</p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="text-right">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bulan Ini</p>
+          <p id="statMonthCount" class="num text-2xl font-black text-pinkdark leading-none">0</p>
+          <p class="text-[9px] font-bold text-slate-400">kegiatan</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="todayChips" class="flex items-center gap-1.5 flex-wrap mt-3"></div>
+  </div>
+
+  <!-- ===== FILTER BAR ===== -->
+  <div class="bg-slate-50/90 rounded-2xl p-2.5 border border-slate-200/70 flex flex-col md:flex-row gap-2.5 relative z-20">
+    <div class="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-0.5">
+      <button onclick="setCategoryFilter('all')" data-cat="all" class="cat-btn shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-900 text-white">
+        Semua
+      </button>
+      <button onclick="setCategoryFilter('meeting')" data-cat="meeting" class="cat-btn shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-softblue text-bluebrand border border-blue-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-bluebrand"></span> Meeting
+      </button>
+      <button onclick="setCategoryFilter('joinpe')" data-cat="joinpe" class="cat-btn shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-softorange text-orangebrand border border-orange-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-orangebrand"></span> Join PE
+      </button>
+      <button onclick="setCategoryFilter('probiotik')" data-cat="probiotik" class="cat-btn shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-softpink text-pinkkategori border border-pink-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-pinkkategori"></span> Probiotik
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2 md:ml-auto">
+      <!-- Search -->
+      <div class="relative flex-1 md:w-56 md:flex-none">
+        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="searchInput" oninput="onSearchInput(this.value)" placeholder="Cari event..." class="w-full bg-white border border-slate-200 text-xs rounded-xl pl-9 pr-3 py-2.5 font-semibold outline-none focus:border-pinkbrand transition">
+      </div>
+
+      <!-- Center filter -->
+      <div class="relative shrink-0">
+        <button type="button" onclick="toggleCenterFilterDropdown()" id="center-filter-trigger" class="bg-white border border-slate-200 text-xs rounded-xl px-3 py-2.5 font-bold flex items-center gap-2 hover:border-pinkbrand transition min-w-[110px] max-w-[140px]">
+          <svg class="w-4 h-4 text-pinkbrand shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span id="center-filter-selected-label" class="truncate flex-1 text-left">Semua</span>
+          <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="center-filter-popup" class="hidden absolute right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden popup-anim max-h-72 overflow-y-auto p-1.5 min-w-[200px]"></div>
+      </div>
+
+      <!-- Export -->
+      <button onclick="exportCSV()" title="Export CSV" class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 flex items-center justify-center shrink-0 active:scale-95 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter indicator -->
+  <div id="filterIndicator" class="hidden flex items-center justify-between px-1 -mt-2">
+    <div id="filterIndicatorText" class="text-[11px] font-bold text-slate-500 flex items-center gap-1.5"></div>
+    <button onclick="resetAllFilters()" class="text-[11px] font-bold text-pinkbrand hover:underline">Reset filter</button>
+  </div>
+
+  <!-- ===== VIEW TABS ===== -->
+  <div class="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl">
+    <button onclick="setView('calendar')" data-view="calendar" class="view-btn flex-1 py-2 text-xs font-bold rounded-xl transition bg-white text-slate-900 shadow-sm flex items-center justify-center gap-1.5">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Kalender
+    </button>
+    <button onclick="setView('timeline')" data-view="timeline" class="view-btn flex-1 py-2 text-xs font-bold rounded-xl transition text-slate-500 flex items-center justify-center gap-1.5">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+      Timeline
+    </button>
+  </div>
+
+  <!-- ===== CALENDAR VIEW ===== -->
+  <div id="calendarView">
+    <div class="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-slate-200/80 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 bg-pinksoft rounded-2xl text-pinkbrand">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <h2 id="calendar-month-year" class="font-poppins text-xl sm:text-2xl font-extrabold tracking-tight">-</h2>
+            <p class="text-[11px] text-slate-500 font-medium">Klik tanggal untuk memfilter agenda</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="changeMonth(-1)" class="px-2.5 py-2 rounded-xl border border-slate-200 hover:bg-pinksoft text-xs font-bold">‹</button>
+          <button onclick="goToToday()" class="px-3.5 py-2 text-xs font-extrabold bg-pinkbrand text-white rounded-xl shadow-sm hover:bg-pinkdark">Hari Ini</button>
+          <button onclick="changeMonth(1)" class="px-2.5 py-2 rounded-xl border border-slate-200 hover:bg-pinksoft text-xs font-bold">›</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-7 text-center text-[10px] sm:text-[11px] font-extrabold tracking-wider mb-2 uppercase">
+        <div class="py-2 bg-red-50 text-red-500 rounded-lg">Min</div>
+        <div class="py-2 text-slate-500">Sen</div>
+        <div class="py-2 text-slate-500">Sel</div>
+        <div class="py-2 text-slate-500">Rab</div>
+        <div class="py-2 text-slate-500">Kam</div>
+        <div class="py-2 text-slate-500">Jum</div>
+        <div class="py-2 bg-slate-100 text-slate-600 rounded-lg">Sab</div>
+      </div>
+      <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 sm:gap-1.5 min-h-[300px]"></div>
+    </div>
+  </div>
+
+  <!-- ===== TIMELINE VIEW ===== -->
+  <div id="timelineView" class="hidden">
+    <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200/80 shadow-sm">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <h2 class="font-poppins text-lg font-extrabold">7 Hari Ke Depan</h2>
+          <p class="text-[11px] text-slate-500 font-medium">Ringkasan kegiatan mendatang</p>
+        </div>
+        <button onclick="exportCSV()" class="text-xs font-bold text-pinkbrand hover:underline">Export CSV</button>
+      </div>
+      <div id="timelineList" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- ===== AGENDA ===== -->
+  <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200/80 shadow-sm space-y-4" id="agendaSection">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-2xl bg-pinksoft text-pinkbrand flex items-center justify-center border border-pink-200/60 shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h3 id="agenda-section-title" class="font-poppins text-base sm:text-lg font-bold">Agenda Kegiatan</h3>
+            <span id="today-pill-badge" class="bg-pinkbrand text-white text-[9px] font-extrabold px-2 py-0.5 rounded-md hidden">HARI INI</span>
+          </div>
+          <p id="selected-date-display" class="text-[11px] text-slate-500 font-bold mt-0.5">-</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="event-count-badge" class="bg-slate-100 text-slate-800 font-extrabold text-xs px-3 py-1.5 rounded-xl border border-slate-200">0</span>
+        <button onclick="openAddModal()" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl">+ Tambah</button>
+      </div>
+    </div>
+
+    <div id="agenda-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+      <span class="flex items-center gap-1.5">
+        <span id="status-indicator" class="w-2 h-2 rounded-full bg-amber-500"></span>
+        <span id="status-text">Menghubungkan...</span>
+      </span>
+    </div>
+  </div>
+</main>
+
+<!-- ============ SHEET: ADD EVENT ============ -->
+<div id="addSheetBackdrop" class="sheet-backdrop" onclick="closeAddModal()"></div>
+<div id="addSheet" class="sheet">
+  <div class="sheet-handle"></div>
+  <div class="px-5 pb-3 flex items-center justify-between border-b border-slate-100">
+    <div>
+      <h3 class="font-poppins text-lg font-extrabold">Tambah Agenda</h3>
+      <p class="text-[11px] text-slate-500">Lengkapi detail kegiatan</p>
+    </div>
+    <button onclick="closeAddModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <form id="eventForm" onsubmit="handleFormSubmit(event)" class="sheet-body px-5 py-4 space-y-3.5" style="padding-bottom: calc(20px + env(safe-area-inset-bottom));">
+    <div class="relative">
+      <label class="block text-xs font-bold mb-1.5">Nama Center *</label>
+      <button type="button" onclick="toggleFormCenterDropdown()" id="form-center-trigger" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-bold flex items-center justify-between hover:border-emerald-400 transition">
+        <span id="form-center-selected-label" class="truncate text-slate-400">-- Pilih Center --</span>
+        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <input type="hidden" id="form-center-input" required>
+      <div id="form-center-popup" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 max-h-52 overflow-y-auto p-1.5 popup-anim"></div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs font-bold mb-1.5">Tanggal *</label>
+        <input type="date" id="form-date" required class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none focus:border-emerald-400">
+      </div>
+      <div>
+        <label class="block text-xs font-bold mb-1.5">Jam *</label>
+        <input type="time" id="form-time" required class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none focus:border-emerald-400">
+      </div>
+    </div>
+
+    <div class="relative">
+      <label class="block text-xs font-bold mb-1.5">Kategori *</label>
+      <button type="button" onclick="toggleFormCategoryDropdown()" id="form-category-trigger" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-bold flex items-center justify-between">
+        <span id="form-category-selected-label" class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-bluebrand"></span><span>Jadwal Meeting</span>
+        </span>
+        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <input type="hidden" id="form-category" value="meeting" required>
+
+      <div id="form-category-popup" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-1.5 space-y-1 popup-anim">
+        <button type="button" onclick="selectFormCategory('meeting', 'Jadwal Meeting', 'bg-bluebrand')" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold bg-softblue text-bluebrand border border-blue-200">Jadwal Meeting</button>
+        <button type="button" onclick="selectFormCategory('joinpe', 'Jadwal Join PE', 'bg-orangebrand')" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold bg-softorange text-orangebrand border border-orange-200">Jadwal Join PE</button>
+        <button type="button" onclick="selectFormCategory('probiotik', 'Sharing Probiotik', 'bg-pinkkategori')" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold bg-softpink text-pinkkategori border border-pink-200">Sharing Probiotik</button>
+      </div>
+    </div>
+
+    <!-- Meeting -->
+    <div id="section-meeting" class="p-3.5 bg-softblue/70 rounded-2xl border border-blue-200 space-y-2.5">
+      <label class="block text-[11px] font-bold">Jenis Meeting</label>
+      <select id="form-meeting-option" class="w-full bg-white border border-blue-200 rounded-xl p-2.5 text-xs font-bold">
+        <option>Meeting Cabang</option>
+        <option>Meeting Center</option>
+        <option>Meeting Ceko</option>
+        <option>Meeting Staf</option>
+        <option>Meeting Other</option>
+      </select>
+      <div class="grid grid-cols-2 gap-2">
+        <input type="text" id="form-meeting-location" placeholder="Lokasi" class="bg-white border border-blue-200 rounded-xl p-2.5 text-xs font-semibold">
+        <input type="text" id="form-meeting-target" placeholder="Target" class="bg-white border border-blue-200 rounded-xl p-2.5 text-xs font-semibold">
+      </div>
+    </div>
+
+    <!-- Join PE -->
+    <div id="section-joinpe" class="p-3.5 bg-softorange/70 rounded-2xl border border-orange-200 space-y-2.5 hidden">
+      <div class="grid grid-cols-2 gap-2">
+        <select id="form-joinpe-waktu" class="bg-white border border-orange-200 rounded-xl p-2.5 text-xs font-bold">
+          <option>Pagi</option><option>Sore</option>
+        </select>
+        <select id="form-joinpe-jenis" class="bg-white border border-orange-200 rounded-xl p-2.5 text-xs font-bold">
+          <option>Tambah PB</option><option>Tembus Potensi</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <input type="text" id="form-joinpe-location" placeholder="Lokasi" class="bg-white border border-orange-200 rounded-xl p-2.5 text-xs font-semibold">
+        <input type="text" id="form-joinpe-target" placeholder="Target" class="bg-white border border-orange-200 rounded-xl p-2.5 text-xs font-semibold">
+      </div>
+    </div>
+
+    <!-- Probiotik -->
+    <div id="section-probiotik" class="p-3.5 bg-softpink/70 rounded-2xl border border-pink-200 space-y-2.5 hidden">
+      <select id="form-probiotik-jenis" class="w-full bg-white border border-pink-200 rounded-xl p-2.5 text-xs font-bold">
+        <option>Sharing Probiotik</option>
+        <option>Senam Happy</option>
+        <option>Mewarnai</option>
+        <option>Orasi SP</option>
+        <option>Open Booth</option>
+        <option>Spogomi</option>
+        <option>Celengan</option>
+        <option>Sharing Kesehatan</option>
+        <option>Seminar Kesehatan</option>
+        <option>Silaturahmi Pelanggan</option>
+      </select>
+      <div class="grid grid-cols-2 gap-2">
+        <select id="form-probiotik-sub" class="bg-white border border-pink-200 rounded-xl p-2.5 text-xs font-bold">
+          <option>Sekolah</option><option>Kantor</option><option>Warga</option><option>Lain-lain</option>
+        </select>
+        <input type="text" id="form-probiotik-nama" placeholder="Detail nama" class="bg-white border border-pink-200 rounded-xl p-2.5 text-xs font-semibold">
+      </div>
+      <input type="text" id="form-probiotik-target" placeholder="Target Event" class="w-full bg-white border border-pink-200 rounded-xl p-2.5 text-xs font-semibold">
+    </div>
+
+    <div class="flex gap-2 pt-3 border-t border-slate-100">
+      <button type="button" onclick="closeAddModal()" class="flex-1 px-4 py-3 text-xs font-bold text-slate-600 bg-slate-100 rounded-xl">Batal</button>
+      <button type="submit" class="flex-1 px-5 py-3 text-xs font-extrabold bg-emerald-600 text-white rounded-xl shadow-md">Simpan</button>
+    </div>
+  </form>
+</div>
+
+<!-- ============ SHEET: REALISASI MULTI-STEP ============ -->
+<div id="realisasiSheetBackdrop" class="sheet-backdrop" onclick="closeRealisasiModal()"></div>
+<div id="realisasiSheet" class="sheet">
+  <div class="sheet-handle"></div>
+  <div class="px-5 pb-3 flex items-center justify-between border-b border-slate-100">
+    <div class="min-w-0">
+      <h3 class="font-poppins text-lg font-extrabold">Realisasi Kegiatan</h3>
+      <p id="realisasi-event-info" class="text-[11px] text-slate-500 truncate">Detail Event</p>
+    </div>
+    <button onclick="closeRealisasiModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center shrink-0">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="px-5 py-4 flex items-center justify-center gap-3">
+    <div class="step-dot active" id="stepDot1">1</div>
+    <div class="h-0.5 w-8 bg-slate-200" id="stepLine1"></div>
+    <div class="step-dot idle" id="stepDot2">2</div>
+    <div class="h-0.5 w-8 bg-slate-200" id="stepLine2"></div>
+    <div class="step-dot idle" id="stepDot3">3</div>
+  </div>
+
+  <form id="realisasiForm" onsubmit="handleRealisasiSubmit(event)" class="sheet-body px-5 py-2 space-y-3" style="padding-bottom: calc(20px + env(safe-area-inset-bottom));">
+    <!-- STEP 1: PIC -->
+    <div class="realisasi-step" data-step="1">
+      <div class="p-4 bg-orange-50/70 rounded-2xl border border-orange-200 space-y-3">
+        <p class="text-[11px] font-extrabold text-orangebrand uppercase tracking-wider">Langkah 1 — PIC</p>
+        <div>
+          <label class="block text-xs font-bold mb-1.5">Nama PIC *</label>
+          <input type="text" id="real-pic-name" required placeholder="Nama lengkap PIC" class="w-full bg-white border border-orange-200 rounded-xl p-3 text-xs font-bold outline-none focus:border-orangebrand">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1.5">No. WhatsApp PIC *</label>
+          <input type="tel" id="real-pic-phone" required placeholder="08xxxxxxxxxx" class="w-full bg-white border border-orange-200 rounded-xl p-3 text-xs font-bold outline-none focus:border-orangebrand">
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: SAMPLE & SALES -->
+    <div class="realisasi-step hidden" data-step="2">
+      <div class="p-4 bg-orange-50/70 rounded-2xl border border-orange-200 space-y-3">
+        <p class="text-[11px] font-extrabold text-orangebrand uppercase tracking-wider">Langkah 2 — Sample & Penjualan</p>
+        <div>
+          <label class="block text-xs font-bold mb-1.5">Jumlah Sample *</label>
+          <input type="number" id="real-sample" required min="0" value="0" class="w-full bg-white border border-orange-200 rounded-xl p-3 text-xs font-bold outline-none focus:border-orangebrand">
+        </div>
+
+        <div class="p-3 bg-white rounded-2xl border border-orange-100 space-y-2">
+          <span class="text-[10px] font-extrabold text-orangebrand uppercase tracking-wider block">Penjualan Per Varian</span>
+          <div class="grid grid-cols-4 gap-1.5">
+            <div><label class="block text-[10px] font-bold text-slate-600 text-center">YO</label>
+              <input type="number" id="real-yo" min="0" value="0" oninput="calcTotalSales()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold text-center"></div>
+            <div><label class="block text-[10px] font-bold text-slate-600 text-center">OM</label>
+              <input type="number" id="real-om" min="0" value="0" oninput="calcTotalSales()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold text-center"></div>
+            <div><label class="block text-[10px] font-bold text-slate-600 text-center">OS</label>
+              <input type="number" id="real-os" min="0" value="0" oninput="calcTotalSales()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold text-center"></div>
+            <div><label class="block text-[10px] font-bold text-slate-600 text-center">YT</label>
+              <input type="number" id="real-yt" min="0" value="0" oninput="calcTotalSales()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold text-center"></div>
+          </div>
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-bold">Total:</span>
+            <span id="real-total-display" class="num text-lg font-extrabold text-orangebrand">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: REVIEW -->
+    <div class="realisasi-step hidden" data-step="3">
+      <div class="p-4 bg-orange-50/70 rounded-2xl border border-orange-200 space-y-3">
+        <p class="text-[11px] font-extrabold text-orangebrand uppercase tracking-wider">Langkah 3 — Review</p>
+        <div id="realisasiSummary" class="space-y-2 text-xs"></div>
+      </div>
+    </div>
+
+    <!-- Nav buttons -->
+    <div class="flex gap-2 pt-3 border-t border-slate-100">
+      <button type="button" id="realisasiBackBtn" onclick="realisasiPrevStep()" class="hidden px-4 py-3 text-xs font-bold text-slate-600 bg-slate-100 rounded-xl">‹ Kembali</button>
+      <button type="button" id="realisasiNextBtn" onclick="realisasiNextStep()" class="flex-1 px-5 py-3 text-xs font-extrabold bg-orangebrand text-white rounded-xl shadow-md">Lanjut ›</button>
+      <button type="button" onclick="sendWhatsappData()" class="hidden px-3 py-3 text-xs font-bold bg-emerald-600 text-white rounded-xl flex items-center gap-1.5" id="realisasiWaBtn">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.758.459 3.474 1.33 4.982l-1.413 5.164 5.285-1.386c1.45.792 3.09 1.21 4.783 1.211h.005c5.507 0 9.99-4.478 9.99-9.985 0-2.667-1.037-5.176-2.922-7.062a9.923 9.923 0 00-7.058-2.918z"/></svg>
+      </button>
+      <button type="submit" id="realisasiSubmitBtn" class="hidden flex-1 px-5 py-3 text-xs font-extrabold bg-emerald-600 text-white rounded-xl shadow-md">✓ Simpan Realisasi</button>
+    </div>
+  </form>
+</div>
+
+<!-- ============ SHEET: RIWAYAT ============ -->
+<div id="historySheetBackdrop" class="sheet-backdrop" onclick="closeHistorySheet()"></div>
+<div id="historySheet" class="sheet">
+  <div class="sheet-handle"></div>
+  <div class="px-5 pb-3 flex items-center justify-between border-b border-slate-100">
+    <div>
+      <h3 class="font-poppins text-lg font-extrabold">Riwayat Realisasi</h3>
+      <p class="text-[11px] text-slate-500">Semua event yang sudah selesai</p>
+    </div>
+    <button onclick="closeHistorySheet()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body px-5 py-4" style="padding-bottom: calc(20px + env(safe-area-inset-bottom));">
+    <div id="historyStats" class="grid grid-cols-2 gap-2 mb-4"></div>
+    <div id="historyList" class="space-y-2"></div>
+  </div>
+</div>
+
+<!-- ============ MODALS (kecil) ============ -->
+<div id="successModal" class="fixed inset-0 z-[70] hidden modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center popup-anim">
+    <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h3 class="font-poppins text-lg font-extrabold mb-1">Berhasil Tersimpan!</h3>
+    <p class="text-xs text-slate-500 mb-4">Agenda telah diperbarui di Sistem & Google Sheets.</p>
+    <button onclick="toggleSuccessModal(false)" class="w-full py-3 text-xs font-extrabold bg-emerald-600 text-white rounded-xl">Selesai</button>
+  </div>
+</div>
+
+<div id="deleteConfirmModal" class="fixed inset-0 z-[70] hidden modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-sm w-full p-6">
+    <h3 class="font-poppins text-base font-bold mb-2">Konfirmasi Hapus</h3>
+    <p class="text-xs text-slate-600 mb-3">Masukkan kata sandi untuk menghapus agenda ini.</p>
+    <form onsubmit="verifyDeletePassword(event)" class="space-y-3">
+      <input type="password" id="delete-password-input" required placeholder="Password..." class="w-full bg-slate-50 border rounded-xl p-3 text-xs font-bold">
+      <p id="delete-error-msg" class="text-[11px] font-bold text-red-500 hidden">Password salah!</p>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="toggleDeleteModal(false)" class="px-4 py-2 text-xs font-bold text-slate-500">Batal</button>
+        <button type="submit" class="px-4 py-2 text-xs font-extrabold bg-red-600 text-white rounded-xl">Hapus</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="authModal" class="fixed inset-0 z-[70] hidden modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-sm w-full p-6">
+    <h3 class="font-poppins text-base font-bold mb-2">Akses Pengaturan</h3>
+    <form onsubmit="verifyPassword(event)" class="space-y-3">
+      <input type="password" id="auth-password-input" required placeholder="Password..." class="w-full bg-slate-50 border rounded-xl p-3 text-xs font-bold">
+      <p id="auth-error-msg" class="text-[11px] font-bold text-red-500 hidden">Password salah!</p>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="toggleAuthModal(false)" class="px-4 py-2 text-xs font-bold text-slate-500">Batal</button>
+        <button type="submit" class="px-4 py-2 text-xs font-extrabold bg-pinkbrand text-white rounded-xl">Verifikasi</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="gasModal" class="fixed inset-0 z-[70] hidden modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6">
+    <h3 class="font-poppins text-base font-bold mb-3">Integrasi Google Sheets</h3>
+    <input type="url" id="gas-url-input" class="w-full bg-slate-50 border rounded-xl p-3 text-xs font-bold mb-4">
+    <div class="flex justify-end gap-2">
+      <button onclick="toggleGASModal(false)" class="px-4 py-2 text-xs font-bold text-slate-500">Batal</button>
+      <button onclick="saveGASUrl()" class="px-4 py-2 text-xs font-bold bg-pinkbrand text-white rounded-xl">Simpan URL</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toastWrap"></div>
+
+<script>
+/* ============================================================
+ * CONFIG & CONSTANTS
+ * ============================================================ */
+const MONTH_NAMES = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const DAY_NAMES = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const DAY_NAMES_SHORT = ["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+
+const CENTER_LIST = [
+  { id: "PANYILEUKAN", name: "Panyileukan", code: "PNY" },
+  { id: "ARCAMANIK", name: "Arcamanik", code: "ARC" },
+  { id: "UJUNG BERUNG", name: "Ujung Berung", code: "UBR" },
+  { id: "KIARA CONDONG", name: "Kiara Condong", code: "KRC" },
+  { id: "ANTAPANI", name: "Antapani", code: "ANT" },
+  { id: "GEDE BAGE", name: "Gede Bage", code: "GDB" },
+  { id: "MARGAHAYU", name: "Margahayu", code: "MGY" },
+  { id: "BOJONG SOANG", name: "Bojong Soang", code: "BJS" },
+  { id: "BUAH BATU", name: "Buah Batu", code: "BBT" }
+];
+
+const DIRECT_GAS_URL = "https://script.google.com/macros/s/AKfycbyezFauy2MIHUgcQlf7fofvDYIx3RbnGt507EEAUnJfrPj6sAGoKLQ9Z2nOKtSpRKf-/exec";
+
+/* ============================================================
+ * STATE
+ * ============================================================ */
+let systemToday = new Date();
+let currentDate = new Date(systemToday.getFullYear(), systemToday.getMonth(), 1);
+let selectedDateStr = formatDateStr(systemToday);
+let activeCategoryFilter = 'all';
+let activeCenterFilter = 'all';
+let activeSearchTerm = '';
+let selectedFormCenter = '';
+let targetDeleteId = null;
+let selectedEventForRealisasi = null;
+let currentView = 'calendar';
+let currentRealisasiStep = 1;
+
+window.eventsList = JSON.parse(localStorage.getItem('kalender_events_data')) || [];
+let gasWebhookUrl = localStorage.getItem('kalender_gas_url') || DIRECT_GAS_URL;
+let darkMode = localStorage.getItem('kalender_dark') === '1';
+
+/* ============================================================
+ * HELPERS
+ * ============================================================ */
+function formatDateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
+function $ (id) { return document.getElementById(id); }
+
+/* ============================================================
+ * TOAST
+ * ============================================================ */
+function toast(msg, type = 'default', duration = 2400) {
+  const wrap = $('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type !== 'default' ? type : '');
+  const iconMap = {
+    success: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>',
+    error:   '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>',
+    info:    '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+    default: ''
+  };
+  el.innerHTML = (iconMap[type] || '') + '<span>' + msg + '</span>';
+  wrap.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 320);
+  }, duration);
+}
+
+/* ============================================================
+ * DARK MODE
+ * ============================================================ */
+function applyDarkMode() {
+  if (darkMode) document.body.classList.add('dark');
+  else document.body.classList.remove('dark');
+  const icon = $('darkIcon');
+  if (icon) {
+    icon.innerHTML = darkMode
+      ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>'
+      : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>';
+  }
+}
+function toggleDarkMode() {
+  darkMode = !darkMode;
+  localStorage.setItem('kalender_dark', darkMode ? '1' : '0');
+  applyDarkMode();
+  toast(darkMode ? 'Mode gelap aktif' : 'Mode terang aktif', 'info', 1600);
+}
+
+/* ============================================================
+ * INIT
+ * ============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  applyDarkMode();
+  $('form-date').value = selectedDateStr;
+  $('gas-url-input').value = gasWebhookUrl;
+  initCustomCenterDropdowns();
+  renderApp();
+  startDayWatcher();
+  setupSwipeDismiss();
+});
+
+function initCustomCenterDropdowns() {
+  const filterPopup = $('center-filter-popup');
+  let html = `<button type="button" onclick="selectCenterFilter('all', 'Semua')" class="w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-pinksoft rounded-xl">🌐 Semua Center</button>`;
+  CENTER_LIST.forEach(c => {
+    html += `<button type="button" onclick="selectCenterFilter('${c.name}', '${c.code}')" class="w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-pinksoft rounded-xl">${c.name} <span class="text-slate-400">(${c.code})</span></button>`;
+  });
+  filterPopup.innerHTML = html;
+
+  const formPopup = $('form-center-popup');
+  let fh = '';
+  CENTER_LIST.forEach(c => {
+    fh += `<button type="button" onclick="selectFormCenter('${c.name}', '${c.name} (${c.code})')" class="w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-emerald-50 rounded-xl">${c.name} <span class="text-slate-400">(${c.code})</span></button>`;
+  });
+  formPopup.innerHTML = fh;
+}
+
+/* ============================================================
+ * DROPDOWNS
+ * ============================================================ */
+function toggleCenterFilterDropdown() { $('center-filter-popup').classList.toggle('hidden'); }
+function selectCenterFilter(val, label) {
+  activeCenterFilter = val;
+  $('center-filter-selected-label').textContent = label;
+  toggleCenterFilterDropdown();
+  renderApp();
+}
+function toggleFormCenterDropdown() { $('form-center-popup').classList.toggle('hidden'); }
+function selectFormCenter(val, label) {
+  selectedFormCenter = val;
+  $('form-center-input').value = val;
+  $('form-center-selected-label').textContent = label;
+  $('form-center-selected-label').classList.remove('text-slate-400');
+  toggleFormCenterDropdown();
+}
+function toggleFormCategoryDropdown() { $('form-category-popup').classList.toggle('hidden'); }
+function selectFormCategory(val, label, dotBg) {
+  $('form-category').value = val;
+  $('form-category-selected-label').innerHTML = `<span class="w-2.5 h-2.5 rounded-full ${dotBg}"></span><span>${label}</span>`;
+  toggleFormCategoryDropdown();
+  toggleCategoryDynamicFields();
+}
+function toggleCategoryDynamicFields() {
+  const cat = $('form-category').value;
+  ['section-meeting','section-joinpe','section-probiotik'].forEach(id => $(id).classList.add('hidden'));
+  if (cat === 'meeting') $('section-meeting').classList.remove('hidden');
+  else if (cat === 'joinpe') $('section-joinpe').classList.remove('hidden');
+  else if (cat === 'probiotik') $('section-probiotik').classList.remove('hidden');
+}
+
+/* ============================================================
+ * SEARCH & FILTERS
+ * ============================================================ */
+function onSearchInput(val) {
+  activeSearchTerm = (val || '').toLowerCase().trim();
+  renderApp();
+}
+function setCategoryFilter(cat) {
+  activeCategoryFilter = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    if (b.dataset.cat === cat) {
+      b.classList.remove('bg-softblue','text-bluebrand','bg-softorange','text-orangebrand','bg-softpink','text-pinkkategori');
+      b.classList.add('bg-slate-900','text-white');
+    } else {
+      b.classList.remove('bg-slate-900','text-white');
+      if (b.dataset.cat === 'meeting') b.classList.add('bg-softblue','text-bluebrand','border','border-blue-200');
+      else if (b.dataset.cat === 'joinpe') b.classList.add('bg-softorange','text-orangebrand','border','border-orange-200');
+      else if (b.dataset.cat === 'probiotik') b.classList.add('bg-softpink','text-pinkkategori','border','border-pink-200');
+    }
+  });
+  renderApp();
+}
+function resetAllFilters() {
+  activeCategoryFilter = 'all';
+  activeCenterFilter = 'all';
+  activeSearchTerm = '';
+  $('searchInput').value = '';
+  $('center-filter-selected-label').textContent = 'Semua';
+  setCategoryFilter('all');
+  toast('Filter direset', 'info', 1600);
+}
+function setView(v) {
+  currentView = v;
+  document.querySelectorAll('.view-btn').forEach(b => {
+    if (b.dataset.view === v) {
+      b.classList.add('bg-white','text-slate-900','shadow-sm');
+      b.classList.remove('text-slate-500');
+    } else {
+      b.classList.remove('bg-white','text-slate-900','shadow-sm');
+      b.classList.add('text-slate-500');
+    }
+  });
+  $('calendarView').classList.toggle('hidden', v !== 'calendar');
+  $('timelineView').classList.toggle('hidden', v !== 'timeline');
+  if (v === 'timeline') renderTimeline();
+}
+
+/* ============================================================
+ * RENDER
+ * ============================================================ */
+function getFilteredEvents() {
+  return window.eventsList.filter(ev => {
+    const centerMatch = (activeCenterFilter === 'all' || (ev.center && ev.center.toLowerCase() === activeCenterFilter.toLowerCase()));
+    const categoryMatch = (activeCategoryFilter === 'all' || ev.category === activeCategoryFilter);
+    let searchMatch = true;
+    if (activeSearchTerm) {
+      const haystack = [ev.center, ev.detail, ev.lokasi, ev.target, ev.probiotikJenis, ev.probiotikNama].join(' ').toLowerCase();
+      searchMatch = haystack.includes(activeSearchTerm);
+    }
+    return centerMatch && categoryMatch && searchMatch;
+  });
+}
+
+function renderApp() {
+  renderTodayCard();
+  renderCalendar();
+  renderAgendaBottom();
+  renderFilterIndicator();
+  if (currentView === 'timeline') renderTimeline();
+}
+
+function renderFilterIndicator() {
+  const ind = $('filterIndicator');
+  const txt = $('filterIndicatorText');
+  const active = [];
+  if (activeCategoryFilter !== 'all') active.push(`Kategori: ${activeCategoryFilter === 'meeting' ? 'Meeting' : activeCategoryFilter === 'joinpe' ? 'Join PE' : 'Probiotik'}`);
+  if (activeCenterFilter !== 'all') active.push(`Center: ${activeCenterFilter}`);
+  if (activeSearchTerm) active.push(`Cari: "${activeSearchTerm}"`);
+  if (active.length === 0) { ind.classList.add('hidden'); return; }
+  ind.classList.remove('hidden');
+  txt.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg><span>${active.join(' · ')}</span>`;
+}
+
+function renderTodayCard() {
+  const todayKey = formatDateStr(systemToday);
+  const todayEvents = window.eventsList.filter(ev => ev.date === todayKey);
+  const d = systemToday;
+  $('todayDateLabel').textContent = `${DAY_NAMES[d.getDay()]}, ${d.getDate()} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
+
+  const monthPrefix = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-`;
+  const monthCount = window.eventsList.filter(ev => (ev.date || '').startsWith(monthPrefix)).length;
+  $('statMonthCount').textContent = monthCount;
+
+  if (todayEvents.length === 0) {
+    $('todayTitle').textContent = 'Tidak ada kegiatan hari ini';
+    $('todaySubtitle').textContent = 'Cek kalender untuk agenda lain';
+    $('todayChips').innerHTML = '';
+    return;
+  }
+  $('todayTitle').textContent = `${todayEvents.length} kegiatan hari ini`;
+  const doneCount = todayEvents.filter(e => e.isRealized).length;
+  $('todaySubtitle').textContent = doneCount > 0 ? `${doneCount} sudah realisasi` : 'Belum ada realisasi';
+
+  const chips = $('todayChips');
+  chips.innerHTML = '';
+  const catCount = { meeting: 0, joinpe: 0, probiotik: 0 };
+  todayEvents.forEach(e => catCount[e.category] = (catCount[e.category] || 0) + 1);
+  const map = {
+    meeting: { label: 'Meeting', bg: 'bg-softblue text-bluebrand border-blue-200' },
+    joinpe: { label: 'Join PE', bg: 'bg-softorange text-orangebrand border-orange-200' },
+    probiotik: { label: 'Probiotik', bg: 'bg-softpink text-pinkkategori border-pink-200' }
+  };
+  Object.keys(catCount).forEach(k => {
+    if (catCount[k] > 0) {
+      const c = map[k];
+      const el = document.createElement('span');
+      el.className = `text-[10px] font-extrabold px-2.5 py-1 rounded-lg border ${c.bg}`;
+      el.textContent = `${c.label} · ${catCount[k]}`;
+      chips.appendChild(el);
+    }
+  });
+}
+
+function renderCalendar() {
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  $('calendar-month-year').textContent = `${MONTH_NAMES[month]} ${year}`;
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+  const grid = $('calendar-days-grid');
+  grid.innerHTML = '';
+  const activeEvents = getFilteredEvents();
+  const todayKey = formatDateStr(systemToday);
+
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const cell = document.createElement('div');
+    cell.className = "min-h-[52px] sm:min-h-[80px] p-1.5 rounded-xl bg-slate-50 border border-slate-100 text-slate-300 text-xs select-none opacity-40";
+    cell.innerHTML = `<span>${daysInPrevMonth - i}</span>`;
+    grid.appendChild(cell);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateFormatted = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isSelected = dateFormatted === selectedDateStr;
+    const isToday = dateFormatted === todayKey;
+    const dayEvents = activeEvents.filter(e => e.date === dateFormatted);
+    const hasRealized = dayEvents.some(e => e.isRealized);
+
+    const cell = document.createElement('div');
+    let cls = `min-h-[52px] sm:min-h-[80px] p-1.5 rounded-2xl cursor-pointer flex flex-col transition-all relative `;
+    if (isSelected) cls += 'bg-pinksoft border-2 border-pinkbrand shadow-md';
+    else if (isToday) cls += 'bg-white border-2 border-pink-300 today-pulse';
+    else cls += 'bg-slate-50/50 border border-slate-200 hover:bg-white';
+    if (hasRealized && !isSelected) cls += ' realized-glow';
+    cell.className = cls;
+    cell.onclick = () => selectDate(dateFormatted);
+
+    let dayBadgeCls = isSelected ? "bg-pinkbrand text-white text-[11px] px-2 py-0.5 rounded-full font-extrabold" : "text-slate-800 font-extrabold text-xs sm:text-sm";
+    if (isToday && !isSelected) dayBadgeCls = "bg-pinkbrand/90 text-white text-[11px] px-2 py-0.5 rounded-full font-extrabold";
+
+    let dotsHTML = '<div class="space-y-0.5 mt-1 flex-1 overflow-hidden w-full">';
+    dayEvents.slice(0, 2).forEach(ev => {
+      let badge = "bg-softblue text-bluebrand border-blue-200";
+      if (ev.category === 'joinpe') badge = "bg-softorange text-orangebrand border-orange-200";
+      else if (ev.category === 'probiotik') badge = ev.isRealized ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-softpink text-pinkkategori border-pink-200";
+      dotsHTML += `<div class="${badge} border text-[7.5px] sm:text-[8.5px] font-extrabold px-1 py-0.5 rounded truncate">${(ev.center||'').substring(0,3)} · ${ev.detail || 'Event'}</div>`;
+    });
+    if (dayEvents.length > 2) dotsHTML += `<div class="text-[8px] font-bold text-slate-500 pl-1">+${dayEvents.length - 2} lagi</div>`;
+    dotsHTML += '</div>';
+
+    cell.innerHTML = `<div class="flex items-center justify-between w-full gap-1">
+      <span class="${dayBadgeCls}">${day}</span>
+      ${dayEvents.length > 0 ? `<span class="text-[8.5px] font-black text-pinkdark bg-pinklight/70 px-1.5 py-0.5 rounded-full">${dayEvents.length}</span>` : ''}
+    </div>` + dotsHTML;
+    grid.appendChild(cell);
+  }
+}
+
+function renderAgendaBottom() {
+  const matched = getFilteredEvents().filter(ev => ev.date === selectedDateStr);
+  const dateObj = new Date(selectedDateStr + "T00:00:00");
+  const isToday = selectedDateStr === formatDateStr(systemToday);
+
+  $('agenda-section-title').textContent = isToday ? 'Agenda Hari Ini' : 'Agenda Kegiatan';
+  $('today-pill-badge').classList.toggle('hidden', !isToday);
+  $('selected-date-display').textContent = `${DAY_NAMES[dateObj.getDay()]}, ${dateObj.getDate()} ${MONTH_NAMES[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+  $('event-count-badge').textContent = `${matched.length} kegiatan`;
+
+  const container = $('agenda-list');
+  container.innerHTML = '';
+
+  if (matched.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center py-10 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+      <svg class="w-10 h-10 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <p class="text-xs font-bold text-slate-500">Tidak ada agenda pada tanggal ini</p>
+    </div>`;
+    return;
+  }
+
+  matched.forEach(ev => container.appendChild(buildAgendaCard(ev)));
+}
+
+function buildAgendaCard(ev) {
+  const card = document.createElement('div');
+  let accent = '#2563EB';
+  let chip = 'bg-softblue text-bluebrand border-blue-200';
+  let title = 'Jadwal Meeting';
+  let clickable = false;
+
+  if (ev.category === 'meeting') {
+    accent = '#2563EB';
+  } else if (ev.category === 'joinpe') {
+    accent = '#EA580C';
+    chip = 'bg-softorange text-orangebrand border-orange-200';
+    title = 'Jadwal Join PE';
+  } else if (ev.category === 'probiotik') {
+    title = 'Sharing Probiotik';
+    clickable = true;
+    if (ev.isRealized) {
+      accent = '#059669';
+      chip = 'bg-emerald-100 text-emerald-700 border-emerald-200';
+    } else {
+      accent = '#E11D48';
+      chip = 'bg-softpink text-pinkkategori border-pink-200';
+    }
+  }
+
+  card.className = `rounded-2xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-lg transition-shadow ${clickable ? 'cursor-pointer' : ''}`;
+  card.style.borderLeft = `4px solid ${accent}`;
+  if (clickable) card.onclick = () => openRealisasiModal(ev.fbKey || ev.id);
+
+  const deleteId = ev.fbKey || ev.id;
+  const lokasiVal = ev.lokasi || ev.location || '-';
+  const targetVal = ev.target || '-';
+  const realizedChip = ev.isRealized
+    ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200">✓ ${ev.total || 0} pcs</span>`
+    : '';
+
+  card.innerHTML = `
+    <div class="p-3.5 flex-1">
+      <div class="flex items-center justify-between mb-2 gap-2">
+        <span class="text-[9.5px] font-black uppercase px-2 py-0.5 rounded-md border ${chip} truncate">${title}</span>
+        <div class="flex items-center gap-1 shrink-0">
+          <span class="num text-[11px] font-bold bg-slate-100 px-2 py-0.5 rounded-md text-slate-700">${ev.time || '--:--'}</span>
+          <button onclick="event.stopPropagation(); requestDeleteEvent('${deleteId}')" class="text-slate-300 hover:text-red-500 transition p-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap mb-2">
+        <span class="text-[10px] font-extrabold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">${ev.center}</span>
+        ${realizedChip}
+      </div>
+
+      <div class="font-bold text-sm text-slate-900 leading-tight">${ev.probiotikJenis || ev.detail || 'Event'}</div>
+      ${ev.probiotikNama ? `<p class="text-[11px] text-slate-500 font-semibold mt-0.5">${ev.probiotikNama}</p>` : ''}
+
+      <div class="mt-2 space-y-0.5 text-[11px] text-slate-600">
+        <p><span class="text-slate-400 font-bold">📍</span> ${lokasiVal}</p>
+        <p><span class="text-slate-400 font-bold">🎯</span> ${targetVal}</p>
+      </div>
+    </div>
+
+    ${ev.isRealized ? `
+      <div class="px-3.5 py-2 bg-emerald-50 border-t border-emerald-100 flex items-center justify-between text-[10px] font-bold text-emerald-800">
+        <span>👤 ${ev.picName || '-'}</span>
+        <span class="num">${ev.picPhone || ''}</span>
+      </div>
+    ` : clickable ? `
+      <div class="px-3.5 py-2 bg-slate-50 border-t border-slate-100 text-[10px] font-bold text-slate-500 flex items-center justify-between">
+        <span>Tap untuk realisasi</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </div>
+    ` : ''}
+  `;
+  return card;
+}
+
+function renderTimeline() {
+  const list = $('timelineList');
+  list.innerHTML = '';
+  const today = new Date(systemToday);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+    days.push(d);
+  }
+  const activeEvents = getFilteredEvents();
+  let anyData = false;
+
+  days.forEach((d, idx) => {
+    const key = formatDateStr(d);
+    const events = activeEvents.filter(e => e.date === key);
+    const wrap = document.createElement('div');
+    const dayLabel = idx === 0 ? 'Hari Ini' : idx === 1 ? 'Besok' : DAY_NAMES[d.getDay()];
+    wrap.innerHTML = `
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-12 text-center shrink-0">
+          <p class="text-[10px] font-extrabold uppercase tracking-wider ${idx === 0 ? 'text-pinkbrand' : 'text-slate-400'}">${dayLabel}</p>
+          <p class="num text-lg font-black ${idx === 0 ? 'text-pinkdark' : 'text-slate-800'} leading-none mt-0.5">${d.getDate()}</p>
+          <p class="text-[9px] font-bold text-slate-400 uppercase">${MONTH_NAMES[d.getMonth()].slice(0,3)}</p>
+        </div>
+        <div class="flex-1 min-w-0">
+          ${events.length === 0
+            ? '<p class="text-xs text-slate-400 italic py-2">Tidak ada kegiatan</p>'
+            : events.map(ev => {
+              let accent = '#2563EB'; let label = ev.detail || 'Event';
+              if (ev.category === 'joinpe') accent = '#EA580C';
+              else if (ev.category === 'probiotik') accent = ev.isRealized ? '#059669' : '#E11D48';
+              return `<div class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50 cursor-pointer" onclick="selectDate('${key}'); setView('calendar');">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:${accent}"></span>
+                <span class="num text-[10px] font-bold text-slate-500 shrink-0">${ev.time || '--'}</span>
+                <span class="text-xs font-bold text-slate-800 truncate">${label}</span>
+                <span class="text-[10px] font-bold text-slate-400 ml-auto shrink-0">${ev.center}</span>
+              </div>`;
+            }).join('')
+          }
+        </div>
+      </div>
+    `;
+    if (events.length > 0) anyData = true;
+    list.appendChild(wrap);
+  });
+
+  if (!anyData) {
+    list.innerHTML = '<div class="text-center py-12 text-slate-400 text-xs font-bold">Tidak ada kegiatan 7 hari ke depan</div>';
+  }
+}
+
+function selectDate(dateStr) {
+  selectedDateStr = dateStr;
+  $('form-date').value = dateStr;
+  renderApp();
+  // Auto-scroll ke agenda
+  setTimeout(() => {
+    const el = $('agendaSection');
+    if (el) {
+      const y = el.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  }, 120);
+}
+function changeMonth(offset) {
+  currentDate.setMonth(currentDate.getMonth() + offset);
+  renderApp();
+}
+function goToToday() {
+  currentDate = new Date(systemToday.getFullYear(), systemToday.getMonth(), 1);
+  selectedDateStr = formatDateStr(systemToday);
+  renderApp();
+  toast('Kembali ke hari ini', 'info', 1500);
+}
+
+/* ============================================================
+ * SHEET: ADD
+ * ============================================================ */
+function openAddModal() {
+  $('addSheetBackdrop').classList.add('show');
+  requestAnimationFrame(() => $('addSheet').classList.add('show'));
+}
+function closeAddModal() {
+  $('addSheet').classList.remove('show');
+  $('addSheetBackdrop').classList.remove('show');
+}
+
+/* ============================================================
+ * SHEET: REALISASI MULTI-STEP
+ * ============================================================ */
+function openRealisasiModal(eventId) {
+  selectedEventForRealisasi = window.eventsList.find(e => (e.fbKey === eventId || e.id === eventId));
+  if (!selectedEventForRealisasi) return;
+
+  $('realisasi-event-info').textContent = `${selectedEventForRealisasi.center} · ${selectedEventForRealisasi.detail || ''} · ${selectedEventForRealisasi.date}`;
+  $('real-pic-name').value = selectedEventForRealisasi.picName || '';
+  $('real-pic-phone').value = selectedEventForRealisasi.picPhone || '';
+  $('real-sample').value = selectedEventForRealisasi.sample || 0;
+  $('real-yo').value = selectedEventForRealisasi.yo || 0;
+  $('real-om').value = selectedEventForRealisasi.om || 0;
+  $('real-os').value = selectedEventForRealisasi.os || 0;
+  $('real-yt').value = selectedEventForRealisasi.yt || 0;
+  calcTotalSales();
+
+  currentRealisasiStep = 1;
+  renderRealisasiStep();
+
+  $('realisasiSheetBackdrop').classList.add('show');
+  requestAnimationFrame(() => $('realisasiSheet').classList.add('show'));
+}
+function closeRealisasiModal() {
+  $('realisasiSheet').classList.remove('show');
+  $('realisasiSheetBackdrop').classList.remove('show');
+}
+function renderRealisasiStep() {
+  document.querySelectorAll('.realisasi-step').forEach(el => {
+    el.classList.toggle('hidden', parseInt(el.dataset.step) !== currentRealisasiStep);
+  });
+  for (let i = 1; i <= 3; i++) {
+    const dot = $('stepDot' + i);
+    dot.classList.remove('active','done','idle');
+    if (i === currentRealisasiStep) dot.classList.add('active');
+    else if (i < currentRealisasiStep) dot.classList.add('done');
+    else dot.classList.add('idle');
+  }
+  $('realisasiBackBtn').classList.toggle('hidden', currentRealisasiStep === 1);
+  $('realisasiNextBtn').classList.toggle('hidden', currentRealisasiStep === 3);
+  $('realisasiSubmitBtn').classList.toggle('hidden', currentRealisasiStep !== 3);
+  $('realisasiWaBtn').classList.toggle('hidden', currentRealisasiStep !== 3);
+
+  if (currentRealisasiStep === 3) renderRealisasiSummary();
+}
+function realisasiNextStep() {
+  if (currentRealisasiStep === 1) {
+    const name = $('real-pic-name').value.trim();
+    const phone = $('real-pic-phone').value.trim();
+    if (!name) { toast('Nama PIC wajib diisi', 'error'); return; }
+    if (!phone) { toast('No. WhatsApp wajib diisi', 'error'); return; }
+  }
+  if (currentRealisasiStep < 3) {
+    currentRealisasiStep++;
+    renderRealisasiStep();
+  }
+}
+function realisasiPrevStep() {
+  if (currentRealisasiStep > 1) {
+    currentRealisasiStep--;
+    renderRealisasiStep();
+  }
+}
+function renderRealisasiSummary() {
+  const total = calcTotalSales();
+  const el = $('realisasiSummary');
+  el.innerHTML = `
+    <div class="space-y-1.5">
+      <div class="flex justify-between"><span class="text-slate-500 font-bold">Nama PIC</span><span class="font-bold text-slate-900">${$('real-pic-name').value}</span></div>
+      <div class="flex justify-between"><span class="text-slate-500 font-bold">No. WhatsApp</span><span class="font-bold text-slate-900 num">${$('real-pic-phone').value}</span></div>
+      <div class="flex justify-between"><span class="text-slate-500 font-bold">Jumlah Sample</span><span class="font-bold text-slate-900 num">${$('real-sample').value}</span></div>
+      <div class="border-t border-orange-200 my-2"></div>
+      <div class="flex justify-between"><span class="text-slate-500 font-bold">YO</span><span class="font-bold num">${$('real-yo').value}</span></div>
+      <div class="flex justify-between"><span class="text-slate-500 font-bold">OM</span><span class="font-bold num">${$('real-om').value}</span></div>
+      <div class="flex justify-between"><span class="text-slate-500 font-bold">OS</span><span class="font-bold num">${$('real-os').value}</span></div>
+      <div class="flex justify-between"><span class="text-slate-500 font-bold">YT</span><span class="font-bold num">${$('real-yt').value}</span></div>
+      <div class="border-t border-orange-200 my-2"></div>
+      <div class="flex justify-between items-center"><span class="font-extrabold text-orangebrand uppercase text-[10px] tracking-wider">Total</span><span class="num text-xl font-black text-orangebrand">${total}</span></div>
+    </div>
+  `;
+}
+
+function calcTotalSales() {
+  const yo = parseInt($('real-yo').value) || 0;
+  const om = parseInt($('real-om').value) || 0;
+  const os = parseInt($('real-os').value) || 0;
+  const yt = parseInt($('real-yt').value) || 0;
+  const total = yo + om + os + yt;
+  $('real-total-display').textContent = total;
+  return total;
+}
+
+function handleRealisasiSubmit(e) {
+  e.preventDefault();
+  if (!selectedEventForRealisasi) return;
+  const realData = {
+    isRealized: true,
+    picName: $('real-pic-name').value,
+    picPhone: $('real-pic-phone').value,
+    sample: parseInt($('real-sample').value) || 0,
+    yo: parseInt($('real-yo').value) || 0,
+    om: parseInt($('real-om').value) || 0,
+    os: parseInt($('real-os').value) || 0,
+    yt: parseInt($('real-yt').value) || 0,
+    total: calcTotalSales()
+  };
+  if (window.fbUpdate && window.fbRef && window.fbDB && selectedEventForRealisasi.fbKey) {
+    window.fbUpdate(window.fbRef(window.fbDB, 'events/' + selectedEventForRealisasi.fbKey), realData);
+  }
+  syncRealisasiToGoogleSheets({ ...selectedEventForRealisasi, ...realData });
+  closeRealisasiModal();
+  renderApp();
+  toggleSuccessModal(true);
+}
+
+function sendWhatsappData() {
+  if (!selectedEventForRealisasi) return;
+  const picName = $('real-pic-name').value || '-';
+  const picPhone = $('real-pic-phone').value || '-';
+  const sample = $('real-sample').value || '0';
+  const yo = $('real-yo').value || '0';
+  const om = $('real-om').value || '0';
+  const os = $('real-os').value || '0';
+  const yt = $('real-yt').value || '0';
+  const total = calcTotalSales();
+
+  const text = `*LAPORAN REALISASI EVENT PROBIOTIK*%0A` +
+    `==========================%0A` +
+    `*Center:* ${selectedEventForRealisasi.center}%0A` +
+    `*Tanggal:* ${selectedEventForRealisasi.date}%0A` +
+    `*Jenis Event:* ${selectedEventForRealisasi.detail}%0A` +
+    `*Lokasi:* ${selectedEventForRealisasi.lokasi}%0A` +
+    `*Target:* ${selectedEventForRealisasi.target}%0A` +
+    `--------------------------%0A` +
+    `*Nama PIC:* ${picName}%0A` +
+    `*No. PIC:* ${picPhone}%0A` +
+    `*Jumlah Sample:* ${sample}%0A` +
+    `--------------------------%0A` +
+    `*HASIL PENJUALAN:*%0A` +
+    `- YO: ${yo}%0A- OM: ${om}%0A- OS: ${os}%0A- YT: ${yt}%0A` +
+    `*TOTAL:* ${total} Botol/Pcs%0A` +
+    `==========================`;
+
+  window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+}
+
+/* ============================================================
+ * SHEET: HISTORY
+ * ============================================================ */
+function openHistorySheet() {
+  const realized = window.eventsList.filter(e => e.isRealized);
+  const totalSales = realized.reduce((s, e) => s + (parseInt(e.total) || 0), 0);
+  const totalSample = realized.reduce((s, e) => s + (parseInt(e.sample) || 0), 0);
+
+  $('historyStats').innerHTML = `
+    <div class="rounded-2xl p-3.5 bg-gradient-to-br from-emerald-50 to-white border border-emerald-200">
+      <p class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wider">Total Realisasi</p>
+      <p class="num text-2xl font-black text-emerald-700 mt-0.5">${realized.length}</p>
+      <p class="text-[10px] font-bold text-emerald-600">event selesai</p>
+    </div>
+    <div class="rounded-2xl p-3.5 bg-gradient-to-br from-orange-50 to-white border border-orange-200">
+      <p class="text-[10px] font-extrabold text-orange-700 uppercase tracking-wider">Total Penjualan</p>
+      <p class="num text-2xl font-black text-orange-700 mt-0.5">${totalSales}</p>
+      <p class="text-[10px] font-bold text-orange-600">botol/pcs</p>
+    </div>
+  `;
+
+  const list = $('historyList');
+  list.innerHTML = '';
+  if (realized.length === 0) {
+    list.innerHTML = '<div class="text-center py-12 text-slate-400 text-xs font-bold">Belum ada realisasi</div>';
+  } else {
+    realized.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    realized.forEach(ev => {
+      const el = document.createElement('div');
+      el.className = 'rounded-2xl border border-slate-200 p-3.5 hover:bg-slate-50 cursor-pointer';
+      el.onclick = () => { closeHistorySheet(); openRealisasiModal(ev.fbKey || ev.id); };
+      el.innerHTML = `
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <span class="text-[10px] font-extrabold text-slate-500 uppercase">${ev.date}</span>
+          <span class="num text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">${ev.total || 0} pcs</span>
+        </div>
+        <p class="text-xs font-bold text-slate-900">${ev.detail || 'Event'}</p>
+        <p class="text-[10px] text-slate-500 mt-0.5">${ev.center} · PIC: ${ev.picName || '-'}</p>
+      `;
+      list.appendChild(el);
+    });
+  }
+  $('historySheetBackdrop').classList.add('show');
+  requestAnimationFrame(() => $('historySheet').classList.add('show'));
+}
+function closeHistorySheet() {
+  $('historySheet').classList.remove('show');
+  $('historySheetBackdrop').classList.remove('show');
+}
+
+/* ============================================================
+ * FORM SUBMIT
+ * ============================================================ */
+function handleFormSubmit(e) {
+  e.preventDefault();
+  const center = $('form-center-input').value;
+  if (!center) { toast('Pilih Center terlebih dahulu!', 'error'); return; }
+
+  const date = $('form-date').value;
+  const time = $('form-time').value;
+  const category = $('form-category').value;
+
+  const newEvent = {
+    id: "EVT-" + Date.now(),
+    center, date, time, category,
+    isRealized: false,
+    createdAt: new Date().toISOString()
+  };
+
+  if (category === 'meeting') {
+    newEvent.meetingOption = $('form-meeting-option').value;
+    newEvent.lokasi = $('form-meeting-location').value;
+    newEvent.target = $('form-meeting-target').value;
+    newEvent.detail = newEvent.meetingOption;
+  } else if (category === 'joinpe') {
+    newEvent.joinpeWaktu = $('form-joinpe-waktu').value;
+    newEvent.joinpeJenis = $('form-joinpe-jenis').value;
+    newEvent.lokasi = $('form-joinpe-location').value;
+    newEvent.target = $('form-joinpe-target').value;
+    newEvent.detail = "Join PE " + newEvent.joinpeWaktu + " - " + newEvent.joinpeJenis;
+  } else if (category === 'probiotik') {
+    newEvent.probiotikJenis = $('form-probiotik-jenis').value;
+    newEvent.probiotikSub = $('form-probiotik-sub').value;
+    newEvent.probiotikNama = $('form-probiotik-nama').value;
+    newEvent.lokasi = newEvent.probiotikSub + " (" + newEvent.probiotikNama + ")";
+    newEvent.target = $('form-probiotik-target').value;
+    newEvent.detail = newEvent.probiotikJenis;
+  }
+
+  if (window.fbPush && window.fbEventsRef) window.fbPush(window.fbEventsRef, newEvent);
+  syncToGoogleSheets(newEvent);
+
+  selectedDateStr = date;
+  closeAddModal();
+  renderApp();
+  toggleSuccessModal(true);
+}
+
+/* ============================================================
+ * DELETE
+ * ============================================================ */
+function deleteEvent(id) {
+  if (window.fbRemove && window.fbRef && window.fbDB && id && id.startsWith('-')) {
+    window.fbRemove(window.fbRef(window.fbDB, 'events/' + id));
+  } else {
+    window.eventsList = window.eventsList.filter(e => e.id !== id && e.fbKey !== id);
+    localStorage.setItem('kalender_events_data', JSON.stringify(window.eventsList));
+  }
+  renderApp();
+  toast('Agenda dihapus', 'info');
+}
+function requestDeleteEvent(id) {
+  targetDeleteId = id;
+  $('deleteConfirmModal').classList.remove('hidden');
+}
+function toggleDeleteModal(s) {
+  $('deleteConfirmModal').classList.toggle('hidden', !s);
+  if (!s) { $('delete-password-input').value = ''; $('delete-error-msg').classList.add('hidden'); }
+}
+function verifyDeletePassword(e) {
+  e.preventDefault();
+  if ($('delete-password-input').value === "Yakult2027") {
+    deleteEvent(targetDeleteId);
+    toggleDeleteModal(false);
+  } else $('delete-error-msg').classList.remove('hidden');
+}
+
+/* ============================================================
+ * AUTH & GAS
+ * ============================================================ */
+function requestSettingsAuth() { $('authModal').classList.remove('hidden'); }
+function toggleAuthModal(s) {
+  $('authModal').classList.toggle('hidden', !s);
+  if (!s) { $('auth-password-input').value = ''; $('auth-error-msg').classList.add('hidden'); }
+}
+function verifyPassword(e) {
+  e.preventDefault();
+  if ($('auth-password-input').value === "Yakult2027") {
+    toggleAuthModal(false);
+    $('gasModal').classList.remove('hidden');
+  } else $('auth-error-msg').classList.remove('hidden');
+}
+function toggleGASModal(s) { $('gasModal').classList.toggle('hidden', !s); }
+function saveGASUrl() {
+  gasWebhookUrl = $('gas-url-input').value.trim();
+  localStorage.setItem('kalender_gas_url', gasWebhookUrl);
+  toggleGASModal(false);
+  toast('URL Google Sheets disimpan', 'success');
+}
+function toggleSuccessModal(s) { $('successModal').classList.toggle('hidden', !s); }
+
+/* ============================================================
+ * SYNC TO SHEETS
+ * ============================================================ */
+function syncToGoogleSheets(eventData) {
+  if (!gasWebhookUrl) return;
+  const params = new URLSearchParams();
+  ['id','center','date','time','category','detail','lokasi','target'].forEach(k => params.append(k, eventData[k] || ''));
+  fetch(gasWebhookUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() });
+}
+function syncRealisasiToGoogleSheets(eventData) {
+  if (!gasWebhookUrl) return;
+  const params = new URLSearchParams();
+  params.append('action', 'realisasi');
+  ['id','center','date','time','category','detail','lokasi','target','picName','picPhone','sample','yo','om','os','yt','total'].forEach(k => params.append(k, eventData[k] || ''));
+  fetch(gasWebhookUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() });
+}
+
+/* ============================================================
+ * EXPORT CSV
+ * ============================================================ */
+function exportCSV() {
+  const events = getFilteredEvents();
+  if (events.length === 0) { toast('Tidak ada event untuk diexport', 'error'); return; }
+  const headers = ['ID','Center','Tanggal','Jam','Kategori','Detail','Lokasi','Target','PIC','No PIC','Sample','YO','OM','OS','YT','Total','Realisasi'];
+  const rows = events.map(e => [
+    e.id || e.fbKey || '', e.center || '', e.date || '', e.time || '', e.category || '',
+    e.detail || '', e.lokasi || '', e.target || '',
+    e.picName || '', e.picPhone || '', e.sample || 0,
+    e.yo || 0, e.om || 0, e.os || 0, e.yt || 0, e.total || 0,
+    e.isRealized ? 'Ya' : 'Belum'
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `kalender_event_${formatDateStr(new Date())}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`${events.length} event diexport`, 'success');
+}
+
+/* ============================================================
+ * DAY WATCHER (auto-refresh badge "Hari Ini")
+ * ============================================================ */
+function startDayWatcher() {
+  setInterval(() => {
+    const now = new Date();
+    if (formatDateStr(now) !== formatDateStr(systemToday)) {
+      systemToday = now;
+      renderApp();
+      toast('Hari baru dimulai', 'info', 2000);
+    }
+  }, 60000);
+}
+
+/* ============================================================
+ * SWIPE DOWN TO DISMISS SHEETS
+ * ============================================================ */
+function setupSwipeDismiss() {
+  ['addSheet', 'realisasiSheet', 'historySheet'].forEach(id => {
+    const sheet = $(id);
+    if (!sheet) return;
+    let startY = 0, curY = 0, dragging = false;
+    const handle = sheet.querySelector('.sheet-handle');
+    if (!handle) return;
+    const onStart = e => { startY = e.touches ? e.touches[0].clientY : e.clientY; dragging = true; sheet.style.transition = 'none'; };
+    const onMove = e => {
+      if (!dragging) return;
+      curY = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+      if (curY > 0) sheet.style.transform = `translate(-50%, ${curY}px)`;
+    };
+    const onEnd = () => {
+      dragging = false;
+      sheet.style.transition = '';
+      sheet.style.transform = '';
+      if (curY > 100) {
+        if (id === 'addSheet') closeAddModal();
+        if (id === 'realisasiSheet') closeRealisasiModal();
+        if (id === 'historySheet') closeHistorySheet();
+      }
+      curY = 0;
+    };
+    handle.addEventListener('touchstart', onStart, { passive: true });
+    handle.addEventListener('touchmove', onMove, { passive: true });
+    handle.addEventListener('touchend', onEnd);
+    handle.addEventListener('mousedown', onStart);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+  });
+}
+
+/* ============================================================
+ * ESCAPE KEY — close any open sheet/modal
+ * ============================================================ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeAddModal(); closeRealisasiModal(); closeHistorySheet();
+    toggleSuccessModal(false); toggleDeleteModal(false); toggleAuthModal(false); toggleGASModal(false);
+  }
+});
+
+/* ============================================================
+ * EXPOSE to window
+ * ============================================================ */
+window.renderApp = renderApp;
+window.openAddModal = openAddModal;
+window.closeAddModal = closeAddModal;
+window.openRealisasiModal = openRealisasiModal;
+window.closeRealisasiModal = closeRealisasiModal;
+window.openHistorySheet = openHistorySheet;
+window.closeHistorySheet = closeHistorySheet;
+window.setCategoryFilter = setCategoryFilter;
+window.setView = setView;
+window.changeMonth = changeMonth;
+window.goToToday = goToToday;
+window.selectDate = selectDate;
+window.toggleCenterFilterDropdown = toggleCenterFilterDropdown;
+window.selectCenterFilter = selectCenterFilter;
+window.toggleFormCenterDropdown = toggleFormCenterDropdown;
+window.selectFormCenter = selectFormCenter;
+window.toggleFormCategoryDropdown = toggleFormCategoryDropdown;
+window.selectFormCategory = selectFormCategory;
+window.handleFormSubmit = handleFormSubmit;
+window.handleRealisasiSubmit = handleRealisasiSubmit;
+window.calcTotalSales = calcTotalSales;
+window.sendWhatsappData = sendWhatsappData;
+window.realisasiNextStep = realisasiNextStep;
+window.realisasiPrevStep = realisasiPrevStep;
+window.requestDeleteEvent = requestDeleteEvent;
+window.toggleDeleteModal = toggleDeleteModal;
+window.verifyDeletePassword = verifyDeletePassword;
+window.requestSettingsAuth = requestSettingsAuth;
+window.toggleAuthModal = toggleAuthModal;
+window.verifyPassword = verifyPassword;
+window.toggleGASModal = toggleGASModal;
+window.saveGASUrl = saveGASUrl;
+window.toggleSuccessModal = toggleSuccessModal;
+window.exportCSV = exportCSV;
+window.toggleDarkMode = toggleDarkMode;
+window.onSearchInput = onSearchInput;
+window.resetAllFilters = resetAllFilters;
+</script>
+
+</body>
+</html>

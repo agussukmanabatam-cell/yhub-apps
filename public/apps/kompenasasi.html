@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#E11D48">
+
+    <title>Kompensasi YL Bandung V</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #eef0f3;
+            margin: 0; padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        .num { font-family: 'Plus Jakarta Sans', sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+        .skeleton-text {
+            color: transparent !important;
+            background: linear-gradient(90deg, #fce7f3 25%, #fdf2f8 50%, #fce7f3 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+            display: inline-block;
+            min-width: 90px;
+            min-height: 12px;
+        }
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        #modalContent { transition: transform .32s cubic-bezier(.32,.72,0,1), opacity .28s ease; }
+        #leaderboardContent { transition: transform .32s cubic-bezier(.32,.72,0,1), opacity .28s ease; }
+        .opacity-fade { transition: opacity .28s ease; }
+
+        #headerActive, #headerWelcome { transition: opacity .3s ease, transform .3s ease; }
+        #headerActive.hidden-anim { opacity: 0; transform: translateY(6px); pointer-events: none; position: absolute; inset: 0; }
+
+        /* Podium */
+        .podium-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr 1fr;
+            gap: 8px;
+            align-items: end;
+        }
+        .podium-item {
+            position: relative;
+            border-radius: 14px;
+            padding: 10px 8px 12px;
+            background: #FFFFFF;
+            border: 1px solid rgba(15,23,42,.08);
+            text-align: center;
+            box-shadow: 0 2px 8px -4px rgba(225,29,72,.1);
+            transition: transform .3s ease;
+            animation: podiumIn .6s cubic-bezier(.16,1,.3,1) backwards;
+        }
+        .podium-item:nth-child(1) { animation-delay: .05s; }
+        .podium-item:nth-child(2) { animation-delay: .25s; }
+        .podium-item:nth-child(3) { animation-delay: .45s; }
+        @keyframes podiumIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .podium-1 { padding-top: 14px; padding-bottom: 16px; border-color: rgba(234,179,8,.4); }
+        .podium-1::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg,#FACC15,#EAB308);
+            border-radius: 14px 14px 0 0;
+        }
+        .podium-2::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg,#CBD5E1,#94A3B8);
+            border-radius: 14px 14px 0 0;
+        }
+        .podium-3::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg,#FDBA74,#EA580C);
+            border-radius: 14px 14px 0 0;
+        }
+        .medal {
+            width: 34px; height: 34px; border-radius: 50%;
+            margin: 0 auto 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 900; color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-shadow: 0 4px 12px -4px rgba(0,0,0,.25);
+        }
+        .medal-1 { background: linear-gradient(135deg,#FACC15,#EAB308); }
+        .medal-2 { background: linear-gradient(135deg,#CBD5E1,#94A3B8); }
+        .medal-3 { background: linear-gradient(135deg,#FDBA74,#EA580C); }
+        .podium-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px; font-weight: 800;
+            color: #0F172A;
+            line-height: 1.15;
+            overflow: hidden; text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            word-break: break-word;
+            min-height: 26px;
+        }
+        .podium-value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px; font-weight: 900;
+            margin-top: 5px;
+        }
+        .podium-center {
+            font-size: 8.5px; font-weight: 700;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Leaderboard list */
+        .lb-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 14px;
+            background: #FFFFFF;
+            border: 1px solid rgba(15,23,42,.08);
+            transition: all .18s ease;
+            position: relative;
+        }
+        .lb-row:hover {
+            border-color: rgba(225,29,72,.2);
+            background: #FFF5F8;
+        }
+        .lb-row.is-me {
+            border-color: rgba(225,29,72,.4);
+            background: linear-gradient(135deg, #FFF1F2, #FFFFFF);
+            box-shadow: 0 4px 12px -4px rgba(225,29,72,.2);
+        }
+        .lb-row.is-pending {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .lb-rank {
+            width: 28px; height: 28px;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px; font-weight: 900;
+            flex-shrink: 0;
+        }
+        .lb-rank-1 { background: linear-gradient(135deg,#FACC15,#EAB308); color: #fff; box-shadow: 0 3px 8px -3px rgba(234,179,8,.5); }
+        .lb-rank-2 { background: linear-gradient(135deg,#CBD5E1,#94A3B8); color: #fff; }
+        .lb-rank-3 { background: linear-gradient(135deg,#FDBA74,#EA580C); color: #fff; }
+        .lb-rank-other { background: #F1F5F9; color: #64748B; }
+
+        .lb-info { flex: 1; min-width: 0; }
+        .lb-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px; font-weight: 800;
+            color: #0F172A;
+            line-height: 1.15;
+            overflow: hidden; text-overflow: ellipsis;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+        .lb-name-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .lb-center {
+            font-size: 10.5px; font-weight: 600;
+            color: #94A3B8;
+            margin-top: 2px;
+            overflow: hidden; text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .lb-value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px; font-weight: 900;
+            color: #E11D48;
+            flex-shrink: 0;
+            text-align: right;
+        }
+        .lb-value-sub {
+            font-size: 9px; font-weight: 700;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 1px;
+        }
+        .lb-me-badge {
+            background: linear-gradient(135deg,#F472B6,#E11D48);
+            color: white;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 999px;
+            letter-spacing: 0.05em;
+            margin-left: 6px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px -2px rgba(225,29,72,.5);
+        }
+        .lb-share-btn {
+            width: 32px; height: 32px;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #CBD5E1;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all .18s ease;
+            flex-shrink: 0;
+            margin-left: 2px;
+        }
+        .lb-share-btn:hover {
+            background: rgba(16,185,129,.1);
+            color: #059669;
+            border-color: rgba(16,185,129,.2);
+        }
+        .lb-share-btn:active {
+            transform: scale(.92);
+        }
+        .lb-share-btn i { font-size: 13px; }
+
+        /* Filter chips */
+        .filter-chip {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(15,23,42,.08);
+            background: white;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all .18s ease;
+            white-space: nowrap;
+            font-family: inherit;
+            flex-shrink: 0;
+        }
+        .filter-chip.active {
+            background: linear-gradient(135deg, #F472B6, #E11D48);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px -4px rgba(225,29,72,.4);
+        }
+
+        /* Header action buttons in sheet */
+        .sheet-icon-btn {
+            width: 34px; height: 34px;
+            border-radius: 11px;
+            background: #F8FAFC;
+            border: 1px solid rgba(15,23,42,.08);
+            color: #64748B;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all .18s ease;
+            flex-shrink: 0;
+        }
+        .sheet-icon-btn:hover {
+            background: rgba(225,29,72,.08);
+            color: #E11D48;
+            border-color: rgba(225,29,72,.2);
+        }
+        .sheet-icon-btn:active {
+            transform: scale(.92);
+        }
+        .sheet-icon-btn i { font-size: 14px; }
+        .sheet-icon-btn.is-wa {
+            background: linear-gradient(135deg,#10B981,#059669);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px -4px rgba(16,185,129,.5);
+        }
+        .sheet-icon-btn.is-wa:hover {
+            background: linear-gradient(135deg,#059669,#047857);
+            color: white;
+        }
+
+        /* Modal aksi YL (bottom action sheet) */
+        .action-sheet {
+            position: fixed;
+            left: 50%;
+            bottom: 0;
+            transform: translate(-50%, 100%);
+            width: 100%;
+            max-width: 480px;
+            background: #FFFFFF;
+            border-radius: 28px 28px 0 0;
+            z-index: 120;
+            transition: transform .32s cubic-bezier(.32,.72,0,1);
+            box-shadow: 0 -8px 32px rgba(0,0,0,.2);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .action-sheet.show { transform: translate(-50%, 0); }
+        .action-sheet-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: background .15s ease;
+            border-bottom: 1px solid #F1F5F9;
+            font-family: inherit;
+        }
+        .action-sheet-item:last-child { border-bottom: 0; }
+        .action-sheet-item:hover { background: #FFF5F8; }
+        .action-sheet-item:active { background: #FFF1F2; }
+        .action-sheet-icon {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+        .action-sheet-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .action-sheet-title {
+            font-size: 13px; font-weight: 800;
+            color: #0F172A;
+            line-height: 1.15;
+        }
+        .action-sheet-sub {
+            font-size: 10.5px; font-weight: 500;
+            color: #94A3B8;
+            margin-top: 2px;
+        }
+        .action-sheet-chev {
+            color: #CBD5E1;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-start min-h-screen">
+
+<div class="w-full max-w-[480px] bg-[#eef0f3] min-h-screen flex flex-col relative shadow-2xl overflow-hidden">
+
+    <!-- ==================== HEADER ADAPTIF ==================== -->
+    <div class="bg-gradient-to-br from-[#E11D48] to-[#BE123C] text-white px-5 pt-7 pb-6 rounded-b-[28px] shadow-[0_8px_24px_-8px_rgba(225,29,72,0.5)] z-10 relative shrink-0">
+
+        <!-- Welcome state -->
+        <div id="headerWelcome" class="text-center">
+            <h1 class="text-[22px] font-extrabold tracking-tight" style="font-family:'Plus Jakarta Sans',sans-serif;">Kompensasi YL</h1>
+            <p class="text-[11px] opacity-75 mt-0.5 font-medium">Bandung V · Siap hitung kompensasi</p>
+            <div id="dataFreshness" class="hidden mt-2 flex justify-center">
+                <div class="text-[10px] font-semibold bg-white/15 backdrop-blur-sm px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-check text-[7px]"></i>
+                    <span id="dataFreshnessText">Data tersinkron</span>
+                </div>
+            </div>
+            <button onclick="openLeaderboard()" class="mt-4 inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/20 rounded-2xl px-4 py-2 text-[12px] font-extrabold active:scale-95 transition">
+                <i class="fa-solid fa-trophy text-amber-300"></i>
+                <span>Lihat Leaderboard YL</span>
+                <i class="fa-solid fa-chevron-right text-[10px] opacity-75"></i>
+            </button>
+        </div>
+
+        <!-- Active state -->
+        <div id="headerActive" class="hidden-anim hidden items-center gap-3 relative">
+            <div id="headerAvatar" class="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center font-extrabold text-base flex-shrink-0 num">?</div>
+            <div class="flex-1 min-w-0">
+                <p id="headerYL" class="text-[15px] font-extrabold truncate leading-tight">Nama YL</p>
+                <p id="headerCenter" class="text-[11px] opacity-80 truncate leading-tight mt-0.5">
+                    <i class="fa-solid fa-location-dot text-[9px] mr-1"></i><span>Center</span>
+                </p>
+            </div>
+            <button onclick="openLeaderboard()" class="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 transition flex items-center justify-center flex-shrink-0" title="Leaderboard">
+                <i class="fa-solid fa-trophy text-xs text-amber-300"></i>
+            </button>
+            <button onclick="openModal('center')" class="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 transition flex items-center justify-center flex-shrink-0" title="Ganti Center / YL">
+                <i class="fa-solid fa-right-left text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== CONTENT ==================== -->
+    <div class="flex-1 px-4 pt-4 space-y-4 overflow-y-auto pb-28">
+
+        <section id="heroSection" class="relative">
+            <div id="heroEmpty" class="bg-white border-2 border-dashed border-gray-200 rounded-[28px] px-5 py-4 text-center">
+                <div class="flex items-center justify-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-base"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-[13px] font-extrabold text-gray-700 leading-tight">Mulai Hitung Kompensasi</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5 leading-tight">Pilih Center & Yakult Lady di bawah</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="heroFilled" class="hidden bg-gradient-to-br from-emerald-500 via-emerald-500 to-teal-600 text-white rounded-[28px] p-5 shadow-[0_12px_32px_-8px_rgba(16,185,129,0.55)] relative overflow-hidden">
+                <div class="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10"></div>
+                <div class="absolute -bottom-8 -left-4 w-20 h-20 rounded-full bg-white/10"></div>
+                <div class="relative">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-white/70">Total Bersih</p>
+                    <p id="heroTotal" class="num text-[40px] font-black tracking-tight mt-1 leading-none">Rp 0</p>
+                    <div class="flex items-center gap-2 mt-3 flex-wrap">
+                        <span class="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-bold">
+                            <span id="heroZoneEmoji">🌟</span>
+                            <span id="heroZoneName">Zona</span>
+                        </span>
+                        <span id="heroHintWrap" class="hidden inline-flex items-center gap-1 text-[10px] font-bold opacity-90">
+                            <i class="fa-solid fa-arrow-trend-up text-[9px]"></i>
+                            <span id="heroHintText">+0 btl/hari</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CARD 1 -->
+        <div class="bg-white rounded-[28px] px-5 pt-5 pb-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-100">
+            <div class="flex items-center gap-2 mb-5">
+                <i class="fa-solid fa-user text-[11px] text-pink-500"></i>
+                <h3 class="text-[11px] font-extrabold text-gray-400 uppercase tracking-[0.12em]">Data YL</h3>
+            </div>
+
+            <div class="space-y-2.5">
+                <div id="centerTrigger" class="flex items-center gap-2.5 bg-[#fff5f9] rounded-2xl p-3 border border-pink-100/80 cursor-pointer hover:bg-pink-50 active:scale-[0.99] transition" onclick="onTriggerTap('center')">
+                    <div class="w-8 h-8 rounded-xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i class="fa-solid fa-building text-pink-500 text-[11px]"></i>
+                    </div>
+                    <select id="centerSelect" class="hidden"></select>
+                    <div class="w-full flex justify-between items-center min-w-0">
+                        <span id="centerTriggerText" class="text-[13px] font-bold text-gray-700 skeleton-text">Memuat</span>
+                        <i class="fa-solid fa-chevron-right text-pink-300 text-[10px]"></i>
+                    </div>
+                </div>
+
+                <div id="ylTrigger" class="flex items-center gap-2.5 bg-[#fff5f9] rounded-2xl p-3 border border-pink-100/80 cursor-pointer hover:bg-pink-50 active:scale-[0.99] transition" onclick="onTriggerTap('yl')">
+                    <div class="w-8 h-8 rounded-xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i class="fa-solid fa-person-dress-burst text-pink-500 text-[11px]"></i>
+                    </div>
+                    <select id="ylSelect" class="hidden">
+                        <option value="" disabled selected>Pilih Yakult Lady</option>
+                    </select>
+                    <div class="w-full flex justify-between items-center min-w-0">
+                        <span id="ylTriggerText" class="text-[13px] font-bold text-gray-700">Pilih Yakult Lady</span>
+                        <i class="fa-solid fa-chevron-right text-pink-300 text-[10px]"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-2 mt-3">
+                <div class="col-span-5 flex items-center bg-[#effaf7] rounded-2xl p-2.5 border border-emerald-100">
+                    <i class="fa-solid fa-calendar-days text-emerald-600 mr-2 flex-shrink-0"></i>
+                    <div class="flex flex-col w-full min-w-0">
+                        <label class="text-[9px] text-gray-500 font-bold uppercase tracking-wide truncate">Hari</label>
+                        <input type="number" id="hariInput" placeholder="0" min="1" max="31"
+                            class="num w-full bg-transparent text-[15px] font-extrabold text-gray-800 outline-none placeholder-gray-300"
+                            onblur="validateHari(this)" oninput="calculate()">
+                    </div>
+                </div>
+
+                <div id="kerajinanTrigger" class="col-span-7 flex items-center bg-[#effaf7] rounded-2xl p-2.5 border border-emerald-100 cursor-pointer hover:bg-emerald-50 active:scale-[0.99] transition" onclick="onTriggerTap('kerajinan')">
+                    <i class="fa-solid fa-medal text-emerald-600 mr-2 flex-shrink-0"></i>
+                    <div class="flex flex-col w-full min-w-0">
+                        <label class="text-[9px] text-gray-500 font-bold uppercase tracking-wide truncate">Kerajinan</label>
+                        <select id="kerajinanSelect" class="hidden">
+                            <option value="60">🌟 Hadir Selalu</option>
+                            <option value="40">✅ Absen 1x</option>
+                            <option value="20">🟡 Absen 2x</option>
+                            <option value="10">🟠 Absen 3x</option>
+                            <option value="0">🔴 Absen 4x+</option>
+                        </select>
+                        <div class="w-full flex justify-between items-center min-w-0">
+                            <span id="kerajinanTriggerText" class="text-[12px] font-bold text-gray-800 truncate">🌟 Hadir Selalu</span>
+                            <i class="fa-solid fa-chevron-down text-emerald-400 text-[9px] flex-shrink-0 ml-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="bg-white rounded-[28px] px-5 pt-5 pb-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-100">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-chart-simple text-[11px] text-pink-500"></i>
+                    <h3 class="text-[11px] font-extrabold text-gray-400 uppercase tracking-[0.12em]">Performa Bulan Ini</h3>
+                </div>
+                <div class="flex items-baseline gap-1 bg-pink-50 rounded-full px-2.5 py-1">
+                    <span id="rataRataDisplay" class="num text-[13px] font-black text-pink-600">0</span>
+                    <span class="text-[9px] font-bold text-pink-400 uppercase">btl/hari</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 pb-5 border-b border-dashed border-gray-100">
+                <div class="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-boxes-stacked text-pink-500"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Akumulasi Botol</label>
+                    <div class="flex items-baseline gap-1.5 mt-1">
+                        <input type="text" id="akumulasiInput" placeholder="0" readonly
+                            class="num text-[26px] font-black text-gray-800 bg-transparent outline-none placeholder-gray-300 w-full leading-none cursor-not-allowed">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase flex-shrink-0">btl</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2 pt-5">
+                <div class="text-center">
+                    <p class="text-[10px] font-extrabold uppercase tracking-wider text-red-500">YO</p>
+                    <p id="valB" class="num text-[18px] font-black mt-1.5 leading-none text-red-600">0</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-[10px] font-extrabold uppercase tracking-wider text-blue-700">YT</p>
+                    <p id="valC" class="num text-[18px] font-black mt-1.5 leading-none text-blue-800">0</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-[10px] font-extrabold uppercase tracking-wider text-orange-500">OM</p>
+                    <p id="valD" class="num text-[18px] font-black mt-1.5 leading-none text-orange-600">0</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-[10px] font-extrabold uppercase tracking-wider text-pink-500">OS</p>
+                    <p id="valE" class="num text-[18px] font-black mt-1.5 leading-none text-pink-600">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="bg-white rounded-[28px] px-5 pt-5 pb-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-100">
+            <div class="flex items-center gap-2 mb-5">
+                <i class="fa-solid fa-star text-[11px] text-amber-500"></i>
+                <h3 class="text-[11px] font-extrabold text-gray-400 uppercase tracking-[0.12em]">Zona & Rincian</h3>
+            </div>
+
+            <div id="tierBox" class="rounded-2xl bg-gradient-to-br from-gray-50 to-white border border-gray-100 px-4 py-4 mb-5 transition-all duration-300">
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span id="tierEmoji" class="text-xl flex-shrink-0">⭐</span>
+                        <span id="tierName" class="text-[14px] font-extrabold text-gray-400 truncate">Belum ada Zona</span>
+                    </div>
+                    <span id="tierPct" class="num text-[10px] font-bold text-gray-400 flex-shrink-0">0%</span>
+                </div>
+
+                <div class="w-full bg-gray-100 rounded-full h-1.5 mb-3 overflow-hidden">
+                    <div id="tierProgress" class="h-1.5 rounded-full transition-all duration-500 ease-out bg-gray-300" style="width: 0%"></div>
+                </div>
+
+                <p id="tierMessage" class="text-[11px] text-gray-500 font-medium leading-relaxed">Masukkan data untuk melihat zona.</p>
+
+                <p id="tierNext" class="hidden text-[11px] text-pink-600 font-bold mt-2.5 items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-trend-up text-[9px]"></i>
+                    <span id="tierNextText"></span>
+                </p>
+            </div>
+
+            <div class="space-y-3 text-[13px]">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 font-medium">Pengali Rata-rata</span>
+                    <span id="pengaliRata" class="num font-extrabold text-gray-800">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 font-medium">Bonus Kehadiran</span>
+                    <span id="bonusKehadiran" class="num font-extrabold text-gray-300">+0</span>
+                </div>
+                <div class="flex justify-between items-center pt-3 mt-1 border-t border-dashed border-gray-100">
+                    <span class="text-gray-700 font-bold">Total Pengali</span>
+                    <span id="totalPengali" class="num font-black text-gray-900 text-[17px]">0</span>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-5 border-t border-dashed border-gray-100 space-y-3 text-[13px]">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 font-medium">Kompensasi Awal</span>
+                    <span id="gajiKotor" class="num font-extrabold text-gray-800">Rp 0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 font-medium">Pajak (2,5%)</span>
+                    <span id="pajak" class="num font-extrabold text-rose-500">- Rp 0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-2"></div>
+    </div>
+
+    <!-- ==================== BOTTOM BAR ==================== -->
+    <div class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md px-4 pt-3 pb-5 border-t border-gray-100 flex items-center gap-2 z-20">
+        <button onclick="bagikanKeWhatsApp()" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold py-3.5 rounded-2xl flex justify-center items-center gap-2 shadow-[0_6px_20px_-6px_rgba(16,185,129,0.6)] hover:brightness-105 active:scale-[0.98] transition">
+            <i class="fa-brands fa-whatsapp text-lg"></i>
+            <span class="text-[14px]">Kirim WhatsApp</span>
+        </button>
+        <button onclick="copyToClipboard()" title="Salin teks" class="w-[52px] h-[52px] bg-white border border-gray-200 rounded-2xl flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-700 active:scale-95 transition">
+            <i class="fa-solid fa-copy text-base"></i>
+        </button>
+        <button id="clearBtn" onclick="clearData()" title="Kosongkan" class="w-[52px] h-[52px] bg-white border border-rose-200 rounded-2xl flex items-center justify-center text-rose-500 hover:bg-rose-50 active:scale-95 transition">
+            <i class="fa-solid fa-trash-can text-base"></i>
+        </button>
+    </div>
+
+    <!-- ==================== TOAST ==================== -->
+    <div id="toast" class="absolute bottom-28 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-5 py-3 rounded-full shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none z-50 whitespace-nowrap">
+        ✅ Disalin ke clipboard
+    </div>
+
+    <!-- ==================== BOTTOM SHEET (Selection) — DIPINDAHKAN KE ATAS ==================== -->
+    <div id="selectionModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm hidden opacity-0 opacity-fade">
+        <div class="absolute inset-0" onclick="closeModal()"></div>
+        <div id="modalContent" class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full w-full max-w-[480px] bg-white rounded-b-[28px] shadow-2xl flex flex-col max-h-[85vh]">
+            <div class="px-5 pt-5 pb-4 flex justify-between items-center shrink-0 border-b border-gray-100">
+                <h3 id="modalTitle" class="font-extrabold text-[17px] text-gray-800 tracking-tight">Pilih</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="modalSearchContainer" class="px-5 pt-3 pb-3 shrink-0">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input type="text" id="modalSearch" placeholder="Cari data..."
+                        class="w-full bg-gray-50 border border-gray-200 rounded-2xl pl-10 pr-4 py-2.5 text-[13px] font-medium focus:outline-none focus:border-[#E11D48] focus:bg-white focus:ring-2 focus:ring-pink-100 transition">
+                </div>
+            </div>
+            <div class="overflow-y-auto flex-1 px-3 pb-4 space-y-1" id="modalList"></div>
+            <div class="flex justify-center pt-2 pb-3 shrink-0">
+                <div class="w-10 h-1.5 bg-gray-200 rounded-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== BOTTOM SHEET (Leaderboard) — DIPINDAHKAN KE ATAS ==================== -->
+    <div id="leaderboardModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm hidden opacity-0 opacity-fade">
+        <div class="absolute inset-0" onclick="closeLeaderboard()"></div>
+        <div id="leaderboardContent" class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full w-full max-w-[480px] bg-white rounded-b-[28px] shadow-2xl flex flex-col max-h-[92vh]">
+            <div class="px-5 pt-5 pb-4 flex justify-between items-center shrink-0 gap-2 border-b border-gray-100">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white flex-shrink-0">
+                        <i class="fa-solid fa-trophy text-sm"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-extrabold text-[17px] text-gray-800 tracking-tight leading-none">Leaderboard YL</h3>
+                        <p id="lbSubtitle" class="text-[11px] text-gray-400 font-semibold mt-0.5 truncate">Ranking berdasarkan akumulasi botol</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                    <button onclick="copyLeaderboard()" title="Salin" class="sheet-icon-btn">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+                    <button onclick="shareLeaderboardWA()" title="Share WA" class="sheet-icon-btn is-wa">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </button>
+                    <button onclick="closeLeaderboard()" class="text-gray-400 hover:text-gray-600 transition bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Podium -->
+            <div id="lbPodium" class="px-5 pt-4 pb-4 shrink-0 hidden">
+                <div class="podium-grid">
+                    <div id="lb-podium-2" class="podium-item podium-2">
+                        <div class="medal medal-2">2</div>
+                        <div class="podium-name" id="lb-p2-name">—</div>
+                        <div class="podium-value text-slate-500" id="lb-p2-val">—</div>
+                        <div class="podium-center" id="lb-p2-center">—</div>
+                    </div>
+                    <div id="lb-podium-1" class="podium-item podium-1">
+                        <div class="medal medal-1" style="width:42px;height:42px;font-size:18px;">1</div>
+                        <div class="podium-name" id="lb-p1-name" style="font-size:12px;">—</div>
+                        <div class="podium-value text-amber-600" id="lb-p1-val" style="font-size:13px;">—</div>
+                        <div class="podium-center" id="lb-p1-center">—</div>
+                    </div>
+                    <div id="lb-podium-3" class="podium-item podium-3">
+                        <div class="medal medal-3">3</div>
+                        <div class="podium-name" id="lb-p3-name">—</div>
+                        <div class="podium-value text-orange-600" id="lb-p3-val">—</div>
+                        <div class="podium-center" id="lb-p3-center">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="px-5 pb-3 shrink-0 space-y-2.5">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input type="text" id="lbSearch" placeholder="Cari YL atau center..."
+                        class="w-full bg-gray-50 border border-gray-200 rounded-2xl pl-10 pr-4 py-2.5 text-[13px] font-medium focus:outline-none focus:border-[#E11D48] focus:bg-white focus:ring-2 focus:ring-pink-100 transition">
+                </div>
+                <div class="flex gap-1.5 overflow-x-auto pb-1" id="lbFilterRow">
+                    <button class="filter-chip active" data-filter="all">
+                        <i class="fa-solid fa-list"></i> Semua
+                    </button>
+                    <button class="filter-chip" data-filter="top10">
+                        <i class="fa-solid fa-crown"></i> Top 10
+                    </button>
+                    <button class="filter-chip" data-filter="mine">
+                        <i class="fa-solid fa-user"></i> Saya
+                    </button>
+                </div>
+                <div class="relative">
+                    <button type="button" onclick="toggleLbCenterDropdown()" class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-3.5 py-2.5 text-[12px] font-bold flex items-center justify-between">
+                        <span class="flex items-center gap-2 min-w-0">
+                            <i class="fa-solid fa-building text-pink-500 text-[11px]"></i>
+                            <span id="lbCenterLabel" class="truncate">Semua Center</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-[10px] flex-shrink-0"></i>
+                    </button>
+                    <div id="lbCenterPopup" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto p-1.5"></div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div id="lbStats" class="px-5 pb-3 shrink-0 hidden">
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-gradient-to-br from-pink-50 to-white border border-pink-100 rounded-2xl p-2.5 text-center">
+                        <p class="text-[9px] font-extrabold text-pink-500 uppercase tracking-wider">Total YL</p>
+                        <p id="lb-stat-total" class="num text-[18px] font-black text-pink-600 mt-0.5 leading-none">0</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-2xl p-2.5 text-center">
+                        <p class="text-[9px] font-extrabold text-emerald-600 uppercase tracking-wider">Total Botol</p>
+                        <p id="lb-stat-botol" class="num text-[18px] font-black text-emerald-600 mt-0.5 leading-none">0</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-2xl p-2.5 text-center">
+                        <p class="text-[9px] font-extrabold text-amber-600 uppercase tracking-wider">Rata-rata</p>
+                        <p id="lb-stat-avg" class="num text-[18px] font-black text-amber-600 mt-0.5 leading-none">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto flex-1 px-4 pb-4 space-y-2" id="lbList"></div>
+            <div class="flex justify-center pt-2 pb-3 shrink-0">
+                <div class="w-10 h-1.5 bg-gray-200 rounded-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== ACTION SHEET (Share YL individu) ==================== -->
+    <div id="actionSheetBackdrop" class="fixed inset-0 z-[115] bg-black/40 backdrop-blur-sm hidden opacity-0 opacity-fade"></div>
+    <div id="actionSheet" class="action-sheet">
+        <div class="flex justify-center pt-3 pb-2">
+            <div class="w-10 h-1.5 bg-gray-200 rounded-full"></div>
+        </div>
+        <div class="px-5 pb-3">
+            <div class="flex items-center gap-3 mb-1">
+                <div id="asAvatar" class="w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white font-extrabold text-base flex-shrink-0">?</div>
+                <div class="min-w-0 flex-1">
+                    <p id="asName" class="font-extrabold text-[15px] text-gray-900 truncate leading-tight">—</p>
+                    <p id="asCenter" class="text-[11px] text-gray-500 font-semibold truncate mt-0.5">—</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                    <p id="asValue" class="num text-[16px] font-black text-pink-600 leading-none">0</p>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">botol</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-100">
+            <div class="action-sheet-item" onclick="shareSingleYLWA()">
+                <div class="action-sheet-icon" style="background: linear-gradient(135deg,#10B981,#059669); color: white;">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <div class="action-sheet-text">
+                    <div class="action-sheet-title">Share ke WhatsApp</div>
+                    <div class="action-sheet-sub">Kirim pencapaian YL ini ke grup atau kontak</div>
+                </div>
+                <i class="fa-solid fa-chevron-right action-sheet-chev"></i>
+            </div>
+
+            <div class="action-sheet-item" onclick="copySingleYL()">
+                <div class="action-sheet-icon" style="background: linear-gradient(135deg,#F472B6,#E11D48); color: white;">
+                    <i class="fa-solid fa-copy"></i>
+                </div>
+                <div class="action-sheet-text">
+                    <div class="action-sheet-title">Salin Teks</div>
+                    <div class="action-sheet-sub">Salin ringkasan ke clipboard</div>
+                </div>
+                <i class="fa-solid fa-chevron-right action-sheet-chev"></i>
+            </div>
+
+            <div class="action-sheet-item" onclick="closeActionSheet()" style="border-top: 1px solid #F1F5F9;">
+                <div class="action-sheet-icon" style="background: #F1F5F9; color: #64748B;">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
+                <div class="action-sheet-text">
+                    <div class="action-sheet-title" style="color: #64748B;">Tutup</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* ============================================================
+ * CONFIG
+ * ============================================================ */
+const CONFIG = {
+    PAJAK: 0.025,
+    PENGALI_TIERS: [
+        { min: 350, val: 386 },
+        { min: 330, val: 382 },
+        { min: 300, val: 378 },
+        { min: 280, val: 371 },
+        { min: 250, val: 363 },
+        { min: 200, val: 328 },
+        { min: 0,   val: 292 },
+    ],
+    ZONES: [
+        { min: 350, name: 'Zona Platinum', cls: 'text-indigo-600', bar: 'bg-indigo-500', emoji: '👑',
+          msg: 'Fantastis! Ibu adalah seorang juara sejati dan teruslah menjadi teladan bagi yang lain! 👑✨' },
+        { min: 330, name: 'Zona Gold', cls: 'text-amber-500', bar: 'bg-amber-500', emoji: '🏆',
+          msg: 'Luar biasa! Ibu berada di jajaran pencapaian tinggi. Jadikan ini inspirasi untuk terus melangkah lebih jauh!' },
+        { min: 300, name: 'Zona Silver', cls: 'text-gray-600', bar: 'bg-gray-500', emoji: '🌟',
+          msg: 'Hebat sekali! Performa Ibu sudah sangat baik 🌟' },
+        { min: 280, name: 'Zona Hijau', cls: 'text-emerald-600', bar: 'bg-emerald-500', emoji: '⭐',
+          msg: 'Hampir menyentuh puncak! Fokus penuh dan dorong sedikit lagi untuk menembus batas baru. Ibu pasti bisa!' },
+        { min: 250, name: 'Zona Kuning', cls: 'text-yellow-600', bar: 'bg-yellow-500', emoji: '🚀',
+          msg: 'Luar biasa Ibu sudah di jalur yang tepat. Tingkatkan ritme kerja keras ini!' },
+        { min: 200, name: 'Zona Oranye', cls: 'text-orange-500', bar: 'bg-orange-500', emoji: '🔥',
+          msg: 'Ayo Bu! Tingkatkan sedikit lagi usahanya, untuk keluar dari zona ini.' },
+        { min: 1,   name: 'Zona Merah', cls: 'text-red-500', bar: 'bg-red-500', emoji: '💪',
+          msg: 'Ayo semangat capai target! Masih ada waktu untuk bangkit. Jangan menyerah!' },
+    ],
+    CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCp3DY8YrJP9Bmy1eO6-w6LJzuUj5Iq9cVNnPiJKjpF91Hcei7o4Q5-2i7rTQbrcmT6hCHotfTmU5u/pub?gid=68788908&single=true&output=csv',
+    CACHE_KEY: 'yl_csv_cache_v3',
+    CACHE_TTL: 1000 * 60 * 60 * 24,
+    LS_CENTER: 'yl_last_center',
+    LS_YL:     'yl_last_yl',
+};
+const EMPTY_ZONE = { min: 0, name: 'Belum ada Zona', cls: 'text-gray-400', bar: 'bg-gray-300', emoji: '⭐',
+                     msg: 'Masukkan data untuk melihat zona.' };
+
+/* ============================================================
+ * LOGIKA ZONA & PENGALI (RANGE-BASED)
+ * ============================================================
+ * ZONES diurutkan dari min TERBESAR ke terkecil.
+ * getZone(r) → cari zona pertama (dari atas) yang r >= min-nya.
+ *
+ * Contoh (r = rata-rata botol/hari):
+ *   r >= 350            → Zona Platinum  (termasuk 350, 400, 999, dst)
+ *   330 <= r < 350      → Zona Gold
+ *   300 <= r < 330      → Zona Silver
+ *   280 <= r < 300      → Zona Hijau
+ *   250 <= r < 280      → Zona Kuning
+ *   200 <= r < 250      → Zona Oranye
+ *   1   <= r < 200      → Zona Merah
+ *   r < 1               → Belum ada Zona
+ * ============================================================ */
+const getZone = r => {
+    if (!r || r <= 0) return EMPTY_ZONE;
+    return CONFIG.ZONES.find(z => r >= z.min) ?? EMPTY_ZONE;
+};
+const getPengali = r => (CONFIG.PENGALI_TIERS.find(t => r >= t.min)?.val ?? 292);
+
+/* Zona berikutnya: cari zona dengan min LEBIH TINGGI dari r, ambil yang paling dekat */
+const getNextZone = r => {
+    // Urutkan dari min terkecil ke terbesar, cari yang min-nya > r
+    const sorted = [...CONFIG.ZONES].sort((a, b) => a.min - b.min);
+    return sorted.find(z => z.min > r) || null;
+};
+
+/* ============================================================
+ * HELPERS
+ * ============================================================ */
+const $ = id => document.getElementById(id);
+const fmtIDR = (() => { const f = new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', maximumFractionDigits:0 }); return n => f.format(n); })();
+const fmtNum = (() => { const f = new Intl.NumberFormat('id-ID'); return n => f.format(n); })();
+const haptic = (ms = 10) => { try { navigator.vibrate?.(ms); } catch(_){} };
+
+let savedScrollY = 0;
+
+function lockBodyScroll() {
+    savedScrollY = window.scrollY || window.pageYOffset || 0;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${savedScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+}
+
+function unlockBodyScroll() {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, savedScrollY);
+}
+
+const centerSelect = $('centerSelect');
+const ylSelect     = $('ylSelect');
+const akumulasiInput = $('akumulasiInput');
+
+/* ============================================================
+ * HEADER
+ * ============================================================ */
+function updateHeader() {
+    const welcome = $('headerWelcome');
+    const active  = $('headerActive');
+    const hasYL   = !!ylSelect.value;
+
+    if (hasYL) {
+        welcome.classList.add('hidden');
+        active.classList.remove('hidden');
+        requestAnimationFrame(() => active.classList.remove('hidden-anim'));
+
+        const name = ylSelect.value;
+        const initial = name.trim().charAt(0).toUpperCase() || '?';
+        $('headerAvatar').innerText = initial;
+        $('headerYL').innerText = name;
+        $('headerCenter').innerHTML = `<i class="fa-solid fa-location-dot text-[9px] mr-1"></i><span>${centerSelect.value || '—'}</span>`;
+    } else {
+        active.classList.add('hidden-anim');
+        setTimeout(() => {
+            if (!ylSelect.value) {
+                active.classList.add('hidden');
+                welcome.classList.remove('hidden');
+            }
+        }, 250);
+    }
+}
+
+function updateHero() {
+    const hasYL = !!ylSelect.value;
+    $('heroEmpty').classList.toggle('hidden', hasYL);
+    $('heroFilled').classList.toggle('hidden', !hasYL);
+}
+
+/* ============================================================
+ * BOTTOM SHEET (Selection) — DIPINDAHKAN KE ATAS
+ * ============================================================ */
+let activeDropdownType = '';
+
+function openModal(type) {
+    haptic(8);
+    activeDropdownType = type;
+    const modal = $('selectionModal');
+    const content = $('modalContent');
+    const search = $('modalSearch');
+    const searchContainer = $('modalSearchContainer');
+
+    search.value = '';
+    lockBodyScroll();
+    modal.classList.remove('hidden');
+    void modal.offsetWidth;
+    modal.classList.remove('opacity-0');
+    content.classList.remove('-translate-y-full');
+
+    if (type === 'center') {
+        $('modalTitle').innerText = 'Pilih Center';
+        searchContainer.style.display = 'block';
+        populateModalList(centerSelect);
+    } else if (type === 'yl') {
+        $('modalTitle').innerText = 'Pilih Yakult Lady';
+        searchContainer.style.display = 'block';
+        populateModalList(ylSelect);
+    } else if (type === 'kerajinan') {
+        $('modalTitle').innerText = 'Pilih Kerajinan';
+        searchContainer.style.display = 'none';
+        populateModalList($('kerajinanSelect'));
+    }
+
+    const listEl = $('modalList');
+    if (listEl) listEl.scrollTop = 0;
+
+    if (searchContainer.style.display !== 'none') {
+        setTimeout(() => search.focus({ preventScroll: true }), 320);
+    }
+}
+
+function closeModal() {
+    const modal = $('selectionModal');
+    const content = $('modalContent');
+    modal.classList.add('opacity-0');
+    content.classList.add('-translate-y-full');
+    unlockBodyScroll();
+    setTimeout(() => modal.classList.add('hidden'), 320);
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        if (!$('selectionModal').classList.contains('hidden')) closeModal();
+        if (!$('leaderboardModal').classList.contains('hidden')) closeLeaderboard();
+        if ($('actionSheet').classList.contains('show')) closeActionSheet();
+    }
+});
+
+function populateModalList(selectElement) {
+    const list = $('modalList');
+    list.innerHTML = '';
+    const options = Array.from(selectElement.options);
+    let has = false;
+
+    options.forEach(opt => {
+        if (opt.disabled && !opt.value) return;
+        has = true;
+        const div = document.createElement('div');
+        div.className = 'data-item p-3.5 rounded-2xl hover:bg-[#fff5f9] text-[13px] font-semibold text-gray-700 cursor-pointer transition flex items-center border border-transparent hover:border-pink-100 active:bg-pink-50';
+
+        if (opt.value === selectElement.value) {
+            div.classList.add('bg-[#fff5f9]', 'border-pink-100');
+            div.innerHTML = `<span class="flex-1">${opt.text}</span><i class="fa-solid fa-check text-[#E11D48] text-xs"></i>`;
+        } else {
+            div.innerText = opt.text;
+        }
+
+        div.onclick = () => handleSelection(opt.value, opt.text);
+        list.appendChild(div);
+    });
+
+    if (!has) {
+        list.innerHTML = `<div class="p-5 text-center text-gray-400 text-[12px] font-medium">Data belum tersedia</div>`;
+    }
+}
+
+function handleSelection(value, text) {
+    haptic(12);
+    if (activeDropdownType === 'center') {
+        $('centerTriggerText').innerText = text;
+        centerSelect.value = value;
+        centerSelect.dispatchEvent(new Event('change'));
+        try { localStorage.setItem(CONFIG.LS_CENTER, value); } catch(_){}
+    } else if (activeDropdownType === 'yl') {
+        $('ylTriggerText').innerText = text;
+        ylSelect.value = value;
+        ylSelect.dispatchEvent(new Event('change'));
+        try { localStorage.setItem(CONFIG.LS_YL, value); } catch(_){}
+    } else if (activeDropdownType === 'kerajinan') {
+        $('kerajinanTriggerText').innerText = text;
+        const sel = $('kerajinanSelect');
+        sel.value = value;
+        sel.dispatchEvent(new Event('change'));
+    }
+    closeModal();
+}
+
+$('modalSearch').addEventListener('input', function (e) {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('#modalList .data-item').forEach(item => {
+        item.style.display = item.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
+    });
+});
+
+function onTriggerTap(type) {
+    if (type === 'yl' && !centerSelect.value) {
+        showToast('Pilih Center dulu ya ✋');
+        return;
+    }
+    openModal(type);
+}
+
+/* ============================================================
+ * CSV
+ * ============================================================ */
+let globalCsvData = [];
+let headerMap = { center: 0, yl: 2, yo: 3, yt: 4, om: 5, os: 6, akumulasi: 7 };
+
+function parseCSV(text) {
+    const rows = [];
+    let row = [], cur = '', inQ = false;
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i], n = text[i+1];
+        if (inQ) {
+            if (c === '"' && n === '"') { cur += '"'; i++; }
+            else if (c === '"') inQ = false;
+            else cur += c;
+        } else {
+            if (c === '"') inQ = true;
+            else if (c === ',') { row.push(cur); cur = ''; }
+            else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+            else if (c === '\r') { /* skip */ }
+            else cur += c;
+        }
+    }
+    if (cur.length || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+}
+
+function buildHeaderMap(headers) {
+    const result = { ...headerMap };
+    if (!headers || !headers.length) return result;
+    headers.forEach((h, i) => {
+        const k = String(h).toLowerCase().trim();
+        if (k.includes('center') || k.includes('cabang')) result.center = i;
+        else if (k === 'yl' || k.includes('yakult lady') || k === 'nama yl') result.yl = i;
+        else if (k === 'yo' || k.includes('yakult original') || k === 'original') result.yo = i;
+        else if (k === 'yt' || k.includes('yakult tawar') || k === 'tawar') result.yt = i;
+        else if (k === 'om' || k.includes('original manis')) result.om = i;
+        else if (k === 'os' || k.includes('original sugar') || k === 'sugar') result.os = i;
+        else if (k.includes('akumulasi') || k.includes('total botol')) result.akumulasi = i;
+    });
+    return result;
+}
+
+function processCSV(text) {
+    const rows = parseCSV(text);
+    if (!rows.length) throw new Error('CSV kosong');
+
+    headerMap = buildHeaderMap(rows[0]);
+    const data = [];
+    for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || !r.length || !r.join('').trim()) continue;
+        data.push(r.map(c => (c ?? '').toString().trim()));
+    }
+    globalCsvData = data;
+
+    const centers = [...new Set(data.map(row => row[headerMap.center]).filter(Boolean))].sort();
+    centerSelect.innerHTML = '<option value="" disabled selected>Pilih Center</option>';
+    centers.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c; o.textContent = c;
+        centerSelect.appendChild(o);
+    });
+    centerSelect.disabled = false;
+    $('centerTriggerText').classList.remove('skeleton-text');
+    $('centerTriggerText').innerText = 'Pilih Center';
+
+    tryRestoreLast();
+}
+
+function readCache() {
+    try {
+        const raw = localStorage.getItem(CONFIG.CACHE_KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (!obj || !obj.text) return null;
+        return obj;
+    } catch(_) { return null; }
+}
+function writeCache(text) {
+    try { localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify({ text, ts: Date.now() })); } catch(_){}
+}
+function setFreshness(ts, stale = false) {
+    const d = new Date(ts);
+    const opts = { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' };
+    const label = d.toLocaleString('id-ID', opts).replace('.', ':');
+    const el = $('dataFreshness');
+    el.classList.remove('hidden');
+    $('dataFreshnessText').innerText = stale
+        ? `Mode offline · Data ${label}`
+        : `Data per ${label}`;
+    el.querySelector('i').className = stale
+        ? 'fa-solid fa-wifi text-[7px] opacity-70'
+        : 'fa-solid fa-circle-check text-[7px]';
+}
+
+async function fetchCSV(force = false) {
+    if (!force) {
+        const c = readCache();
+        if (c) {
+            try {
+                processCSV(c.text);
+                setFreshness(c.ts, false);
+                if (Date.now() - c.ts > CONFIG.CACHE_TTL) silentRefresh();
+                return;
+            } catch(_) {}
+        }
+    }
+
+    setCenterLoading(true);
+
+    try {
+        const res = await fetch(CONFIG.CSV_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const text = await res.text();
+        processCSV(text);
+        writeCache(text);
+        setFreshness(Date.now(), false);
+    } catch (err) {
+        console.error('Fetch CSV gagal:', err);
+        const c = readCache();
+        if (c) {
+            try {
+                processCSV(c.text);
+                setFreshness(c.ts, true);
+            } catch(_) {
+                setCenterError();
+            }
+        } else {
+            setCenterError();
+        }
+    } finally {
+        setCenterLoading(false);
+    }
+}
+
+async function silentRefresh() {
+    try {
+        const res = await fetch(CONFIG.CSV_URL, { cache: 'no-store' });
+        if (!res.ok) return;
+        const text = await res.text();
+        writeCache(text);
+        if (!ylSelect.value) processCSV(text);
+        setFreshness(Date.now(), false);
+    } catch(_) {}
+}
+
+function setCenterLoading(on) {
+    const t = $('centerTriggerText');
+    if (on) {
+        t.classList.add('skeleton-text');
+        t.innerText = 'Memuat data';
+        centerSelect.disabled = true;
+    }
+}
+function setCenterError() {
+    const t = $('centerTriggerText');
+    t.classList.remove('skeleton-text');
+    t.innerText = 'Gagal memuat — tap coba lagi';
+    $('centerTrigger').onclick = () => { fetchCSV(true); onTriggerTap('center'); };
+    centerSelect.disabled = true;
+}
+
+function tryRestoreLast() {
+    let lastCenter, lastYL;
+    try {
+        lastCenter = localStorage.getItem(CONFIG.LS_CENTER);
+        lastYL     = localStorage.getItem(CONFIG.LS_YL);
+    } catch(_) { return; }
+    if (!lastCenter) return;
+    if (![...centerSelect.options].some(o => o.value === lastCenter)) return;
+
+    centerSelect.value = lastCenter;
+    centerSelect.dispatchEvent(new Event('change'));
+    $('centerTriggerText').innerText = lastCenter;
+
+    if (lastYL && [...ylSelect.options].some(o => o.value === lastYL)) {
+        ylSelect.value = lastYL;
+        ylSelect.dispatchEvent(new Event('change'));
+        $('ylTriggerText').innerText = lastYL;
+    }
+}
+
+/* ============================================================
+ * DROPDOWN EVENTS
+ * ============================================================ */
+centerSelect.addEventListener('change', function () {
+    const selectedCenter = this.value;
+    ylSelect.innerHTML = '<option value="" disabled selected>Pilih Yakult Lady</option>';
+    $('ylTriggerText').innerText = 'Pilih Yakult Lady';
+
+    const yls = globalCsvData
+        .filter(r => r[headerMap.center] === selectedCenter && r[headerMap.yl])
+        .map(r => r[headerMap.yl]);
+    [...new Set(yls)].sort().forEach(name => {
+        const o = document.createElement('option');
+        o.value = name; o.textContent = name;
+        ylSelect.appendChild(o);
+    });
+
+    resetDataFields();
+    updateHeader();
+    updateHero();
+});
+
+ylSelect.addEventListener('change', function () {
+    const c = centerSelect.value, y = this.value;
+    const row = globalCsvData.find(r => r[headerMap.center] === c && r[headerMap.yl] === y);
+    if (!row) return;
+
+    $('valB').innerText = fmtNum(parseInt(row[headerMap.yo]) || 0);
+    $('valC').innerText = fmtNum(parseInt(row[headerMap.yt]) || 0);
+    $('valD').innerText = fmtNum(parseInt(row[headerMap.om]) || 0);
+    $('valE').innerText = fmtNum(parseInt(row[headerMap.os]) || 0);
+
+    const ak = (row[headerMap.akumulasi] || '0').replace(/[^0-9]/g, '');
+    akumulasiInput.value = fmtNum(parseInt(ak) || 0);
+
+    updateHeader();
+    updateHero();
+    calculate();
+});
+
+function resetDataFields() {
+    ['valB','valC','valD','valE'].forEach(id => $(id).innerText = '0');
+    akumulasiInput.value = '';
+    calculate();
+}
+
+function validateHari(input) {
+    let v = parseInt(input.value);
+    if (isNaN(v)) return;
+    if (v < 1) input.value = 1;
+    if (v > 31) input.value = 31;
+    calculate();
+}
+
+/* ============================================================
+ * CALCULATE
+ * ============================================================ */
+function calculate() {
+    const akumulasi = parseInt(akumulasiInput.value.replace(/\./g, '')) || 0;
+    const hari      = parseInt($('hariInput').value) || 0;
+    const kerajinan = parseInt($('kerajinanSelect').value) || 0;
+
+    let rataRata = 0, pengaliRata = 0;
+    if (hari > 0 && akumulasi > 0) {
+        rataRata    = Math.floor(akumulasi / hari);
+        pengaliRata = getPengali(rataRata);
+    }
+
+    $('rataRataDisplay').innerText = fmtNum(rataRata);
+
+    const zone = getZone(rataRata);
+    const next = getNextZone(rataRata);
+
+    $('tierEmoji').innerText = zone.emoji;
+    $('tierName').innerText  = zone.name;
+    $('tierName').className  = `text-[14px] font-extrabold truncate ${zone.cls}`;
+    $('tierMessage').innerText = zone.msg;
+
+    /* Progress bar dalam zona:
+       - Kalau di zona tertinggi (Platinum / puncak) → 100%
+       - Kalau di Zona Merah (paling bawah) → progress dari 0 ke next.min
+       - Zona lain → progress dari zone.min ke next.min
+    */
+    let pct = 0;
+    if (rataRata <= 0) {
+        pct = 0;
+    } else if (!next) {
+        /* Sudah di zona tertinggi → 100% */
+        pct = 100;
+    } else if (zone.min <= 1 || zone === EMPTY_ZONE) {
+        /* Zona Merah (min 1) atau zona kosong → progress dari 0 ke next.min */
+        pct = Math.min(100, (rataRata / next.min) * 100);
+    } else {
+        /* Zona tengah → progress dari zone.min ke next.min */
+        pct = Math.min(100, ((rataRata - zone.min) / (next.min - zone.min)) * 100);
+    }
+
+    $('tierProgress').style.width = pct + '%';
+    $('tierProgress').className   = `h-1.5 rounded-full transition-all duration-500 ease-out ${zone.bar}`;
+    $('tierPct').innerText = Math.round(pct) + '%';
+
+    const nextEl = $('tierNext');
+    if (next && rataRata > 0) {
+        const need = Math.max(0, next.min - rataRata);
+        $('tierNextText').innerText = `Butuh +${fmtNum(need)} btl/hari untuk tembus ${next.name}`;
+        nextEl.classList.remove('hidden');
+        nextEl.classList.add('flex');
+    } else if (!next && rataRata > 0) {
+        $('tierNextText').innerText = 'Ibu sudah di puncak! Pertahankan 👑';
+        nextEl.classList.remove('hidden');
+        nextEl.classList.add('flex');
+    } else {
+        nextEl.classList.add('hidden');
+        nextEl.classList.remove('flex');
+    }
+
+    const totalPengali = pengaliRata + kerajinan;
+    const gajiKotor    = akumulasi * totalPengali;
+    const pajak        = gajiKotor * CONFIG.PAJAK;
+    const totalBersih  = gajiKotor - pajak;
+
+    const hasData = !!ylSelect.value;
+
+    $('pengaliRata').innerText    = pengaliRata;
+    $('bonusKehadiran').innerText = '+' + kerajinan;
+    $('bonusKehadiran').className = hasData
+        ? 'num font-extrabold text-emerald-600'
+        : 'num font-extrabold text-gray-300';
+    $('totalPengali').innerText   = totalPengali;
+    $('gajiKotor').innerText      = fmtIDR(gajiKotor);
+    $('pajak').innerText          = '- ' + fmtIDR(pajak);
+
+    $('heroTotal').innerText = fmtIDR(totalBersih);
+    $('heroZoneEmoji').innerText = zone.emoji;
+    $('heroZoneName').innerText  = zone.name;
+
+    const hintWrap = $('heroHintWrap');
+    if (next && rataRata > 0) {
+        $('heroHintText').innerText = `+${fmtNum(next.min - rataRata)} btl/hari lagi`;
+        hintWrap.classList.remove('hidden');
+    } else if (!next && rataRata > 0) {
+        $('heroHintText').innerText = 'Sudah di puncak';
+        hintWrap.classList.remove('hidden');
+    } else {
+        hintWrap.classList.add('hidden');
+    }
+}
+
+/* ============================================================
+ * SHARE / COPY / CLEAR
+ * ============================================================ */
+function buildShareText() {
+    const center = centerSelect.value || '[Belum Dipilih]';
+    const yl = ylSelect.value || '[Belum Dipilih]';
+    const akumulasi = akumulasiInput.value || '0';
+    const valB = $('valB').innerText;
+    const valC = $('valC').innerText;
+    const valD = $('valD').innerText;
+    const valE = $('valE').innerText;
+    const hari = $('hariInput').value || '0';
+    const rataRata = $('rataRataDisplay').innerText;
+    const kerajinanText = $('kerajinanSelect').options[$('kerajinanSelect').selectedIndex].text.replace(/[^\w\s]/gi, '').trim();
+    const pengali = $('pengaliRata').innerText;
+    const bonus = $('bonusKehadiran').innerText;
+    const totalP = $('totalPengali').innerText;
+    const kotor = $('gajiKotor').innerText;
+    const pjk = $('pajak').innerText;
+    const bersihFinal = $('heroTotal').innerText;
+
+    const rataNum = parseInt(rataRata.replace(/\./g, '')) || 0;
+    const zone = getZone(rataNum);
+    const next = getNextZone(rataNum);
+
+    let hint = '';
+    if (next && rataNum > 0) {
+        hint = `\n🎯 _Butuh +${fmtNum(Math.max(0, next.min - rataNum))} btl/hari lagi untuk ${next.name}_`;
+    }
+
+    return `*Rincian Kompensasi YL*
+🏢 Center: ${center}
+👩‍💼 Nama YL: ${yl}
+--------------------------
+📊 *Performa*
+Akumulasi Botol: ${akumulasi} botol
+Akumulasi YO : ${valB}
+Akumulasi YT : ${valC}
+Akumulasi OM : ${valD}
+Akumulasi OS : ${valE}
+Hari Delivery: ${hari} hari
+*Rata-rata: ${rataRata} btl/hari*
+*Kehadiran: ${kerajinanText}*
+--------------------------
+🧮 *Pengali*
+Pengali Rata-rata: ${pengali}
+Bonus Kehadiran: ${bonus}
+Total Pengali: ${totalP}
+--------------------------
+💰 *Penerimaan*
+Kompensasi Awal: ${kotor}
+Pajak (2,5%): ${pjk}
+*Total Bersih: ${bersihFinal}*
+--------------------------
+${zone.emoji} *${zone.name}*${hint}
+💬 _"${zone.msg}"_`;
+}
+
+function bagikanKeWhatsApp() {
+    haptic(14);
+    const waUrl = 'https://wa.me/?text=' + encodeURIComponent(buildShareText());
+    const win = window.open(waUrl, '_blank');
+    if (!win) window.location.href = waUrl;
+}
+
+async function copyToClipboard() {
+    haptic(12);
+    const text = buildShareText();
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+        showToast('Teks disalin ke clipboard ✅');
+    } catch(_) {
+        showToast('Gagal menyalin 😕');
+    }
+}
+
+function clearData() {
+    const btn = $('clearBtn');
+    if (!clearArmed) {
+        clearArmed = true;
+        haptic(15);
+        btn.classList.remove('bg-white', 'text-rose-500', 'border-rose-200');
+        btn.classList.add('bg-rose-500', 'text-white', 'border-rose-500');
+        btn.innerHTML = '<i class="fa-solid fa-check text-base"></i>';
+        showToast('Tap sekali lagi untuk hapus 🗑️');
+        clearTimer = setTimeout(() => { clearArmed = false; resetClearBtn(); }, 3000);
+        return;
+    }
+    clearTimeout(clearTimer);
+    clearArmed = false;
+    haptic(20);
+    resetClearBtn();
+
+    centerSelect.selectedIndex = 0;
+    $('centerTriggerText').innerText = 'Pilih Center';
+    $('centerTriggerText').classList.remove('skeleton-text');
+    ylSelect.innerHTML = '<option value="" disabled selected>Pilih Yakult Lady</option>';
+    $('ylTriggerText').innerText = 'Pilih Yakult Lady';
+    resetDataFields();
+    $('hariInput').value = '';
+    $('kerajinanSelect').selectedIndex = 0;
+    $('kerajinanTriggerText').innerText = '🌟 Hadir Selalu';
+    try {
+        localStorage.removeItem(CONFIG.LS_CENTER);
+        localStorage.removeItem(CONFIG.LS_YL);
+    } catch(_) {}
+    updateHeader();
+    updateHero();
+    calculate();
+    showToast('Form dibersihkan ✨');
+}
+
+let clearArmed = false;
+let clearTimer = null;
+function resetClearBtn() {
+    const btn = $('clearBtn');
+    if (!btn) return;
+    btn.classList.remove('bg-rose-500', 'text-white', 'border-rose-500');
+    btn.classList.add('bg-white', 'text-rose-500', 'border-rose-200');
+    btn.innerHTML = '<i class="fa-solid fa-trash-can text-base"></i>';
+}
+
+let toastTimer = null;
+function showToast(msg) {
+    const t = $('toast');
+    t.innerText = msg;
+    t.classList.remove('opacity-0');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.add('opacity-0'), 1800);
+}
+
+/* ============================================================
+ * LEADERBOARD
+ * ============================================================ */
+let lbFilter = 'all';
+let lbSearchTerm = '';
+let lbCenterFilter = 'all';
+let lbCurrentList = [];
+let currentActionYL = null;
+
+function buildLeaderboardData() {
+    const rows = [];
+    const seen = new Set();
+    globalCsvData.forEach(row => {
+        const center = (row[headerMap.center] || '').trim();
+        const yl = (row[headerMap.yl] || '').trim();
+        if (!center || !yl) return;
+        const key = `${center}__${yl}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const akum = parseInt((row[headerMap.akumulasi] || '0').replace(/[^0-9]/g, '')) || 0;
+        const yo = parseInt(row[headerMap.yo]) || 0;
+        const yt = parseInt(row[headerMap.yt]) || 0;
+        const om = parseInt(row[headerMap.om]) || 0;
+        const os = parseInt(row[headerMap.os]) || 0;
+        rows.push({ center, yl, akum, yo, yt, om, os, total: yo + yt + om + os });
+    });
+    return rows.sort((a, b) => b.akum - a.akum);
+}
+
+function openLeaderboard() {
+    haptic(10);
+    const modal = $('leaderboardModal');
+    const content = $('leaderboardContent');
+    lbFilter = 'all';
+    lbSearchTerm = '';
+    lbCenterFilter = 'all';
+    $('lbSearch').value = '';
+    $('lbCenterLabel').innerText = 'Semua Center';
+
+    document.querySelectorAll('#lbFilterRow .filter-chip').forEach(b => {
+        b.classList.toggle('active', b.dataset.filter === 'all');
+    });
+
+    const centers = [...new Set(globalCsvData.map(r => (r[headerMap.center] || '').trim()).filter(Boolean))].sort();
+    const popup = $('lbCenterPopup');
+    popup.innerHTML = `<button type="button" onclick="selectLbCenter('all', 'Semua Center')" class="w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-pink-50 rounded-xl flex items-center gap-2">
+        <i class="fa-solid fa-globe text-pink-400"></i> Semua Center
+    </button>` + centers.map(c => `
+        <button type="button" onclick="selectLbCenter('${c}', '${c}')" class="w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-pink-50 rounded-xl flex items-center gap-2">
+            <i class="fa-solid fa-building text-pink-400"></i> ${c}
+        </button>
+    `).join('');
+
+    renderLeaderboard();
+
+    lockBodyScroll();
+    modal.classList.remove('hidden');
+    void modal.offsetWidth;
+    modal.classList.remove('opacity-0');
+    content.classList.remove('-translate-y-full');
+
+    const lbList = $('lbList');
+    if (lbList) lbList.scrollTop = 0;
+}
+
+function closeLeaderboard() {
+    const modal = $('leaderboardModal');
+    const content = $('leaderboardContent');
+    modal.classList.add('opacity-0');
+    content.classList.add('-translate-y-full');
+    unlockBodyScroll();
+    setTimeout(() => modal.classList.add('hidden'), 320);
+}
+
+function toggleLbCenterDropdown() {
+    $('lbCenterPopup').classList.toggle('hidden');
+}
+
+function selectLbCenter(val, label) {
+    lbCenterFilter = val;
+    $('lbCenterLabel').innerText = label;
+    $('lbCenterPopup').classList.add('hidden');
+    renderLeaderboard();
+}
+
+function getFilteredLeaderboard() {
+    const all = buildLeaderboardData();
+    let list = all;
+    if (lbCenterFilter !== 'all') {
+        list = list.filter(r => r.center === lbCenterFilter);
+    }
+    if (lbFilter === 'top10') {
+        list = list.slice(0, 10);
+    } else if (lbFilter === 'mine') {
+        const myCenter = centerSelect.value;
+        const myYL = ylSelect.value;
+        if (myYL) {
+            list = list.filter(r => r.yl === myYL && r.center === myCenter);
+        } else {
+            list = [];
+        }
+    }
+    if (lbSearchTerm) {
+        const q = lbSearchTerm.toLowerCase();
+        list = list.filter(r => r.yl.toLowerCase().includes(q) || r.center.toLowerCase().includes(q));
+    }
+    return { all, list };
+}
+
+function renderLeaderboard() {
+    const { all, list } = getFilteredLeaderboard();
+    lbCurrentList = list;
+
+    const filtered = lbFilter === 'all' && lbCenterFilter === 'all' && !lbSearchTerm ? all : list;
+    const totalYL = filtered.length;
+    const totalBotol = filtered.reduce((s, r) => s + r.akum, 0);
+    const avgBotol = totalYL ? Math.round(totalBotol / totalYL) : 0;
+
+    $('lbStats').classList.remove('hidden');
+    $('lb-stat-total').innerText = fmtNum(totalYL);
+    $('lb-stat-botol').innerText = fmtNum(totalBotol);
+    $('lb-stat-avg').innerText = fmtNum(avgBotol);
+
+    const podium = $('lbPodium');
+    const showPodium = (lbFilter === 'all' && !lbSearchTerm && lbCenterFilter === 'all' && list.length >= 3);
+    podium.classList.toggle('hidden', !showPodium);
+
+    if (showPodium) {
+        const [first, second, third] = list;
+        const setP = (rank, data) => {
+            const nEl = $(`lb-p${rank}-name`);
+            const vEl = $(`lb-p${rank}-val`);
+            const cEl = $(`lb-p${rank}-center`);
+            if (!data) { nEl.textContent = '—'; vEl.textContent = '—'; cEl.textContent = '—'; return; }
+            nEl.textContent = data.yl;
+            vEl.textContent = fmtNum(data.akum) + ' btl';
+            cEl.textContent = data.center;
+            vEl.className = 'podium-value ' + (
+                rank === 1 ? 'text-amber-600' :
+                rank === 2 ? 'text-slate-500' : 'text-orange-600'
+            );
+        };
+        setP(1, first); setP(2, second); setP(3, third);
+    }
+
+    const lbList = $('lbList');
+    lbList.innerHTML = '';
+
+    if (list.length === 0) {
+        lbList.innerHTML = `
+            <div class="text-center py-12">
+                <i class="fa-solid fa-magnifying-glass text-3xl text-gray-300 mb-2"></i>
+                <p class="text-[12px] font-bold text-gray-400">Tidak ada data YL</p>
+                <p class="text-[10px] text-gray-300 mt-1">Coba ubah filter atau kata kunci</p>
+            </div>
+        `;
+        return;
+    }
+
+    const myYL = ylSelect.value;
+    const myCenter = centerSelect.value;
+
+    list.forEach((item) => {
+        const rank = all.findIndex(r => r.yl === item.yl && r.center === item.center) + 1;
+        const isMe = (item.yl === myYL && item.center === myCenter);
+        const rankCls = rank === 1 ? 'lb-rank-1' : rank === 2 ? 'lb-rank-2' : rank === 3 ? 'lb-rank-3' : 'lb-rank-other';
+
+        const row = document.createElement('div');
+        row.className = 'lb-row' + (isMe ? ' is-me' : '');
+        row.innerHTML = `
+            <div class="lb-rank ${rankCls}">${rank}</div>
+            <div class="lb-info">
+                <div class="lb-name">
+                    <span class="lb-name-text">${item.yl}</span>
+                    ${isMe ? '<span class="lb-me-badge">SAYA</span>' : ''}
+                </div>
+                <div class="lb-center">${item.center}</div>
+            </div>
+            <div>
+                <div class="lb-value">${fmtNum(item.akum)}</div>
+                <div class="lb-value-sub">botol</div>
+            </div>
+            <button class="lb-share-btn" title="Bagikan">
+                <i class="fa-brands fa-whatsapp"></i>
+            </button>
+        `;
+
+        const shareBtn = row.querySelector('.lb-share-btn');
+        shareBtn.onclick = (e) => {
+            e.stopPropagation();
+            openActionSheet(item);
+        };
+
+        row.onclick = (e) => {
+            if (e.target.closest('.lb-share-btn')) return;
+            openActionSheet(item);
+        };
+
+        lbList.appendChild(row);
+    });
+}
+
+/* ============================================================
+ * ACTION SHEET (Share YL individu)
+ * ============================================================ */
+function openActionSheet(item) {
+    currentActionYL = item;
+    haptic(10);
+    $('asName').textContent = item.yl;
+    $('asCenter').textContent = item.center;
+    $('asValue').textContent = fmtNum(item.akum);
+    const initial = item.yl.trim().charAt(0).toUpperCase() || '?';
+    $('asAvatar').textContent = initial;
+
+    $('actionSheetBackdrop').classList.remove('hidden');
+    void $('actionSheetBackdrop').offsetWidth;
+    $('actionSheetBackdrop').classList.remove('opacity-0');
+    $('actionSheet').classList.add('show');
+}
+
+function closeActionSheet() {
+    $('actionSheet').classList.remove('show');
+    $('actionSheetBackdrop').classList.add('opacity-0');
+    setTimeout(() => {
+        $('actionSheetBackdrop').classList.add('hidden');
+        currentActionYL = null;
+    }, 280);
+}
+
+function buildSingleYLText(item) {
+    const rank = lbCurrentList.findIndex(r => r.yl === item.yl && r.center === item.center) + 1;
+    const totalYL = lbCurrentList.length;
+    return `🏆 *Pencapaian YL*
+━━━━━━━━━━━━━━━
+👩‍💼 Nama: *${item.yl}*
+🏢 Center: ${item.center}
+📊 Akumulasi Botol: *${fmtNum(item.akum)} btl*
+━━━━━━━━━━━━━━━
+📦 *Rincian Varian*
+• Original: ${fmtNum(item.yo)}
+• Tawar: ${fmtNum(item.yt)}
+• Original Manis: ${fmtNum(item.om)}
+• Original Sugar: ${fmtNum(item.os)}
+━━━━━━━━━━━━━━━
+${rank > 0 ? `🥇 Peringkat *${rank}* dari ${totalYL} YL` : ''}
+━━━━━━━━━━━━━━━
+_Kompensasi YL Bandung V_`;
+}
+
+function shareSingleYLWA() {
+    if (!currentActionYL) return;
+    haptic(14);
+    const text = buildSingleYLText(currentActionYL);
+    const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
+    const win = window.open(waUrl, '_blank');
+    if (!win) window.location.href = waUrl;
+    closeActionSheet();
+}
+
+async function copySingleYL() {
+    if (!currentActionYL) return;
+    haptic(12);
+    const text = buildSingleYLText(currentActionYL);
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+        showToast('Ringkasan YL disalin ✅');
+    } catch(_) {
+        showToast('Gagal menyalin 😕');
+    }
+    closeActionSheet();
+}
+
+/* ============================================================
+ * SHARE LEADERBOARD
+ * ============================================================ */
+function buildLeaderboardText() {
+    const { all, list } = getFilteredLeaderboard();
+
+    let header = '';
+    if (lbFilter === 'mine' && list.length > 0) {
+        header = `🏆 *PENCAPAIAN SAYA*\n`;
+    } else if (lbFilter === 'top10') {
+        header = `🏆 *TOP 10 YL BANDUNG V*\n`;
+    } else if (lbCenterFilter !== 'all') {
+        header = `🏆 *RANKING YL — ${lbCenterFilter}*\n`;
+    } else {
+        header = `🏆 *LEADERBOARD YL BANDUNG V*\n`;
+    }
+
+    const totalYL = list.length;
+    const totalBotol = list.reduce((s, r) => s + r.akum, 0);
+    const avgBotol = totalYL ? Math.round(totalBotol / totalYL) : 0;
+
+    const subtitle = lbFilter === 'mine' ? 'Rincian lengkap'
+                    : lbFilter === 'top10' ? '10 YL dengan akumulasi tertinggi'
+                    : lbCenterFilter !== 'all' ? `Ranking YL di ${lbCenterFilter}`
+                    : 'Peringkat berdasarkan akumulasi botol';
+
+    let text = header + `_${subtitle}_\n━━━━━━━━━━━━━━━\n\n`;
+
+    if (list.length === 0) {
+        text += '_Belum ada data YL_\n';
+        return text;
+    }
+
+    if (lbFilter === 'all' && lbCenterFilter === 'all' && list.length >= 3 && !lbSearchTerm) {
+        const [p1, p2, p3] = list;
+        text += `🥇 *${p1.yl}* — ${fmtNum(p1.akum)} btl\n`;
+        text += `     _${p1.center}_\n\n`;
+        text += `🥈 *${p2.yl}* — ${fmtNum(p2.akum)} btl\n`;
+        text += `     _${p2.center}_\n\n`;
+        text += `🥉 *${p3.yl}* — ${fmtNum(p3.akum)} btl\n`;
+        text += `     _${p3.center}_\n\n`;
+        if (list.length > 3) {
+            text += `_...dan ${list.length - 3} YL lainnya_\n\n`;
+        }
+    } else {
+        list.forEach((item, idx) => {
+            const globalRank = all.findIndex(r => r.yl === item.yl && r.center === item.center) + 1;
+            const medal = globalRank === 1 ? '🥇' : globalRank === 2 ? '🥈' : globalRank === 3 ? '🥉' : `${globalRank}.`;
+            text += `${medal} *${item.yl}*\n`;
+            text += `     ${fmtNum(item.akum)} btl · _${item.center}_\n\n`;
+        });
+    }
+
+    text += `━━━━━━━━━━━━━━━\n`;
+    text += `📊 *Ringkasan*\n`;
+    text += `• Total YL: ${fmtNum(totalYL)}\n`;
+    text += `• Total Botol: ${fmtNum(totalBotol)}\n`;
+    text += `• Rata-rata: ${fmtNum(avgBotol)} btl/YL\n`;
+    text += `\n_— Kompensasi YL Bandung V_`;
+
+    return text;
+}
+
+function shareLeaderboardWA() {
+    if (lbCurrentList.length === 0) {
+        showToast('Tidak ada data untuk dibagikan');
+        return;
+    }
+    haptic(14);
+    const text = buildLeaderboardText();
+    const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
+    const win = window.open(waUrl, '_blank');
+    if (!win) window.location.href = waUrl;
+    showToast('Membuka WhatsApp... ✅');
+}
+
+async function copyLeaderboard() {
+    if (lbCurrentList.length === 0) {
+        showToast('Tidak ada data untuk disalin');
+        return;
+    }
+    haptic(12);
+    const text = buildLeaderboardText();
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+        showToast('Leaderboard disalin ✅');
+    } catch(_) {
+        showToast('Gagal menyalin 😕');
+    }
+}
+
+/* ============================================================
+ * EVENTS
+ * ============================================================ */
+$('lbSearch').addEventListener('input', function (e) {
+    lbSearchTerm = e.target.value.trim();
+    renderLeaderboard();
+});
+
+document.querySelectorAll('#lbFilterRow .filter-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+        lbFilter = btn.dataset.filter;
+        document.querySelectorAll('#lbFilterRow .filter-chip').forEach(b => {
+            b.classList.toggle('active', b === btn);
+        });
+        haptic(6);
+        renderLeaderboard();
+    });
+});
+
+ylSelect.addEventListener('change', () => {
+    if (!$('leaderboardModal').classList.contains('hidden')) renderLeaderboard();
+});
+
+$('actionSheetBackdrop').onclick = closeActionSheet;
+
+calculate();
+updateHeader();
+updateHero();
+fetchCSV();
+</script>
+</body>
+</html>

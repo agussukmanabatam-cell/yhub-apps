@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#E11D48">
+<meta name="color-scheme" content="light">
+<title>Overview BDL · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://docs.google.com">
+<link rel="dns-prefetch" href="https://docs.google.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: { brand: '#E11D48', brandDark: '#BE123C', brandSoft: '#FFF1F2' },
+      fontFamily: {
+        sans: ['Plus Jakarta Sans', 'sans-serif'],
+        outfit: ['Poppins', 'sans-serif'],
+        number: ['Plus Jakarta Sans', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  :root{
+    --brand:#E11D48; --brand-dark:#BE123C; --brand-soft:#FFF1F2;
+    --stroke: rgba(15,23,42,.08);
+    --stroke-strong: rgba(15,23,42,.15);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0; padding:0;
+    background: #FAFAFC;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    color: #0F172A;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .app-shell{
+    position:relative; width:100%; max-width:28rem;
+    min-height:100vh; min-height:100dvh;
+    margin:0 auto; display:flex; flex-direction:column; overflow:hidden;
+    background:
+      radial-gradient(80% 40% at 50% -5%, rgba(225,29,72,.08), transparent 60%),
+      radial-gradient(60% 35% at 100% 15%, rgba(236,72,153,.05), transparent 60%),
+      linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 100%);
+    box-shadow: 0 0 60px rgba(15,23,42,.06);
+  }
+  @media (min-width: 640px){
+    .app-shell{
+      min-height: 100vh;
+      border-left:1px solid rgba(15,23,42,.06);
+      border-right:1px solid rgba(15,23,42,.06);
+    }
+  }
+  .bg-blob{ position:absolute; border-radius:50%; filter: blur(70px); pointer-events:none; z-index:0; opacity:.45; }
+  .blob-1{ width:260px; height:260px; top:-90px; left:-90px; background: radial-gradient(circle, rgba(225,29,72,.3), transparent 70%); animation: float1 16s ease-in-out infinite; }
+  .blob-2{ width:240px; height:240px; top:28%; right:-110px; background: radial-gradient(circle, rgba(244,114,182,.25), transparent 70%); animation: float2 20s ease-in-out infinite; }
+  .blob-3{ width:280px; height:280px; bottom:-120px; left:-80px; background: radial-gradient(circle, rgba(251,113,133,.22), transparent 70%); animation: float1 22s ease-in-out infinite reverse; }
+  @keyframes float1{ 0%,100%{ transform: translate3d(0,0,0) scale(1); } 50%{ transform: translate3d(24px,30px,0) scale(1.12); } }
+  @keyframes float2{ 0%,100%{ transform: translate3d(0,0,0) scale(1); } 50%{ transform: translate3d(-30px,-22px,0) scale(1.08); } }
+
+  /* ================= HEADER ================= */
+  .app-header{
+    position:sticky; top:0; z-index:40;
+    padding: calc(env(safe-area-inset-top,0px) + 16px) 18px 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,.97) 0%, rgba(255,255,255,.88) 75%, rgba(255,255,255,0) 100%);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  }
+  .header-top{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  }
+  .brand-block{ min-width:0; flex:1; }
+  .brand-eyebrow{
+    font-size:10px; font-weight:800; letter-spacing:.18em; text-transform:uppercase;
+    color:#94A3B8;
+  }
+  .brand-title{
+    font-family:'Poppins',sans-serif;
+    font-size:24px; font-weight:900; letter-spacing:-.025em; line-height:1;
+    background: linear-gradient(100deg, #0F172A 0%, #E11D48 50%, #BE123C 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    margin-top:2px;
+  }
+  .brand-sub{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:7px; padding:3px 9px 3px 7px;
+    font-size:10.5px; font-weight:700; letter-spacing:.02em;
+    color:var(--brand); background: rgba(225,29,72,.08);
+    border:1px solid rgba(225,29,72,.18); border-radius:999px;
+  }
+  .brand-sub i{ font-size:9px; }
+  .header-right{ display:flex; flex-direction:column; align-items:flex-end; gap:7px; flex-shrink:0; }
+  .header-actions{ display:flex; align-items:center; gap:6px; }
+  .fs-btn{
+    width:28px; height:28px; border-radius:9px;
+    background: #F1F5F9; border:1px solid var(--stroke); color:#64748B;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:11px; transition: all .25s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fs-btn:hover{ background: rgba(225,29,72,.12); color:var(--brand); border-color: rgba(225,29,72,.3); }
+  .fs-btn:active{ transform: scale(.92); }
+  body.is-fullscreen .fs-btn i{ transform: rotate(180deg); }
+  body.no-fullscreen .fs-btn{ display:none; }
+  .clock-chip{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:11px; font-weight:700; letter-spacing:.04em;
+    color:#475569; padding:4px 9px;
+    background: #F1F5F9; border:1px solid var(--stroke); border-radius:9px;
+  }
+  .live-dot{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:4px 9px; font-size:10px; font-weight:700;
+    border-radius:999px;
+    border:1px solid rgba(5,150,105,.2);
+    background: rgba(5,150,105,.08);
+    color:#059669; transition: all .3s ease;
+  }
+  .live-dot .dot{
+    width:6px;height:6px;border-radius:50%;background:#10B981;
+    box-shadow:0 0 0 0 rgba(16,185,129,.5);
+    animation: pulseDot 2s infinite;
+  }
+  .live-dot.is-warn{ border-color:rgba(217,119,6,.25); background:rgba(217,119,6,.08); color:#D97706; }
+  .live-dot.is-warn .dot{ background:#F59E0B; box-shadow:0 0 0 0 rgba(245,158,11,.5); }
+  .live-dot.is-err{ border-color:rgba(220,38,38,.25); background:rgba(220,38,38,.08); color:#DC2626; }
+  .live-dot.is-err .dot{ background:#EF4444; animation:none; box-shadow:none; }
+  @keyframes pulseDot{
+    0%{ box-shadow:0 0 0 0 rgba(16,185,129,.5); }
+    70%{ box-shadow:0 0 0 7px rgba(16,185,129,0); }
+    100%{ box-shadow:0 0 0 0 rgba(16,185,129,0); }
+  }
+
+  /* ================= MAIN ================= */
+  .app-main{
+    position:relative; z-index:10; flex:1;
+    padding: 4px 16px calc(env(safe-area-inset-bottom,0px) + 128px);
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+    opacity:0; transition: opacity .7s ease;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .app-main.ready{ opacity:1; }
+
+  /* ================= CARD ================= */
+  .card{
+    position:relative; border-radius:20px;
+    background: #FFFFFF; border:1px solid var(--stroke);
+    box-shadow: 0 4px 16px -8px rgba(225,29,72,.08), 0 1px 2px rgba(15,23,42,.03);
+    overflow:hidden;
+    transition: transform .35s cubic-bezier(.2,.8,.3,1), border-color .35s ease, box-shadow .35s ease;
+  }
+  .card:hover{
+    transform: translateY(-3px);
+    border-color: rgba(225,29,72,.2);
+    box-shadow: 0 12px 28px -12px rgba(225,29,72,.2), 0 2px 4px rgba(15,23,42,.04);
+  }
+  @media (hover:none){ .card:hover{ transform:none; } }
+  .card-topline{ position:absolute; top:0; left:0; right:0; height:2px; }
+
+  /* ================= HERO ================= */
+  .hero{
+    border-radius:24px;
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(255,255,255,.18), transparent 55%),
+      linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
+    border:1px solid rgba(255,255,255,.15);
+    box-shadow: 0 20px 44px -22px rgba(225,29,72,.55), inset 0 1px 0 rgba(255,255,255,.12);
+    padding:18px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:''; position:absolute; top:-60%; left:-60%;
+    width:60%; height:220%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+    transform: rotate(22deg); animation: shine 6.5s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes shine{ 0%, 55%{ left:-60%; } 100%{ left:160%; } }
+  .hero-label{
+    font-size:10px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+    color:rgba(255,255,255,.85); display:flex; align-items:center; gap:6px;
+  }
+  .hero-value{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:clamp(30px, 9.5vw, 40px);
+    font-weight:900; letter-spacing:-.025em; line-height:1;
+    color:#FFFFFF; margin-top:8px;
+    text-shadow: 0 0 26px rgba(255,255,255,.3);
+    word-break:break-all;
+  }
+  .hero-sub{ color:rgba(255,255,255,.78) !important; }
+  .delta-pill{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 9px; border-radius:999px;
+    font-size:11px; font-weight:800;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    border:1px solid transparent; white-space:nowrap;
+  }
+  .delta-up{ color:#059669; background:rgba(16,185,129,.10); border-color:rgba(16,185,129,.24); }
+  .delta-down{ color:#DC2626; background:rgba(220,38,38,.10); border-color:rgba(220,38,38,.24); }
+  .delta-flat{ color:#64748B; background:rgba(100,116,139,.10); border-color:rgba(100,116,139,.2); }
+  .hero .delta-up{ color:#D1FAE5; background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.28); }
+  .hero .delta-down{ color:#FECDD3; background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.28); }
+  .hero .delta-flat{ color:rgba(255,255,255,.85); background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.2); }
+
+  /* Horizontal progress bar (target bulanan) */
+  .progress-wrap{ margin-top:14px; position:relative; }
+  .progress-labels{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:10px; font-weight:700; color:rgba(255,255,255,.8);
+    margin-bottom:6px;
+  }
+  .progress-bar{
+    width:100%; height:7px; border-radius:999px;
+    background: rgba(255,255,255,.2);
+    overflow:hidden; position:relative;
+  }
+  .progress-fill{
+    height:100%; border-radius:999px;
+    background: linear-gradient(90deg, #FFFFFF, #FBCFE8);
+    width:0%; transition: width 1.2s cubic-bezier(.16,1,.3,1);
+    box-shadow: 0 0 12px rgba(255,255,255,.6);
+  }
+  .progress-fill.done{
+    background: linear-gradient(90deg, #D1FAE5, #6EE7B7);
+    box-shadow: 0 0 12px rgba(110,231,183,.7);
+  }
+
+  .ring-wrap{ position:relative; width:100px; height:100px; flex:0 0 auto; }
+  .ring-wrap svg{ transform: rotate(-90deg); display:block; }
+  .ring-track{ stroke: rgba(255,255,255,.2); }
+  .ring-fill{ transition: stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1); }
+  .ring-center{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .ring-pct{
+    font-family:'Plus Jakarta Sans',sans-serif; font-weight:900; font-size:19px; letter-spacing:-.02em; line-height:1;
+    color:#FFFFFF;
+  }
+  .ring-cap{ font-size:8px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.75); margin-top:3px; }
+
+  /* ================= STAT CHIP ================= */
+  .stat-chip{
+    border-radius:16px; padding:11px 11px 12px;
+    background: #FFFFFF; border:1px solid var(--stroke);
+    position:relative; overflow:hidden;
+    box-shadow: 0 2px 8px -4px rgba(15,23,42,.06);
+    transition: transform .3s cubic-bezier(.2,.8,.3,1), border-color .3s ease, box-shadow .3s ease;
+  }
+  .stat-chip:hover{ transform:translateY(-2px); border-color: rgba(225,29,72,.15); box-shadow: 0 8px 18px -8px rgba(225,29,72,.15); }
+  @media (hover:none){ .stat-chip:hover{ transform:none; } }
+  .stat-chip .rail{ position:absolute; top:0; left:0; right:0; height:3px; }
+  .stat-chip .ic{
+    width:24px;height:24px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px; margin-bottom:8px;
+  }
+  .stat-label{ font-size:9px; font-weight:800; letter-spacing:.10em; text-transform:uppercase; color:#94A3B8; }
+  .stat-value{ font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:clamp(14px,4.4vw,19px); letter-spacing:-.02em; margin-top:3px; color:#0F172A; }
+
+  /* ================= RINGKASAN CEPAT ================= */
+  .quick-grid{
+    display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;
+  }
+  .quick-item{
+    border-radius:14px; padding:10px 10px 11px;
+    background: linear-gradient(135deg, #FFF5F7, #FFFFFF);
+    border:1px solid rgba(225,29,72,.12);
+    position:relative; overflow:hidden;
+  }
+  .quick-item .ql{
+    font-size:8.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+    color:#94A3B8; display:flex; align-items:center; gap:4px;
+  }
+  .quick-item .ql i{ font-size:9px; color:var(--brand); }
+  .quick-item .qv{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:900; font-size:clamp(13px,4vw,17px); letter-spacing:-.02em;
+    margin-top:4px; line-height:1.1; color:#0F172A;
+  }
+  .quick-item .qs{
+    font-size:9px; font-weight:700; color:#94A3B8; margin-top:2px;
+  }
+
+  /* ================= VAR CARD ================= */
+  .var-card{
+    position:relative; border-radius:16px; padding:11px 10px 10px;
+    background: #FFFFFF; border:1px solid var(--stroke);
+    box-shadow: 0 2px 8px -4px rgba(15,23,42,.06);
+    overflow:hidden;
+    display:flex; flex-direction:column; justify-content:space-between;
+    min-height:132px;
+    transition: transform .3s cubic-bezier(.2,.8,.3,1), border-color .3s ease, box-shadow .3s ease;
+    cursor:pointer;
+  }
+  .var-card:hover{ transform:translateY(-4px); border-color: rgba(225,29,72,.2); box-shadow: 0 12px 24px -10px rgba(225,29,72,.2); }
+  @media (hover:none){ .var-card:hover{ transform:none; } }
+  .var-card:active{ transform: scale(.97) !important; }
+  .var-card::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background: var(--accent); box-shadow: 0 0 10px var(--accent);
+  }
+  .var-card::after{
+    content:''; position:absolute; right:-28px; top:-28px; width:74px; height:74px; border-radius:50%;
+    background: var(--accent); opacity:.10; filter: blur(18px);
+  }
+  .var-card.is-top{ border-color: rgba(5,150,105,.4); box-shadow: 0 8px 24px -12px rgba(5,150,105,.3); }
+  .var-card.is-top::before{ box-shadow: 0 0 14px var(--accent); }
+  .var-card.is-low{ opacity:.92; }
+  .var-name{ font-size:8.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; }
+  .var-icon{
+    width:22px;height:22px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;font-size:10px;
+    flex:0 0 auto;
+  }
+  .var-badge{
+    position:absolute; top:6px; right:6px;
+    font-size:8px; font-weight:900; letter-spacing:.04em; text-transform:uppercase;
+    padding:2px 6px; border-radius:999px;
+    z-index:2;
+  }
+  .var-badge.top{ background: linear-gradient(135deg,#10B981,#059669); color:white; box-shadow: 0 2px 8px -2px rgba(5,150,105,.5); }
+  .var-badge.low{ background: rgba(220,38,38,.12); color:#DC2626; border:1px solid rgba(220,38,38,.25); }
+  .var-value{ font-family:'Plus Jakarta Sans',sans-serif; font-weight:900; font-size:clamp(14px,4.6vw,19px); letter-spacing:-.02em; color:#0F172A; line-height:1.1; }
+  .mini-bar{ height:4px; border-radius:999px; background: rgba(15,23,42,.08); overflow:hidden; margin-top:7px; }
+  .mini-bar > span{
+    display:block; height:100%; border-radius:999px;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    width:0%; transition: width 1s cubic-bezier(.16,1,.3,1);
+  }
+  .var-pct{ font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:11px; }
+
+  /* ================= SECTION HEADER ================= */
+  .sec-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:11px 13px; border-radius:16px;
+    background: #FFFFFF; border:1px solid var(--stroke);
+    box-shadow: 0 2px 8px -4px rgba(15,23,42,.06);
+  }
+  .sec-eyebrow{
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:8.5px; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--brand); background:rgba(225,29,72,.08);
+    border:1px solid rgba(225,29,72,.18);
+    padding:3px 8px; border-radius:999px;
+  }
+  .sec-title{ font-size:13px; font-weight:800; color:#0F172A; display:flex; align-items:center; gap:7px; margin-top:6px; }
+
+  .chart-toggle{
+    display:inline-flex; padding:3px; gap:3px;
+    background: #F1F5F9; border:1px solid var(--stroke); border-radius:11px;
+  }
+  .chart-toggle button{
+    border:0; cursor:pointer;
+    padding:5px 11px; border-radius:8px;
+    font-size:10.5px; font-weight:800; letter-spacing:.03em;
+    color:#64748B; background:transparent;
+    transition: all .25s ease;
+    font-family:'Plus Jakarta Sans', sans-serif;
+  }
+  .chart-toggle button.active{
+    color:#fff;
+    background: linear-gradient(135deg, #F472B6, #E11D48);
+    box-shadow: 0 4px 12px -4px rgba(225,29,72,.5);
+  }
+
+  .mm-box{
+    border-radius:14px; padding:10px 12px;
+    background: #F8FAFC; border:1px solid var(--stroke);
+  }
+  .mm-label{ font-size:9.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#94A3B8; }
+  .mm-value{ font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:16px; margin-top:3px; letter-spacing:-.01em; color:#0F172A; }
+
+  /* ================= BOTTOM ================= */
+  .app-bottom{
+    position:absolute; left:0; right:0; bottom:0; z-index:45;
+    padding: 14px 16px calc(env(safe-area-inset-bottom,0px) + 14px);
+    background: linear-gradient(0deg, #FFFFFF 40%, rgba(255,255,255,.85) 75%, rgba(255,255,255,0) 100%);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .btn-refresh{
+    position:relative; width:100%; border:0; cursor:pointer;
+    padding:14px 18px; border-radius:16px;
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-size:13.5px; font-weight:800; letter-spacing:.01em;
+    color:#fff; display:flex; align-items:center; justify-content:center; gap:9px;
+    background: linear-gradient(120deg, #F472B6 0%, #E11D48 50%, #BE123C 100%);
+    background-size: 200% 100%;
+    box-shadow: 0 14px 30px -14px rgba(225,29,72,.55), inset 0 1px 0 rgba(255,255,255,.2);
+    overflow:hidden;
+    transition: transform .18s ease, box-shadow .3s ease, background-position .6s ease;
+  }
+  .btn-refresh:hover{ background-position: 100% 0; box-shadow: 0 18px 38px -14px rgba(225,29,72,.65); }
+  .btn-refresh:active{ transform: scale(.975); }
+  .btn-refresh:disabled{ opacity:.72; cursor:not-allowed; }
+  .btn-refresh::after{
+    content:''; position:absolute; top:0; left:-100%; width:60%; height:100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
+    animation: btnShine 3.4s ease-in-out infinite;
+  }
+  @keyframes btnShine{ 0%, 60%{ left:-100%; } 100%{ left:180%; } }
+  .refresh-meta{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    font-size:10px; font-weight:600; color:#94A3B8;
+    margin-top:9px; letter-spacing:.02em;
+  }
+  .refresh-meta b{ color:#475569; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; }
+  .spin{ animation: spin .85s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  /* ================= LOADING ================= */
+  #initial-loading{
+    position:absolute; inset:0; z-index:70;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 100%);
+    transition: opacity .5s ease, visibility .5s ease;
+  }
+  #initial-loading.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+  .loader-orb{ position:relative; width:66px; height:66px; }
+  .loader-orb .ring{ position:absolute; inset:0; border-radius:50%; border:3px solid transparent; }
+  .loader-orb .r1{ border-top-color:#F472B6; border-right-color:#E11D48; animation: spin 1.05s linear infinite; }
+  .loader-orb .r2{ inset:9px; border-bottom-color:#FB7185; border-left-color:#FDA4AF; animation: spin 1.5s linear infinite reverse; }
+  .loader-orb .core{
+    position:absolute; inset:22px; border-radius:50%;
+    background: linear-gradient(135deg,#F472B6,#E11D48);
+    box-shadow: 0 0 22px rgba(225,29,72,.5);
+    animation: corePulse 1.6s ease-in-out infinite;
+  }
+  @keyframes corePulse{ 0%,100%{ transform:scale(.85); opacity:.75; } 50%{ transform:scale(1.08); opacity:1; } }
+  .loader-text{
+    font-size:11px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
+    background: linear-gradient(90deg,#F472B6,#E11D48,#BE123C);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    animation: loaderFade 1.8s ease-in-out infinite;
+  }
+  @keyframes loaderFade{ 0%,100%{opacity:.45} 50%{opacity:1} }
+  .loader-sub{ font-size:10px; color:#94A3B8; font-weight:600; letter-spacing:.04em; }
+
+  .skeleton{
+    background: linear-gradient(90deg, #FCE7F3 25%, #FBCFE8 37%, #FCE7F3 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+    border-radius:6px; color: transparent !important;
+    display: inline-block;
+  }
+  @keyframes shimmer{ 0%{ background-position: 100% 0; } 100%{ background-position: -100% 0; } }
+
+  /* ================= TOAST ================= */
+  #toast-wrap{
+    position:absolute; left:0; right:0; bottom:126px; z-index:60;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    padding:0 16px; pointer-events:none;
+  }
+  .toast{
+    max-width:100%; display:flex; align-items:center; gap:9px;
+    padding:10px 14px; border-radius:13px;
+    font-size:11.5px; font-weight:700; color:#0F172A;
+    background: rgba(255,255,255,.98);
+    border:1px solid var(--stroke-strong);
+    box-shadow: 0 16px 34px -14px rgba(15,23,42,.25);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    animation: toastIn .45s cubic-bezier(.16,1,.3,1) both;
+    pointer-events: auto;
+  }
+  .toast.out{ animation: toastOut .35s ease forwards; }
+  .toast i{ font-size:12px; }
+  .toast.ok i{ color:#059669; }
+  .toast.err i{ color:#DC2626; }
+  .toast.warn i{ color:#D97706; }
+  @keyframes toastIn{ from{ opacity:0; transform: translateY(14px) scale(.95); } to{ opacity:1; transform: translateY(0) scale(1); } }
+  @keyframes toastOut{ to{ opacity:0; transform: translateY(-8px) scale(.96); } }
+
+  .reveal{ opacity:0; transform: translateY(16px); animation: fadeUp .7s cubic-bezier(.16,1,.3,1) forwards; }
+  @keyframes fadeUp{ to{ opacity:1; transform: translateY(0); } }
+
+  ::-webkit-scrollbar{ width:0; height:0; display:none; }
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  html, body { scrollbar-width: none; -ms-overflow-style: none; }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
+
+  .forecast-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px; }
+  .forecast-item{ border-radius:12px; padding:9px 11px; background: #F8FAFC; border:1px solid var(--stroke); }
+  .forecast-item .lbl{ font-size:8.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#94A3B8; }
+  .forecast-item .val{ font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:14px; margin-top:3px; letter-spacing:-.01em; color:#0F172A; }
+  .trend-badge{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 10px; border-radius:999px;
+    font-size:10.5px; font-weight:800; border:1px solid transparent;
+  }
+  .trend-up{ color:#059669; background:rgba(16,185,129,.10); border-color:rgba(16,185,129,.28); }
+  .trend-down{ color:#DC2626; background:rgba(220,38,38,.10); border-color:rgba(220,38,38,.28); }
+  .trend-flat{ color:#64748B; background:rgba(100,116,139,.10); border-color:rgba(100,116,139,.2); }
+
+  /* ================= MODAL ================= */
+  .modal-overlay{
+    position:absolute; inset:0; z-index:90;
+    background: rgba(15,23,42,.4);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    opacity:0; visibility:hidden;
+    transition: opacity .35s ease, visibility .35s ease;
+    display:flex; align-items:flex-start; justify-content:center;
+  }
+  .modal-overlay.open{ opacity:1; visibility:visible; }
+  .modal-sheet{
+    position:relative; width:100%; max-height:92%;
+    border-radius:0 0 28px 28px;
+    background: #FFFFFF;
+    border-bottom:1px solid var(--stroke-strong);
+    border-left:1px solid var(--stroke);
+    border-right:1px solid var(--stroke);
+    box-shadow: 0 22px 60px -12px rgba(15,23,42,.25);
+    padding: calc(env(safe-area-inset-top,0px) + 20px) 18px 24px;
+    overflow-y:auto;
+    transform: translateY(-100%);
+    transition: transform .45s cubic-bezier(.16,1,.3,1);
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-overlay.open .modal-sheet{ transform: translateY(0); }
+  .modal-handle{
+    width:44px; height:4px; border-radius:999px;
+    background: rgba(15,23,42,.15);
+    margin:0 auto 16px;
+  }
+  .modal-close{
+    position:absolute; top:calc(env(safe-area-inset-top,0px) + 16px); right:16px;
+    width:34px; height:34px; border-radius:50%;
+    background: #F1F5F9; border:1px solid var(--stroke); color:#64748B;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:2; transition: all .25s ease;
+  }
+  .modal-close:hover{ background: #E2E8F0; color:#0F172A; transform: rotate(90deg); }
+  .modal-close:active{ transform: rotate(90deg) scale(.92); }
+  .modal-hero{
+    border-radius:18px; padding:16px;
+    background: radial-gradient(120% 130% at 100% 0%, var(--accent-soft, rgba(225,29,72,.12)), transparent 55%),
+                linear-gradient(160deg, #FFFFFF, #F8FAFC);
+    border:1px solid var(--stroke);
+    position:relative; overflow:hidden;
+    margin-bottom:14px;
+    box-shadow: 0 2px 8px -4px rgba(15,23,42,.06);
+  }
+  .modal-hero::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background: var(--accent, #E11D48);
+    box-shadow: 0 0 12px var(--accent, #E11D48);
+  }
+  .modal-title{
+    font-family:'Poppins',sans-serif;
+    font-size:20px; font-weight:900;
+    letter-spacing:-.02em; color:#0F172A;
+    display:flex; align-items:center; gap:8px; margin:0;
+  }
+  .modal-total{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:34px; font-weight:900;
+    letter-spacing:-.03em; line-height:1;
+    color:#0F172A; margin-top:6px;
+  }
+  .daily-bars{
+    display:flex; align-items:flex-end; gap:3px;
+    height:130px; margin-top:6px;
+    padding:6px 2px 0;
+    border-bottom:1px solid var(--stroke);
+  }
+  .daily-bar{
+    flex:1; min-width:5px; border-radius:4px 4px 0 0;
+    background: var(--accent, #E11D48);
+    position:relative;
+    transition: height .6s cubic-bezier(.16,1,.3,1), filter .2s ease;
+    cursor:pointer; opacity:.9;
+  }
+  .daily-bar:hover{ filter: brightness(1.15); opacity:1; }
+  .daily-bar .tip{
+    position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+    background: #0F172A; color:#FFFFFF;
+    font-size:9px; font-weight:700;
+    padding:3px 6px; border-radius:6px;
+    white-space:nowrap; opacity:0; pointer-events:none;
+    transition: opacity .2s ease;
+    box-shadow: 0 4px 12px rgba(15,23,42,.2);
+    z-index:5;
+  }
+  .daily-bar:hover .tip{ opacity:1; }
+  .daily-labels{
+    display:flex; justify-content:space-between;
+    font-size:9px; font-weight:700; color:#94A3B8;
+    margin-top:6px; padding:0 2px;
+  }
+</style>
+</head>
+<body>
+<div class="app-shell" id="app-shell">
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  <!-- ================= HEADER ================= -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="brand-block">
+        <div class="brand-eyebrow">Dashboard Cabang</div>
+        <h1 class="font-heading class="brand-title">Overview BDL</h1>
+        <div class="brand-sub">
+          <i class="fa-solid fa-store"></i>
+          <span id="cabang-title">Memuat cabang…</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-actions">
+          <button id="btn-fullscreen" class="fs-btn" aria-label="Fullscreen" title="Fullscreen">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+          <div id="timestamp" class="clock-chip">--:--:--</div>
+        </div>
+        <div id="conn-status" class="live-dot">
+          <span class="dot"></span>
+          <span id="conn-text">Sinkron…</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="dashboard-content" class="app-main">
+
+    <!-- =============== HERO =============== -->
+    <section class="hero reveal" style="animation-delay:40ms">
+      <div class="flex items-center justify-between gap-4">
+        <div class="min-w-0 flex-1">
+          <div class="hero-label">
+            <i class="fa-solid fa-bolt"></i> Penjualan Hari Ini
+          </div>
+          <div id="val-hari-ini" class="hero-value skeleton">0</div>
+          <div class="mt-3 flex flex-wrap items-center gap-2">
+            <span id="hero-delta" class="delta-pill delta-flat">
+              <i class="fa-solid fa-minus"></i> <span>—</span>
+            </span>
+            <span class="text-[10px] font-semibold hero-sub">vs bulan lalu</span>
+          </div>
+        </div>
+        <div class="ring-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FBCFE8"/>
+                <stop offset="50%" stop-color="#F472B6"/>
+                <stop offset="100%" stop-color="#FFFFFF"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="50" cy="50" r="41" fill="none" stroke-width="8"/>
+            <circle id="ring-fill" class="ring-fill" cx="50" cy="50" r="41" fill="none"
+                    stroke="url(#ringGrad)" stroke-width="8" stroke-linecap="round"
+                    stroke-dasharray="257.6" stroke-dashoffset="257.6"/>
+          </svg>
+          <div class="ring-center">
+            <div id="ring-pct" class="ring-pct">0%</div>
+            <div class="ring-cap">Target</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bar target bulanan -->
+      <div class="progress-wrap">
+        <div class="progress-labels">
+          <span><i class="fa-solid fa-bullseye mr-1"></i> Menuju target bulan ini</span>
+          <span id="progress-text">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============== QUICK SUMMARY =============== -->
+    <section class="reveal" style="animation-delay:90ms">
+  <div class="sec-head mb-2.5">
+    <div>
+      <span class="sec-eyebrow"><i class="fa-solid fa-clock"></i> Glance</span>
+      <h2 class="font-heading class="sec-title">
+        <i class="fa-solid fa-gauge text-[#E11D48] text-[12px]"></i>
+        Ringkasan Cepat
+      </h2>
+    </div>
+  </div>
+  <div class="quick-item quick-item-wide">
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <div class="ql"><i class="fa-solid fa-calendar-day"></i> Penjualan Hari Ini</div>
+        <div id="q-today" class="qv skeleton">0</div>
+        <div id="q-today-sub" class="qs">—</div>
+      </div>
+      <div class="quick-icon-wrap">
+        <i class="fa-solid fa-fire"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- =============== 3 STAT CHIPS =============== -->
+    <section class="grid grid-cols-3 gap-2.5 reveal" style="animation-delay:130ms">
+      <div class="stat-chip">
+        <div class="rail" style="background:linear-gradient(90deg,#F472B6,#E11D48)"></div>
+        <div class="ic" style="background:rgba(225,29,72,.10);color:#E11D48"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="stat-label">Akm All Var</div>
+        <div id="val-akm" class="stat-value skeleton">0</div>
+      </div>
+      <div class="stat-chip">
+        <div class="rail" style="background:linear-gradient(90deg,#FB923C,#EA580C)"></div>
+        <div class="ic" style="background:rgba(234,88,12,.10);color:#EA580C"><i class="fa-solid fa-gauge-high"></i></div>
+        <div class="stat-label">AVG / Hari</div>
+        <div id="val-avg" class="stat-value skeleton">0</div>
+      </div>
+      <div class="stat-chip">
+        <div class="rail" style="background:linear-gradient(90deg,#F87171,#DC2626)"></div>
+        <div class="ic" style="background:rgba(220,38,38,.10);color:#DC2626"><i class="fa-solid fa-bullseye"></i></div>
+        <div class="stat-label">Target +/-</div>
+        <div id="val-target-diff" class="stat-value skeleton">0</div>
+      </div>
+    </section>
+
+    <!-- =============== VS CARDS =============== -->
+    <section class="grid grid-cols-2 gap-3 reveal" style="animation-delay:170ms">
+      <div class="card p-4">
+        <div class="card-topline" style="background:linear-gradient(90deg,#38BDF8,#2563EB)"></div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Vs Bulan Lalu</span>
+          <i class="fa-solid fa-calendar-day text-[11px] text-sky-500"></i>
+        </div>
+        <div class="flex items-baseline gap-1.5">
+          <span id="val-pct-lm" class="font-outfit text-[26px] font-black leading-none tracking-tight text-slate-900">-</span>
+        </div>
+        <div class="mt-2.5 flex items-center gap-1.5">
+          <span id="pill-lm" class="delta-pill delta-flat"><i class="fa-solid fa-minus"></i><span>—</span></span>
+        </div>
+        <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400">Basis</span>
+          <span id="val-lm" class="font-outfit text-[12.5px] font-bold text-slate-600">-</span>
+        </div>
+      </div>
+      <div class="card p-4">
+        <div class="card-topline" style="background:linear-gradient(90deg,#F472B6,#E11D48)"></div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Vs Tahun Lalu</span>
+          <i class="fa-solid fa-calendar text-[11px] text-pink-500"></i>
+        </div>
+        <div class="flex items-baseline gap-1.5">
+          <span id="val-pct-ly" class="font-outfit text-[26px] font-black leading-none tracking-tight text-slate-900">-</span>
+        </div>
+        <div class="mt-2.5 flex items-center gap-1.5">
+          <span id="pill-ly" class="delta-pill delta-flat"><i class="fa-solid fa-minus"></i><span>—</span></span>
+        </div>
+        <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400">Basis</span>
+          <span id="val-ly" class="font-outfit text-[12.5px] font-bold text-slate-600">-</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============== VARIAN =============== -->
+    <section class="reveal" style="animation-delay:230ms">
+      <div class="sec-head mb-3">
+        <div>
+          <span class="sec-eyebrow"><i class="fa-solid fa-satellite-dish"></i> Live Monitoring</span>
+          <h2 class="font-heading class="sec-title">
+            <i class="fa-solid fa-chart-simple text-[#E11D48] text-[12px]"></i>
+            Penjualan by Varian
+          </h2>
+        </div>
+        <div id="status-badge-varian" class="live-dot is-warn">
+          <span class="dot"></span><span>Sinkron…</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5" id="varian-grid">
+        <div class="var-card" data-variant="original" style="--accent:#EF4444">
+          <span class="var-badge" id="badge-original" style="display:none;"></span>
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <span class="var-name text-red-500">Original</span>
+              <div class="var-icon" style="background:rgba(239,68,68,.10);color:#DC2626"><i class="fa-solid fa-bottle-droplet"></i></div>
+            </div>
+            <div id="val-original" class="var-value skeleton">0</div>
+          </div>
+          <div>
+            <div class="mini-bar"><span id="bar-original"></span></div>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[8.5px] font-bold uppercase tracking-wider text-slate-400">Capaian</span>
+              <span id="pct-original" class="var-pct text-slate-400">0%</span>
+            </div>
+          </div>
+        </div>
+        <div class="var-card" data-variant="light" style="--accent:#3B82F6">
+          <span class="var-badge" id="badge-light" style="display:none;"></span>
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <span class="var-name text-blue-500">Light</span>
+              <div class="var-icon" style="background:rgba(59,130,246,.10);color:#2563EB"><i class="fa-solid fa-feather"></i></div>
+            </div>
+            <div id="val-light" class="var-value skeleton">0</div>
+          </div>
+          <div>
+            <div class="mini-bar"><span id="bar-light"></span></div>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[8.5px] font-bold uppercase tracking-wider text-slate-400">Capaian</span>
+              <span id="pct-light" class="var-pct text-slate-400">0%</span>
+            </div>
+          </div>
+        </div>
+        <div class="var-card" data-variant="mangga" style="--accent:#F97316">
+          <span class="var-badge" id="badge-mangga" style="display:none;"></span>
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <span class="var-name text-orange-500">Mangga</span>
+              <div class="var-icon" style="background:rgba(249,115,22,.10);color:#EA580C"><i class="fa-solid fa-lemon"></i></div>
+            </div>
+            <div id="val-mangga" class="var-value skeleton">0</div>
+          </div>
+          <div>
+            <div class="mini-bar"><span id="bar-mangga"></span></div>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[8.5px] font-bold uppercase tracking-wider text-slate-400">Capaian</span>
+              <span id="pct-mangga" class="var-pct text-slate-400">0%</span>
+            </div>
+          </div>
+        </div>
+        <div class="var-card" data-variant="stroberi" style="--accent:#EC4899">
+          <span class="var-badge" id="badge-stroberi" style="display:none;"></span>
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <span class="var-name text-pink-500">Stroberi</span>
+              <div class="var-icon" style="background:rgba(236,72,153,.10);color:#DB2777"><i class="fa-solid fa-seedling"></i></div>
+            </div>
+            <div id="val-stroberi" class="var-value skeleton">0</div>
+          </div>
+          <div>
+            <div class="mini-bar"><span id="bar-stroberi"></span></div>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[8.5px] font-bold uppercase tracking-wider text-slate-400">Capaian</span>
+              <span id="pct-stroberi" class="var-pct text-slate-400">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============== CHART =============== -->
+    <section class="reveal" style="animation-delay:290ms">
+      <div class="sec-head mb-3">
+        <div>
+          <span class="sec-eyebrow"><i class="fa-solid fa-wave-square"></i> Tren Harian</span>
+          <h2 class="font-heading class="sec-title">
+            <i class="fa-solid fa-chart-column text-[#E11D48] text-[12px]"></i>
+            Grafik Penjualan Bulan Ini
+          </h2>
+        </div>
+        <div id="chart-toggle" class="chart-toggle">
+          <button data-type="bar" class="active">Bar</button>
+          <button data-type="line">Line</button>
+          <button data-type="area">Area</button>
+        </div>
+      </div>
+      <div class="card p-4">
+        <div class="grid grid-cols-2 gap-2.5 mb-4">
+          <div class="mm-box">
+            <div class="mm-label">Terendah</div>
+            <div id="min-penjualan" class="mm-value text-sky-600">0</div>
+          </div>
+          <div class="mm-box">
+            <div class="mm-label">Tertinggi</div>
+            <div id="max-penjualan" class="mm-value text-pink-600">0</div>
+          </div>
+        </div>
+        <div class="relative w-full h-[250px] sm:h-[330px]">
+          <canvas id="salesChart"></canvas>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-[9.5px] font-bold uppercase tracking-widest text-slate-400">Total Bulan Ini</span>
+          <span id="total-penjualan" class="font-outfit text-[13px] font-extrabold text-slate-900">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============== FORECAST =============== -->
+    <section class="reveal" style="animation-delay:340ms">
+      <div class="sec-head mb-3">
+        <div>
+          <span class="sec-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> Prediksi</span>
+          <h2 class="font-heading class="sec-title">
+            <i class="fa-solid fa-chart-line text-[#E11D48] text-[12px]"></i>
+            Forecast Akhir Bulan
+          </h2>
+        </div>
+        <div id="trend-badge" class="trend-badge trend-flat">
+          <i class="fa-solid fa-minus"></i><span>—</span>
+        </div>
+      </div>
+      <div class="card p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="mm-label">Proyeksi Total</div>
+            <div id="forecast-total" class="font-outfit text-[28px] font-black text-slate-900 mt-1 skeleton">0</div>
+          </div>
+          <div class="text-right">
+            <div class="mm-label">Hari Terpakai</div>
+            <div class="font-outfit text-sm font-bold text-sky-600 mt-1">
+              <span id="days-passed">0</span> / <span id="days-total">30</span>
+            </div>
+          </div>
+        </div>
+        <div class="forecast-grid">
+          <div class="forecast-item">
+            <div class="lbl">Rata-rata / Hari</div>
+            <div id="forecast-avg" class="val text-sky-600">0</div>
+          </div>
+          <div class="forecast-item">
+            <div class="lbl">Sisa Hari</div>
+            <div id="forecast-remaining-days" class="val text-orange-600">0</div>
+          </div>
+          <div class="forecast-item">
+            <div class="lbl">Prediksi Sisa</div>
+            <div id="forecast-remaining-val" class="val text-pink-600">0</div>
+          </div>
+          <div class="forecast-item">
+            <div class="lbl">vs Target</div>
+            <div id="forecast-vs-target" class="val text-slate-700">-</div>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-100 text-[10px] text-slate-400 font-medium leading-relaxed">
+          <i class="fa-solid fa-circle-info text-[#E11D48]"></i>
+          Prediksi pakai rata-rata harian + tren linear dari data grafik.
+        </div>
+      </div>
+    </section>
+
+    <div class="text-center text-[10px] font-medium text-slate-400 pt-1 pb-2">
+      Auto-sync tiap 30 detik · Diperbarui <span id="last-updated" class="text-slate-600 font-bold">-</span>
+    </div>
+  </main>
+
+  <div class="app-bottom">
+    <button id="btn-refresh" class="btn-refresh" aria-label="Refresh data sekarang">
+      <i id="refresh-icon-bottom" class="fa-solid fa-arrows-rotate"></i>
+      <span>Refresh Data Sekarang</span>
+    </button>
+    <div class="refresh-meta">
+      <i class="fa-regular fa-clock"></i>
+      Auto-refresh dalam <b id="countdown">30</b>s
+      <span class="text-slate-300">•</span>
+      <span id="net-status" class="text-slate-400">Online</span>
+    </div>
+  </div>
+
+  <!-- =============== MODAL DETAIL VARIAN =============== -->
+  <div id="variant-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-sheet" role="dialog" aria-modal="true">
+      <div class="modal-handle"></div>
+      <button class="modal-close" id="modal-close-btn" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div id="modal-hero" class="modal-hero">
+        <div class="flex items-center gap-2">
+          <div id="modal-icon" class="w-9 h-9 rounded-lg flex items-center justify-center text-base">
+            <i class="fa-solid fa-bottle-droplet"></i>
+          </div>
+          <div>
+            <div class="text-[9px] font-extrabold uppercase tracking-widest text-slate-400">Detail Varian</div>
+            <h3 class="font-heading id="modal-title" class="modal-title">—</h3>
+          </div>
+        </div>
+        <div id="modal-total" class="modal-total">0</div>
+        <div class="flex items-center gap-2 mt-2">
+          <span id="modal-pct-pill" class="delta-pill delta-flat">
+            <i class="fa-solid fa-minus"></i><span>—</span>
+          </span>
+          <span class="text-[10px] font-semibold text-slate-400">Capaian target varian</span>
+        </div>
+      </div>
+      <div class="mb-4">
+        <div class="mm-label mb-2">Breakdown Harian (Estimasi)</div>
+        <div class="daily-bars" id="modal-daily-bars"></div>
+        <div class="daily-labels">
+          <span id="modal-first-day">—</span>
+          <span id="modal-mid-day">—</span>
+          <span id="modal-last-day">—</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5 mb-4">
+        <div class="forecast-item">
+          <div class="lbl">Hari Terbaik</div>
+          <div id="modal-best-day" class="val text-emerald-600">-</div>
+        </div>
+        <div class="forecast-item">
+          <div class="lbl">Hari Terendah</div>
+          <div id="modal-worst-day" class="val text-rose-600">-</div>
+        </div>
+        <div class="forecast-item">
+          <div class="lbl">Rata-rata Harian</div>
+          <div id="modal-avg" class="val text-sky-600">0</div>
+        </div>
+        <div class="forecast-item">
+          <div class="lbl">Kontribusi</div>
+          <div id="modal-contribution" class="val text-purple-600">0%</div>
+        </div>
+      </div>
+      <button id="modal-close-btn-2" class="btn-refresh w-full" style="padding:12px 16px; font-size:13px;">
+        <i class="fa-solid fa-check"></i>
+        <span>Tutup</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="toast-wrap" aria-live="polite"></div>
+
+  <div id="initial-loading">
+    <div class="loader-orb">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="core"></div>
+    </div>
+    <div class="loader-text">Menghubungkan…</div>
+    <div class="loader-sub" id="loader-status">Mengambil data dari Google Sheets…</div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIG
+   ===================================================================== */
+const URLS = {
+  overview: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCp3DY8YrJP9Bmy1eO6-w6LJzuUj5Iq9cVNnPiJKjpF91Hcei7o4Q5-2i7rTQbrcmT6hCHotfTmU5u/pub?gid=642333741&single=true&output=csv',
+  varian:   'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCp3DY8YrJP9Bmy1eO6-w6LJzuUj5Iq9cVNnPiJKjpF91Hcei7o4Q5-2i7rTQbrcmT6hCHotfTmU5u/pub?gid=1144378168&single=true&output=csv',
+  chart:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCp3DY8YrJP9Bmy1eO6-w6LJzuUj5Iq9cVNnPiJKjpF91Hcei7o4Q5-2i7rTQbrcmT6hCHotfTmU5u/pub?gid=1170221097&single=true&output=csv'
+};
+const REFRESH_MS = 30000;
+const FETCH_TIMEOUT = 8000;
+const MAX_RETRY = 2;
+const RING_R = 41;
+const RING_C = 2 * Math.PI * RING_R;
+
+const state = {
+  chartType: 'bar',
+  chartLabels: [],
+  chartValues: [],
+  nextRefreshAt: Date.now() + REFRESH_MS,
+  hasLoadedOnce: false,
+  target: 0,
+  akmAll: 0,
+  avgAll: 0,
+  todayVal: 0
+};
+
+const variantState = {
+  original: { total: 0, pct: 0 },
+  light:    { total: 0, pct: 0 },
+  mangga:   { total: 0, pct: 0 },
+  stroberi: { total: 0, pct: 0 }
+};
+
+const VARIAN_META = {
+  original: { name: 'Original', color: '#EF4444', soft: 'rgba(239,68,68,.12)',  icon: 'fa-bottle-droplet' },
+  light:    { name: 'Light',    color: '#3B82F6', soft: 'rgba(59,130,246,.12)', icon: 'fa-feather' },
+  mangga:   { name: 'Mangga',   color: '#F97316', soft: 'rgba(249,115,22,.12)', icon: 'fa-lemon' },
+  stroberi: { name: 'Stroberi', color: '#EC4899', soft: 'rgba(236,72,153,.12)', icon: 'fa-seedling' }
+};
+let modalOpen = false;
+
+/* =====================================================================
+   UTILITIES
+   ===================================================================== */
+function parseCSVRow(rowStr) {
+  const arr = [];
+  let quote = false, col = '';
+  for (let i = 0; i < rowStr.length; i++) {
+    const cc = rowStr[i], nc = rowStr[i + 1];
+    if (cc === '"' && quote && nc === '"') { col += '"'; i++; continue; }
+    if (cc === '"') { quote = !quote; continue; }
+    if (cc === ',' && !quote) { arr.push(col.trim()); col = ''; continue; }
+    col += cc;
+  }
+  arr.push(col.trim());
+  return arr.map(item => item.replace(/^"|"$/g, '').trim());
+}
+
+function parseNumber(val) {
+  if (val === null || val === undefined) return 0;
+  let s = String(val).replace(/["']/g, '').trim();
+  if (s === '' || s === '-') return 0;
+  s = s.replace(/%/g, '').trim();
+  if (s.includes('.') && s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (s.includes(',')) s = s.replace(',', '.');
+  else if (s.includes('.')) {
+    const parts = s.split('.');
+    if (parts.length > 1 && parts[parts.length - 1].length === 3 && parts[0].length <= 3) s = s.replace(/\./g, '');
+  }
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+
+function fmtNum(input) {
+  if (input === null || input === undefined) return '-';
+  const n = parseNumber(input);
+  if (isNaN(n)) return '-';
+  return Math.round(n).toLocaleString('id-ID');
+}
+
+function animateNumber(el, target, opts = {}) {
+  if (!el) return;
+  const { duration = 850, suffix = '', prefix = '' } = opts;
+  const prev = parseFloat(el.dataset.val || '0');
+  const start = isNaN(prev) ? 0 : prev;
+  if (Math.abs(target - start) < 0.5) {
+    el.textContent = prefix + Math.round(target).toLocaleString('id-ID') + suffix;
+    el.dataset.val = target;
+    return;
+  }
+  const t0 = performance.now();
+  function frame(t) {
+    const p = Math.min((t - t0) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const cur = start + (target - start) * eased;
+    el.textContent = prefix + Math.round(cur).toLocaleString('id-ID') + suffix;
+    if (p < 1) requestAnimationFrame(frame);
+    else el.dataset.val = target;
+  }
+  requestAnimationFrame(frame);
+}
+
+function setValueAnimated(id, rawVal) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('skeleton');
+  animateNumber(el, parseNumber(rawVal));
+}
+
+function renderDeltaPill(pillId, pctRaw) {
+  const el = document.getElementById(pillId);
+  if (!el) return;
+  const n = parseNumber(pctRaw);
+  const hasData = pctRaw !== null && pctRaw !== undefined && String(pctRaw).trim() !== '' && String(pctRaw).trim() !== '-';
+  el.className = 'delta-pill';
+  if (!hasData) {
+    el.classList.add('delta-flat');
+    el.innerHTML = '<i class="fa-solid fa-minus"></i><span>—</span>';
+    return;
+  }
+  if (n > 0) {
+    el.classList.add('delta-up');
+    el.innerHTML = `<i class="fa-solid fa-arrow-trend-up"></i><span>+${n.toLocaleString('id-ID', {maximumFractionDigits:1})}%</span>`;
+  } else if (n < 0) {
+    el.classList.add('delta-down');
+    el.innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i><span>${n.toLocaleString('id-ID', {maximumFractionDigits:1})}%</span>`;
+  } else {
+    el.classList.add('delta-flat');
+    el.innerHTML = '<i class="fa-solid fa-equals"></i><span>0%</span>';
+  }
+}
+
+function applyVarian(idPct, idBar, rawPct) {
+  const elPct = document.getElementById(idPct);
+  const elBar = document.getElementById(idBar);
+  if (!elPct) return;
+  elPct.classList.remove('skeleton');
+  const n = parseNumber(rawPct);
+  const txt = String(rawPct ?? '').includes('%') ? String(rawPct) : (String(rawPct ?? '0') + '%');
+  elPct.textContent = txt;
+  elPct.classList.remove('text-rose-500', 'text-sky-500', 'text-emerald-600', 'text-slate-400');
+  if (n >= 100) elPct.classList.add('text-emerald-600');
+  else if (n >= 80) elPct.classList.add('text-sky-500');
+  else elPct.classList.add('text-rose-500');
+  if (elBar) {
+    const width = Math.max(0, Math.min(100, n));
+    requestAnimationFrame(() => { elBar.style.width = width + '%'; });
+  }
+}
+
+function setRing(pct) {
+  const ring = document.getElementById('ring-fill');
+  const label = document.getElementById('ring-pct');
+  if (!ring || !label) return;
+  const p = Math.max(0, Math.min(100, pct));
+  ring.style.strokeDasharray = RING_C;
+  ring.style.strokeDashoffset = RING_C * (1 - p / 100);
+  label.textContent = (pct >= 1000 ? '999+' : Math.round(pct)) + '%';
+}
+
+function setProgressBar(pct) {
+  const fill = document.getElementById('progress-fill');
+  const txt = document.getElementById('progress-text');
+  if (!fill || !txt) return;
+  const p = Math.max(0, Math.min(100, pct));
+  fill.style.width = p + '%';
+  txt.textContent = Math.round(pct) + '%';
+  if (pct >= 100) fill.classList.add('done');
+  else fill.classList.remove('done');
+}
+
+/* =====================================================================
+   HIGHLIGHT BEST/WORST VARIAN
+   ===================================================================== */
+function highlightVariantBadges() {
+  const entries = Object.keys(variantState).map(k => ({ key: k, total: variantState[k].total }));
+  const valid = entries.filter(e => e.total > 0);
+  if (valid.length < 2) {
+    entries.forEach(e => {
+      const b = document.getElementById('badge-' + e.key);
+      if (b) b.style.display = 'none';
+      const card = document.querySelector(`.var-card[data-variant="${e.key}"]`);
+      if (card) card.classList.remove('is-top', 'is-low');
+    });
+    return;
+  }
+  const sorted = [...valid].sort((a, b) => b.total - a.total);
+  const top = sorted[0];
+  const low = sorted[sorted.length - 1];
+
+  entries.forEach(e => {
+    const b = document.getElementById('badge-' + e.key);
+    const card = document.querySelector(`.var-card[data-variant="${e.key}"]`);
+    if (!b || !card) return;
+    b.style.display = 'none';
+    b.className = 'var-badge';
+    card.classList.remove('is-top', 'is-low');
+    if (e.key === top.key) {
+      b.style.display = 'block';
+      b.classList.add('top');
+      b.innerHTML = '<i class="fa-solid fa-trophy"></i> TOP';
+      card.classList.add('is-top');
+    } else if (e.key === low.key && low.total > 0 && top.total !== low.total) {
+      b.style.display = 'block';
+      b.classList.add('low');
+      b.innerHTML = '⚠️ LOW';
+      card.classList.add('is-low');
+    }
+  });
+}
+
+let toastTimer = null;
+function showToast(msg, type = 'ok', duration = 3200) {
+  const wrap = document.getElementById('toast-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const icons = { ok: 'fa-circle-check', err: 'fa-circle-exclamation', warn: 'fa-triangle-exclamation' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="fa-solid ${icons[type] || icons.ok}"></i><span>${msg}</span>`;
+  wrap.appendChild(el);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 350);
+  }, duration);
+}
+
+function setConnStatus(mode, text) {
+  const el = document.getElementById('conn-status');
+  const txt = document.getElementById('conn-text');
+  if (!el || !txt) return;
+  el.className = 'live-dot' + (mode === 'ok' ? '' : mode === 'warn' ? ' is-warn' : ' is-err');
+  txt.textContent = text;
+}
+
+function setLoaderStatus(text) {
+  const el = document.getElementById('loader-status');
+  if (el) el.textContent = text;
+}
+
+/* =====================================================================
+   FETCH
+   ===================================================================== */
+async function smartFetch(url, isManual = false) {
+  const finalUrl = isManual ? url + (url.includes('?') ? '&' : '?') + 't=' + Date.now() : url;
+  for (let attempt = 0; attempt <= MAX_RETRY; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+    try {
+      const res = await fetch(finalUrl, { cache: isManual ? 'no-store' : 'default', signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.text();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (attempt === MAX_RETRY) throw err;
+      await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+    }
+  }
+}
+
+/* =====================================================================
+   FULLSCREEN
+   ===================================================================== */
+function isFullscreenSupported() {
+  return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled ||
+           document.mozFullScreenEnabled || document.msFullscreenEnabled);
+}
+function getFullscreenElement() {
+  return document.fullscreenElement || document.webkitFullscreenElement ||
+         document.mozFullScreenElement || document.msFullscreenElement;
+}
+function toggleFullscreen() {
+  const el = document.getElementById('app-shell') || document.documentElement;
+  if (!getFullscreenElement()) {
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (req) req.call(el).catch(() => showToast('Fullscreen tidak didukung', 'warn'));
+    else showToast('Gunakan "Add to Home Screen"', 'warn', 4500);
+  } else {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+    if (exit) exit.call(document);
+  }
+}
+function updateFullscreenIcon() {
+  const btn = document.getElementById('btn-fullscreen');
+  if (!btn) return;
+  const icon = btn.querySelector('i');
+  if (!icon) return;
+  if (getFullscreenElement()) {
+    document.body.classList.add('is-fullscreen');
+    icon.className = 'fa-solid fa-compress';
+  } else {
+    document.body.classList.remove('is-fullscreen');
+    icon.className = 'fa-solid fa-expand';
+  }
+}
+['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+  document.addEventListener(evt, updateFullscreenIcon);
+});
+
+/* =====================================================================
+   OVERVIEW FETCH
+   ===================================================================== */
+async function fetchOverview(isManual = false) {
+  const text = await smartFetch(URLS.overview, isManual);
+  const lines = text.split('\n').filter(r => r.trim().length > 0);
+  if (lines.length < 2) throw new Error('Data Overview kosong');
+
+  const headers = parseCSVRow(lines[0].toLowerCase());
+  const data = parseCSVRow(lines[1]);
+
+  const findIdx = (keywords, fallback) => {
+    const idx = headers.findIndex(h => keywords.some(kw => h.includes(kw)));
+    return idx !== -1 ? idx : fallback;
+  };
+
+  const idx = {
+    cabang:  findIdx(['cabang'], 1),
+    hariIni: findIdx(['pencapaian hari ini', 'penjualan hari ini', 'hari ini'], 22),
+    akmAll:  2,
+    avgAll:  findIdx(['avg all', 'rata'], 13),
+    pctTgt:  findIdx(['% vs target', 'vs target'], 14),
+    hslLm:   findIdx(['hasil bulan lalu', 'hasil lm'], 16),
+    pctLm:   findIdx(['% lm'], 17),
+    lmDiff:  findIdx(['lm +/-', 'lm+/-'], 18),
+    hslLy:   findIdx(['hasil tahun lalu', 'hasil ly'], 19),
+    pctLy:   findIdx(['% ly'], 20),
+    lyDiff:  findIdx(['ly +/-', 'ly+/-'], 21)
+  };
+
+  const cabang = data[idx.cabang] || 'BANDUNG V';
+  document.getElementById('cabang-title').textContent = cabang;
+
+  state.todayVal = parseNumber(data[idx.hariIni]);
+  state.akmAll = parseNumber(data[idx.akmAll]);
+  state.avgAll = parseNumber(data[idx.avgAll]);
+
+  setValueAnimated('val-hari-ini', data[idx.hariIni]);
+  setValueAnimated('val-akm', data[idx.akmAll]);
+  setValueAnimated('val-avg', data[idx.avgAll]);
+
+  const tgDate = new Date().getDate();
+  const tgAkum = state.akmAll;
+  let tgTargetDaily = parseNumber(data[7]);
+
+  if (tgTargetDaily < 1000 || tgTargetDaily > 1000000) {
+    for (let i = 0; i < data.length; i++) {
+      if (i === idx.akmAll) continue;
+      const hdr = (headers[i] || '').toLowerCase();
+      const v = parseNumber(data[i]);
+      if (hdr.includes('target') && !hdr.includes('+/-') && !hdr.includes('vs') && !hdr.includes('%')) {
+        if (v >= 1000 && v <= 1000000) { tgTargetDaily = v; break; }
+      }
+    }
+  }
+  if (tgTargetDaily < 1000) tgTargetDaily = 32750;
+
+  const tgTargetByToday = tgTargetDaily * tgDate;
+  const tgDiff = tgAkum - tgTargetByToday;
+
+  const tgDiffEl = document.getElementById('val-target-diff');
+  if (tgDiffEl) {
+    tgDiffEl.classList.remove('skeleton');
+    const r = Math.round(tgDiff);
+    tgDiffEl.textContent = (r > 0 ? '+' : '') + r.toLocaleString('id-ID');
+    tgDiffEl.classList.remove('text-emerald-600', 'text-rose-600', 'text-slate-900');
+    if (r > 0) tgDiffEl.classList.add('text-emerald-600');
+    else if (r < 0) tgDiffEl.classList.add('text-rose-600');
+    else tgDiffEl.classList.add('text-slate-900');
+  }
+
+  const pctTargetNum = parseNumber(data[idx.pctTgt]);
+  setRing(pctTargetNum);
+  setProgressBar(pctTargetNum);
+  state.target = pctTargetNum > 0 ? tgAkum / (pctTargetNum / 100) : 0;
+
+  const lmPctEl = document.getElementById('val-pct-lm');
+  if (lmPctEl) {
+    lmPctEl.classList.remove('skeleton');
+    const n = parseNumber(data[idx.pctLm]);
+    lmPctEl.textContent = String(data[idx.pctLm] ?? '-');
+    lmPctEl.classList.remove('text-emerald-600', 'text-rose-600', 'text-slate-900');
+    lmPctEl.classList.add(n >= 100 ? 'text-emerald-600' : 'text-rose-600');
+  }
+  renderDeltaPill('pill-lm', data[idx.lmDiff]);
+  document.getElementById('val-lm').textContent = fmtNum(data[idx.hslLm]);
+
+  const lyPctEl = document.getElementById('val-pct-ly');
+  if (lyPctEl) {
+    lyPctEl.classList.remove('skeleton');
+    const n = parseNumber(data[idx.pctLy]);
+    lyPctEl.textContent = String(data[idx.pctLy] ?? '-');
+    lyPctEl.classList.remove('text-emerald-600', 'text-rose-600', 'text-slate-900');
+    lyPctEl.classList.add(n >= 100 ? 'text-emerald-600' : 'text-rose-600');
+  }
+  renderDeltaPill('pill-ly', data[idx.lyDiff]);
+  document.getElementById('val-ly').textContent = fmtNum(data[idx.hslLy]);
+
+  const heroDelta = document.getElementById('hero-delta');
+  if (heroDelta) {
+    const lmPct = parseNumber(data[idx.pctLm]);
+    heroDelta.className = 'delta-pill';
+    if (lmPct >= 100) {
+      heroDelta.classList.add('delta-up');
+      heroDelta.innerHTML = `<i class="fa-solid fa-arrow-trend-up"></i><span>${lmPct.toLocaleString('id-ID', {maximumFractionDigits:1})}% vs LM</span>`;
+    } else if (lmPct > 0) {
+      heroDelta.classList.add('delta-down');
+      heroDelta.innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i><span>${lmPct.toLocaleString('id-ID', {maximumFractionDigits:1})}% vs LM</span>`;
+    } else {
+      heroDelta.classList.add('delta-flat');
+      heroDelta.innerHTML = '<i class="fa-solid fa-minus"></i><span>—</span>';
+    }
+  }
+}
+
+/* =====================================================================
+   VARIAN FETCH
+   ===================================================================== */
+async function fetchVarian(isManual = false) {
+  const badge = document.getElementById('status-badge-varian');
+  if (badge) {
+    badge.className = 'live-dot is-warn';
+    badge.innerHTML = '<span class="dot"></span><span>Sinkron…</span>';
+  }
+  const csvText = await smartFetch(URLS.varian, isManual);
+  const lines = csvText.split('\n').filter(r => r.trim().length > 0);
+  if (lines.length < 2) throw new Error('Data Varian kosong');
+
+  const headers = parseCSVRow(lines[0].toLowerCase());
+  const dataRow = parseCSVRow(lines[1]);
+
+  function findPair(keywords, valFallback, pctFallback) {
+    let vi = -1, pi = -1;
+    headers.forEach((h, i) => { if (vi === -1 && keywords.some(k => h.includes(k))) vi = i; });
+    if (vi !== -1 && headers[vi + 1] && (headers[vi + 1].includes('%') || headers[vi + 1].includes('capaian') || headers[vi + 1].includes('pencapaian'))) {
+      pi = vi + 1;
+    } else {
+      vi = valFallback; pi = pctFallback;
+    }
+    return { v: dataRow[vi], p: dataRow[pi] };
+  }
+
+  const original = findPair(['original', 'orignal'], 4, 5);
+  const light    = findPair(['light', 'lite'], 6, 7);
+  const mangga   = findPair(['mangga'], 8, 9);
+  const stroberi = findPair(['stroberi', 'strawberry'], 10, 11);
+
+  setValueAnimated('val-original', original.v);
+  applyVarian('pct-original', 'bar-original', original.p);
+  setValueAnimated('val-light', light.v);
+  applyVarian('pct-light', 'bar-light', light.p);
+  setValueAnimated('val-mangga', mangga.v);
+  applyVarian('pct-mangga', 'bar-mangga', mangga.p);
+  setValueAnimated('val-stroberi', stroberi.v);
+  applyVarian('pct-stroberi', 'bar-stroberi', stroberi.p);
+
+  variantState.original = { total: parseNumber(original.v), pct: parseNumber(original.p) };
+  variantState.light    = { total: parseNumber(light.v),    pct: parseNumber(light.p) };
+  variantState.mangga   = { total: parseNumber(mangga.v),   pct: parseNumber(mangga.p) };
+  variantState.stroberi = { total: parseNumber(stroberi.v), pct: parseNumber(stroberi.p) };
+
+  highlightVariantBadges();
+
+  if (badge) {
+    badge.className = 'live-dot';
+    badge.innerHTML = '<span class="dot"></span><span>Aktif</span>';
+  }
+}
+
+/* =====================================================================
+   CHART FETCH
+   ===================================================================== */
+async function fetchChart(isManual = false) {
+  const dataText = await smartFetch(URLS.chart, isManual);
+  const rawLines = dataText.split('\n');
+  const labels = [], values = [];
+  for (let i = 1; i < rawLines.length; i++) {
+    const line = rawLines[i].trim();
+    if (!line) continue;
+    const cols = parseCSVRow(line);
+    if (cols.length >= 2 && cols[0] !== '') {
+      labels.push(cols[0]);
+      values.push(parseNumber(cols[1]));
+    }
+  }
+  state.chartLabels = labels;
+  state.chartValues = values;
+
+  const nonZero = values.filter(v => v > 0);
+  const min = nonZero.length ? Math.min(...nonZero) : 0;
+  const max = Math.max(...values, 0);
+  const total = values.reduce((a, b) => a + b, 0);
+
+  document.getElementById('min-penjualan').textContent = min.toLocaleString('id-ID');
+  document.getElementById('max-penjualan').textContent = max.toLocaleString('id-ID');
+  document.getElementById('total-penjualan').textContent = total.toLocaleString('id-ID');
+
+  renderChart();
+  updateQuickSummary();
+}
+
+/* =====================================================================
+   QUICK SUMMARY
+   ===================================================================== */
+function updateQuickSummary() {
+  const values = state.chartValues;
+  const todayVal = state.todayVal || (values.length ? values[values.length - 1] : 0);
+  const weekVal = values.slice(-7).reduce((a, b) => a + b, 0);
+  const monthVal = values.reduce((a, b) => a + b, 0);
+
+  const qToday = document.getElementById('q-today');
+  const qWeek = document.getElementById('q-week');
+  const qMonth = document.getElementById('q-month');
+  if (qToday) { qToday.classList.remove('skeleton'); animateNumber(qToday, todayVal); }
+  if (qWeek) { qWeek.classList.remove('skeleton'); animateNumber(qWeek, weekVal); }
+  if (qMonth) { qMonth.classList.remove('skeleton'); animateNumber(qMonth, monthVal); }
+
+  const avgDaily = state.avgAll || (values.length ? monthVal / values.filter(v=>v>0).length : 0);
+  const targetDay = state.target ? state.target / 30 : 0;
+
+  const qTodaySub = document.getElementById('q-today-sub');
+  const qWeekSub = document.getElementById('q-week-sub');
+  const qMonthSub = document.getElementById('q-month-sub');
+  if (qTodaySub) qTodaySub.textContent = targetDay ? (todayVal >= targetDay ? '✓ Di atas target' : (todayVal > 0 ? `${Math.round((todayVal/targetDay)*100)}% target` : '—')) : '—';
+  if (qWeekSub) qWeekSub.textContent = avgDaily ? `Rata-rata ${Math.round(weekVal/7).toLocaleString('id-ID')}/hari` : '—';
+  if (qMonthSub) qMonthSub.textContent = state.target ? `${Math.round((monthVal/state.target)*100)}% target` : '—';
+}
+
+let salesChartInstance = null;
+function renderChart() {
+  const canvas = document.getElementById('salesChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const labels = state.chartLabels;
+  const values = state.chartValues;
+  const type = state.chartType;
+  const H = canvas.parentElement.clientHeight || 300;
+
+  const barGrad = ctx.createLinearGradient(0, 0, 0, H);
+  barGrad.addColorStop(0, '#F472B6');
+  barGrad.addColorStop(0.5, '#E11D48');
+  barGrad.addColorStop(1, '#BE123C');
+  const lineGrad = ctx.createLinearGradient(0, 0, canvas.width || 300, 0);
+  lineGrad.addColorStop(0, '#F472B6');
+  lineGrad.addColorStop(0.5, '#E11D48');
+  lineGrad.addColorStop(1, '#BE123C');
+  const areaFill = ctx.createLinearGradient(0, 0, 0, H);
+  areaFill.addColorStop(0, 'rgba(225,29,72,.35)');
+  areaFill.addColorStop(0.6, 'rgba(244,114,182,.10)');
+  areaFill.addColorStop(1, 'rgba(225,29,72,0)');
+
+  let dataset;
+  if (type === 'bar') {
+    dataset = { label: 'Penjualan Harian', data: values, backgroundColor: barGrad, borderRadius: 7, borderSkipped: false, maxBarThickness: 26, hoverBackgroundColor: '#FB7185' };
+  } else if (type === 'line') {
+    dataset = { label: 'Penjualan Harian', data: values, borderColor: lineGrad, borderWidth: 3, tension: 0.38, fill: false, pointRadius: 0, pointHoverRadius: 6, pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#E11D48', pointHoverBorderWidth: 3 };
+  } else {
+    dataset = { label: 'Penjualan Harian', data: values, borderColor: lineGrad, borderWidth: 3, tension: 0.38, fill: true, backgroundColor: areaFill, pointRadius: 0, pointHoverRadius: 6, pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#E11D48', pointHoverBorderWidth: 3 };
+  }
+
+  if (salesChartInstance) salesChartInstance.destroy();
+  salesChartInstance = new Chart(ctx, {
+    type: type === 'bar' ? 'bar' : 'line',
+    data: { labels, datasets: [dataset] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 950, easing: 'easeOutQuart' },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(15,23,42,.96)',
+          titleFont: { family: 'Plus Jakarta Sans', size: 13, weight: '700' },
+          titleColor: '#F1F5F9',
+          bodyFont: { family: 'Plus Jakarta Sans', size: 12, weight: '600' },
+          bodyColor: '#FBCFE8',
+          padding: 12, cornerRadius: 12, displayColors: false,
+          borderColor: 'rgba(225,29,72,.4)', borderWidth: 1,
+          callbacks: { label: (c) => '  ' + c.parsed.y.toLocaleString('id-ID') }
+        }
+      },
+      scales: {
+        x: { grid: { display: false, drawBorder: false }, ticks: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', size: 10, weight: '700' }, maxRotation: 0, autoSkipPadding: 12 }, border: { display: false } },
+        y: { beginAtZero: true, grid: { color: 'rgba(15,23,42,.06)', drawBorder: false }, border: { display: false }, ticks: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', size: 10, weight: '600' }, maxTicksLimit: 6, callback: (v) => { if (v >= 1000000) return (v / 1000000).toFixed(1).replace('.', ',') + 'jt'; if (v >= 1000) return (v / 1000).toFixed(0) + 'rb'; return v; } } }
+      }
+    }
+  });
+}
+
+document.getElementById('chart-toggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const type = btn.dataset.type;
+  if (type === state.chartType) return;
+  state.chartType = type;
+  document.querySelectorAll('#chart-toggle button').forEach(b => b.classList.toggle('active', b === btn));
+  if (navigator.vibrate) navigator.vibrate(8);
+  renderChart();
+});
+
+/* =====================================================================
+   FORECAST
+   ===================================================================== */
+function computeForecast() {
+  const values = state.chartValues;
+  if (!values.length) return;
+  const daysWithData = values.filter(v => v > 0).length || values.length;
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysRemaining = Math.max(0, daysInMonth - daysWithData);
+  const currentTotal = values.reduce((a, b) => a + b, 0);
+  const avg = daysWithData ? currentTotal / daysWithData : 0;
+
+  let slope = 0;
+  if (values.length > 1) {
+    const n = values.length;
+    const xs = values.map((_, i) => i + 1);
+    const meanX = xs.reduce((a, b) => a + b, 0) / n;
+    const meanY = values.reduce((a, b) => a + b, 0) / n;
+    let num = 0, den = 0;
+    for (let i = 0; i < n; i++) {
+      num += (xs[i] - meanX) * (values[i] - meanY);
+      den += Math.pow(xs[i] - meanX, 2);
+    }
+    slope = den ? num / den : 0;
+  }
+  const trendProjection = Math.max(0, avg + slope * (daysRemaining / 2));
+  const dailyProjection = Math.max(0, (avg * 0.6) + (trendProjection * 0.4));
+  const remainingTotal = dailyProjection * daysRemaining;
+  const forecastTotal = currentTotal + remainingTotal;
+
+  const totalEl = document.getElementById('forecast-total');
+  if (totalEl) {
+    totalEl.classList.remove('skeleton');
+    setValueAnimated('forecast-total', forecastTotal);
+  }
+  const dpEl = document.getElementById('days-passed');
+  const dtEl = document.getElementById('days-total');
+  if (dpEl) dpEl.textContent = daysWithData;
+  if (dtEl) dtEl.textContent = daysInMonth;
+  const avgEl = document.getElementById('forecast-avg');
+  const rdEl = document.getElementById('forecast-remaining-days');
+  const rvEl = document.getElementById('forecast-remaining-val');
+  if (avgEl) avgEl.textContent = Math.round(avg).toLocaleString('id-ID');
+  if (rdEl) rdEl.textContent = daysRemaining;
+  if (rvEl) rvEl.textContent = Math.round(remainingTotal).toLocaleString('id-ID');
+
+  const vsTargetEl = document.getElementById('forecast-vs-target');
+  if (vsTargetEl) {
+    if (state.target && state.target > 0) {
+      const pct = (forecastTotal / state.target) * 100;
+      vsTargetEl.textContent = (pct >= 100 ? '✓ ' : '') + pct.toFixed(0) + '%';
+      vsTargetEl.className = 'val ' + (pct >= 100 ? 'text-emerald-600' : 'text-rose-600');
+    } else {
+      vsTargetEl.textContent = '-';
+    }
+  }
+  const trendBadge = document.getElementById('trend-badge');
+  if (trendBadge) {
+    const slopePct = avg ? (slope / avg) * 100 : 0;
+    if (slopePct > 3) {
+      trendBadge.className = 'trend-badge trend-up';
+      trendBadge.innerHTML = '<i class="fa-solid fa-arrow-trend-up"></i><span>Naik</span>';
+    } else if (slopePct < -3) {
+      trendBadge.className = 'trend-badge trend-down';
+      trendBadge.innerHTML = '<i class="fa-solid fa-arrow-trend-down"></i><span>Turun</span>';
+    } else {
+      trendBadge.className = 'trend-badge trend-flat';
+      trendBadge.innerHTML = '<i class="fa-solid fa-minus"></i><span>Stabil</span>';
+    }
+  }
+}
+
+/* =====================================================================
+   MODAL VARIAN
+   ===================================================================== */
+function openVariantModal(key) {
+  const meta = VARIAN_META[key];
+  const data = variantState[key];
+  if (!meta || !data) return;
+  const modal = document.getElementById('variant-modal');
+  const hero = document.getElementById('modal-hero');
+  const iconEl = document.getElementById('modal-icon');
+  iconEl.style.background = meta.soft;
+  iconEl.style.color = meta.color;
+  iconEl.innerHTML = `<i class="fa-solid ${meta.icon}"></i>`;
+  document.getElementById('modal-title').textContent = meta.name;
+  document.getElementById('modal-total').textContent = data.total.toLocaleString('id-ID');
+  hero.style.setProperty('--accent', meta.color);
+  hero.style.setProperty('--accent-soft', meta.soft);
+
+  const pctPill = document.getElementById('modal-pct-pill');
+  pctPill.className = 'delta-pill';
+  if (data.pct >= 100) {
+    pctPill.classList.add('delta-up');
+    pctPill.innerHTML = `<i class="fa-solid fa-arrow-trend-up"></i><span>${data.pct.toLocaleString('id-ID',{maximumFractionDigits:1})}%</span>`;
+  } else if (data.pct > 0) {
+    pctPill.classList.add('delta-down');
+    pctPill.innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i><span>${data.pct.toLocaleString('id-ID',{maximumFractionDigits:1})}%</span>`;
+  } else {
+    pctPill.classList.add('delta-flat');
+    pctPill.innerHTML = '<i class="fa-solid fa-minus"></i><span>—</span>';
+  }
+
+  const allVariantTotal = Object.values(variantState).reduce((a, b) => a + b.total, 0) || 1;
+  const proportion = data.total / allVariantTotal;
+  const dailyValues = state.chartValues.map(v => v * proportion);
+  const maxVal = Math.max(...dailyValues, 1);
+
+  const barsWrap = document.getElementById('modal-daily-bars');
+  barsWrap.innerHTML = dailyValues.map((v, i) => {
+    const h = (v / maxVal) * 100;
+    return `<div class="daily-bar" data-h="${h}" style="height:0%; --accent:${meta.color};">
+      <span class="tip">${state.chartLabels[i] || 'Hari '+(i+1)}: ${Math.round(v).toLocaleString('id-ID')}</span>
+    </div>`;
+  }).join('');
+
+  requestAnimationFrame(() => {
+    barsWrap.querySelectorAll('.daily-bar').forEach(el => { el.style.height = el.dataset.h + '%'; });
+  });
+
+  document.getElementById('modal-first-day').textContent = state.chartLabels[0] || '';
+  document.getElementById('modal-mid-day').textContent = state.chartLabels[Math.floor(state.chartLabels.length/2)] || '';
+  document.getElementById('modal-last-day').textContent = state.chartLabels[state.chartLabels.length-1] || '';
+
+  const nonZero = dailyValues.filter(v => v > 0);
+  const best = nonZero.length ? Math.max(...dailyValues) : 0;
+  const worst = nonZero.length ? Math.min(...dailyValues) : 0;
+  const avg = dailyValues.length ? dailyValues.reduce((a,b)=>a+b,0) / dailyValues.length : 0;
+
+  document.getElementById('modal-best-day').textContent = best ? Math.round(best).toLocaleString('id-ID') : '-';
+  document.getElementById('modal-worst-day').textContent = worst ? Math.round(worst).toLocaleString('id-ID') : '-';
+  document.getElementById('modal-avg').textContent = Math.round(avg).toLocaleString('id-ID');
+  document.getElementById('modal-contribution').textContent = (proportion * 100).toFixed(1).replace('.', ',') + '%';
+
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  modalOpen = true;
+  if (navigator.vibrate) navigator.vibrate(8);
+
+  const sheet = modal.querySelector('.modal-sheet');
+  if (sheet) {
+    sheet.scrollTop = 0;
+    setTimeout(() => { sheet.scrollTop = 0; }, 470);
+  }
+}
+
+function closeVariantModal() {
+  const modal = document.getElementById('variant-modal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  modalOpen = false;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.var-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const key = card.dataset.variant;
+      if (key) openVariantModal(key);
+    });
+  });
+  const c1 = document.getElementById('modal-close-btn');
+  const c2 = document.getElementById('modal-close-btn-2');
+  if (c1) c1.addEventListener('click', closeVariantModal);
+  if (c2) c2.addEventListener('click', closeVariantModal);
+  const modalEl = document.getElementById('variant-modal');
+  if (modalEl) {
+    modalEl.addEventListener('click', (e) => {
+      if (e.target.id === 'variant-modal') closeVariantModal();
+    });
+  }
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOpen) closeVariantModal(); });
+
+  const fsBtn = document.getElementById('btn-fullscreen');
+  if (fsBtn) {
+    if (!isFullscreenSupported()) document.body.classList.add('no-fullscreen');
+    fsBtn.addEventListener('click', () => {
+      if (navigator.vibrate) navigator.vibrate(10);
+      toggleFullscreen();
+    });
+  }
+});
+
+/* =====================================================================
+   ORCHESTRATOR
+   ===================================================================== */
+let isFetching = false;
+
+async function fetchAllData(isManual = false) {
+  if (isFetching) return;
+  isFetching = true;
+
+  const btn = document.getElementById('btn-refresh');
+  const icon = document.getElementById('refresh-icon-bottom');
+  if (isManual && icon) icon.classList.add('spin');
+  if (btn) btn.disabled = true;
+  if (!state.hasLoadedOnce) {
+    setConnStatus('warn', 'Sinkron…');
+    setLoaderStatus('Menghubungi server…');
+  }
+
+  const t0 = performance.now();
+
+  const results = await Promise.allSettled([
+    fetchOverview(isManual),
+    fetchVarian(isManual),
+    fetchChart(isManual)
+  ]);
+
+  const failed = results.filter(r => r.status === 'rejected');
+  const elapsed = Math.round(performance.now() - t0);
+
+  if (failed.length === 0) {
+    setConnStatus('ok', 'Live');
+    if (isManual) showToast(`Data diperbarui (${elapsed}ms)`, 'ok');
+  } else if (failed.length < results.length) {
+    setConnStatus('warn', 'Sebagian');
+    if (isManual) showToast(`${failed.length} bagian gagal dimuat`, 'warn');
+  } else {
+    setConnStatus('err', 'Offline');
+    showToast('Gagal memuat data. Periksa koneksi.', 'err', 4200);
+  }
+  failed.forEach(f => console.warn('Fetch gagal:', f.reason));
+
+  const now = new Date();
+  const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.getElementById('timestamp').textContent = timeString;
+  document.getElementById('last-updated').textContent = timeString;
+
+  state.nextRefreshAt = Date.now() + REFRESH_MS;
+
+  const loadingEl = document.getElementById('initial-loading');
+  if (loadingEl) loadingEl.classList.add('hide');
+
+  document.getElementById('dashboard-content').classList.add('ready');
+  state.hasLoadedOnce = true;
+
+  try { computeForecast(); } catch(e) { console.warn('Forecast error:', e); }
+
+  if (modalOpen) {
+    const sheet = document.querySelector('#variant-modal .modal-sheet');
+    if (sheet) sheet.scrollTop = 0;
+  }
+
+  isFetching = false;
+  if (btn) btn.disabled = false;
+  if (isManual && icon) setTimeout(() => icon.classList.remove('spin'), 600);
+}
+
+/* =====================================================================
+   COUNTDOWN + CLOCK
+   ===================================================================== */
+setInterval(() => {
+  const remain = Math.max(0, Math.ceil((state.nextRefreshAt - Date.now()) / 1000));
+  const cd = document.getElementById('countdown');
+  if (cd) cd.textContent = remain;
+  if (remain === 0 && !isFetching && state.hasLoadedOnce) fetchAllData(false);
+}, 1000);
+
+setInterval(() => {
+  const t = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const ts = document.getElementById('timestamp');
+  if (ts && state.hasLoadedOnce) ts.textContent = t;
+}, 1000);
+
+/* =====================================================================
+   NETWORK
+   ===================================================================== */
+function updateNetStatus() {
+  const el = document.getElementById('net-status');
+  if (!el) return;
+  if (navigator.onLine) {
+    el.textContent = 'Online';
+    el.className = 'text-slate-400';
+  } else {
+    el.textContent = 'Offline';
+    el.className = 'text-rose-500 font-bold';
+    setConnStatus('err', 'Offline');
+  }
+}
+window.addEventListener('online', () => { updateNetStatus(); showToast('Kembali online', 'ok'); fetchAllData(false); });
+window.addEventListener('offline', () => { updateNetStatus(); showToast('Koneksi terputus', 'err'); });
+
+document.getElementById('btn-refresh').addEventListener('click', () => {
+  if (navigator.vibrate) navigator.vibrate(12);
+  fetchAllData(true);
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && state.hasLoadedOnce) {
+    const elapsed = Date.now() - (state.nextRefreshAt - REFRESH_MS);
+    if (elapsed > REFRESH_MS) fetchAllData(false);
+  }
+});
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+window.addEventListener('load', () => {
+  updateNetStatus();
+  fetchAllData(false);
+  setTimeout(() => {
+    if (!state.hasLoadedOnce) {
+      document.getElementById('initial-loading').classList.add('hide');
+      document.getElementById('dashboard-content').classList.add('ready');
+      setConnStatus('warn', 'Terbatas');
+      showToast('Koneksi lambat, coba refresh manual', 'warn', 4000);
+    }
+  }, 12000);
+});
+</script>
+</body>
+</html>

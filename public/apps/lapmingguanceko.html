@@ -1,0 +1,3086 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#e11d48">
+    <title>Form Laporan Mingguan Ceko</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* ============================================================
+           1. VARIABLES & THEME
+           ============================================================ */
+        :root {
+            --bg-main: #f8fafc;
+            --bg-grad: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 50%, #f0fdfa 100%);
+            --card-bg: #ffffff;
+            --card-soft: #f8fafc;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-main: #e2e8f0;
+            --input-bg: #f8fafc;
+            --accent: #e11d48;
+            --accent-2: #f43f5e;
+            --shadow-card: 0 10px 30px -10px rgba(15,23,42,.12);
+            --shadow-soft: 0 4px 12px rgba(0,0,0,.04);
+            --font-body: 'Poppins', sans-serif;
+            --font-display: 'Plus Jakarta Sans', sans-serif;
+        }
+        [data-theme="dark"] {
+            --bg-main: #0a0f1a;
+            --bg-grad: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0d1117 100%);
+            --card-bg: #111827;
+            --card-soft: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-main: #334155;
+            --input-bg: #1e293b;
+            --shadow-card: 0 10px 30px -10px rgba(0,0,0,.5);
+            --shadow-soft: 0 4px 12px rgba(0,0,0,.3);
+        }
+
+        /* ============================================================
+           2. RESET & BASE
+           ============================================================ */
+        * { -webkit-tap-highlight-color: transparent; }
+        html, body {
+            font-family: var(--font-body);
+            background-color: var(--bg-main);
+            background-image: var(--bg-grad);
+            background-attachment: fixed;
+            color: var(--text-main);
+            transition: background .35s ease, color .35s ease;
+            min-height: 100vh;
+            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
+        }
+        body {
+            -webkit-transform: translate3d(0,0,0);
+            transform: translate3d(0,0,0);
+        }
+        ::-webkit-scrollbar { width: 0; height: 0; }
+
+        /* Display font */
+        h1, h2, h3, h4,
+        .header-glass h1,
+        .modal-title,
+        .raport-title,
+        .history-title,
+        .cleanup-title,
+        .prog-title,
+        .qs-value,
+        .banner-text,
+        .ceko-pill,
+        .bp-count,
+        .urgent-list-topik {
+            font-family: var(--font-display);
+            letter-spacing: -.01em;
+        }
+        svg.lucide, [data-lucide] {
+            stroke-width: 1.75;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* ============================================================
+           3. FORM ELEMENTS
+           ============================================================ */
+        .emboss-input {
+            background-color: var(--input-bg);
+            border: 1.5px solid var(--border-main);
+            border-left: 4px solid var(--accent);
+            border-radius: 14px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,.04), inset 0 -1px 2px rgba(255,255,255,.6), 0 1px 2px rgba(0,0,0,.02);
+            transition: all .22s cubic-bezier(.16,1,.3,1);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .emboss-input::placeholder { color: #9ca3af; font-weight: 400; }
+        .emboss-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--card-bg);
+            box-shadow: 0 0 0 4px rgba(225,29,72,.12), 0 2px 6px rgba(0,0,0,.04);
+            transform: translateY(-1px);
+        }
+        .emboss-input.field-invalid {
+            border-left-color: #dc2626 !important;
+            background: linear-gradient(to right, rgba(254,226,226,.6), var(--card-bg)) !important;
+            animation: fieldShake .35s;
+        }
+        .emboss-input.field-valid { border-left-color: #10b981 !important; }
+        @keyframes fieldShake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        /* Buttons */
+        .btn-3d {
+            position: relative;
+            transition: all .15s cubic-bezier(.16,1,.3,1);
+            box-shadow: 0 4px 12px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.3);
+        }
+        .btn-3d:hover { transform: translateY(-1px); }
+        .btn-3d:active {
+            transform: translateY(2px) scale(.99);
+            box-shadow: 0 1px 3px rgba(0,0,0,.1), inset 0 2px 4px rgba(0,0,0,.15);
+        }
+        .btn-3d:disabled { opacity: .6; cursor: not-allowed; }
+        .btn-wa .wa-icon { width: 20px; height: 20px; display: block; }
+
+        /* Dropdown */
+        .dropdown-menu {
+            transition: all .22s cubic-bezier(.16,1,.3,1);
+            transform-origin: top;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border-main);
+            box-shadow: 0 15px 40px -8px rgba(15,23,42,.2), 0 4px 12px rgba(0,0,0,.06);
+        }
+        .dropdown-menu.hidden { display: none; }
+        .dropdown-item {
+            padding: 10px 16px;
+            font-weight: 500;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all .15s;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dropdown-item:hover, .dropdown-item:active {
+            background: linear-gradient(135deg, var(--card-soft), rgba(0,0,0,.02));
+            padding-left: 20px;
+        }
+        [data-theme="dark"] .dropdown-item:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+        }
+
+        /* ============================================================
+           4. PRIORITY BADGES
+           ============================================================ */
+        .prio-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .prio-urgent .prio-dot { background: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,.2); }
+        .prio-tinggi .prio-dot { background: #ea580c; box-shadow: 0 0 0 3px rgba(234,88,12,.2); }
+        .prio-sedang .prio-dot { background: #ca8a04; box-shadow: 0 0 0 3px rgba(202,138,4,.2); }
+        .prio-rendah .prio-dot { background: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,.2); }
+
+        .prio-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+        .prio-tag.urgent { background: #fee2e2; color: #dc2626; }
+        .prio-tag.tinggi { background: #ffedd5; color: #ea580c; }
+        .prio-tag.sedang { background: #fef9c3; color: #ca8a04; }
+        .prio-tag.rendah { background: #d1fae5; color: #059669; }
+        [data-theme="dark"] .prio-tag.urgent { background: rgba(220,38,38,.2); color: #fca5a5; }
+        [data-theme="dark"] .prio-tag.tinggi { background: rgba(234,88,12,.2); color: #fdba74; }
+        [data-theme="dark"] .prio-tag.sedang { background: rgba(202,138,4,.2); color: #fde047; }
+        [data-theme="dark"] .prio-tag.rendah { background: rgba(5,150,105,.2); color: #6ee7b7; }
+
+        /* ============================================================
+           5. CHAR COUNTER
+           ============================================================ */
+        .char-counter {
+            position: absolute;
+            bottom: 8px; right: 12px;
+            font-size: 10px; font-weight: 700;
+            color: #9ca3af;
+            background: rgba(255,255,255,.9);
+            padding: 2px 8px;
+            border-radius: 8px;
+            pointer-events: none;
+            display: inline-flex; align-items: center; gap: 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.05);
+            transition: all .2s;
+        }
+        [data-theme="dark"] .char-counter { background: rgba(0,0,0,.5); color: #6b7280; }
+        .char-counter.warn { color: #f59e0b; background: rgba(254,243,199,.98); }
+        .char-counter.danger { color: #dc2626; background: rgba(254,226,226,.98); }
+        .char-counter.valid { color: #059669; background: rgba(209,250,229,.98); }
+        .char-counter .req-hint { font-size: 9px; opacity: .8; }
+
+        /* ============================================================
+           6. HEADER
+           ============================================================ */
+        .header-glass {
+            background: linear-gradient(135deg, #e11d48 0%, #f43f5e 50%, #ec4899 100%);
+            position: sticky; top: 0; z-index: 30;
+            border-radius: 0 0 2rem 2rem;
+            box-shadow: 0 15px 40px -10px rgba(225,29,72,.4);
+            overflow: hidden;
+        }
+        .header-glass::before {
+            content: '';
+            position: absolute; top: -50%; right: -20%;
+            width: 60%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .header-btn {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.2);
+            border: 1px solid rgba(255,255,255,.3);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            transition: all .2s;
+            position: relative;
+        }
+        .header-btn:active { transform: scale(.94); }
+
+        /* Urgent bell */
+        .urgent-btn {
+            background: linear-gradient(135deg, #fff1f2 0%, #fecdd3 100%) !important;
+            color: #dc2626 !important;
+            border-color: rgba(220,38,38,.35) !important;
+            animation: urgentPulse 1.4s infinite;
+        }
+        .urgent-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            animation: urgentRing 1.4s infinite;
+            pointer-events: none;
+        }
+        @keyframes urgentPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,.55), 0 4px 12px rgba(220,38,38,.25); }
+            50% { box-shadow: 0 0 0 10px rgba(220,38,38,0), 0 4px 12px rgba(220,38,38,.15); }
+        }
+        @keyframes urgentRing {
+            0%, 100% { border: 2px solid rgba(220,38,38,.5); }
+            50% { border: 2px solid rgba(220,38,38,0); }
+        }
+        .urgent-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            min-width: 18px; height: 18px;
+            padding: 0 4px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #fee2e2;
+            box-shadow: 0 2px 6px rgba(220,38,38,.5);
+            animation: badgeBounce .8s infinite;
+            font-family: var(--font-display);
+        }
+        @keyframes badgeBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* Cloud status */
+        .cloud-status {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.2);
+            border: 1px solid rgba(255,255,255,.3);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            position: relative;
+            transition: all .2s;
+        }
+        .cloud-status::after {
+            content: '';
+            position: absolute; top: 5px; right: 5px;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #f59e0b;
+            border: 1.5px solid rgba(255,255,255,.75);
+            animation: pulseDot 2s infinite;
+        }
+        .cloud-status.online::after { background: #10b981; }
+        .cloud-status.offline::after { background: #ef4444; }
+        @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+        /* ============================================================
+           7. BANNER
+           ============================================================ */
+        .banner-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 16px;
+            padding: 12px 14px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 24px -8px rgba(16,185,129,.4);
+            position: relative; overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .banner-card.show { display: flex; animation: fadeInUp .4s ease; }
+        .banner-card::before {
+            content: '';
+            position: absolute; top: -50%; right: -20%;
+            width: 140px; height: 140px;
+            background: rgba(255,255,255,.1);
+            border-radius: 50%;
+        }
+        .banner-icon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.2);
+            border: 1px solid rgba(255,255,255,.3);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .banner-text {
+            flex: 1;
+            font-size: 11.5px; font-weight: 700;
+            color: #fff;
+            line-height: 1.35;
+            position: relative; z-index: 1;
+        }
+        .banner-btn {
+            width: 30px; height: 30px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.2);
+            border: 1px solid rgba(255,255,255,.3);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all .18s;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+        .banner-btn:active { transform: scale(.92); }
+        .banner-btn svg { transition: transform .3s cubic-bezier(.16,1,.3,1); }
+        .banner-btn.open svg { transform: rotate(180deg); }
+        .banner-list {
+            display: none;
+            background: rgba(16,185,129,.06);
+            border: 1.5px dashed rgba(16,185,129,.4);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+            animation: fadeInUp .3s ease;
+        }
+        .banner-list.show { display: block; }
+        .banner-staff-grid {
+            display: grid;
+            grid-template-columns: minmax(0,1fr);
+            gap: 6px;
+        }
+        @media (min-width: 480px) {
+            .banner-staff-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+        }
+        .banner-staff-item {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 10px;
+            background: var(--card-bg);
+            border-radius: 9px;
+            font-size: 11px; font-weight: 700;
+            color: var(--text-main);
+            border: 1px solid rgba(16,185,129,.15);
+            min-width: 0;
+        }
+        .banner-staff-item .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #f59e0b;
+            flex-shrink: 0;
+        }
+        .banner-staff-item span:last-child {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ============================================================
+           8. QUICK STATS
+           ============================================================ */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        @media (min-width: 640px) {
+            .quick-stats { grid-template-columns: repeat(3,1fr); gap: 10px; }
+        }
+        .qs-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border-main);
+            border-radius: 14px;
+            box-shadow: var(--shadow-soft);
+            position: relative; overflow: hidden;
+            min-height: 62px;
+        }
+        .qs-item::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+        }
+        .qs-item:nth-child(2)::before { background: linear-gradient(180deg, #06b6d4, #0891b2); }
+        .qs-item:nth-child(3)::before { background: linear-gradient(180deg, #ec4899, #db2777); }
+        .qs-icon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            color: #6366f1;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .qs-item:nth-child(2) .qs-icon { background: linear-gradient(135deg, #cffafe, #a5f3fc); color: #0891b2; }
+        .qs-item:nth-child(3) .qs-icon { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #db2777; }
+        .qs-content { flex: 1; min-width: 0; }
+        .qs-value {
+            font-size: 17px; font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.15;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        #qsTopKategori {
+            font-size: 13.5px;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -.01em;
+        }
+        .qs-label {
+            font-size: 9.5px; font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 2px;
+        }
+        [data-theme="dark"] .qs-icon { background: rgba(99,102,241,.15) !important; }
+        [data-theme="dark"] .qs-item:nth-child(2) .qs-icon { background: rgba(6,182,212,.15) !important; }
+        [data-theme="dark"] .qs-item:nth-child(3) .qs-icon { background: rgba(236,72,153,.15) !important; }
+
+        /* ============================================================
+           9. RAPORT CARD
+           ============================================================ */
+        .raport-card {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 50%, #c7d2fe 100%);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            display: none;
+            box-shadow: 0 8px 24px -8px rgba(99,102,241,.35);
+            position: relative; overflow: hidden;
+        }
+        [data-theme="dark"] .raport-card {
+            background: linear-gradient(135deg, rgba(99,102,241,.28), rgba(139,92,246,.18));
+        }
+        .raport-card.show { display: block; animation: fadeInUp .4s ease; }
+        .raport-card::before {
+            content: '';
+            position: absolute; top: -50%; right: -15%;
+            width: 130px; height: 130px;
+            background: rgba(255,255,255,.35);
+            border-radius: 50%;
+        }
+        .raport-head {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; margin-bottom: 12px;
+            position: relative; z-index: 1;
+        }
+        .raport-title {
+            font-size: 12.5px; font-weight: 800;
+            color: #4c1d95;
+            display: flex; align-items: center; gap: 7px;
+        }
+        [data-theme="dark"] .raport-title { color: #c4b5fd; }
+        .raport-title-icon {
+            width: 26px; height: 26px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.85);
+            color: #7c3aed;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        [data-theme="dark"] .raport-title-icon { background: rgba(0,0,0,.3); color: #a78bfa; }
+        .raport-month {
+            font-size: 10.5px; font-weight: 800;
+            color: #5b21b6;
+            background: rgba(255,255,255,.75);
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-family: var(--font-display);
+        }
+        [data-theme="dark"] .raport-month { background: rgba(0,0,0,.3); color: #c4b5fd; }
+        .raport-pills {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            position: relative; z-index: 1;
+        }
+        .ceko-pill {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 7px 12px;
+            background: #fff;
+            border-radius: 11px;
+            font-size: 12px; font-weight: 700;
+            color: #4c1d95;
+            box-shadow: 0 2px 8px rgba(99,102,241,.18);
+            border: 1px solid rgba(99,102,241,.2);
+        }
+        [data-theme="dark"] .ceko-pill { background: rgba(0,0,0,.35); color: #c4b5fd; }
+        .ceko-count {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 22px; height: 20px; padding: 0 6px;
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            color: #fff;
+            border-radius: 7px;
+            font-size: 10px; font-weight: 800;
+            font-family: var(--font-display);
+        }
+        .raport-empty {
+            font-size: 11.5px; color: #5b21b6;
+            font-weight: 600; padding: 6px 0;
+        }
+        [data-theme="dark"] .raport-empty { color: #c4b5fd; }
+
+        /* ============================================================
+           10. HISTORY CARD
+           ============================================================ */
+        .history-card {
+            background: linear-gradient(135deg, rgba(204,251,241,.5), rgba(165,243,252,.3));
+            border: 1.5px dashed #14b8a6;
+            border-radius: 18px;
+            padding: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        [data-theme="dark"] .history-card {
+            background: linear-gradient(135deg, rgba(20,184,166,.15), rgba(6,182,212,.1));
+            border-color: #14b8a6;
+        }
+        .history-card.show { display: block; animation: fadeInUp .4s ease; }
+        .history-head {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 8px; margin-bottom: 10px; padding-bottom: 8px;
+            border-bottom: 2px dashed rgba(20,184,166,.35);
+        }
+        .history-title {
+            font-size: 12.5px; font-weight: 800;
+            color: #0f766e;
+            display: flex; align-items: center; gap: 6px;
+            flex: 1; min-width: 0;
+        }
+        [data-theme="dark"] .history-title { color: #5eead4; }
+        .history-head-right {
+            display: flex; align-items: center; gap: 6px;
+            flex-shrink: 0;
+        }
+        .history-count {
+            background: rgba(20,184,166,.15);
+            color: #0f766e;
+            font-size: 10px; font-weight: 800;
+            padding: 3px 9px; border-radius: 8px;
+            border: 1px solid rgba(20,184,166,.3);
+            font-family: var(--font-display);
+        }
+        [data-theme="dark"] .history-count { color: #5eead4; }
+
+        /* Icon action buttons */
+        .icon-action-btn {
+            width: 30px; height: 30px;
+            border-radius: 9px;
+            border: 1px solid;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all .2s;
+            flex-shrink: 0;
+            background: transparent;
+        }
+        .icon-action-btn:active { transform: scale(.93); }
+        .icon-action-btn:hover { transform: scale(1.05); }
+
+        .icon-action-btn.expand {
+            background: rgba(148,163,184,.12);
+            color: #475569;
+            border-color: rgba(148,163,184,.35);
+        }
+        .icon-action-btn.expand:hover { background: #475569; color: #fff; }
+        .icon-action-btn.expand.expanded {
+            background: rgba(225,29,72,.1);
+            color: #e11d48;
+            border-color: rgba(225,29,72,.3);
+        }
+        .icon-action-btn.expand.expanded:hover { background: #e11d48; color: #fff; }
+        [data-theme="dark"] .icon-action-btn.expand { color: #cbd5e1; }
+
+        .icon-action-btn.export {
+            background: rgba(16,185,129,.1);
+            color: #059669;
+            border-color: rgba(16,185,129,.3);
+        }
+        .icon-action-btn.export:hover { background: #10b981; color: #fff; }
+
+        .icon-action-btn.bulk {
+            background: rgba(14,165,233,.1);
+            color: #0284c7;
+            border-color: rgba(14,165,233,.3);
+        }
+        .icon-action-btn.bulk:hover { background: #0ea5e9; color: #fff; }
+
+        .icon-action-btn.danger {
+            background: rgba(239,68,68,.1);
+            color: #dc2626;
+            border-color: rgba(239,68,68,.3);
+        }
+        .icon-action-btn.danger:hover { background: #ef4444; color: #fff; }
+
+        /* Search */
+        .history-search-wrap { position: relative; margin-bottom: 10px; }
+        .history-search-wrap > i {
+            position: absolute; left: 12px; top: 50%;
+            transform: translateY(-50%);
+            color: #64748b; font-size: 14px;
+            pointer-events: none;
+        }
+        .history-search-wrap input {
+            width: 100%;
+            padding: 9px 36px 9px 34px;
+            background: var(--card-bg);
+            border: 1.5px solid rgba(20,184,166,.3);
+            border-radius: 11px;
+            font-size: 12px; font-weight: 600;
+            color: var(--text-main);
+            outline: none; font-family: inherit;
+            transition: all .2s;
+        }
+        .history-search-wrap input:focus {
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20,184,166,.15);
+        }
+        .history-search-clear {
+            position: absolute; right: 8px; top: 50%;
+            transform: translateY(-50%);
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(239,68,68,.1); color: #dc2626;
+            border: none; cursor: pointer;
+            display: none; align-items: center; justify-content: center;
+        }
+        .history-search-clear.show { display: flex; }
+
+        /* History items */
+        .history-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(20,184,166,.2);
+            border-left: 3px solid #14b8a6;
+            font-size: 11.5px;
+            position: relative;
+        }
+        .history-item.urgent {
+            border-left-color: #dc2626;
+            background: linear-gradient(to right, rgba(254,226,226,.5), var(--card-bg));
+        }
+        [data-theme="dark"] .history-item.urgent {
+            background: linear-gradient(to right, rgba(220,38,38,.15), var(--card-bg));
+        }
+        .history-item.tinggi { border-left-color: #ea580c; }
+        .history-item.sedang { border-left-color: #ca8a04; }
+        .history-item.rendah { border-left-color: #059669; }
+        .history-item:last-child { margin-bottom: 0; }
+        .history-item-head {
+            display: flex; justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px; margin-bottom: 4px;
+        }
+        .history-item-topik {
+            font-weight: 800;
+            color: var(--text-main);
+            font-size: 12px;
+            word-break: break-word;
+            flex: 1; min-width: 0;
+            font-family: var(--font-display);
+        }
+        .history-item-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+            background: rgba(20,184,166,.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .history-item-meta {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: flex; gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .history-item-meta b { color: var(--text-main); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================================
+           11. MODALS
+           ============================================================ */
+        .modal-backdrop {
+            position: fixed; inset: 0;
+            z-index: 100003;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(15,23,42,.6);
+            backdrop-filter: blur(6px);
+            padding: 16px;
+            opacity: 0;
+            transition: opacity .25s;
+        }
+        .modal-backdrop.show { opacity: 1; }
+        .modal-backdrop.hidden { display: none; }
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 22px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
+            border: 1.5px solid var(--border-main);
+            transform: scale(.94);
+            transition: transform .3s cubic-bezier(.16,1,.3,1);
+            display: flex; flex-direction: column;
+        }
+        .modal-backdrop.show .modal-content { transform: scale(1); }
+        .modal-head {
+            padding: 18px 20px 14px;
+            border-bottom: 1.5px solid var(--border-main);
+            flex-shrink: 0;
+        }
+        .modal-title {
+            font-size: 15px; font-weight: 800;
+            color: var(--text-main);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .modal-sub {
+            font-size: 11px; color: var(--text-muted);
+            margin-top: 3px;
+        }
+        .modal-body {
+            padding: 14px 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;   /* ✅ scroll halus iOS */
+            overscroll-behavior: contain;        /* ✅ tidak "bocor" ke page belakang */
+            scroll-behavior: smooth;
+            flex: 1;
+            min-height: 0;                       /* ✅ wajib agar flex child bisa scroll */
+        }
+        .modal-foot {
+            padding: 14px 18px;
+            border-top: 1.5px solid var(--border-main);
+            display: flex; gap: 8px;
+            flex-shrink: 0;
+        }
+        .preview-row {
+            display: flex; justify-content: space-between;
+            align-items: flex-start; gap: 12px;
+            padding: 8px 11px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            font-size: 12px;
+            line-height: 1.45;
+            margin-bottom: 6px;
+        }
+        .preview-row .pr-label {
+            color: var(--text-muted);
+            font-weight: 600;
+            flex-shrink: 0;
+            font-size: 11px;
+        }
+        .preview-row .pr-value {
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: right;
+            word-break: break-word;
+            min-width: 0;
+        }
+        .preview-section {
+            padding: 10px 11px;
+            background: var(--card-soft);
+            border-radius: 9px;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+        .preview-section .ps-label {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            margin-bottom: 5px;
+        }
+        .preview-section .ps-content {
+            color: var(--text-main);
+            line-height: 1.5;
+            word-break: break-word;
+            font-weight: 500;
+        }
+        .btn-modal-cancel {
+            flex: 1; padding: 12px;
+            background: var(--card-soft);
+            color: var(--text-main);
+            border: none; border-radius: 12px;
+            font-size: 13px; font-weight: 700;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            font-family: inherit;
+        }
+        .btn-modal-cancel:active { transform: scale(.97); }
+        .btn-modal-primary {
+            flex: 1; padding: 12px;
+            background: linear-gradient(135deg, #e11d48, #f43f5e);
+            color: #fff; border: none; border-radius: 12px;
+            font-size: 13px; font-weight: 800;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            box-shadow: 0 4px 12px rgba(225,29,72,.35);
+            font-family: inherit;
+        }
+        .btn-modal-primary:active { transform: scale(.97); }
+        .btn-modal-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+        /* ============================================================
+           12. PROGRESS OVERLAY
+           ============================================================ */
+        #progressOverlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh;
+            z-index: 100002;
+            background: rgba(15,23,42,.75);
+            backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        #progressOverlay.show { display: flex; animation: fadeInUp .25s ease; }
+        .progress-box {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 28px 22px;
+            width: 100%; max-width: 340px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
+            text-align: center;
+        }
+        .progress-box .prog-title {
+            font-size: 15px; font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        .progress-box .prog-sub {
+            font-size: 11.5px; color: var(--text-muted);
+            margin-bottom: 18px; font-weight: 500;
+        }
+        .progress-bar-bg {
+            width: 100%; height: 10px;
+            background: rgba(225,29,72,.12);
+            border-radius: 5px; overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #e11d48, #ec4899);
+            width: 0%;
+            transition: width .3s ease;
+            border-radius: 5px;
+            box-shadow: 0 0 12px rgba(225,29,72,.5);
+        }
+        .prog-pct {
+            font-size: 26px; font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -.5px;
+            font-family: var(--font-display);
+        }
+
+        /* ============================================================
+           13. TOAST
+           ============================================================ */
+        #toastContainer {
+            position: fixed;
+            top: calc(90px + env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100001;
+            display: flex; flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+            width: calc(100% - 24px);
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        .toast-item {
+            background: #1f2937;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 12.5px; font-weight: 700;
+            box-shadow: 0 15px 35px rgba(0,0,0,.3);
+            display: flex; align-items: center; gap: 10px;
+            opacity: 0;
+            transform: translateY(-20px) scale(.95);
+            transition: all .3s cubic-bezier(.16,1,.3,1);
+            word-break: break-word;
+        }
+        .toast-item.show { opacity: 1; transform: translateY(0) scale(1); }
+        .toast-item.success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast-item.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .toast-item.warn { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .toast-item.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+        /* ============================================================
+           14. CLEANUP MODAL
+           ============================================================ */
+        .cleanup-icon-wrap {
+            width: 64px; height: 64px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #dc2626;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+            border: 2px solid #fca5a5;
+        }
+        .cleanup-title {
+            font-size: 16px; font-weight: 800;
+            color: var(--text-main);
+            text-align: center; margin-bottom: 6px;
+        }
+        .cleanup-desc {
+            font-size: 12px; color: var(--text-muted);
+            text-align: center; line-height: 1.5; margin-bottom: 16px;
+        }
+        .cleanup-warning {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 1.5px solid #f59e0b;
+            border-left: 4px solid #d97706;
+            border-radius: 11px;
+            padding: 10px 12px; margin-bottom: 14px;
+            display: flex; gap: 8px; align-items: flex-start;
+            font-size: 11px; font-weight: 700;
+            color: #78350f; line-height: 1.4;
+        }
+        .cleanup-pwd {
+            width: 100%; padding: 12px 14px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border-main);
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 13px; font-weight: 600;
+            outline: none; font-family: inherit;
+            margin-bottom: 14px;
+        }
+        .cleanup-pwd:focus {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220,38,38,.15);
+        }
+        .cleanup-pwd.error {
+            border-color: #dc2626;
+            background: rgba(254,226,226,.5);
+            animation: fieldShake .4s;
+        }
+
+        /* ============================================================
+           15. BULK MODAL
+           ============================================================ */
+        .bulk-select, .bulk-input {
+            width: 100%; padding: 10px 12px;
+            border-radius: 11px;
+            border: 1.5px solid var(--border-main);
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 12.5px; font-weight: 600;
+            outline: none; font-family: inherit;
+            margin-bottom: 10px;
+        }
+        .bulk-select:focus, .bulk-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(225,29,72,.12);
+        }
+        .bulk-preview-btn {
+            width: 100%; padding: 10px 14px;
+            border-radius: 11px;
+            background: rgba(225,29,72,.1);
+            color: var(--accent);
+            border: 1.5px solid rgba(225,29,72,.3);
+            font-size: 12.5px; font-weight: 800;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; font-family: inherit;
+        }
+        .bulk-preview-btn:hover { background: rgba(225,29,72,.2); }
+        .bulk-preview-result {
+            display: none; margin-top: 12px; padding: 12px;
+            background: var(--card-soft);
+            border: 1.5px dashed rgba(225,29,72,.4);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .bulk-preview-result.show { display: block; animation: fadeInUp .25s ease; }
+        .bp-count {
+            font-size: 28px; font-weight: 900;
+            color: var(--accent);
+            letter-spacing: -1px; line-height: 1;
+        }
+        .bp-label {
+            font-size: 11px; font-weight: 700;
+            color: var(--text-muted);
+            margin-top: 4px; margin-bottom: 8px;
+        }
+        .bp-list {
+            font-size: 10.5px; color: var(--text-muted);
+            font-weight: 600;
+            max-height: 80px; overflow-y: auto;
+            text-align: left;
+            padding: 6px 10px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        /* ============================================================
+           16. URGENT LIST MODAL
+           ============================================================ */
+        .urgent-list-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, rgba(254,226,226,.5), rgba(255,255,255,0));
+            border: 1.5px solid rgba(220,38,38,.25);
+            border-left: 4px solid #dc2626;
+            border-radius: 11px;
+            margin-bottom: 8px;
+        }
+        [data-theme="dark"] .urgent-list-item {
+            background: linear-gradient(135deg, rgba(220,38,38,.15), transparent);
+        }
+        .urgent-list-icon {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            animation: urgentIconPulse 1.5s infinite;
+        }
+        @keyframes urgentIconPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,.6); }
+            50% { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+        }
+        .urgent-list-body { flex: 1; min-width: 0; }
+        .urgent-list-topik {
+            font-size: 12.5px; font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 3px;
+            word-break: break-word;
+        }
+        .urgent-list-meta {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        .urgent-list-meta b { color: #dc2626; }
+
+        /* ============================================================
+           17. DRAFT INDICATOR
+           ============================================================ */
+        #draftIndicator {
+            position: fixed;
+            bottom: calc(16px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(15,23,42,.94);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            font-size: 11px; font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 12px;
+            display: flex; align-items: center; gap: 6px;
+            z-index: 99990;
+            box-shadow: 0 8px 24px rgba(0,0,0,.3);
+            opacity: 0; pointer-events: none;
+            transition: all .3s cubic-bezier(.16,1,.3,1);
+        }
+        #draftIndicator.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        #draftIndicator i { font-size: 14px; color: #10b981; }
+
+        /* ============================================================
+           18. VOICE BUTTON
+           ============================================================ */
+        .voice-btn {
+            position: absolute;
+            top: 10px; right: 12px;
+            width: 30px; height: 30px;
+            border-radius: 9px;
+            background: rgba(225,29,72,.1);
+            color: var(--accent);
+            border: 1px solid rgba(225,29,72,.25);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all .2s;
+            z-index: 5;
+        }
+        .voice-btn.recording {
+            background: #ef4444; color: #fff;
+            border-color: #dc2626;
+            animation: voicePulse 1.2s infinite;
+        }
+        @keyframes voicePulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.5); }
+            50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+        }
+
+        /* ============================================================
+           19. FLATPICKR OVERRIDE
+           ============================================================ */
+        .flatpickr-calendar {
+            font-family: 'Poppins', sans-serif !important;
+            width: 300px !important;
+            padding: 12px 10px !important;
+            border-radius: 20px !important;
+            box-shadow: 0 25px 50px -12px rgba(225,29,72,.35), 0 10px 20px -5px rgba(0,0,0,.1) !important;
+            border: 2px solid var(--card-bg) !important;
+            background: var(--card-bg) !important;
+            box-sizing: content-box !important;
+            z-index: 100000 !important;
+        }
+        .flatpickr-calendar.open {
+            position: fixed !important;
+            top: 50% !important; left: 50% !important;
+            right: auto !important; bottom: auto !important;
+            margin: 0 !important;
+            transform: translate(-50%, -50%) !important;
+            animation: calPop .3s cubic-bezier(.16,1,.3,1) !important;
+        }
+        @keyframes calPop {
+            0% { opacity: 0; transform: translate(-50%,-46%) scale(.94); }
+            100% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+        }
+        .flatpickr-calendar::before, .flatpickr-calendar::after { display: none !important; }
+        .flatpickr-months .flatpickr-month,
+        .flatpickr-current-month .flatpickr-monthDropdown-months,
+        .flatpickr-current-month input.cur-year {
+            color: var(--accent) !important;
+            fill: var(--accent) !important;
+            font-weight: 700 !important;
+            background: transparent !important;
+        }
+        .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month {
+            fill: var(--accent) !important;
+            color: var(--accent) !important;
+        }
+        span.flatpickr-weekday { color: var(--accent) !important; font-weight: 700 !important; }
+        .flatpickr-day {
+            color: var(--text-main) !important;
+            border-radius: 10px !important;
+            max-width: 36px !important;
+            height: 36px !important;
+            line-height: 34px !important;
+            font-size: .85rem !important;
+            font-weight: 600 !important;
+        }
+        .flatpickr-day:hover { background: rgba(225,29,72,.08) !important; color: var(--accent) !important; }
+        .flatpickr-day.today { border-color: var(--accent) !important; color: var(--accent) !important; font-weight: 800 !important; }
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange {
+            background: linear-gradient(135deg, #e11d48, #ec4899) !important;
+            border-color: transparent !important;
+            color: #fff !important;
+            font-weight: 800 !important;
+            box-shadow: 0 6px 14px rgba(225,29,72,.4) !important;
+        }
+
+        #dateBackdrop {
+            position: fixed; inset: 0;
+            z-index: 99998;
+            background: rgba(15,23,42,.4);
+            backdrop-filter: blur(2px);
+            display: none;
+        }
+        #dateBackdrop.show { display: block; }
+
+        /* ============================================================
+           20. DARK MODE OVERRIDES
+           ============================================================ */
+        [data-theme="dark"] .text-gray-800 { color: var(--text-main) !important; }
+        [data-theme="dark"] .text-gray-700 { color: var(--text-main) !important; }
+        [data-theme="dark"] .text-gray-600 { color: var(--text-muted) !important; }
+        [data-theme="dark"] .text-gray-500 { color: var(--text-muted) !important; }
+        [data-theme="dark"] .bg-white { background-color: var(--card-bg) !important; }
+        [data-theme="dark"] .bg-pink-50 { background-color: var(--card-soft) !important; }
+        [data-theme="dark"] .bg-pink-100 { background-color: rgba(225,29,72,.15) !important; }
+        [data-theme="dark"] .border-pink-100,
+        [data-theme="dark"] .border-pink-200 { border-color: var(--border-main) !important; }
+        [data-theme="dark"] .border-red-200 { border-color: rgba(225,29,72,.3) !important; }
+
+        @media (min-width: 768px) {
+            .header-btn, .cloud-status { width: 44px; height: 44px; }
+        }
+    </style>
+</head>
+<body class="antialiased relative min-h-screen pb-10">
+
+    <!-- ============================================================
+         HEADER
+         ============================================================ -->
+    <header class="header-glass">
+        <div class="relative px-6 py-5 flex items-center justify-center">
+            <div class="absolute top-1/2 left-5 -translate-y-1/2 flex items-center gap-2">
+                <div class="header-btn">
+                    <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="text-center px-16">
+                <h1 class="font-heading class="text-xl md:text-2xl font-extrabold tracking-wide text-white leading-tight">Laporan Mingguan Ceko</h1>
+                <p class="text-pink-100/90 text-[11px] md:text-xs mt-0.5 font-medium">Sistem Reporting Ceko Bandung Raya</p>
+            </div>
+
+            <div class="absolute top-1/2 right-5 -translate-y-1/2 flex flex-col items-center gap-2">
+                <button type="button" id="themeToggle" class="header-btn" title="Ganti tema">
+                    <i id="themeIcon" data-lucide="moon" class="w-5 h-5"></i>
+                </button>
+                <button type="button" id="urgentBtn" class="header-btn urgent-btn" title="Laporan Urgent" style="display:none;">
+                    <i data-lucide="bell-ring" class="w-5 h-5"></i>
+                    <span id="urgentBadge" class="urgent-badge">0</span>
+                </button>
+                <span id="cloudStatusBadge" class="cloud-status" title="Memuat...">
+                    <i data-lucide="cloud" class="w-5 h-5"></i>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-2xl mx-auto px-4 mt-6">
+
+        <!-- QUICK STATS -->
+        <div class="quick-stats">
+            <div class="qs-item">
+                <div class="qs-icon"><i data-lucide="file-text" class="w-4 h-4"></i></div>
+                <div class="qs-content">
+                    <div class="qs-value" id="qsTotal">0</div>
+                    <div class="qs-label">Laporan Bulan Ini</div>
+                </div>
+            </div>
+            <div class="qs-item">
+                <div class="qs-icon"><i data-lucide="users" class="w-4 h-4"></i></div>
+                <div class="qs-content">
+                    <div class="qs-value" id="qsCekoAktif">0</div>
+                    <div class="qs-label">Ceko Aktif</div>
+                </div>
+            </div>
+            <div class="qs-item">
+                <div class="qs-icon"><i data-lucide="flame" class="w-4 h-4"></i></div>
+                <div class="qs-content">
+                    <div class="qs-value" id="qsTopKategori">—</div>
+                    <div class="qs-label">Kategori Top</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BANNER BELUM LAPOR -->
+        <div id="bannerBelum" class="banner-card">
+            <div class="banner-icon"><i data-lucide="bell" class="w-4 h-4"></i></div>
+            <div class="banner-text" id="bannerText">—</div>
+            <button type="button" class="banner-btn" id="bannerBtn" aria-label="Toggle daftar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+        </div>
+        <div id="bannerList" class="banner-list"></div>
+
+        <!-- RAPORT CARD -->
+        <div id="raportCard" class="raport-card">
+            <div class="raport-head">
+                <div class="raport-title">
+                    <div class="raport-title-icon"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i></div>
+                    <span>Raport Laporan</span>
+                </div>
+                <span class="raport-month" id="raportMonth">—</span>
+            </div>
+            <div class="raport-pills" id="raportPills">
+                <div class="raport-empty">Belum ada laporan bulan ini</div>
+            </div>
+        </div>
+
+        <!-- HISTORY CARD -->
+        <div id="historyCard" class="history-card">
+            <div class="history-head">
+                <div class="history-title">
+                    <i data-lucide="clock" class="w-4 h-4"></i>
+                    <span>Laporan Sebelumnya</span>
+                </div>
+                <div class="history-head-right">
+                    <span class="history-count" id="historyCount">0</span>
+                    <button type="button" class="icon-action-btn expand" id="historyExpandBtn" title="Lihat semua laporan" style="display:none;">
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button type="button" class="icon-action-btn export" id="historyExportBtn" title="Export CSV">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button type="button" class="icon-action-btn bulk" id="historyBulkBtn" title="Hapus selektif">
+                        <i data-lucide="filter" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button type="button" class="icon-action-btn danger" id="historyCleanupBtn" title="Bersihkan semua">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="history-search-wrap">
+                <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                <input type="text" id="historySearch" placeholder="Cari topik, ceko, center..." />
+                <button type="button" id="historySearchClear" class="history-search-clear" title="Hapus">
+                    <i data-lucide="x" class="w-3 h-3"></i>
+                </button>
+            </div>
+            <div id="historyList"></div>
+        </div>
+
+        <!-- FORM -->
+        <form id="laporanForm" class="flex flex-col gap-5">
+
+            <!-- Kategori -->
+            <div class="flex flex-col gap-1.5 relative dropdown-wrap">
+                <label class="text-sm font-semibold text-gray-600 pl-1">Kategori <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <div onclick="toggleDropdown('kategoriDropdown','kategoriArrow')" class="w-full px-4 py-3.5 rounded-xl emboss-input flex justify-between items-center cursor-pointer">
+                        <span id="kategoriText" class="text-gray-500 text-[13.5px]">Pilih Kategori...</span>
+                        <i data-lucide="chevron-down" id="kategoriArrow" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+                    </div>
+                    <div id="kategoriDropdown" class="dropdown-menu absolute z-30 w-full mt-2 rounded-2xl hidden opacity-0 scale-95 flex-col py-1.5">
+                        <div class="dropdown-item" onclick="selectOption('kategoriText','kategoriInput','Masalah YL','kategoriDropdown','kategoriArrow')">Masalah YL</div>
+                        <div class="dropdown-item" onclick="selectOption('kategoriText','kategoriInput','Masalah Center','kategoriDropdown','kategoriArrow')">Masalah Center</div>
+                        <div class="dropdown-item" onclick="selectOption('kategoriText','kategoriInput','Lain-lain','kategoriDropdown','kategoriArrow')">Lain-lain</div>
+                    </div>
+                </div>
+                <input type="text" id="kategoriInput" name="kategori" class="hidden" required>
+            </div>
+
+            <!-- Prioritas -->
+            <div class="flex flex-col gap-1.5 relative dropdown-wrap">
+                <label class="text-sm font-semibold text-gray-600 pl-1">Tingkat Prioritas <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <div onclick="toggleDropdown('prioritasDropdown','prioritasArrow')" class="w-full px-4 py-3.5 rounded-xl emboss-input flex justify-between items-center cursor-pointer">
+                        <span id="prioritasText" class="text-gray-500 text-[13.5px]">Pilih Prioritas...</span>
+                        <i data-lucide="chevron-down" id="prioritasArrow" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+                    </div>
+                    <div id="prioritasDropdown" class="dropdown-menu absolute z-30 w-full mt-2 rounded-2xl hidden opacity-0 scale-95 flex-col py-1.5">
+                        <div class="dropdown-item prio-urgent" onclick="selectOption('prioritasText','prioritasInput','Urgent','prioritasDropdown','prioritasArrow')">
+                            <span class="prio-dot"></span> 🚨 Urgent
+                        </div>
+                        <div class="dropdown-item prio-tinggi" onclick="selectOption('prioritasText','prioritasInput','Tinggi','prioritasDropdown','prioritasArrow')">
+                            <span class="prio-dot"></span> ⚠️ Tinggi
+                        </div>
+                        <div class="dropdown-item prio-sedang" onclick="selectOption('prioritasText','prioritasInput','Sedang','prioritasDropdown','prioritasArrow')">
+                            <span class="prio-dot"></span> 🔸 Sedang
+                        </div>
+                        <div class="dropdown-item prio-rendah" onclick="selectOption('prioritasText','prioritasInput','Rendah','prioritasDropdown','prioritasArrow')">
+                            <span class="prio-dot"></span> ✅ Rendah
+                        </div>
+                    </div>
+                </div>
+                <input type="text" id="prioritasInput" name="prioritas" class="hidden" required>
+            </div>
+
+            <!-- Center -->
+            <div class="flex flex-col gap-1.5 relative dropdown-wrap">
+                <label class="text-sm font-semibold text-gray-600 pl-1">Nama Center <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <div onclick="toggleDropdown('centerDropdown','centerArrow')" class="w-full px-4 py-3.5 rounded-xl emboss-input flex justify-between items-center cursor-pointer">
+                        <span id="centerText" class="text-gray-500 text-[13.5px]">Pilih Center...</span>
+                        <i data-lucide="chevron-down" id="centerArrow" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+                    </div>
+                    <div id="centerDropdown" class="dropdown-menu absolute z-20 w-full mt-2 rounded-2xl hidden opacity-0 scale-95 flex-col py-1.5 max-h-60 overflow-y-auto"></div>
+                </div>
+                <input type="text" id="centerInput" name="namaCenter" class="hidden" required onchange="updateCeko()">
+            </div>
+
+            <!-- Nama Ceko -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-gray-600 pl-1">Nama Ceko <span class="text-red-500">*</span></label>
+                <input type="text" id="namaCeko" name="namaCeko" class="w-full px-4 py-3.5 rounded-xl emboss-input text-gray-500 font-medium" placeholder="Terisi otomatis..." readonly required>
+            </div>
+
+            <!-- Topik -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-gray-600 pl-1">
+                    Topik <span class="text-red-500">*</span>
+                    <span class="text-[10px] font-normal text-gray-400 ml-1">(min 10 kar)</span>
+                </label>
+                <div class="relative">
+                    <input type="text" id="topik" name="topik" data-min="10" class="w-full px-4 py-3.5 rounded-xl emboss-input focus:ring-0 text-[13.5px]" placeholder="Ketik topik laporan..." required>
+                    <span class="char-counter" data-counter="topik"><span class="req-hint">min 10</span></span>
+                </div>
+            </div>
+
+            <!-- Kapan -->
+            <div class="flex flex-col gap-1.5 relative">
+                <label class="text-sm font-semibold text-gray-600 pl-1">Kapan <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <input type="text" id="kapan" name="kapan" class="w-full px-4 py-3.5 rounded-xl emboss-input focus:ring-0 cursor-pointer text-[13.5px]" placeholder="Pilih tanggal..." readonly required>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                        <i data-lucide="calendar" class="w-5 h-5 text-red-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Siapa -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-gray-600 pl-1">
+                    Siapa <span class="text-red-500">*</span>
+                    <span class="text-[10px] font-normal text-gray-400 ml-1">(min 3 kar)</span>
+                </label>
+                <div class="relative">
+                    <input type="text" id="siapa" name="siapa" data-min="3" class="w-full px-4 py-3.5 rounded-xl emboss-input focus:ring-0 text-[13.5px]" placeholder="Siapa yang terlibat..." required>
+                    <span class="char-counter" data-counter="siapa"><span class="req-hint">min 3</span></span>
+                </div>
+            </div>
+
+            <!-- Dimana -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-gray-600 pl-1">
+                    Dimana <span class="text-red-500">*</span>
+                    <span class="text-[10px] font-normal text-gray-400 ml-1">(min 3 kar)</span>
+                </label>
+                <div class="relative">
+                    <input type="text" id="dimana" name="dimana" data-min="3" class="w-full px-4 py-3.5 rounded-xl emboss-input focus:ring-0 text-[13.5px]" placeholder="Lokasi kejadian..." required>
+                    <span class="char-counter" data-counter="dimana"><span class="req-hint">min 3</span></span>
+                </div>
+            </div>
+
+            <!-- Mengapa -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-gray-600 pl-1">
+                    Mengapa <span class="text-red-500">*</span>
+                    <span class="text-[10px] font-normal text-gray-400 ml-1">(min 50 kar + angka)</span>
+                </label>
+                <div class="relative">
+                    <textarea id="mengapa" name="mengapa" rows="3" data-min="50" data-require-number="true" class="w-full px-4 py-3.5 pb-8 rounded-xl emboss-input focus:ring-0 resize-none text-[13.5px]" placeholder="Jelaskan alasannya..." required></textarea>
+                    <button type="button" class="voice-btn" data-voice-for="mengapa" title="Rekam suara"><i data-lucide="mic" class="w-4 h-4"></i></button>
+                    <span class="char-counter" data-counter="mengapa"><span class="req-hint">min 50 + angka</span></span>
+                </div>
+            </div>
+
+            <!-- Tindakan -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-gray-600 pl-1">
+                    Tindakan <span class="text-red-500">*</span>
+                    <span class="text-[10px] font-normal text-gray-400 ml-1">(min 50 kar + angka)</span>
+                </label>
+                <div class="relative">
+                    <textarea id="tindakan" name="tindakan" rows="3" data-min="50" data-require-number="true" class="w-full px-4 py-3.5 pb-8 rounded-xl emboss-input focus:ring-0 resize-none text-[13.5px]" placeholder="Tindakan yang diambil..." required></textarea>
+                    <button type="button" class="voice-btn" data-voice-for="tindakan" title="Rekam suara"><i data-lucide="mic" class="w-4 h-4"></i></button>
+                    <span class="char-counter" data-counter="tindakan"><span class="req-hint">min 50 + angka</span></span>
+                </div>
+            </div>
+
+            <!-- Hasil -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-semibold text-gray-600 pl-1">
+                    Hasil <span class="text-red-500">*</span>
+                    <span class="text-[10px] font-normal text-gray-400 ml-1">(min 50 kar + angka)</span>
+                </label>
+                <div class="relative">
+                    <textarea id="hasil" name="hasil" rows="3" data-min="50" data-require-number="true" class="w-full px-4 py-3.5 pb-8 rounded-xl emboss-input focus:ring-0 resize-none text-[13.5px]" placeholder="Hasil dari tindakan..." required></textarea>
+                    <button type="button" class="voice-btn" data-voice-for="hasil" title="Rekam suara"><i data-lucide="mic" class="w-4 h-4"></i></button>
+                    <span class="char-counter" data-counter="hasil"><span class="req-hint">min 50 + angka</span></span>
+                </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="flex gap-3 mt-6 pt-4">
+                <button type="button" id="btnReset" class="btn-3d flex-shrink-0 w-14 bg-white border border-red-200 text-red-600 font-semibold py-4 rounded-xl flex justify-center items-center hover:bg-pink-50" title="Reset form">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                </button>
+                <button type="button" id="btnSalin" class="btn-3d btn-wa flex-1 bg-white border border-emerald-200 text-emerald-600 font-semibold py-4 rounded-xl flex justify-center items-center gap-2 hover:bg-emerald-50">
+                    <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    <span>WhatsApp</span>
+                </button>
+                <button type="submit" id="btnSubmit" class="btn-3d flex-1 bg-gradient-to-r from-red-600 to-pink-500 text-white font-bold py-4 rounded-xl flex justify-center items-center gap-2 hover:from-red-700 hover:to-pink-600 disabled:opacity-60">
+                    <i data-lucide="send" class="w-5 h-5"></i> <span id="submitText">Submit</span>
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- ============================================================
+         FLOATING ELEMENTS
+         ============================================================ -->
+    <div id="draftIndicator">
+        <i data-lucide="cloud-check" class="w-3.5 h-3.5"></i>
+        <span id="draftIndicatorText">✓ Draft tersimpan</span>
+    </div>
+
+    <div id="dateBackdrop"></div>
+
+    <div id="progressOverlay">
+        <div class="progress-box">
+            <div class="prog-title" id="progTitle">Mengirim Data...</div>
+            <div class="prog-sub" id="progSub">Mohon tunggu sebentar</div>
+            <div class="progress-bar-bg"><div id="progressFill" class="progress-bar-fill"></div></div>
+            <div class="prog-pct" id="progPct">0%</div>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <!-- ============================================================
+         MODALS
+         ============================================================ -->
+
+    <!-- PREVIEW MODAL -->
+    <div id="previewModal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <div class="modal-head">
+                <div class="modal-title">
+                    <i data-lucide="eye" class="w-4 h-4 text-red-500"></i> Cek Sebelum Kirim
+                </div>
+                <div class="modal-sub">Pastikan data di bawah sudah benar.</div>
+            </div>
+            <div id="previewBody" class="modal-body"></div>
+            <div class="modal-foot">
+                <button type="button" id="previewCancel" class="btn-modal-cancel">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Cek Lagi
+                </button>
+                <button type="button" id="previewConfirm" class="btn-modal-primary">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i> Kirim
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div id="successModal" class="modal-backdrop hidden">
+        <div class="modal-content" style="max-width: 360px;">
+            <div class="modal-body" style="text-align: center; padding: 28px 20px 20px;">
+                <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #d1fae5, #a7f3d0); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; border: 4px solid #fff; box-shadow: 0 8px 20px rgba(16,185,129,.3);">
+                    <i data-lucide="check-circle" class="w-9 h-9 text-emerald-500"></i>
+                </div>
+                <h3 class="font-heading style="font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">Terkirim!</h3>
+                <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px;">Laporan berhasil disimpan ke Google Spreadsheet & Cloud.</p>
+            </div>
+            <div class="modal-foot">
+                <button onclick="closeModal('successModal')" class="btn-modal-primary" style="background: linear-gradient(135deg, #1e293b, #334155);">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- URGENT MODAL -->
+    <div id="urgentModal" class="modal-backdrop hidden">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-head" style="background: linear-gradient(135deg, #fee2e2, #fecaca); border-bottom-color: rgba(220,38,38,.3);">
+                <div class="modal-title" style="color: #991b1b;">
+                    <i data-lucide="bell-ring" class="w-4 h-4 animate-pulse"></i> Laporan Urgent
+                </div>
+                <div class="modal-sub" style="color: #b91c1c;">Perlu keputusan segera. Tap untuk lihat detail.</div>
+            </div>
+            <div id="urgentBody" class="modal-body"></div>
+            <div class="modal-foot">
+                <button type="button" onclick="closeModal('urgentModal')" class="btn-modal-primary" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLEANUP MODAL -->
+    <div id="cleanupModal" class="modal-backdrop hidden">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-body" style="padding: 24px 22px;">
+                <div class="cleanup-icon-wrap"><i data-lucide="trash-2" class="w-7 h-7"></i></div>
+                <div class="cleanup-title">Hapus Semua History?</div>
+                <div class="cleanup-desc">Masukkan password untuk konfirmasi.<br>Tindakan ini tidak bisa dibatalkan.</div>
+                <div class="cleanup-warning">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+                    <div>Semua history laporan akan dihapus permanen dari cloud & perangkat. Data di Google Sheets tetap aman.</div>
+                </div>
+                <input type="password" id="cleanupPwd" class="cleanup-pwd" placeholder="Masukkan password..." autocomplete="off" inputmode="text">
+            </div>
+            <div class="modal-foot">
+                <button type="button" id="cleanupCancel" class="btn-modal-cancel">Batal</button>
+                <button type="button" id="cleanupDelete" class="btn-modal-primary" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BULK MODAL -->
+    <div id="bulkModal" class="modal-backdrop hidden">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-head">
+                <div class="modal-title">
+                    <i data-lucide="filter" class="w-4 h-4 text-blue-500"></i> Hapus History Selektif
+                </div>
+                <div class="modal-sub">Pilih filter, lalu preview jumlah yang akan dihapus.</div>
+            </div>
+            <div class="modal-body">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Filter Hapus</label>
+                <select id="bulkFilterType" class="bulk-select">
+                    <option value="before-date">Laporan sebelum tanggal</option>
+                    <option value="after-date">Laporan setelah tanggal</option>
+                    <option value="by-ceko">Berdasarkan nama ceko</option>
+                    <option value="by-center">Berdasarkan center</option>
+                    <option value="by-kategori">Berdasarkan kategori</option>
+                    <option value="by-prioritas">Berdasarkan prioritas</option>
+                </select>
+                <div id="bulkDateWrap">
+                    <input type="date" id="bulkDateInput" class="bulk-input">
+                </div>
+                <div id="bulkSelectWrap" style="display: none;">
+                    <select id="bulkSelectInput" class="bulk-select"></select>
+                </div>
+                <button type="button" id="bulkPreviewBtn" class="bulk-preview-btn">
+                    <i data-lucide="search" class="w-3.5 h-3.5"></i> Preview
+                </button>
+                <div id="bulkPreviewResult" class="bulk-preview-result">
+                    <div class="bp-count" id="bulkCount">0</div>
+                    <div class="bp-label">laporan akan dihapus</div>
+                    <div id="bulkList" class="bp-list"></div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button type="button" id="bulkCancel" class="btn-modal-cancel">Batal</button>
+                <button type="button" id="bulkDelete" class="btn-modal-primary" disabled style="background: linear-gradient(135deg, #ef4444, #dc2626); opacity:.5;">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         SCRIPT
+         ============================================================ -->
+    <script>
+        // ============================================================
+        // CONFIG
+        // ============================================================
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyDzvdqupOV2DIq_i3-drHrM2epgz1phYJQ",
+          authDomain: "laporan-mingguan-ceko.firebaseapp.com",
+          databaseURL: "https://laporan-mingguan-ceko-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "laporan-mingguan-ceko",
+          storageBucket: "laporan-mingguan-ceko.firebasestorage.app",
+          messagingSenderId: "363183156279",
+          appId: "1:363183156279:web:b833ee4fa406fc0c20e3b2",
+          measurementId: "G-8FKWYTG7RT"
+        };
+        const CLEANUP_PASSWORD = 'Yakult2027';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyhIUgjVPzjolCeR4YKwCQdJ_CKdRPFr9Cvs9KhMfz3dkdB8GpQu3GTOu5n646QSgrxkQ/exec';
+        const COLLECTION_PATH = 'laporan_ceko'; // ⚠️ sesuaikan dengan nama collection Firestore-mu
+
+        const BULAN_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        const BULAN_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+        const pasanganCenterCeko = {
+            "PANYILEUKAN": "Ayu Eriza",
+            "ARCAMANIK": "Syarin Inka Pratiwi",
+            "UJUNG BERUNG": "Devi Sulistiawati",
+            "KIARA CONDONG": "Ditta Hasna Febriany",
+            "ANTAPANI": "Sari Hayu Damayanti",
+            "GEDE BAGE": "Hilda Kholida",
+            "MARGAHAYU": "Siti Syarifah",
+            "BOJONG SOANG": "Meirina",
+            "BUAH BATU": "Sri Sulistiawati"
+        };
+        const CEKO_LIST = Object.values(pasanganCenterCeko);
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        let db = null;
+        let currentUser = null;
+        let firebaseStatus = 'init';
+        let state = { history: [] };
+        let isSubmitting = false;
+        let pendingSubmitData = null;
+        let bulkMatched = [];
+        let draftIndicatorTimer = null;
+        let bannerExpanded = false;
+        let historyExpanded = false;
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function icons() {
+            try {
+                lucide.createIcons({
+                    attrs: {
+                        'stroke-width': 1.75,
+                        'stroke-linecap': 'round',
+                        'stroke-linejoin': 'round'
+                    }
+                });
+            } catch(e){}
+        }
+        icons();
+
+        function haptic(ms) {
+            try { if (navigator.vibrate) navigator.vibrate(ms || 10); } catch(e){}
+        }
+
+        function escapeHtml(s) {
+            return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        }
+
+        function isInIframe() {
+            try { return window.self !== window.top; } catch(e) { return true; }
+        }
+
+        function fmtBulan(d) {
+            return `${BULAN_SHORT[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`;
+        }
+
+        // ============================================================
+        // WEEK RANGE (Senin - Sabtu)
+        // ============================================================
+        function getWeekRange() {
+            const now = new Date();
+            const dayOfWeek = now.getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
+
+            const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
+            const monday = new Date(now);
+            monday.setDate(now.getDate() + diffToMonday);
+
+            const saturday = new Date(monday);
+            saturday.setDate(monday.getDate() + 5);
+
+            const yyyyM = monday.getFullYear();
+            const mmM = String(monday.getMonth() + 1).padStart(2, '0');
+            const ddM = String(monday.getDate()).padStart(2, '0');
+
+            const yyyyS = saturday.getFullYear();
+            const mmS = String(saturday.getMonth() + 1).padStart(2, '0');
+            const ddS = String(saturday.getDate()).padStart(2, '0');
+
+            const label = `${monday.getDate()} ${BULAN_SHORT[monday.getMonth()]} sd ${saturday.getDate()} ${BULAN_SHORT[saturday.getMonth()]}`;
+
+            return {
+                startStr: `${yyyyM}-${mmM}-${ddM}`,
+                endStr: `${yyyyS}-${mmS}-${ddS}`,
+                label: label
+            };
+        }
+
+        // ============================================================
+        // DATE PARSING
+        // ============================================================
+        function parseKapanDate(kapanStr) {
+            if (!kapanStr) return null;
+            const m = kapanStr.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})$/);
+            if (!m) {
+                const d = new Date(kapanStr);
+                return isNaN(d.getTime()) ? null : d;
+            }
+            const monthIdx = BULAN_ID.findIndex(b => b.toLowerCase() === m[2].toLowerCase());
+            if (monthIdx === -1) return null;
+            return new Date(parseInt(m[3]), monthIdx, parseInt(m[1]));
+        }
+
+        function getItemMonth(h) {
+            const d = parseKapanDate(h.kapan || '');
+            if (d) return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+            const at = h.at;
+            if (at) {
+                const dd = new Date(typeof at === 'number' ? at : at);
+                if (!isNaN(dd.getTime())) return `${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}`;
+            }
+            return '';
+        }
+
+        function getItemDateISO(h) {
+            const d = parseKapanDate(h.kapan || '');
+            if (d) return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            const at = h.at;
+            if (at) {
+                const dd = new Date(typeof at === 'number' ? at : at);
+                if (!isNaN(dd.getTime())) return `${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}-${String(dd.getDate()).padStart(2,'0')}`;
+            }
+            return '';
+        }
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(msg, type, duration) {
+            const container = document.getElementById('toastContainer');
+            const iconsMap = { success: 'check-circle', error: 'x-circle', warn: 'alert-triangle', info: 'info' };
+            const el = document.createElement('div');
+            el.className = 'toast-item ' + (type || 'info');
+            el.innerHTML = `<i data-lucide="${iconsMap[type] || 'info'}" class="w-4 h-4 flex-shrink-0"></i><span>${escapeHtml(msg)}</span>`;
+            container.appendChild(el);
+            icons();
+            requestAnimationFrame(() => el.classList.add('show'));
+            setTimeout(() => {
+                el.classList.remove('show');
+                setTimeout(() => el.remove(), 350);
+            }, duration || 2800);
+        }
+
+        // ============================================================
+        // THEME
+        // ============================================================
+        function initTheme() {
+            let saved = 'light';
+            try { saved = localStorage.getItem('laporan_ceko_theme') || 'light'; } catch(e){}
+            if (saved === 'dark') document.documentElement.setAttribute('data-theme','dark');
+            updateThemeIcon();
+        }
+
+        function toggleTheme() {
+            haptic(15);
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) document.documentElement.removeAttribute('data-theme');
+            else document.documentElement.setAttribute('data-theme','dark');
+            try { localStorage.setItem('laporan_ceko_theme', isDark ? 'light' : 'dark'); } catch(e){}
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+                icons();
+            }
+        }
+
+        function updateCloudBadge(status, text) {
+            const badge = document.getElementById('cloudStatusBadge');
+            if (!badge) return;
+            badge.className = 'cloud-status ' + status;
+            badge.setAttribute('title', text || '');
+        }
+
+        // ============================================================
+        // FIREBASE INIT
+        // ============================================================
+        try {
+            if (typeof firebase !== 'undefined' && !firebaseConfig.apiKey.startsWith('GANTI')) {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                updateCloudBadge('', 'Menghubungkan...');
+                firebase.auth().signInAnonymously()
+                    .then(u => {
+                        currentUser = u.user;
+                        firebaseStatus = 'online';
+                        updateCloudBadge('online', 'Cloud Aktif');
+                        startListener();
+                        syncLocalToCloud();
+                    })
+                    .catch(err => {
+                        console.warn('Auth gagal:', err);
+                        firebaseStatus = 'offline';
+                        updateCloudBadge('offline', 'Mode Lokal');
+                        loadLocal();
+                    });
+            } else {
+                firebaseStatus = 'offline';
+                updateCloudBadge('offline', 'Mode Lokal (config belum diisi)');
+                loadLocal();
+            }
+        } catch(e) {
+            firebaseStatus = 'offline';
+            updateCloudBadge('offline', 'Mode Lokal');
+            loadLocal();
+        }
+
+        function loadLocal() {
+            try { state.history = JSON.parse(localStorage.getItem('laporan_ceko_history') || '[]'); }
+            catch(e) { state.history = []; }
+            renderAll();
+        }
+
+        function startListener() {
+            if (!db || !currentUser) return;
+            db.collection(COLLECTION_PATH).onSnapshot(snap => {
+                const list = [];
+                snap.forEach(doc => list.push({ _id: doc.id, ...doc.data() }));
+                state.history = list;
+                try { localStorage.setItem('laporan_ceko_history', JSON.stringify(list)); } catch(e){}
+                renderAll();
+            }, err => {
+                console.warn('Listener error:', err);
+                loadLocal();
+            });
+        }
+
+        function syncLocalToCloud() {
+            if (!db || !currentUser) return;
+            try {
+                const local = JSON.parse(localStorage.getItem('laporan_ceko_history') || '[]');
+                if (!local.length) return;
+                local.forEach(item => {
+                    if (!item._localKey) return;
+                    db.collection(COLLECTION_PATH).where('_localKey','==',item._localKey).get()
+                        .then(snap => {
+                            if (snap.empty) {
+                                db.collection(COLLECTION_PATH).add({
+                                    ...item,
+                                    createdAtServer: firebase.firestore.FieldValue.serverTimestamp()
+                                }).catch(()=>{});
+                            }
+                        }).catch(()=>{});
+                });
+            } catch(e){}
+        }
+
+        // ============================================================
+        // DROPDOWN
+        // ============================================================
+        function toggleDropdown(menuId, arrowId) {
+            haptic(8);
+            const menu = document.getElementById(menuId);
+            const arrow = document.getElementById(arrowId);
+            const isHidden = menu.classList.contains('hidden');
+
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                m.classList.add('hidden','opacity-0','scale-95');
+                m.classList.remove('opacity-100','scale-100');
+            });
+            document.querySelectorAll('[id$="Arrow"]').forEach(a => a.classList.remove('rotate-180'));
+
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                setTimeout(() => {
+                    menu.classList.remove('opacity-0','scale-95');
+                    menu.classList.add('opacity-100','scale-100');
+                    arrow.classList.add('rotate-180');
+                }, 10);
+            }
+        }
+
+        function closeDropdown(menuId, arrowId) {
+            const menu = document.getElementById(menuId);
+            const arrow = document.getElementById(arrowId);
+            if (!menu || !arrow) return;
+            menu.classList.add('opacity-0','scale-95');
+            menu.classList.remove('opacity-100','scale-100');
+            arrow.classList.remove('rotate-180');
+            setTimeout(() => menu.classList.add('hidden'), 200);
+        }
+
+        function selectOption(textId, inputId, value, menuId, arrowId, isCenter) {
+            haptic(10);
+            const txt = document.getElementById(textId);
+            const inp = document.getElementById(inputId);
+            txt.textContent = value;
+            txt.classList.remove('text-gray-500');
+            txt.classList.add('text-gray-800','font-semibold');
+            inp.value = value;
+            closeDropdown(menuId, arrowId);
+            if (isCenter) updateCeko();
+            saveDraft(true);
+            markFieldValid(inp);
+        }
+
+        function updateCeko() {
+            const center = document.getElementById('centerInput').value;
+            const ceko = document.getElementById('namaCeko');
+            if (pasanganCenterCeko[center]) {
+                ceko.value = pasanganCenterCeko[center];
+                ceko.classList.remove('text-gray-500');
+                ceko.classList.add('text-gray-800');
+                markFieldValid(ceko);
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown-wrap')) {
+                closeDropdown('kategoriDropdown','kategoriArrow');
+                closeDropdown('prioritasDropdown','prioritasArrow');
+                closeDropdown('centerDropdown','centerArrow');
+            }
+        });
+
+        function markFieldValid(el) {
+            if (!el) return;
+            el.classList.remove('field-invalid');
+            el.classList.add('field-valid');
+        }
+
+        const centerMenu = document.getElementById('centerDropdown');
+        Object.keys(pasanganCenterCeko).forEach(center => {
+            const d = document.createElement('div');
+            d.className = 'dropdown-item';
+            d.textContent = center;
+            d.onclick = () => selectOption('centerText','centerInput', center, 'centerDropdown','centerArrow', true);
+            centerMenu.appendChild(d);
+        });
+
+        // ============================================================
+        // FLATPICKR
+        // ============================================================
+        const dateBackdrop = document.getElementById('dateBackdrop');
+        const fpKapan = flatpickr("#kapan", {
+            dateFormat: "d F Y",
+            locale: "id",
+            disableMobile: true,
+            defaultDate: "today",
+            onOpen: () => { haptic(8); dateBackdrop.classList.add('show'); },
+            onClose: () => dateBackdrop.classList.remove('show'),
+            onChange: () => { markFieldValid(document.getElementById('kapan')); saveDraft(true); }
+        });
+        dateBackdrop.addEventListener('click', () => fpKapan.close());
+
+        // ============================================================
+        // LIVE VALIDATION
+        // ============================================================
+        function checkFieldValidity(el) {
+            const val = (el.value || '').trim();
+            const min = parseInt(el.dataset.min || 0);
+            const reqNum = el.dataset.requireNumber === 'true';
+            if (!val) return { valid: false, reason: 'empty', msg: 'wajib diisi' };
+            if (min && val.length < min) return { valid: false, reason: 'short', msg: `minimal ${min} karakter` };
+            if (reqNum && !/\d/.test(val)) return { valid: false, reason: 'nonum', msg: 'harus mengandung angka' };
+            if (reqNum && !/[a-zA-Z]/.test(val)) return { valid: false, reason: 'nolet', msg: 'harus mengandung huruf' };
+            return { valid: true };
+        }
+
+        function attachLiveValidation(el) {
+            const counter = document.querySelector(`.char-counter[data-counter="${el.id}"]`);
+            const min = parseInt(el.dataset.min || 0);
+            const reqNum = el.dataset.requireNumber === 'true';
+            let touched = false;
+
+            function update() {
+                const val = (el.value || '').trim();
+                const len = val.length;
+                el.classList.remove('field-invalid','field-valid');
+                if (counter && min > 0) {
+                    let hint = `${min}+`;
+                    if (reqNum) hint = `${min}+ angka`;
+                    counter.innerHTML = `${len}/${min} <span class="req-hint">${hint}</span>`;
+                    counter.classList.remove('warn','danger','valid');
+                }
+                if (!val) {
+                    if (touched) el.classList.add('field-invalid');
+                    return;
+                }
+                const r = checkFieldValidity(el);
+                if (r.valid) {
+                    el.classList.add('field-valid');
+                    if (counter) counter.classList.add('valid');
+                } else {
+                    el.classList.add('field-invalid');
+                    if (counter) {
+                        if (r.reason === 'nonum' || r.reason === 'nolet') counter.classList.add('danger');
+                        else counter.classList.add('warn');
+                    }
+                }
+            }
+            el.addEventListener('input', update);
+            el.addEventListener('blur', () => { touched = true; update(); });
+            update();
+        }
+
+        document.querySelectorAll('input[data-min], textarea[data-min]').forEach(attachLiveValidation);
+
+        // ============================================================
+        // VOICE INPUT
+        // ============================================================
+        function attachVoice() {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR || isInIframe()) {
+                document.querySelectorAll('.voice-btn').forEach(b => b.style.display = 'none');
+                return;
+            }
+            document.querySelectorAll('.voice-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = document.getElementById(btn.dataset.voiceFor);
+                    if (!target) return;
+                    if (btn.classList.contains('recording')) {
+                        if (window._rec) { try { window._rec.stop(); } catch(e){} }
+                        btn.classList.remove('recording');
+                        return;
+                    }
+                    document.querySelectorAll('.voice-btn.recording').forEach(b => b.classList.remove('recording'));
+                    if (window._rec) { try { window._rec.stop(); } catch(e){} }
+
+                    const rec = new SR();
+                    rec.lang = 'id-ID';
+                    rec.continuous = true;
+                    rec.interimResults = false;
+                    window._rec = rec;
+                    let buffer = '';
+
+                    rec.onresult = (e) => {
+                        for (let i = e.resultIndex; i < e.results.length; i++) {
+                            if (e.results[i].isFinal) buffer += e.results[i][0].transcript;
+                        }
+                        if (buffer) {
+                            const ex = target.value.trim();
+                            target.value = ex ? ex + ' ' + buffer.trim() : buffer.trim();
+                            target.dispatchEvent(new Event('input', { bubbles: true }));
+                            buffer = '';
+                        }
+                    };
+                    rec.onerror = (e) => {
+                        btn.classList.remove('recording');
+                        let msg = 'Gagal rekam suara';
+                        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+                            msg = isInIframe() ? 'Mic diblokir di preview. Buka di tab baru.' : 'Izinkan akses mikrofon';
+                        } else if (e.error === 'no-speech') msg = 'Tidak ada suara terdeteksi';
+                        if (e.error !== 'aborted') showToast(msg, 'error', 3500);
+                    };
+                    rec.onend = () => {
+                        btn.classList.remove('recording');
+                        window._rec = null;
+                    };
+                    try {
+                        rec.start();
+                        btn.classList.add('recording');
+                        haptic(20);
+                        showToast('🎤 Mendengarkan... bicara sekarang', 'info', 2200);
+                    } catch(err) {
+                        btn.classList.remove('recording');
+                    }
+                });
+            });
+        }
+        attachVoice();
+
+        // ============================================================
+        // DRAFT
+        // ============================================================
+        const DRAFT_KEY = 'laporan_ceko_draft';
+
+        function showDraftIndicator(text) {
+            const el = document.getElementById('draftIndicator');
+            const txt = document.getElementById('draftIndicatorText');
+            if (!el || !txt) return;
+            txt.textContent = text;
+            el.classList.add('show');
+            clearTimeout(draftIndicatorTimer);
+            draftIndicatorTimer = setTimeout(() => el.classList.remove('show'), 2000);
+        }
+
+        function collectForm() {
+            return {
+                kategori: document.getElementById('kategoriInput').value,
+                prioritas: document.getElementById('prioritasInput').value,
+                namaCenter: document.getElementById('centerInput').value,
+                namaCeko: document.getElementById('namaCeko').value,
+                topik: document.getElementById('topik').value,
+                kapan: document.getElementById('kapan').value,
+                siapa: document.getElementById('siapa').value,
+                dimana: document.getElementById('dimana').value,
+                mengapa: document.getElementById('mengapa').value,
+                tindakan: document.getElementById('tindakan').value,
+                hasil: document.getElementById('hasil').value
+            };
+        }
+
+        function saveDraft(showIndicator) {
+            try {
+                const data = collectForm();
+                const isEmpty = Object.values(data).every(v => !v);
+                if (isEmpty) {
+                    localStorage.removeItem(DRAFT_KEY);
+                    return;
+                }
+                localStorage.setItem(DRAFT_KEY, JSON.stringify({ data, savedAt: new Date().toISOString() }));
+                if (showIndicator) showDraftIndicator('✓ Draft tersimpan');
+            } catch(e){}
+        }
+
+        function loadDraft() {
+            try {
+                const raw = localStorage.getItem(DRAFT_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (!parsed?.data) return;
+                const hasContent = Object.values(parsed.data).some(v => v);
+                if (!hasContent) return;
+
+                const savedAt = parsed.savedAt ? new Date(parsed.savedAt).toLocaleString('id-ID') : '?';
+                if (!confirm(`Ada draft laporan yang belum dikirim (${savedAt}).\n\nLanjutkan mengisi?`)) {
+                    localStorage.removeItem(DRAFT_KEY);
+                    return;
+                }
+
+                ['topik','siapa','dimana','mengapa','tindakan','hasil'].forEach(k => {
+                    const el = document.getElementById(k);
+                    if (el && parsed.data[k] !== undefined) {
+                        el.value = parsed.data[k];
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                });
+                if (parsed.data.kategori) selectOption('kategoriText','kategoriInput', parsed.data.kategori, 'kategoriDropdown','kategoriArrow');
+                if (parsed.data.prioritas) selectOption('prioritasText','prioritasInput', parsed.data.prioritas, 'prioritasDropdown','prioritasArrow');
+                if (parsed.data.namaCenter) selectOption('centerText','centerInput', parsed.data.namaCenter, 'centerDropdown','centerArrow', true);
+                if (parsed.data.kapan) { try { fpKapan.setDate(parsed.data.kapan, false); } catch(e){} }
+                showToast('Draft dipulihkan ✓', 'info', 2400);
+            } catch(e){}
+        }
+
+        ['topik','siapa','dimana','mengapa','tindakan','hasil'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', () => saveDraft(true));
+        });
+        setInterval(() => saveDraft(false), 30000);
+
+        // ============================================================
+        // VALIDATION
+        // ============================================================
+        function validateAll(silent) {
+            const checks = [
+                { el: document.getElementById('kategoriInput'), label: 'Kategori', msg: 'wajib dipilih' },
+                { el: document.getElementById('prioritasInput'), label: 'Prioritas', msg: 'wajib dipilih' },
+                { el: document.getElementById('centerInput'), label: 'Nama Center', msg: 'wajib dipilih' },
+                { el: document.getElementById('namaCeko'), label: 'Nama Ceko', msg: 'wajib diisi' },
+                { el: document.getElementById('kapan'), label: 'Kapan', msg: 'wajib diisi' }
+            ];
+            for (const c of checks) {
+                if (!c.el.value.trim()) {
+                    if (!silent) {
+                        c.el.classList.add('field-invalid');
+                        c.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        showToast(`"${c.label}" ${c.msg}`, 'error', 3200);
+                        haptic(80);
+                    }
+                    return false;
+                }
+            }
+            const fields = document.querySelectorAll('input[data-min], textarea[data-min]');
+            for (const f of fields) {
+                const r = checkFieldValidity(f);
+                if (!r.valid) {
+                    if (!silent) {
+                        f.classList.add('field-invalid');
+                        f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        const labelMap = { topik:'Topik', siapa:'Siapa', dimana:'Dimana', mengapa:'Mengapa', tindakan:'Tindakan', hasil:'Hasil' };
+                        showToast(`"${labelMap[f.id] || f.id}" ${r.msg}`, 'error', 3600);
+                        haptic(80);
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // ============================================================
+        // PREVIEW
+        // ============================================================
+        function getPrioTag(prio) {
+            if (!prio) return '';
+            const cls = prio.toLowerCase();
+            const emoji = { 'urgent': '🚨', 'tinggi': '⚠️', 'sedang': '🔸', 'rendah': '✅' }[cls] || '';
+            return `<span class="prio-tag ${cls}">${emoji} ${escapeHtml(prio)}</span>`;
+        }
+
+        function showPreview(data) {
+            const body = document.getElementById('previewBody');
+            body.innerHTML = `
+                <div class="preview-row"><span class="pr-label">Kategori</span><span class="pr-value">${escapeHtml(data.kategori)}</span></div>
+                <div class="preview-row"><span class="pr-label">Prioritas</span><span class="pr-value">${getPrioTag(data.prioritas)}</span></div>
+                <div class="preview-row"><span class="pr-label">Kapan</span><span class="pr-value">${escapeHtml(data.kapan)}</span></div>
+                <div class="preview-row"><span class="pr-label">Center</span><span class="pr-value">${escapeHtml(data.namaCenter)}</span></div>
+                <div class="preview-row"><span class="pr-label">Ceko</span><span class="pr-value">${escapeHtml(data.namaCeko)}</span></div>
+                <div class="preview-row"><span class="pr-label">Topik</span><span class="pr-value">${escapeHtml(data.topik)}</span></div>
+                <div class="preview-section"><div class="ps-label">Siapa</div><div class="ps-content">${escapeHtml(data.siapa)}</div></div>
+                <div class="preview-section"><div class="ps-label">Dimana</div><div class="ps-content">${escapeHtml(data.dimana)}</div></div>
+                <div class="preview-section"><div class="ps-label">Mengapa</div><div class="ps-content">${escapeHtml(data.mengapa)}</div></div>
+                <div class="preview-section"><div class="ps-label">Tindakan</div><div class="ps-content">${escapeHtml(data.tindakan)}</div></div>
+                <div class="preview-section"><div class="ps-label">Hasil</div><div class="ps-content">${escapeHtml(data.hasil)}</div></div>
+            `;
+            pendingSubmitData = data;
+            openModal('previewModal');
+        }
+
+        // ============================================================
+        // MODAL
+        // ============================================================
+        function openModal(id, focusTarget) {
+            const m = document.getElementById(id);
+            const body = m.querySelector('.modal-body');
+
+            // ✅ Reset scroll tiap kali modal dibuka
+            if (body) body.scrollTop = 0;
+
+            m.classList.remove('hidden');
+            m.classList.remove('show');
+            requestAnimationFrame(() => {
+                m.classList.add('show');
+
+                if (focusTarget) {
+                    setTimeout(() => {
+                        const el = typeof focusTarget === 'string'
+                            ? document.getElementById(focusTarget)
+                            : focusTarget;
+                        if (!el) return;
+                        try {
+                            el.focus({ preventScroll: true });       // ✅ jangan auto scroll page
+                            if (typeof el.setSelectionRange === 'function' && el.value !== undefined) {
+                                const len = (el.value || '').length;
+                                el.setSelectionRange(len, len);
+                            }
+                            // ✅ scroll ke elemen DI DALAM modal body saja
+                            if (body && body.contains(el)) {
+                                const offset = el.offsetTop - 20;
+                                body.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
+                            }
+                        } catch(e){}
+                    }, 320);
+                }
+            });
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            m.classList.remove('show');
+            setTimeout(() => {
+                m.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 250);
+        }
+
+        document.getElementById('previewCancel').addEventListener('click', () => {
+            haptic(10);
+            closeModal('previewModal');
+            pendingSubmitData = null;
+        });
+        document.getElementById('previewConfirm').addEventListener('click', async () => {
+            haptic(20);
+            closeModal('previewModal');
+            if (pendingSubmitData) {
+                await doSubmit(pendingSubmitData);
+                pendingSubmitData = null;
+            }
+        });
+
+        // ============================================================
+        // PROGRESS
+        // ============================================================
+        function showProgress(pct, title, sub) {
+            const ov = document.getElementById('progressOverlay');
+            const fill = document.getElementById('progressFill');
+            const pctEl = document.getElementById('progPct');
+            const titleEl = document.getElementById('progTitle');
+            const subEl = document.getElementById('progSub');
+            if (pct > 0) ov.classList.add('show');
+            fill.style.width = Math.min(pct, 100) + '%';
+            pctEl.textContent = Math.round(Math.min(pct, 100)) + '%';
+            if (title) titleEl.textContent = title;
+            if (sub) subEl.textContent = sub;
+            if (pct <= 0) setTimeout(() => ov.classList.remove('show'), 250);
+        }
+
+        // ============================================================
+        // SUBMIT
+        // ============================================================
+        async function doSubmit(data) {
+            if (isSubmitting) return;
+            isSubmitting = true;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const btn = document.getElementById('btnSubmit');
+            const txt = document.getElementById('submitText');
+            const original = txt.textContent;
+            btn.disabled = true;
+            txt.textContent = 'Mengirim...';
+
+            let pct = 8;
+            showProgress(8, 'Menyiapkan data...', 'Mengumpulkan field');
+            const interval = setInterval(() => {
+                pct = Math.min(pct + Math.random() * 12 + 4, 92);
+                if (pct < 40) showProgress(pct, 'Menyiapkan data...', 'Mengumpulkan field');
+                else if (pct < 70) showProgress(pct, 'Mengirim...', 'Menghubungi server...');
+                else showProgress(pct, 'Antosan Geulis', 'Sing sabar yaa...-Sing Gede Milik Nya')
+            }, 220);
+
+            try {
+                const formEl = document.getElementById('laporanForm');
+                await fetch(GAS_URL, { method: 'POST', body: new FormData(formEl) });
+
+                clearInterval(interval);
+                showProgress(100, 'Selesai!', 'Data terkirim');
+                await new Promise(r => setTimeout(r, 500));
+                showProgress(0);
+
+                saveToHistory(data);
+                localStorage.removeItem(DRAFT_KEY);
+                haptic(50);
+                openModal('successModal');
+
+                setTimeout(() => { resetForm(); }, 3200);
+            } catch (err) {
+                clearInterval(interval);
+                showProgress(0);
+                console.error(err);
+                showToast('Gagal mengirim. Coba lagi.', 'error', 3400);
+                haptic(80);
+            } finally {
+                btn.disabled = false;
+                txt.textContent = original;
+                isSubmitting = false;
+            }
+        }
+
+        document.getElementById('laporanForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (isSubmitting) {
+                showToast('Sedang mengirim, tunggu sebentar...', 'warn', 2200);
+                return;
+            }
+            haptic(15);
+            if (!validateAll(false)) return;
+            const data = collectForm();
+            showPreview(data);
+        });
+
+        // ============================================================
+        // RESET
+        // ============================================================
+        function resetForm() {
+            document.getElementById('laporanForm').reset();
+            document.querySelectorAll('.field-invalid,.field-valid').forEach(el => el.classList.remove('field-invalid','field-valid'));
+            document.querySelectorAll('.char-counter').forEach(c => {
+                const id = c.dataset.counter;
+                const el = document.getElementById(id);
+                const min = parseInt(el?.dataset.min || 0);
+                const reqNum = el?.dataset.requireNumber === 'true';
+                if (min > 0) {
+                    let hint = `${min}+`;
+                    if (reqNum) hint = `${min}+ angka`;
+                    c.innerHTML = `0/${min} <span class="req-hint">${hint}</span>`;
+                }
+            });
+            ['kategoriText','centerText','prioritasText'].forEach(id => {
+                const el = document.getElementById(id);
+                el.textContent = id === 'kategoriText' ? 'Pilih Kategori...' : id === 'centerText' ? 'Pilih Center...' : 'Pilih Prioritas...';
+                el.classList.remove('text-gray-800','font-semibold');
+                el.classList.add('text-gray-500');
+            });
+            document.getElementById('namaCeko').value = '';
+            document.getElementById('namaCeko').classList.add('text-gray-500');
+            try { fpKapan.setDate(new Date(), false); } catch(e){}
+            localStorage.removeItem(DRAFT_KEY);
+            renderAll();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById('btnReset').addEventListener('click', () => {
+            haptic(15);
+            const hasContent = Object.values(collectForm()).some(v => v && v.trim());
+            if (!hasContent) {
+                showToast('Form sudah kosong', 'info', 2000);
+                return;
+            }
+            if (!confirm('Yakin reset form? Semua data terisi akan hilang.')) return;
+            resetForm();
+            showToast('Form direset', 'info', 2000);
+        });
+
+        // ============================================================
+        // WHATSAPP SHARE
+        // ============================================================
+        document.getElementById('btnSalin').addEventListener('click', () => {
+            haptic(15);
+            if (!validateAll(false)) return;
+            const d = collectForm();
+            const teks = `*LAPORAN MINGGUAN CEKO*\n\n`
+                + `*Kategori:* ${d.kategori}\n`
+                + `*Prioritas:* ${d.prioritas}\n`
+                + `*Kapan:* ${d.kapan}\n`
+                + `*Nama Center:* ${d.namaCenter}\n`
+                + `*Nama Ceko:* ${d.namaCeko}\n`
+                + `*Topik:* ${d.topik}\n`
+                + `*Siapa:* ${d.siapa}\n`
+                + `*Dimana:* ${d.dimana}\n`
+                + `*Mengapa:* ${d.mengapa}\n`
+                + `*Tindakan:* ${d.tindakan}\n`
+                + `*Hasil:* ${d.hasil}`;
+            const url = 'https://wa.me/?text=' + encodeURIComponent(teks);
+            const w = window.open(url, '_blank');
+            if (!w) window.location.href = url;
+        });
+
+        // ============================================================
+        // SAVE TO HISTORY
+        // ============================================================
+        function saveToHistory(data) {
+            const item = {
+                kategori: data.kategori || '',
+                prioritas: data.prioritas || '',
+                namaCenter: data.namaCenter || '',
+                namaCeko: data.namaCeko || '',
+                topik: data.topik || '',
+                kapan: data.kapan || '',
+                siapa: data.siapa || '',
+                dimana: data.dimana || '',
+                mengapa: data.mengapa || '',
+                tindakan: data.tindakan || '',
+                hasil: data.hasil || '',
+                at: Date.now()
+            };
+            item._localKey = `${item.namaCeko}|${item.kapan}|${item.topik}`;
+
+            if (db && currentUser) {
+                db.collection(COLLECTION_PATH).add({
+                    ...item,
+                    createdAtServer: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(err => {
+                    console.warn('Cloud save gagal:', err);
+                    saveLocalOnly(item);
+                });
+            } else {
+                saveLocalOnly(item);
+            }
+
+            function saveLocalOnly(it) {
+                try {
+                    const arr = JSON.parse(localStorage.getItem('laporan_ceko_history') || '[]');
+                    arr.push(it);
+                    if (arr.length > 500) arr.splice(0, arr.length - 500);
+                    localStorage.setItem('laporan_ceko_history', JSON.stringify(arr));
+                    state.history = arr;
+                    renderAll();
+                } catch(e){}
+            }
+        }
+
+        // ============================================================
+        // RENDER — MAIN
+        // ============================================================
+        function renderAll() {
+            renderQuickStats();
+            renderHistory();
+            renderBanner();
+            renderRaport();
+            renderUrgentNotification();
+        }
+
+        function renderQuickStats() {
+            const all = state.history || [];
+            const now = new Date();
+            const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            const m = all.filter(h => getItemMonth(h) === thisMonth);
+            document.getElementById('qsTotal').textContent = m.length;
+
+            const set = new Set(m.map(h => h.namaCeko).filter(Boolean));
+            document.getElementById('qsCekoAktif').textContent = `${set.size}/${CEKO_LIST.length}`;
+
+            const byKat = {};
+            m.forEach(h => { if (h.kategori) byKat[h.kategori] = (byKat[h.kategori]||0) + 1; });
+            const sorted = Object.entries(byKat).sort((a,b) => b[1]-a[1]);
+            document.getElementById('qsTopKategori').textContent = sorted.length ? sorted[0][0] : '—';
+        }
+
+        // ============================================================
+        // URGENT NOTIFICATION
+        // ============================================================
+        function getUrgentItems() {
+            const all = state.history || [];
+            const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+            return all
+                .filter(h => (h.prioritas || '').toLowerCase() === 'urgent' && (h.at || 0) >= cutoff)
+                .sort((a,b) => (b.at||0) - (a.at||0));
+        }
+
+        function renderUrgentNotification() {
+            const btn = document.getElementById('urgentBtn');
+            const badge = document.getElementById('urgentBadge');
+            const urgent = getUrgentItems();
+            if (urgent.length > 0) {
+                btn.style.display = 'flex';
+                btn.classList.add('urgent-btn');
+                badge.textContent = urgent.length > 9 ? '9+' : urgent.length;
+            } else {
+                btn.style.display = 'none';
+                btn.classList.remove('urgent-btn');
+            }
+        }
+
+        document.getElementById('urgentBtn').addEventListener('click', () => {
+            haptic(20);
+            const urgent = getUrgentItems();
+            const body = document.getElementById('urgentBody');
+            if (!urgent.length) {
+                body.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px 0;">Tidak ada laporan urgent.</p>';
+            } else {
+                body.innerHTML = urgent.map(h => `
+                    <div class="urgent-list-item">
+                        <div class="urgent-list-icon"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div>
+                        <div class="urgent-list-body">
+                            <div class="urgent-list-topik">${escapeHtml(h.topik || '-')}</div>
+                            <div class="urgent-list-meta">
+                                <span>👤 <b>${escapeHtml(h.namaCeko || '-')}</b></span>
+                                <span>🏢 ${escapeHtml(h.namaCenter || '-')}</span>
+                                <span>📅 ${escapeHtml(h.kapan || '-')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            icons();
+            openModal('urgentModal');
+        });
+
+        // ============================================================
+        // HISTORY
+        // ============================================================
+        function renderHistory() {
+            const card = document.getElementById('historyCard');
+            const list = document.getElementById('historyList');
+            const count = document.getElementById('historyCount');
+            const expandBtn = document.getElementById('historyExpandBtn');
+            const search = (document.getElementById('historySearch')?.value || '').toLowerCase().trim();
+            const clearBtn = document.getElementById('historySearchClear');
+
+            let allItems = (state.history || []).slice().sort((a, b) => (b.at || 0) - (a.at || 0));
+
+            // Filter search
+            if (search) {
+                allItems = allItems.filter(h =>
+                    (h.topik || '').toLowerCase().includes(search) ||
+                    (h.namaCeko || '').toLowerCase().includes(search) ||
+                    (h.namaCenter || '').toLowerCase().includes(search) ||
+                    (h.kategori || '').toLowerCase().includes(search) ||
+                    (h.prioritas || '').toLowerCase().includes(search) ||
+                    (h.kapan || '').toLowerCase().includes(search)
+                );
+            }
+
+            const urgents = allItems.filter(h => (h.prioritas || '').toLowerCase() === 'urgent');
+            const nonUrgents = allItems.filter(h => (h.prioritas || '').toLowerCase() !== 'urgent');
+            const hasUrgent = urgents.length > 0;
+
+            const showAll = !!search || historyExpanded || !hasUrgent;
+            const items = (showAll ? allItems : urgents).slice(0, 20);
+
+            if (clearBtn) clearBtn.classList.toggle('show', !!search);
+
+            if (!items.length) {
+                card.classList.remove('show');
+                if (expandBtn) expandBtn.style.display = 'none';
+                return;
+            }
+
+            count.textContent = (showAll || search)
+                ? items.length + ' laporan'
+                : items.length + ' urgent';
+
+            const showArrow = !search && hasUrgent && nonUrgents.length > 0;
+            if (expandBtn) {
+                expandBtn.style.display = showArrow ? 'flex' : 'none';
+                expandBtn.classList.toggle('expanded', historyExpanded);
+                expandBtn.title = historyExpanded ? 'Sembunyikan non-urgent' : 'Lihat semua laporan';
+                expandBtn.innerHTML = `<i data-lucide="${historyExpanded ? 'chevron-up' : 'chevron-down'}" class="w-3.5 h-3.5"></i>`;
+            }
+
+            list.innerHTML = items.map(h => {
+                const prio = (h.prioritas || '').toLowerCase();
+                const prioCls = ['urgent','tinggi','sedang','rendah'].includes(prio) ? prio : '';
+                return `
+                <div class="history-item ${prioCls}">
+                    <div class="history-item-head">
+                        <div class="history-item-topik">${escapeHtml(h.topik || '-')}</div>
+                        <div class="history-item-time">${getPrioTag(h.prioritas) || escapeHtml(h.kategori || '-')}</div>
+                    </div>
+                    <div class="history-item-meta">
+                        <span>👤 <b>${escapeHtml(h.namaCeko || '-')}</b></span>
+                        <span>🏢 <b>${escapeHtml(h.namaCenter || '-')}</b></span>
+                        <span>📅 <b>${escapeHtml(h.kapan || '-')}</b></span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            card.classList.add('show');
+            icons();
+        }
+
+        document.getElementById('historySearch')?.addEventListener('input', renderHistory);
+        document.getElementById('historySearchClear')?.addEventListener('click', () => {
+            document.getElementById('historySearch').value = '';
+            renderHistory();
+        });
+
+        // ============================================================
+        // BANNER BELUM LAPOR
+        // ============================================================
+        function renderBanner() {
+            const banner = document.getElementById('bannerBelum');
+            const listEl = document.getElementById('bannerList');
+            const text = document.getElementById('bannerText');
+            const btn = document.getElementById('bannerBtn');
+            const all = state.history || [];
+            const wk = getWeekRange();
+
+            const done = new Set();
+            all.forEach(h => {
+                const iso = getItemDateISO(h);
+                if (iso && iso >= wk.startStr && iso <= wk.endStr) done.add(h.namaCeko);
+            });
+
+            const belum = CEKO_LIST.filter(c => !done.has(c));
+            if (!belum.length) {
+                banner.classList.remove('show');
+                listEl.classList.remove('show');
+                btn.classList.remove('open');
+                bannerExpanded = false;
+                return;
+            }
+
+            text.textContent = `Periode ${wk.label} · ${belum.length} ceko belum lapor`;
+            banner.classList.add('show');
+
+            listEl.innerHTML = `<div class="banner-staff-grid">${belum.map(s => `
+                <div class="banner-staff-item"><span class="dot"></span><span>${escapeHtml(s)}</span></div>
+            `).join('')}</div>`;
+
+            listEl.classList.toggle('show', bannerExpanded);
+            btn.classList.toggle('open', bannerExpanded);
+        }
+
+        document.getElementById('bannerBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            haptic(10);
+            bannerExpanded = !bannerExpanded;
+            const listEl = document.getElementById('bannerList');
+            const btn = document.getElementById('bannerBtn');
+            listEl.classList.toggle('show', bannerExpanded);
+            btn.classList.toggle('open', bannerExpanded);
+        });
+
+        // ============================================================
+        // RAPORT — ✅ Nama depan saja
+        // ============================================================
+function renderRaport() {
+    const card = document.getElementById('raportCard');
+    const pills = document.getElementById('raportPills');
+    const monthEl = document.getElementById('raportMonth');
+    const all = state.history || [];
+    const now = new Date();
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    monthEl.textContent = fmtBulan(now);
+
+    const m = all.filter(h => getItemMonth(h) === thisMonth);
+    if (!m.length) {
+        pills.innerHTML = `<div class="raport-empty">Belum ada laporan bulan ini</div>`;
+        card.classList.add('show');
+        return;
+    }
+
+    // ✅ Agregasi dengan normalisasi nama depan (case-insensitive)
+    const byCeko = {};
+    const displayName = {};   // simpan ejaan asli untuk tampilan
+    m.forEach(h => {
+        const full = (h.namaCeko || '').trim();
+        if (!full) return;
+        const firstNameRaw = full.split(/\s+/)[0];
+        const key = firstNameRaw.toLowerCase();          // ✅ key lowercase
+        if (!displayName[key]) displayName[key] = firstNameRaw;
+        byCeko[key] = (byCeko[key] || 0) + 1;
+    });
+
+    if (!Object.keys(byCeko).length) {
+        pills.innerHTML = `<div class="raport-empty">Belum ada data ceko</div>`;
+        card.classList.add('show');
+        return;
+    }
+
+    // ✅ Sort: count desc → lalu nama A-Z (biar stabil, gak random)
+    // ✅ TAMPILKAN SEMUA (tidak ada slice(0,8))
+    const sorted = Object.entries(byCeko).sort((a, b) => {
+        if (b[1] !== a[1]) return b[1] - a[1];
+        return displayName[a[0]].localeCompare(displayName[b[0]]);
+    });
+
+    pills.innerHTML = sorted.map(([key, count]) => `
+        <div class="ceko-pill">
+            <span>${escapeHtml(displayName[key])}</span>
+            <span class="ceko-count">${count}x</span>
+        </div>
+    `).join('');
+    card.classList.add('show');
+}
+        // ============================================================
+        // CLEANUP (Hapus semua)
+        // ============================================================
+        document.getElementById('historyCleanupBtn').addEventListener('click', () => {
+            haptic(15);
+            document.getElementById('cleanupPwd').value = '';
+            document.getElementById('cleanupPwd').classList.remove('error');
+            openModal('cleanupModal', 'cleanupPwd');
+        });
+
+        document.getElementById('cleanupCancel').addEventListener('click', () => {
+            haptic(10);
+            closeModal('cleanupModal');
+        });
+
+        document.getElementById('cleanupPwd').addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('cleanupDelete').click();
+            }
+        });
+
+        document.getElementById('cleanupDelete').addEventListener('click', async () => {
+            haptic(20);
+            const pwd = document.getElementById('cleanupPwd').value;
+            if (!pwd) {
+                document.getElementById('cleanupPwd').classList.add('error');
+                showToast('Password wajib diisi', 'warn', 2000);
+                return;
+            }
+            if (pwd !== CLEANUP_PASSWORD) {
+                document.getElementById('cleanupPwd').classList.add('error');
+                document.getElementById('cleanupPwd').value = '';
+                document.getElementById('cleanupPwd').focus();
+                haptic(80);
+                showToast('Password salah!', 'error', 2200);
+                setTimeout(() => document.getElementById('cleanupPwd').classList.remove('error'), 500);
+                return;
+            }
+            try {
+                if (db && currentUser) {
+                    updateCloudBadge('', 'Menghapus...');
+                    const snap = await db.collection(COLLECTION_PATH).get();
+                    const batch = db.batch();
+                    snap.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                }
+                localStorage.removeItem('laporan_ceko_history');
+                state.history = [];
+                closeModal('cleanupModal');
+                if (firebaseStatus === 'online') updateCloudBadge('online', 'Cloud Aktif');
+                renderAll();
+                showToast('History berhasil dihapus ✓', 'success', 2500);
+            } catch(e) {
+                console.error(e);
+                if (firebaseStatus === 'online') updateCloudBadge('online', 'Cloud Aktif');
+                showToast('Gagal hapus history', 'error', 2500);
+            }
+        });
+
+        // ============================================================
+        // BULK DELETE
+        // ============================================================
+        const bulkFilter = document.getElementById('bulkFilterType');
+        const bulkDateWrap = document.getElementById('bulkDateWrap');
+        const bulkSelectWrap = document.getElementById('bulkSelectWrap');
+        const bulkSelect = document.getElementById('bulkSelectInput');
+        const bulkDateInput = document.getElementById('bulkDateInput');
+        const bulkResult = document.getElementById('bulkPreviewResult');
+        const bulkBtn = document.getElementById('bulkDelete');
+
+        function populateBulkSelect() {
+            const t = bulkFilter.value;
+            const all = state.history || [];
+            let opts = [];
+            if (t === 'by-ceko') opts = [...new Set(all.map(h => h.namaCeko).filter(Boolean))].sort();
+            else if (t === 'by-center') opts = [...new Set(all.map(h => h.namaCenter).filter(Boolean))].sort();
+            else if (t === 'by-kategori') opts = [...new Set(all.map(h => h.kategori).filter(Boolean))].sort();
+            else if (t === 'by-prioritas') opts = ['Urgent','Tinggi','Sedang','Rendah'];
+            bulkSelect.innerHTML = opts.length
+                ? opts.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')
+                : '<option value="">(kosong)</option>';
+        }
+
+        function updateBulkUI() {
+            const t = bulkFilter.value;
+            const needDate = t === 'before-date' || t === 'after-date';
+            bulkDateWrap.style.display = needDate ? 'block' : 'none';
+            bulkSelectWrap.style.display = needDate ? 'none' : 'block';
+            if (!needDate) populateBulkSelect();
+            bulkResult.classList.remove('show');
+            bulkBtn.disabled = true;
+            bulkBtn.style.opacity = '.5';
+            bulkMatched = [];
+        }
+
+        bulkFilter.addEventListener('change', updateBulkUI);
+
+        document.getElementById('historyBulkBtn').addEventListener('click', () => {
+            haptic(15);
+            openModal('bulkModal');
+            updateBulkUI();
+            bulkDateInput.value = '';
+        });
+
+        document.getElementById('bulkCancel').addEventListener('click', () => {
+            haptic(10);
+            closeModal('bulkModal');
+        });
+
+        document.getElementById('bulkPreviewBtn').addEventListener('click', () => {
+            haptic(10);
+            const t = bulkFilter.value;
+            const all = state.history || [];
+            let matched = [];
+
+            if (t === 'before-date') {
+                const d = bulkDateInput.value;
+                if (!d) { showToast('Pilih tanggal dulu', 'warn', 2000); return; }
+                matched = all.filter(h => { const iso = getItemDateISO(h); return iso && iso < d; });
+            } else if (t === 'after-date') {
+                const d = bulkDateInput.value;
+                if (!d) { showToast('Pilih tanggal dulu', 'warn', 2000); return; }
+                matched = all.filter(h => { const iso = getItemDateISO(h); return iso && iso > d; });
+            } else if (t === 'by-ceko') matched = all.filter(h => h.namaCeko === bulkSelect.value);
+            else if (t === 'by-center') matched = all.filter(h => h.namaCenter === bulkSelect.value);
+            else if (t === 'by-kategori') matched = all.filter(h => h.kategori === bulkSelect.value);
+            else if (t === 'by-prioritas') matched = all.filter(h => h.prioritas === bulkSelect.value);
+
+            bulkMatched = matched;
+            document.getElementById('bulkCount').textContent = matched.length;
+
+            const listEl = document.getElementById('bulkList');
+            if (!matched.length) {
+                listEl.innerHTML = '<em>Tidak ada yang cocok</em>';
+                bulkBtn.disabled = true;
+                bulkBtn.style.opacity = '.5';
+            } else {
+                listEl.innerHTML = matched.slice(0, 8)
+                    .map(h => `• ${escapeHtml(h.topik)} · ${escapeHtml(h.namaCeko)} · ${escapeHtml(h.kapan)}`)
+                    .join('<br>') + (matched.length > 8 ? `<br><em>+${matched.length - 8} lainnya</em>` : '');
+                bulkBtn.disabled = false;
+                bulkBtn.style.opacity = '1';
+            }
+            bulkResult.classList.add('show');
+        });
+
+        bulkBtn.addEventListener('click', async () => {
+            if (!bulkMatched.length) return;
+            if (!confirm(`Hapus ${bulkMatched.length} laporan? Tidak bisa dibatalkan.`)) return;
+            haptic(50);
+            const n = bulkMatched.length;
+            try {
+                if (db && currentUser) {
+                    updateCloudBadge('', 'Menghapus...');
+                    const keys = new Set(bulkMatched.map(h => h._localKey).filter(Boolean));
+                    const ids = new Set(bulkMatched.map(h => h._id).filter(Boolean));
+                    const snap = await db.collection(COLLECTION_PATH).get();
+                    const batch = db.batch();
+                    let del = 0;
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        if (ids.has(doc.id) || (d._localKey && keys.has(d._localKey))) {
+                            batch.delete(doc.ref);
+                            del++;
+                        }
+                    });
+                    if (del) await batch.commit();
+                }
+                const keys = new Set(bulkMatched.map(h => h._localKey).filter(Boolean));
+                state.history = (state.history || []).filter(h => !keys.has(h._localKey));
+                localStorage.setItem('laporan_ceko_history', JSON.stringify(state.history));
+                closeModal('bulkModal');
+                if (firebaseStatus === 'online') updateCloudBadge('online', 'Cloud Aktif');
+                renderAll();
+                showToast(`✓ ${n} laporan dihapus`, 'success', 2500);
+            } catch(e) {
+                console.error(e);
+                if (firebaseStatus === 'online') updateCloudBadge('online', 'Cloud Aktif');
+                showToast('Gagal hapus: ' + e.message, 'error', 3000);
+            }
+        });
+
+        // ============================================================
+        // EXPORT CSV
+        // ============================================================
+        document.getElementById('historyExportBtn').addEventListener('click', () => {
+            haptic(15);
+            const all = state.history || [];
+            if (!all.length) {
+                showToast('Belum ada data untuk diexport', 'warn', 2500);
+                return;
+            }
+            const items = all.slice().sort((a,b) => (b.at||0) - (a.at||0));
+            const esc = v => {
+                const s = String(v ?? '');
+                return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+            };
+            const headers = ['No','Kategori','Prioritas','Kapan','Nama Center','Nama Ceko','Topik','Siapa','Dimana','Mengapa','Tindakan','Hasil','Waktu Submit'];
+            const rows = items.map((h, i) => [
+                i+1, h.kategori||'', h.prioritas||'', h.kapan||'', h.namaCenter||'', h.namaCeko||'', h.topik||'',
+                h.siapa||'', h.dimana||'', h.mengapa||'', h.tindakan||'', h.hasil||'',
+                h.at ? new Date(h.at).toLocaleString('id-ID') : '-'
+            ]);
+            const csv = '\ufeff' + headers.map(esc).join(';') + '\n' + rows.map(r => r.map(esc).join(';')).join('\n');
+            const now = new Date();
+            const fname = `Laporan_Ceko_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.csv`;
+            try {
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fname;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
+                showToast(`✓ ${items.length} data diexport`, 'success', 2500);
+            } catch(e) {
+                showToast('Gagal export: ' + e.message, 'error', 3000);
+            }
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        (function init() {
+            initTheme();
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+            document.getElementById('historyExpandBtn')?.addEventListener('click', () => {
+                haptic(10);
+                historyExpanded = !historyExpanded;
+                renderHistory();
+            });
+
+            renderAll();
+            setTimeout(() => { loadDraft(); renderAll(); }, 300);
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    ['previewModal','successModal','cleanupModal','bulkModal','urgentModal'].forEach(id => {
+                        const m = document.getElementById(id);
+                        if (m && !m.classList.contains('hidden')) closeModal(id);
+                    });
+                }
+            });
+        })();
+
+        document.addEventListener('gesturestart', e => e.preventDefault());
+    </script>
+</body>
+</html>

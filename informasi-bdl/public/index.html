@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Informasi BDL</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #ffffff; /* Solid white background */
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        * {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            box-sizing: border-box;
+        }
+
+        .no-scroll {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .header-red-gradient {
+            background: linear-gradient(135deg, #c53030 0%, #e53e3e 50%, #c53030 100%);
+            border-bottom-left-radius: 1.5rem;
+            border-bottom-right-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-red-gradient::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -10%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+        }
+
+        .tab-active {
+            background-color: #1f2937; 
+            color: white;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-color: #111827;
+        }
+        
+        .tab-active .tab-number {
+            background-color: #e5f6ec;
+            color: #1f2937;
+        }
+
+        /* 3D Embossed Soft Pink Card Style without outer border outline */
+        .card-embossed {
+            background-color: #fdf2f8; /* Soft pink background */
+            border-radius: 1.5rem;
+            border: none; /* No outline border */
+            box-shadow: 
+                0 10px 25px -5px rgba(0, 0, 0, 0.04),
+                0 8px 10px -6px rgba(0, 0, 0, 0.04),
+                inset 0 3px 6px rgba(255, 255, 255, 0.95),
+                inset 0 -3px 6px rgba(244, 114, 182, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        .card-embossed:hover {
+            box-shadow: 
+                0 14px 30px -5px rgba(0, 0, 0, 0.08),
+                0 10px 12px -6px rgba(0, 0, 0, 0.06),
+                inset 0 3px 6px rgba(255, 255, 255, 1),
+                inset 0 -3px 6px rgba(244, 114, 182, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Preview Modal 3D Embossed Box Style with small rounded corners & solid white content background */
+        .preview-box-embossed {
+            background: linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%);
+            border-radius: 1.5rem; /* Soft rounded corners */
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 1),
+                inset 0 -2px 4px rgba(244, 114, 182, 0.2);
+        }
+
+        .modal-enter {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+        .modal-content-enter {
+            animation: scaleUp 0.2s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes scaleUp {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 pb-12 flex flex-col w-full">
+
+    <header class="header-red-gradient text-white py-6 px-4 sm:px-8 flex items-center justify-between w-full shadow-lg">
+        <div class="flex items-center gap-2 sm:gap-4 w-1/5 sm:w-1/4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl border border-white/40 bg-white/10 flex items-center justify-center backdrop-blur-sm shrink-0">
+                <i class="ph ph-clipboard-text text-xl sm:text-2xl"></i>
+            </div>
+        </div>
+        <div class="text-center w-3/5 sm:w-2/4 px-1">
+            <h1 class="font-heading class="text-xl sm:text-3xl md:text-4xl font-bold mb-1 tracking-wide truncate">Informasi BDL</h1>
+            <p class="text-white/80 text-xs sm:text-sm md:text-base font-light truncate">Pusat informasi internal & data</p>
+        </div>
+        <div class="flex justify-end w-1/5 sm:w-1/4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/40 bg-white/10 backdrop-blur-sm shrink-0"></div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-7xl mx-auto px-3 sm:px-6 mt-6 flex-1">
+        
+        <div class="bg-white rounded-2xl sm:rounded-full p-1.5 shadow-sm border border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-1.5 mb-6">
+            <button onclick="changeTab('memo')" id="tab-memo" class="tab-btn flex items-center justify-center gap-2 py-3 px-3 rounded-xl sm:rounded-full transition-all duration-300 tab-active border border-transparent">
+                <span class="tab-number w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold bg-gray-200 text-gray-600 transition-colors shrink-0">1</span>
+                <span class="font-semibold text-xs sm:text-sm truncate">Memo internal</span>
+            </button>
+            <button onclick="changeTab('project')" id="tab-project" class="tab-btn flex items-center justify-center gap-2 py-3 px-3 rounded-xl sm:rounded-full bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 transition-all duration-300">
+                <span class="tab-number w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold bg-green-100 text-green-700 transition-colors shrink-0">2</span>
+                <span class="font-semibold text-xs sm:text-sm truncate">Yakult project</span>
+            </button>
+            <button onclick="changeTab('news')" id="tab-news" class="tab-btn flex items-center justify-center gap-2 py-3 px-3 rounded-xl sm:rounded-full bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 transition-all duration-300">
+                <span class="tab-number w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold bg-green-100 text-green-700 transition-colors shrink-0">3</span>
+                <span class="font-semibold text-xs sm:text-sm truncate">News update</span>
+            </button>
+            <button onclick="changeTab('kompetisi')" id="tab-kompetisi" class="tab-btn flex items-center justify-center gap-2 py-3 px-3 rounded-xl sm:rounded-full bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 transition-all duration-300">
+                <span class="tab-number w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold bg-green-100 text-green-700 transition-colors shrink-0">4</span>
+                <span class="font-semibold text-xs sm:text-sm truncate">Kompetisi cabang</span>
+            </button>
+        </div>
+
+        <div id="content-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full">
+            <!-- Rendered by JS -->
+        </div>
+
+    </main>
+
+    <!-- Modal Password (Light Blue Theme & Poppins Font) -->
+    <div id="password-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center backdrop-blur-sm p-4 font-['Poppins',sans-serif]">
+        <div class="bg-gradient-to-br from-blue-50 via-sky-50 to-blue-100 border border-blue-200 rounded-3xl p-6 w-full max-w-sm shadow-2xl relative modal-content-enter">
+            <button onclick="closePasswordModal(true)" class="absolute top-4 right-4 text-blue-400 hover:text-blue-700 p-2 transition-colors cursor-pointer">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
+                    <i class="ph ph-lock-key text-2xl"></i>
+                </div>
+                <h3 class="font-heading class="text-lg font-bold text-blue-900">Otorisasi Administrator</h3>
+                <p id="password-modal-desc" class="text-sm text-blue-700 mt-1">Masukkan kata sandi untuk mengunggah atau mengganti file.</p>
+            </div>
+            <div class="mb-4">
+                <input type="password" id="admin-password" placeholder="Kata Sandi" class="w-full px-4 py-3 border border-blue-300 bg-white/90 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-mono text-blue-950 placeholder-blue-300 shadow-inner">
+                <p id="password-error" class="text-red-500 text-xs text-center mt-2 hidden font-medium">Kata sandi salah!</p>
+            </div>
+            <button onclick="verifyPassword()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg cursor-pointer">
+                Lanjutkan
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center relative modal-content-enter">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <i class="ph ph-trash text-2xl"></i>
+            </div>
+            <h3 class="font-heading class="text-lg font-bold text-gray-800">Yakin Dihapus?</h3>
+            <p class="text-sm text-gray-500 mt-1 mb-6">File di web akan dihapus (File asli di Google Drive aman).</p>
+            <div class="flex gap-3">
+                <button onclick="cancelDelete()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3.5 rounded-2xl transition-colors cursor-pointer">
+                    Batal
+                </button>
+                <button onclick="proceedToDelete()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3.5 rounded-2xl transition-colors shadow-md cursor-pointer">
+                    Yes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Preview dengan Background Putih Solid -->
+    <div id="preview-modal" class="fixed inset-0 bg-black/80 z-[60] hidden flex-col backdrop-blur-md w-full h-full p-2 sm:p-6">
+        <div class="w-full h-full flex flex-col preview-box-embossed overflow-hidden border border-pink-200/50">
+            <div class="flex justify-between items-center px-4 py-3.5 bg-gradient-to-r from-pink-500 to-rose-600 text-white shrink-0 shadow-md">
+                <h3 class="font-heading id="preview-title" class="font-semibold text-white truncate pr-4 text-xs sm:text-sm md:text-base tracking-wide uppercase"></h3>
+                <div class="flex items-center gap-2.5">
+                    <a id="preview-download-btn" href="#" target="_blank" download class="px-3.5 py-1.5 bg-white text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow cursor-pointer">
+                        <i class="ph ph-download-simple text-sm"></i> Unduh
+                    </a>
+                    <button onclick="closePreviewModal()" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg text-white flex items-center justify-center transition-colors shrink-0 cursor-pointer">
+                        <i class="ph ph-x text-base"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Background Putih Solid untuk Konten Preview -->
+            <div id="preview-content" class="flex-1 w-full h-full flex items-center justify-center overflow-auto p-2 sm:p-6 relative bg-white"></div>
+        </div>
+    </div>
+
+    <div id="custom-toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3.5 rounded-full shadow-2xl transition-all duration-300 translate-y-20 opacity-0 z-[70] flex items-center gap-2 border border-gray-700">
+        <i class="ph ph-info text-xl text-blue-400"></i>
+        <span id="toast-message" class="text-sm">Notifikasi</span>
+    </div>
+
+    <input type="file" id="system-file-input" accept=".jpg,.jpeg,.png,.pdf">
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkdDiRxkoKbIPlWN7FoYggnnQE6_qbg1Y",
+            authDomain: "informasi-bdl.firebaseapp.com",
+            projectId: "informasi-bdl",
+            storageBucket: "informasi-bdl.firebasestorage.app",
+            messagingSenderId: "270894506378",
+            appId: "1:270894506378:web:5b1e62f82f11e02205e873",
+            measurementId: "G-WR5N04WN3K"
+        };
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'informasi-bdl-app';
+        let db, auth;
+        let filesData = {}; 
+        let state = { currentTab: 'memo' };
+        let actionTargetSlot = null;
+        let deleteTargetSlot = null;
+        let modalMode = 'upload';
+        
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzl8jq2GA6KA7TyVXTvj281QbNU6ojhcZ2jGXGzOS6Ly6c6e2J0gihTyfg2IbKH8mbS/exec"; 
+        const adminPassword = "Tampomas24";
+        const TOTAL_SLOTS = 6;
+        const LOCAL_STORAGE_FALLBACK_KEY = 'bdl_slots_offline_v4';
+
+        function loadLocalStorageFallback() {
+            const saved = localStorage.getItem(LOCAL_STORAGE_FALLBACK_KEY);
+            if (saved) {
+                try {
+                    filesData = JSON.parse(saved);
+                } catch (e) {
+                    filesData = {};
+                }
+            } else {
+                filesData = {};
+            }
+            renderGrid();
+        }
+
+        function saveLocalStorageFallback() {
+            localStorage.setItem(LOCAL_STORAGE_FALLBACK_KEY, JSON.stringify(filesData));
+        }
+
+        async function initDatabase() {
+            loadLocalStorageFallback(); 
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (authErr) {
+                    console.warn("Auth warning:", authErr);
+                }
+                
+                listenToCloudData();
+            } catch (e) {
+                console.warn("Firebase offline mode aktif:", e);
+            }
+        }
+
+        function listenToCloudData() {
+            if (!db) return;
+            try {
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'bdl_fixed_slots');
+                onSnapshot(colRef, (snapshot) => {
+                    let remoteFiles = {};
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        const parts = docSnap.id.split('_slot_');
+                        if (parts.length === 2) {
+                            const tab = parts[0];
+                            const index = parseInt(parts[1], 10);
+                            if (!remoteFiles[tab]) remoteFiles[tab] = {};
+                            remoteFiles[tab][index] = data;
+                        }
+                    });
+                    
+                    // Merge remote files keeping local structure intact
+                    for (let tab in remoteFiles) {
+                        if (!filesData[tab]) filesData[tab] = {};
+                        for (let idx in remoteFiles[tab]) {
+                            filesData[tab][idx] = remoteFiles[tab][idx];
+                        }
+                    }
+                    
+                    saveLocalStorageFallback();
+                    renderGrid();
+                }, (error) => {
+                    console.warn("Firestore sync warning:", error);
+                });
+            } catch (err) {
+                console.warn("Firestore listener error:", err);
+            }
+        }
+
+        window.renderGrid = function() {
+            const grid = document.getElementById('content-grid');
+            if(!grid) return;
+            grid.innerHTML = ''; 
+            
+            const tabKey = state.currentTab;
+            if (!filesData[tabKey]) {
+                filesData[tabKey] = {};
+            }
+
+            for (let i = 0; i < TOTAL_SLOTS; i++) {
+                const item = filesData[tabKey][i];
+
+                if (item) {
+                    const iconClass = item.ext === 'pdf' ? 'ph-file-pdf text-red-500' : 'ph-image text-blue-500';
+                    const iconBg = item.ext === 'pdf' ? 'bg-red-50' : 'bg-blue-50';
+                    const badgeText = item.ext.toUpperCase();
+                    const badgeColor = item.ext === 'pdf' ? 'bg-red-500' : 'bg-blue-500';
+
+                    let visualContent = `<i class="ph ${iconClass} text-6xl"></i>`;
+                    if (item.ext !== 'pdf' && item.url) {
+                        visualContent = `<img src="${item.url}" class="w-full h-full object-cover rounded-2xl" alt="Preview" />`;
+                    }
+
+                    const cardHTML = `
+                        <div class="card-embossed p-4 flex flex-col h-full relative group">
+                            <!-- Tombol Sampah Hapus -->
+                            <button onclick="event.stopPropagation(); confirmDelete(${i})" class="absolute top-3 right-3 w-10 h-10 bg-white/95 shadow-md text-red-500 hover:bg-red-50 rounded-full flex items-center justify-center opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all z-20 border border-red-100 cursor-pointer" title="Hapus file dari web">
+                                <i class="ph ph-trash text-lg"></i>
+                            </button>
+
+                            <!-- Area Klik Pop Up Preview -->
+                            <div class="${iconBg} rounded-2xl h-52 sm:h-60 flex items-center justify-center relative cursor-pointer overflow-hidden z-10 shadow-inner" onclick="openPreview('${tabKey}', ${i})">
+                                ${visualContent}
+                                <span class="absolute bottom-3 left-3 ${badgeColor} text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow-md z-10">${badgeText}</span>
+                            </div>
+
+                            <!-- Menampilkan Nama File & Judul File di Web -->
+                            <div class="mt-3 px-1">
+                                <h4 class="font-bold text-gray-800 text-sm truncate">${item.title || 'Tanpa Judul'}</h4>
+                                <p class="text-xs text-gray-500 font-medium truncate mt-0.5">${item.filename || ''}</p>
+                            </div>
+
+                            <!-- Opsi Ganti File -->
+                            <button onclick="requestUpload(${i})" class="mt-3 w-full py-3 bg-white border border-pink-200 rounded-2xl text-sm font-semibold text-gray-700 hover:bg-pink-50 transition-colors flex items-center justify-center gap-2 relative z-10 shadow-sm cursor-pointer">
+                                <i class="ph ph-arrows-clockwise text-lg"></i> Ganti file
+                            </button>
+                        </div>
+                    `;
+                    grid.innerHTML += cardHTML;
+                } else {
+                    const emptyCardHTML = `
+                        <div class="card-embossed p-6 flex flex-col items-center justify-center text-center h-full min-h-[260px] transition-all cursor-pointer group" onclick="requestUpload(${i})">
+                            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-3 shadow-sm group-hover:bg-pink-50 transition-colors border border-pink-100">
+                                <i class="ph ph-upload-simple text-2xl text-pink-400 group-hover:text-pink-600 transition-colors"></i>
+                            </div>
+                            <h4 class="font-semibold text-gray-700 text-base">Unggah file</h4>
+                            <p class="text-xs text-gray-400 mt-1 px-4">Tarik dan lepas atau klik untuk memilih file jpg / pdf (Slot ${i + 1})</p>
+                        </div>
+                    `;
+                    grid.innerHTML += emptyCardHTML;
+                }
+            }
+        };
+
+        window.changeTab = function(tabId) {
+            state.currentTab = tabId;
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.className = "tab-btn flex items-center justify-center gap-2 py-3 px-3 rounded-xl sm:rounded-full bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 transition-all duration-300";
+                const num = tab.querySelector('.tab-number');
+                if(num) num.className = "tab-number w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold bg-green-100 text-green-700 transition-colors shrink-0";
+            });
+
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            if(activeTab) {
+                activeTab.className = "tab-btn flex items-center justify-center gap-2 py-3 px-3 rounded-xl sm:rounded-full transition-all duration-300 tab-active border border-transparent";
+                const activeNum = activeTab.querySelector('.tab-number');
+                if(activeNum) activeNum.className = "tab-number w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold bg-[#e5f6ec] text-[#1f2937] shrink-0";
+            }
+            renderGrid();
+        };
+
+        function showToast(message) {
+            const toast = document.getElementById('custom-toast');
+            if(!toast) return;
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        }
+
+        const fileInput = document.getElementById('system-file-input');
+        if(fileInput) {
+            fileInput.addEventListener('change', async function(event) {
+                const file = event.target.files[0];
+                if (!file || actionTargetSlot === null) return;
+
+                let ext = file.type.includes("image") ? "jpg" : "pdf";
+                const titleName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+                
+                showToast("Mengunggah file...");
+
+                try {
+                    let finalUrl = "";
+                    const reader = new FileReader();
+                    const base64Full = await new Promise((resolve, reject) => {
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+
+                    if (WEB_APP_URL === "GANTI_DENGAN_URL_WEB_APP_ANDA" || WEB_APP_URL === "") {
+                        await new Promise(r => setTimeout(r, 500));
+                        finalUrl = base64Full;
+                    } else {
+                        const base64Data = base64Full.split(",")[1];
+                        const response = await fetch(WEB_APP_URL, {
+                            method: "POST",
+                            mode: "cors",
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                            body: new URLSearchParams({
+                                filename: file.name,
+                                mimeType: file.type,
+                                category: state.currentTab,
+                                data: base64Data
+                            })
+                        });
+                        const driveFileUrl = await response.text();
+                        finalUrl = driveFileUrl && driveFileUrl.startsWith("http") ? driveFileUrl.trim() : base64Full;
+                    }
+
+                    const tabKey = state.currentTab;
+                    if (!filesData[tabKey]) filesData[tabKey] = {};
+                    
+                    filesData[tabKey][actionTargetSlot] = {
+                        title: titleName,
+                        filename: file.name,
+                        ext: ext,
+                        url: finalUrl,
+                        timestamp: Date.now()
+                    };
+
+                    saveLocalStorageFallback();
+
+                    if (db) {
+                        const docId = `${tabKey}_slot_${actionTargetSlot}`;
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bdl_fixed_slots', docId);
+                        await setDoc(docRef, filesData[tabKey][actionTargetSlot]);
+                    }
+                    
+                    renderGrid();
+                    showToast("File berhasil diunggah!");
+
+                } catch (error) {
+                    console.error("Upload error:", error);
+                    showToast("Gagal mengunggah file.");
+                }
+
+                event.target.value = ""; 
+                actionTargetSlot = null;
+            });
+        }
+
+        window.requestUpload = function(slotIndex) {
+            document.body.classList.add('no-scroll');
+            actionTargetSlot = slotIndex;
+            modalMode = 'upload';
+            document.getElementById('password-modal-desc').textContent = "Masukkan kata sandi untuk mengunggah atau mengganti file di slot ini.";
+            document.getElementById('admin-password').value = ''; 
+            document.getElementById('password-error').classList.add('hidden'); 
+            const modal = document.getElementById('password-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => document.getElementById('admin-password').focus(), 100);
+        };
+
+        window.closePasswordModal = function(isCancelled = false) {
+            const modal = document.getElementById('password-modal');
+            modal.classList.add('hidden');
+            document.body.classList.remove('no-scroll');
+            if(isCancelled) { actionTargetSlot = null; deleteTargetSlot = null; }
+        };
+
+        window.verifyPassword = function() {
+            const input = document.getElementById('admin-password').value;
+            if (input === adminPassword) {
+                closePasswordModal(false);
+                if (modalMode === 'upload') {
+                    document.getElementById('system-file-input').click();
+                } else if (modalMode === 'delete') {
+                    executeDelete();
+                }
+            } else {
+                document.getElementById('password-error').classList.remove('hidden');
+            }
+        };
+
+        window.confirmDelete = function(slotIndex) {
+            document.body.classList.add('no-scroll');
+            deleteTargetSlot = slotIndex;
+            const modal = document.getElementById('delete-confirm-modal');
+            modal.classList.remove('hidden');
+        };
+
+        window.cancelDelete = function() {
+            const modal = document.getElementById('delete-confirm-modal');
+            modal.classList.add('hidden');
+            document.body.classList.remove('no-scroll');
+            deleteTargetSlot = null;
+        };
+
+        window.proceedToDelete = function() {
+            cancelDelete();
+            modalMode = 'delete';
+            document.getElementById('password-modal-desc').textContent = "Masukkan sandi Administrator untuk menghapus rekaman di web.";
+            document.getElementById('admin-password').value = '';
+            document.getElementById('password-error').classList.add('hidden');
+            const modal = document.getElementById('password-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => document.getElementById('admin-password').focus(), 100);
+        };
+
+        async function executeDelete() {
+            if (deleteTargetSlot !== null) {
+                try {
+                    const tabKey = state.currentTab;
+                    if (filesData[tabKey] && filesData[tabKey][deleteTargetSlot]) {
+                        delete filesData[tabKey][deleteTargetSlot];
+                    }
+
+                    saveLocalStorageFallback();
+
+                    if (db) {
+                        const docId = `${tabKey}_slot_${deleteTargetSlot}`;
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bdl_fixed_slots', docId);
+                        await deleteDoc(docRef);
+                    }
+                    renderGrid();
+                    showToast("File berhasil dihapus dari web.");
+                } catch(e) {
+                    console.error("Delete error:", e);
+                    showToast("Gagal menghapus file.");
+                }
+                deleteTargetSlot = null;
+            }
+        }
+
+        window.openPreview = function(tabKey, slotIndex) {
+            const item = filesData[tabKey] && filesData[tabKey][slotIndex];
+            if (!item) return;
+
+            document.body.classList.add('no-scroll');
+            const modal = document.getElementById('preview-modal');
+            document.getElementById('preview-title').textContent = item.title || 'Preview';
+            
+            const downloadBtn = document.getElementById('preview-download-btn');
+            downloadBtn.href = item.url;
+            downloadBtn.download = item.filename || 'download';
+
+            const content = document.getElementById('preview-content');
+            const url = item.url;
+            const ext = item.ext;
+
+            if(url && url.trim() !== '') {
+                if(ext === "pdf"){
+                    content.innerHTML = `
+                        <div class="w-full h-full flex flex-col items-center justify-center relative">
+                            <iframe src="${url}#view=FitH" class="w-full h-full border-0 bg-white rounded-xl shadow-lg"></iframe>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <div class="w-full h-full flex items-center justify-center overflow-auto">
+                            <img src="${url}" class="max-w-none w-auto h-auto min-w-[70%] object-contain rounded-xl shadow-2xl my-auto">
+                        </div>
+                    `;
+                }
+            } else {
+                content.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center"><p class="text-gray-500">File tidak ditemukan.</p></div>`;
+            }
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        };
+
+        window.closePreviewModal = function() {
+            const modal = document.getElementById('preview-modal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            document.body.classList.remove('no-scroll');
+            document.getElementById('preview-content').innerHTML = ''; 
+        };
+
+        const passInput = document.getElementById('admin-password');
+        if(passInput) {
+            passInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') verifyPassword();
+            });
+        }
+
+        initDatabase();
+    </script>
+</body>
+</html>

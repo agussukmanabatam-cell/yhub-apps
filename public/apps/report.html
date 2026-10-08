@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Menu Report</title>
+    
+    <!-- Meta tag untuk Progressive Web App (PWA) -->
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Konfigurasi warna kustom dari screenshot -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'app-blue': '#1c7395', // Warna teks judul
+                        'link-dark': '#333333', // Warna teks link hitam
+                        'link-blue': '#1c7395', // Warna teks link biru
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS tambahan untuk animasi transisi accordion yang halus */
+        .accordion-content {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 1000px; /* Nilai max yang cukup besar agar tidak terpotong saat terbuka */
+            opacity: 1;
+            overflow: hidden;
+        }
+        .accordion-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+        .chevron.collapsed {
+            transform: rotate(180deg);
+        }
+        /* Menghilangkan highlight saat tombol di-tap di perangkat sentuh */
+        a, button {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Tambahan untuk menyembunyikan scrollbar tapi tetap bisa scroll */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen select-none">
+
+    <!-- App Header (Sticky) -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-md mx-auto px-4 py-4 flex items-center justify-center">
+            <div class="flex items-center gap-2">
+                <svg class="w-6 h-6 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">Portal Report</h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-md mx-auto w-full px-4 py-6 pb-24">
+
+        <!-- Card 2025 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-6 overflow-hidden">
+            <!-- Header Accordion -->
+            <button class="accordion-toggle w-full p-4 flex justify-between items-center bg-white active:bg-slate-50 transition-colors" data-target="list-2025">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-50 rounded-xl text-app-blue">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-slate-800">Penjualan 2025</h2>
+                </div>
+                <div class="p-1 rounded-full bg-slate-50">
+                    <svg class="chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                </div>
+            </button>
+            
+            <!-- Daftar Link (Grid Layout 2 Kolom) -->
+            <div id="list-2025" class="accordion-content px-4 pb-4">
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Januari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Februari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Maret <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">April <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Mei <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juni <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juli <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Agustus <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">September <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Oktober <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">November <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Desember <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2026 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-6 overflow-hidden">
+            <button class="accordion-toggle w-full p-4 flex justify-between items-center bg-white active:bg-slate-50 transition-colors" data-target="list-2026">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-50 rounded-xl text-app-blue">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-slate-800">Penjualan 2026</h2>
+                </div>
+                <div class="p-1 rounded-full bg-slate-50">
+                    <svg class="chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                </div>
+            </button>
+            
+            <div id="list-2026" class="accordion-content px-4 pb-4">
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Januari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Februari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Maret <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">April <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Mei <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juni <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juli <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Agustus <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">September <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Oktober <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">November <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Desember <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Report Lainnya -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-6 overflow-hidden">
+            <button class="accordion-toggle w-full p-4 flex justify-between items-center bg-white active:bg-slate-50 transition-colors" data-target="list-lainnya">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-50 rounded-xl text-app-blue">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-slate-800">Report Lainnya</h2>
+                </div>
+                <div class="p-1 rounded-full bg-slate-50">
+                    <svg class="chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                </div>
+            </button>
+            
+            <div id="list-lainnya" class="accordion-content px-4 pb-4">
+                <!-- Untuk nama laporan yang lebih panjang, pakai 1 kolom -->
+                <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Absen YIP <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Ceklist TKU <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Kalender Event <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Report Mingguan Staf <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Report Mingguan Ceko <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Report Hasil Join Ceko <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Data Apk Tukar Botol <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Sales Record <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Materi NC <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const accordionToggles = document.querySelectorAll('.accordion-toggle');
+
+            accordionToggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const targetId = toggle.getAttribute('data-target');
+                    const targetContent = document.getElementById(targetId);
+                    const chevron = toggle.querySelector('.chevron');
+
+                    targetContent.classList.toggle('collapsed');
+                    chevron.classList.toggle('collapsed');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

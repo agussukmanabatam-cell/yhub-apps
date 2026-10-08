@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Firebase
+.firebase/
+firebase-debug.log
+**/.firebase/
+
+# Logs
+*.log
+
+# Env
+.env
+.env.local
+
+# Backup files
+*.backup
+*.bak
+*.bak2
+*.tmp
+
+# IDE
+.vscode/
+.idea/
