@@ -1,5 +1,5 @@
 // ==========================================
-// Y-HUB APP — app.js (v5 — Fix Birthday)
+// Y-HUB APP — app.js (v6 — Birthday: Hari Ini + Terdekat)
 // ==========================================
 
 // 1. ICON SVG
@@ -306,11 +306,6 @@ async function loadEventData() {
     const todayStr2 = `${dd}/${mm}/${yyyy}`;
     const dayMonthStr = `${dd}/${mm}`;
 
-    // Mapping nama bulan Indonesia
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-    const todayMonthName = monthNames[today.getMonth()];
-    const todayDay = String(today.getDate()).padStart(2, '0');
-
     try {
         // === EVENT & SERAGAM ===
         const dataES = await fetchCSV(EVENT_CSV);
@@ -331,31 +326,65 @@ async function loadEventData() {
         if (eventEl) eventEl.innerText = foundEvent;
         if (seragamEl) seragamEl.innerText = foundSeragam;
 
-        // === BIRTHDAY (format "12 Des", "14 Jul", dst) ===
+        // === BIRTHDAY: HARI INI + TERDEKAT (Opsi C) ===
         const dataB = await fetchCSV(BIRTHDAY_CSV);
-        let bdays = [];
-        
+        const monthIndex = { Jan:0, Feb:1, Mar:2, Apr:3, Mei:4, Jun:5, Jul:6, Agu:7, Sep:8, Okt:9, Nov:10, Des:11 };
+        const todayIdx = today.getMonth() * 100 + today.getDate();
+        let todayList = [];
+        let upcomingList = [];
+
         dataB.forEach((row, index) => {
             if (index === 0) return;
             const nama = row[0] ? row[0].trim() : "";
             const tglLahir = row[1] ? row[1].trim() : "";
-            
             if (!nama || !tglLahir) return;
-            
-            // Parse "12 Des" → day=12, month=Des
-            const parts = tglLahir.split(/\s+/);
+
+            // Format: "12 Des" atau "12 Des,07/03/2018"
+            const cleanDate = tglLahir.split(',')[0].trim();
+            const parts = cleanDate.split(/\s+/);
             if (parts.length < 2) return;
-            
-            const day = parts[0].padStart(2, '0');
-            const monthName = parts[1].substring(0, 3); // "Des"
-            
-            if (day === todayDay && monthName === todayMonthName) {
-                bdays.push(nama);
+
+            const day = parseInt(parts[0], 10);
+            const mon = monthIndex[parts[1].substring(0, 3)];
+            if (isNaN(day) || mon === undefined) return;
+
+            const bdayIdx = mon * 100 + day;
+            let diff = bdayIdx - todayIdx;
+            if (diff < 0) diff += 1200;
+
+            if (diff === 0) {
+                todayList.push(nama);
+            } else {
+                upcomingList.push({ nama, diff });
             }
         });
+
+        // Urutkan: terdekat dulu
+        upcomingList.sort((a, b) => a.diff - b.diff);
+
+        // Bangun output: hari ini + 2 terdekat (max 3 total)
+        let output = [];
         
+        // Hari ini dulu
+        todayList.forEach(nama => {
+            output.push(`🎂 ${nama} (hari ini)`);
+        });
+
+        // Terdekat, max sampai total 3
+        const remainingSlots = Math.max(0, 3 - output.length);
+        upcomingList.slice(0, remainingSlots).forEach(x => {
+            let label;
+            if (x.diff === 1) label = 'besok';
+            else if (x.diff <= 7) label = `${x.diff} hari`;
+            else if (x.diff <= 30) label = `${x.diff} hari`;
+            else label = `${x.diff} hari`;
+            output.push(`${x.nama} (${label})`);
+        });
+
         const bdayEl = document.getElementById('birthday-val');
-        if (bdayEl) bdayEl.innerText = bdays.length > 0 ? bdays.join(', ') : "Tidak ada";
+        if (bdayEl) {
+            bdayEl.innerText = output.length > 0 ? output.join(', ') : "Tidak ada";
+        }
 
     } catch (e) {
         console.error('Error loading event:', e);
