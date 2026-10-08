@@ -868,87 +868,40 @@ function renderHero() {
 }
 
 function renderUpcoming() {
-    const section = $('upcoming-section');
     const list = $('upcoming-list');
-    
-    // Ambil SEMUA yang ultah hari ini + 7 hari ke depan
-    const allUpcoming = [];
+    const section = $('upcoming-section');
+    list.innerHTML = '';
+    const upcoming = [];
     Object.keys(birthdayData).forEach(k => {
         birthdayData[k].forEach(item => {
             const info = daysUntil(item.month, item.day);
-            if (info.days >= 0 && info.days <= 7) {
-                allUpcoming.push({ ...item, ...info });
-            }
+            if (info.days >= 0 && info.days <= 7) upcoming.push({ ...item, ...info });
         });
     });
-    allUpcoming.sort((a, b) => a.days - b.days);
+    upcoming.sort((a, b) => a.days - b.days);
 
-    if (allUpcoming.length === 0) {
-        section.classList.add('hidden');
-        return;
-    }
+    if (upcoming.length === 0) { section.classList.add('hidden'); return; }
     section.classList.remove('hidden');
-    $('upcoming-count').innerText = allUpcoming.length + ' orang';
+    $('upcoming-count').innerText = upcoming.length + ' orang';
 
-    const todayList = allUpcoming.filter(x => x.days === 0);
-    const weekList = allUpcoming.filter(x => x.days >= 1 && x.days <= 7);
-
-    let html = '';
-
-    if (todayList.length > 0) {
-        html += `
-            <div class="mb-3">
-                <div class="flex items-center gap-2 mb-2">
-                    <i class="ph-bold ph-confetti text-pink-500 text-[12px]"></i>
-                    <p class="text-[10px] font-extrabold text-pink-500 uppercase tracking-[0.15em]">🎉 Hari Ini Ulang Tahun</p>
-                </div>
-                <div class="space-y-1.5">
-                    ${todayList.map(u => `
-                        <div class="upcoming-item is-today rounded-2xl px-3 py-2.5 flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-white/25 flex items-center justify-center flex-shrink-0">
-                                <i class="ph-bold ph-cake text-white text-[14px]"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="u-text text-[12px] font-extrabold text-white truncate leading-tight">${u.name}</p>
-                                <p class="u-text text-[10px] font-semibold text-white/80 mt-0.5 leading-tight">${u.day} ${MONTHS_SHORT[u.month - 1]}</p>
-                            </div>
-                            <span class="num text-[10px] font-extrabold bg-white/25 text-white px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">Hari ini</span>
-                        </div>
-                    `).join('')}
-                </div>
+    upcoming.forEach(u => {
+        const isToday = u.days === 0;
+        const isTomorrow = u.days === 1;
+        const dayLabel = isToday ? 'Hari ini' : (isTomorrow ? 'Besok' : `${u.days} hari lagi`);
+        const item = document.createElement('div');
+        item.className = 'upcoming-item rounded-2xl px-3 py-2.5 flex items-center gap-3' + (isToday ? ' is-today' : '');
+        item.innerHTML = `
+            <div class="w-8 h-8 rounded-xl ${isToday ? 'bg-white/25' : 'bg-pink-100'} flex items-center justify-center flex-shrink-0">
+                <i class="ph-bold ph-cake ${isToday ? 'text-white' : 'text-pink-500'} text-[14px]"></i>
             </div>
-        `;
-    }
-
-    if (weekList.length > 0) {
-        html += `
-            <div>
-                <div class="flex items-center gap-2 mb-2">
-                    <i class="ph-bold ph-clock-countdown text-pink-400 text-[12px]"></i>
-                    <p class="text-[10px] font-extrabold text-pink-400 uppercase tracking-[0.15em]">📅 7 Hari ke Depan</p>
-                </div>
-                <div class="space-y-1.5">
-                    ${weekList.map(u => {
-                        const label = u.days === 1 ? 'Besok' : `${u.days} hari`;
-                        return `
-                            <div class="upcoming-item rounded-2xl px-3 py-2.5 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-xl bg-pink-100 flex items-center justify-center flex-shrink-0">
-                                    <i class="ph-bold ph-cake text-pink-500 text-[14px]"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="u-text text-[12px] font-extrabold text-gray-700 truncate leading-tight">${u.name}</p>
-                                    <p class="u-text text-[10px] font-semibold text-gray-400 mt-0.5 leading-tight">${u.day} ${MONTHS_SHORT[u.month - 1]}</p>
-                                </div>
-                                <span class="num text-[10px] font-extrabold bg-pink-50 text-pink-500 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">${label}</span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
+            <div class="flex-1 min-w-0">
+                <p class="u-text text-[12px] font-extrabold ${isToday ? 'text-white' : 'text-gray-700'} truncate leading-tight">${u.name}</p>
+                <p class="u-text text-[10px] font-semibold ${isToday ? 'text-white/80' : 'text-gray-400'} mt-0.5 leading-tight">${u.day} ${MONTHS_SHORT[u.month - 1]}</p>
             </div>
+            <span class="num text-[10px] font-extrabold ${isToday ? 'bg-white/25 text-white' : 'bg-pink-50 text-pink-500'} px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">${dayLabel}</span>
         `;
-    }
-
-    list.innerHTML = html;
+        list.appendChild(item);
+    });
 }
 
 function renderStats() {
