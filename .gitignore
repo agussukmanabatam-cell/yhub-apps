@@ -27,3 +27,7 @@ firebase-debug.log
 # IDE
 .vscode/
 .idea/
+
+# Extra
+*.zip
+**/import-users.html
