@@ -8,8 +8,12 @@
     ],
     "rewrites": [
       {
+        "source": "/apps/**",
+        "destination": "/apps/:splat"
+      },
+      {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "/home.html"
       }
     ]
   }
