@@ -1,8 +1,8 @@
 // ==========================================
-// Y-HUB APP — app.js (v3 — Layout Cantik)
+// Y-HUB APP — app.js (v4 — Event & Birthday)
 // ==========================================
 
-// 1. ICON SVG (untuk 7 menu laporan)
+// 1. ICON SVG
 const Icons = {
     home:     `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>`,
     cart:     `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>`,
@@ -21,7 +21,7 @@ const Icons = {
     chevron:  `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>`,
 };
 
-// 2. MENU UTAMA (9 icon image)
+// 2. MENU UTAMA
 const homeMenu = [
     { id: 'penjualan',   label: 'Penjualan',   img: '/assets/menu/penjualan.png' },
     { id: 'yakult-lady', label: 'Yakult Lady', img: '/assets/menu/yakult-lady.png' },
@@ -34,7 +34,7 @@ const homeMenu = [
     { id: 'join-team',   label: 'Join Team',   img: '/assets/menu/join-team.png' },
 ];
 
-// 3. MENU LAPORAN (7 card, SVG gradient)
+// 3. MENU LAPORAN
 const reportMenu = [
     { id: 'ceklist',           label: 'Ceklist TKU',        icon: 'doc',    grad: 'from-blue-500 to-blue-600' },
     { id: 'lap-mingguan-staf', label: 'Lap. Mingguan Staf', icon: 'chart',  grad: 'from-indigo-500 to-indigo-600' },
@@ -130,7 +130,7 @@ function buildBottomNav() {
 // 8. TEMPLATE HOME
 const templates = {
     home: `
-        <div class="space-y-7">
+        <div class="space-y-6">
             <!-- Hero greeting -->
             <div class="fade-in-up" style="animation-delay: 0ms">
                 <div class="bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-3xl p-5 shadow-lg shadow-red-200 relative overflow-hidden">
@@ -141,6 +141,34 @@ const templates = {
                         <h2 class="font-heading text-xl font-bold text-white mb-1" id="greetingText">Selamat Datang! 👋</h2>
                         <p class="text-red-50 text-xs opacity-90">Portal internal Y-Hub App</p>
                     </div>
+                </div>
+            </div>
+
+            <!-- Event & Birthday -->
+            <div class="fade-in-up" style="animation-delay: 100ms">
+                <div class="event-card">
+                    <div class="info-box">
+                        <div class="icon-circle bg-gradient-to-br from-orange-400 to-orange-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+                        </div>
+                        <div style="min-width:0;">
+                            <div class="label">Event Hari Ini</div>
+                            <div class="value" id="event-val">Memuat...</div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <div class="icon-circle bg-gradient-to-br from-pink-400 to-pink-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v13"/><rect x="4" y="9" width="16" height="12" rx="2"/><path d="M12 6c-1.5-2-3.5-3-5-2s-1 3 1 3M12 6c1.5-2 3.5-3 5-2s1 3-1 3"/></svg>
+                        </div>
+                        <div style="min-width:0;">
+                            <div class="label">Birthday</div>
+                            <div class="value" id="birthday-val">Memuat...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 ml-2 flex items-center gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Seragam:</span>
+                    <span class="text-sm font-bold text-gray-700" id="seragam-val">Memuat...</span>
                 </div>
             </div>
 
@@ -160,7 +188,6 @@ const templates = {
                 </div>
             </div>
 
-            <!-- Footer -->
             <div class="text-center pt-4 pb-2 fade-in-up" style="animation-delay: 400ms">
                 <p class="text-[10px] text-gray-400 font-medium">Y-Hub App &copy; 2026</p>
             </div>
@@ -256,9 +283,73 @@ function initHomePage() {
         const d = new Date();
         dateEl.textContent = `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     }
+
+    loadEventData();
 }
 
-// 12. UPDATE ACTIVE NAV
+// 12. EVENT & BIRTHDAY DATA
+const EVENT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCp3DY8YrJP9Bmy1eO6-w6LJzuUj5Iq9cVNnPiJKjpF91Hcei7o4Q5-2i7rTQbrcmT6hCHotfTmU5u/pub?gid=1388278707&single=true&output=csv';
+const BIRTHDAY_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCp3DY8YrJP9Bmy1eO6-w6LJzuUj5Iq9cVNnPiJKjpF91Hcei7o4Q5-2i7rTQbrcmT6hCHotfTmU5u/pub?gid=336207575&single=true&output=csv';
+
+async function fetchCSV(url) {
+    const response = await fetch(url + '&t=' + new Date().getTime());
+    const text = await response.text();
+    return text.split('\n').map(row => row.split(','));
+}
+
+async function loadEventData() {
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    const todayStr1 = `${yyyy}-${mm}-${dd}`;
+    const todayStr2 = `${dd}/${mm}/${yyyy}`;
+    const dayMonthStr = `${dd}/${mm}`;
+
+    try {
+        const dataES = await fetchCSV(EVENT_CSV);
+        let foundEvent = "Tidak ada";
+        let foundSeragam = "Tidak ada";
+
+        dataES.forEach((row, index) => {
+            if (index === 0) return;
+            let dateCol = row[8] ? row[8].trim() : "";
+            if (dateCol === todayStr1 || dateCol === todayStr2 || dateCol.includes(dayMonthStr)) {
+                if (row[5] && row[5].trim() !== "") foundEvent = row[5].trim();
+                if (row[3] && row[3].trim() !== "") foundSeragam = row[3].trim();
+            }
+        });
+        
+        const eventEl = document.getElementById('event-val');
+        const seragamEl = document.getElementById('seragam-val');
+        if (eventEl) eventEl.innerText = foundEvent;
+        if (seragamEl) seragamEl.innerText = foundSeragam;
+
+        const dataB = await fetchCSV(BIRTHDAY_CSV);
+        let bdays = [];
+        dataB.forEach((row, index) => {
+            if (index === 0) return;
+            let bDate = row[1] ? row[1].trim() : "";
+            if (bDate.includes(dayMonthStr)) {
+                bdays.push(row[0]);
+            }
+        });
+        
+        const bdayEl = document.getElementById('birthday-val');
+        if (bdayEl) bdayEl.innerText = bdays.length > 0 ? bdays.join(', ') : "Tidak ada";
+
+    } catch (e) {
+        console.error('Error loading event:', e);
+        const eventEl = document.getElementById('event-val');
+        const bdayEl = document.getElementById('birthday-val');
+        const seragamEl = document.getElementById('seragam-val');
+        if (eventEl) eventEl.innerText = '-';
+        if (bdayEl) bdayEl.innerText = '-';
+        if (seragamEl) seragamEl.innerText = '-';
+    }
+}
+
+// 13. UPDATE ACTIVE NAV
 function updateActiveNav(pageId) {
     document.querySelectorAll('.nav-link').forEach(el => {
         const isActive = el.dataset.id === pageId;
@@ -273,13 +364,13 @@ function updateActiveNav(pageId) {
     });
 }
 
-// 13. BACK BUTTON NATIVE
+// 14. BACK BUTTON
 window.addEventListener('popstate', (e) => {
     const pageId = (e.state && e.state.page) || 'home';
     navigateTo(pageId, false);
 });
 
-// 14. INIT
+// 15. INIT
 document.addEventListener('DOMContentLoaded', () => {
     buildSidebar();
     buildBottomNav();
