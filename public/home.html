@@ -278,6 +278,29 @@
         <nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 flex justify-around items-center z-30" style="height: calc(64px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);"></nav>
     </div>
 
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        (function() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyBGuX3CiF8sEEfuNxcdJpRHetHl6ATtiVQ",
+                authDomain: "y-hub-login.firebaseapp.com",
+                projectId: "y-hub-login",
+                storageBucket: "y-hub-login.firebasestorage.app",
+                messagingSenderId: "439825695894",
+                appId: "1:439825695894:web:45f6f388f9730af5342eb7"
+            };
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                window.__db = firebase.firestore();
+                firebase.auth().signInAnonymously()
+                    .then(() => console.log('[Auth] Anonymous OK'))
+                    .catch(err => console.error('[Auth] Error:', err));
+            }
+        })();
+    </script>
+
     <script src="app.js"></script>
 </body>
 </html>
