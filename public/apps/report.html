@@ -5,33 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Menu Report</title>
     
-    <!-- Meta tag untuk Progressive Web App (PWA) -->
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
-    <!-- Memuat Tailwind CSS untuk styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Konfigurasi warna kustom dari screenshot -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'app-blue': '#1c7395', // Warna teks judul
-                        'link-dark': '#333333', // Warna teks link hitam
-                        'link-blue': '#1c7395', // Warna teks link biru
+                        'app-blue': '#1c7395',
+                        'link-dark': '#333333',
+                        'link-blue': '#1c7395',
                     }
                 }
             }
         }
     </script>
     <style>
-        /* CSS tambahan untuk animasi transisi accordion yang halus */
         .accordion-content {
             transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            max-height: 1000px; /* Nilai max yang cukup besar agar tidak terpotong saat terbuka */
+            max-height: 1000px;
             opacity: 1;
             overflow: hidden;
         }
@@ -45,12 +41,9 @@
         .chevron.collapsed {
             transform: rotate(180deg);
         }
-        /* Menghilangkan highlight saat tombol di-tap di perangkat sentuh */
         a, button {
             -webkit-tap-highlight-color: transparent;
         }
-        
-        /* Tambahan untuk menyembunyikan scrollbar tapi tetap bisa scroll */
         ::-webkit-scrollbar {
             width: 0px;
             background: transparent;
@@ -76,7 +69,6 @@
 
         <!-- Card 2025 -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-6 overflow-hidden">
-            <!-- Header Accordion -->
             <button class="accordion-toggle w-full p-4 flex justify-between items-center bg-white active:bg-slate-50 transition-colors" data-target="list-2025">
                 <div class="flex items-center gap-3">
                     <div class="p-2 bg-blue-50 rounded-xl text-app-blue">
@@ -89,21 +81,20 @@
                 </div>
             </button>
             
-            <!-- Daftar Link (Grid Layout 2 Kolom) -->
             <div id="list-2025" class="accordion-content px-4 pb-4">
                 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Januari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Februari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Maret <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">April <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Mei <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juni <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juli <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Agustus <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">September <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Oktober <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">November <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Desember <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Januari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Februari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Maret <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">April <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Mei <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juni <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juli <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Agustus <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">September <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Oktober <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">November <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Desember <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
                 </div>
             </div>
         </div>
@@ -124,18 +115,18 @@
             
             <div id="list-2026" class="accordion-content px-4 pb-4">
                 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                    <a href="https://docs.google.com/spreadsheets/d/19XUPEce0cL7_5i4LoyVqceY9EPMPR-x2vgjP0HOBQOc/edit?gid=336076885#gid=336076885" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Januari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1rk-6a2SiHfZkt9nbyULI3lFXARHM6-xV1NsgXOewjlI/edit?gid=1146608164#gid=1146608164" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Februari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1Vp4-SBNqzvwaT91TKsdJb2c3s-KctUd76wt-ejAIOlQ/edit?gid=1146608164#gid=1146608164" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Maret <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1PEwZKrD4NRu8oCPt5iaJ8kqXujq_2AiObr6Ef85H2Pc/edit?gid=1146608164#gid=1146608164" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">April <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1xUiK2tXXSX7NyBNjhbpUb_LmV3fnB9gi_YfU02Jr3zs/edit?gid=1146608164#gid=1146608164" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Mei <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1Cenqpoc_HF7oUZhWC5mQjNceJbyGzETWqH8CWfKdg6w/edit?gid=1956256564#gid=1956256564" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juni <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1-zvaWzi8NX99xqcUb69g67wf9j4ijc4R9DA8miNb3No/edit?gid=336076885#gid=336076885" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juli <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/16JFaJnmC3qf9PiZaXEGmvbgUUBSTtPAuPsy97Sl0O_Q/edit?gid=1146608164#gid=1146608164" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Agustus <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1Wv6Jp6ras8NPDGfoeJOS5aBrneGVWk86PNwsCJKbFXI/edit?gid=1146608164#gid=1146608164" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">September <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Oktober <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">November <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                    <a href="#" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Desember <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/19XUPEce0cL7_5i4LoyVqceY9EPMPR-x2vgjP0HOBQOc/edit?gid=336076885#gid=336076885" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Januari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1rk-6a2SiHfZkt9nbyULI3lFXARHM6-xV1NsgXOewjlI/edit?gid=1146608164#gid=1146608164" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Februari <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1Vp4-SBNqzvwaT91TKsdJb2c3s-KctUd76wt-ejAIOlQ/edit?gid=1146608164#gid=1146608164" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Maret <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1PEwZKrD4NRu8oCPt5iaJ8kqXujq_2AiObr6Ef85H2Pc/edit?gid=1146608164#gid=1146608164" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">April <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1xUiK2tXXSX7NyBNjhbpUb_LmV3fnB9gi_YfU02Jr3zs/edit?gid=1146608164#gid=1146608164" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Mei <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1Cenqpoc_HF7oUZhWC5mQjNceJbyGzETWqH8CWfKdg6w/edit?gid=1956256564#gid=1956256564" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juni <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1-zvaWzi8NX99xqcUb69g67wf9j4ijc4R9DA8miNb3No/edit?gid=336076885#gid=336076885" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Juli <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/16JFaJnmC3qf9PiZaXEGmvbgUUBSTtPAuPsy97Sl0O_Q/edit?gid=1146608164#gid=1146608164" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Agustus <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1Wv6Jp6ras8NPDGfoeJOS5aBrneGVWk86PNwsCJKbFXI/edit?gid=1146608164#gid=1146608164" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">September <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Oktober <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">November <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+                    <a href="#" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-95 active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Desember <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
                 </div>
             </div>
         </div>
@@ -155,18 +146,17 @@
             </button>
             
             <div id="list-lainnya" class="accordion-content px-4 pb-4">
-                <!-- Untuk nama laporan yang lebih panjang, pakai 1 kolom -->
                 <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
-                    <a href="https://docs.google.com/spreadsheets/d/1r-x7X3Lj9ikI0NB10-nr5IBMfp77DKZnkC_YJLO4KUY/edit?gid=1146608164#gid=1146608164" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">PJL Harian <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    <a href="https://yakultdashboard.yakult.co.id/pesan/login.php" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Absen YIP <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1i4MidYDZq1Loeq1kW6PGlXN1lbvMU126ncrH9lApDu0/edit?gid=391769652#gid=391769652" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Ceklist TKU <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1YJkQQIwd6XhpDtOcFgjGY5DMHV9C_TO2etOvoGpfTb8/edit?gid=0#gid=0" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Kalender Event <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1y1iYIKRE0S7FzeJ25gPXj9iammqZZQ1Kerreh9A10kA/edit?gid=1639841627#gid=1639841627" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Report Mingguan Staf <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/14fVFo-uICitFadaeSVVZkUF8H2r82F71nUOOsYddGEg/edit?gid=0#gid=0" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Report Mingguan Ceko <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1oI_05YyJnQoemaPIMVqcRhsL3SE9xR4DFvOhH7Hklt0/edit?gid=1491477909#gid=1491477909" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Report Hasil Join Ceko <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1qNPKiyhIft5-WPJOLJvQka8Fli47QNRlCcxbG9PSFV4/edit?gid=1465813228#gid=1465813228" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Data Apk Tukar Botol <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/19TZtq1Bf4VkIWRRI6mORTZwyPMrAt9JMgVRU4Twgga8/edit?gid=704567023#gid=704567023" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Sales Record <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1yACPhvtR-Kxc9vocK82mXOolINP_K7xV/edit?gid=764004863#gid=764004863" class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Materi NC <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1r-x7X3Lj9ikI0NB10-nr5IBMfp77DKZnkC_YJLO4KUY/edit?gid=1146608164#gid=1146608164" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">PJL Harian <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://yakultdashboard.yakult.co.id/pesan/login.php" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Absen YIP <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1i4MidYDZq1Loeq1kW6PGlXN1lbvMU126ncrH9lApDu0/edit?gid=391769652#gid=391769652" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Ceklist TKU <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1YJkQQIwd6XhpDtOcFgjGY5DMHV9C_TO2etOvoGpfTb8/edit?gid=0#gid=0" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Kalender Event <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1y1iYIKRE0S7FzeJ25gPXj9iammqZZQ1Kerreh9A10kA/edit?gid=1639841627#gid=1639841627" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Report Mingguan Staf <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/14fVFo-uICitFadaeSVVZkUF8H2r82F71nUOOsYddGEg/edit?gid=0#gid=0" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Report Mingguan Ceko <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1oI_05YyJnQoemaPIMVqcRhsL3SE9xR4DFvOhH7Hklt0/edit?gid=1491477909#gid=1491477909" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Report Hasil Join Ceko <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1qNPKiyhIft5-WPJOLJvQka8Fli47QNRlCcxbG9PSFV4/edit?gid=1465813228#gid=1465813228" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Data Apk Tukar Botol <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/19TZtq1Bf4VkIWRRI6mORTZwyPMrAt9JMgVRU4Twgga8/edit?gid=704567023#gid=704567023" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Sales Record <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1yACPhvtR-Kxc9vocK82mXOolINP_K7xV/edit?gid=764004863#gid=764004863" class="report-link flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-medium active:scale-[0.98] active:bg-blue-50 active:text-app-blue active:border-blue-200 transition-all">Materi NC <svg class="w-4 h-4 text-app-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>
                 </div>
             </div>
         </div>
@@ -174,6 +164,9 @@
     </main>
 
     <script>
+        // ============================================================
+        // ACCORDION
+        // ============================================================
         document.addEventListener('DOMContentLoaded', () => {
             const accordionToggles = document.querySelectorAll('.accordion-toggle');
 
@@ -188,6 +181,70 @@
                 });
             });
         });
+
+        // ============================================================
+        // PWA LINK HANDLER — Buka di luar PWA (browser / app native)
+        // ============================================================
+        (function() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+                              || window.navigator.standalone === true;
+
+            function handleReportLink(link) {
+                link.addEventListener('click', (e) => {
+                    const href = link.getAttribute('href');
+                    
+                    // Skip link kosong / placeholder
+                    if (!href || href === '#' || href.trim() === '') {
+                        return;
+                    }
+
+                    // Hanya proses link http(s)
+                    if (!href.startsWith('http')) return;
+
+                    // Kalau BUKAN di PWA → biarkan default (buka di tab baru browser)
+                    if (!isStandalone) {
+                        e.preventDefault();
+                        window.open(href, '_blank', 'noopener,noreferrer');
+                        return;
+                    }
+
+                    // Kalau DI PWA — paksa buka di luar PWA
+                    e.preventDefault();
+
+                    // Coba metode 1: window.open dengan noopener
+                    const newWin = window.open(href, '_blank', 'noopener,noreferrer');
+                    
+                    if (newWin && !newWin.closed && typeof newWin.closed !== 'undefined') {
+                        // Berhasil buka di browser baru
+                        return;
+                    }
+
+                    // Coba metode 2: fallback via anchor sementara dengan target _blank
+                    try {
+                        const tempAnchor = document.createElement('a');
+                        tempAnchor.href = href;
+                        tempAnchor.target = '_blank';
+                        tempAnchor.rel = 'noopener noreferrer';
+                        tempAnchor.style.display = 'none';
+                        document.body.appendChild(tempAnchor);
+                        tempAnchor.click();
+                        setTimeout(() => tempAnchor.remove(), 100);
+                    } catch(err) {
+                        // Coba metode 3: fallback ke location.href
+                        window.location.href = href;
+                    }
+                });
+            }
+
+            // Attach ke semua link report
+            document.querySelectorAll('a.report-link').forEach(link => {
+                handleReportLink(link);
+            });
+
+            // Log untuk debug
+            console.log('[PWA] Standalone mode:', isStandalone);
+            console.log('[PWA] Report links found:', document.querySelectorAll('a.report-link').length);
+        })();
     </script>
 </body>
 </html>
