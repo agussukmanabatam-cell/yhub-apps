@@ -1152,11 +1152,11 @@ btnLogin.onclick = async () => {
       $('btnArrow').style.display = 'grid';
 
       showModal({
-        title: '🔒 Akun Sudah Login di Device Lain',
-        desc: `<b>${u.nama}</b> sedang login di device lain.<br><br>Kalau kamu <b>tetap login</b>, device lama bakal <b>otomatis logout</b> dalam beberapa detik.`,
+        title: 'Account Already Active',
+        desc: `<b>${u.nama}</b> is currently signed in on another device.<br><br>Continuing will log out that device.`,
         actions: [
-          { label: 'Batal', primary: false },
-          { label: 'Ya, Login Sekarang', primary: true, onClick: () => doLogin(nik, u.nama, deviceId) }
+          { label: 'Cancel', primary: false },
+          { label: 'Continue', primary: true, onClick: () => doLogin(nik, u.nama, deviceId) }
         ]
       });
       return;

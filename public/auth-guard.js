@@ -1,11 +1,9 @@
 // ============================================
-// AUTH GUARD — Session + Device Lock (Heartbeat)
+// AUTH GUARD — Shared Session Logic
 // ============================================
 
 const SESSION_KEY = 'yhub_session';
 const SESSION_DAYS = 30;
-const HEARTBEAT_INTERVAL = 999999999; // sementara OFF
-let heartbeatTimer = null;
 
 function saveSession(data) {
     const session = {
@@ -40,7 +38,6 @@ function getSession() {
 function clearSession() {
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem('deviceId');
-    stopHeartbeat();
 }
 
 function requireLogin() {
@@ -49,7 +46,6 @@ function requireLogin() {
         window.location.replace('/');
         return null;
     }
-    startHeartbeat(s);
     return s;
 }
 
@@ -64,47 +60,5 @@ function redirectIfLoggedIn() {
 
 function logout() {
     clearSession();
-    window.location.replace('/');
-}
-
-function startHeartbeat(session) {
-    if (heartbeatTimer) return;
-    
-    heartbeatTimer = setInterval(async () => {
-        try {
-            if (typeof firebase === 'undefined' || !window.__db) return;
-            
-            const docRef = window.__db.collection('users').doc(session.nik);
-            const snap = await docRef.get();
-            
-            if (!snap.exists) {
-                forceLogout('User tidak ditemukan');
-                return;
-            }
-            
-            const data = snap.data();
-            if (data.deviceId && data.deviceId !== session.deviceId) {
-                console.warn('[Heartbeat] Device lain login');
-                forceLogout('Akun kamu login di device lain');
-                return;
-            }
-            console.log('[Heartbeat] OK');
-        } catch (err) {
-            console.error('[Heartbeat] Error:', err);
-        }
-    }, HEARTBEAT_INTERVAL);
-}
-
-function stopHeartbeat() {
-    if (heartbeatTimer) {
-        clearInterval(heartbeatTimer);
-        heartbeatTimer = null;
-    }
-}
-
-function forceLogout(reason) {
-    stopHeartbeat();
-    clearSession();
-    alert('🔒 ' + (reason || 'Sesi kamu berakhir') + '\n\nKamu bakal diarahkan ke halaman login.');
     window.location.replace('/');
 }
