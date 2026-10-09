@@ -3,34 +3,33 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#F0F2F8" />
+<meta name="theme-color" content="#F5EEF0" />
 <title>Sign In — Y-HUB</title>
 <script src="auth-guard.js"></script>
 
-<!-- Font Poppins -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --bg: #EEF1F8;
-    --card: #F5F7FB;
-    --text: #1A1D2E;
-    --muted: #8B92A8;
-    --primary: #2563EB;
-    --primary-dark: #1E40AF;
-    --accent: #3B82F6;
+    --bg: #F7EFF1;
+    --card: #FBF3F5;
+    --text: #2B1418;
+    --muted: #9B6F78;
+    --primary: #DC2626;
+    --primary-dark: #991B1B;
+    --accent: #EF4444;
     --success: #10B981;
     --danger: #EF4444;
     --shadow-out:
-      8px 8px 20px rgba(174,184,205,0.55),
+      8px 8px 20px rgba(180,140,150,0.4),
       -8px -8px 20px rgba(255,255,255,0.95);
     --shadow-in:
-      inset 6px 6px 12px rgba(174,184,205,0.55),
+      inset 6px 6px 12px rgba(180,140,150,0.4),
       inset -6px -6px 12px rgba(255,255,255,0.9);
     --shadow-btn:
-      6px 6px 16px rgba(37,99,235,0.35),
+      6px 6px 16px rgba(220,38,38,0.35),
       -4px -4px 12px rgba(255,255,255,0.6);
   }
 
@@ -45,25 +44,148 @@
     overscroll-behavior:none;
   }
 
-  /* Background decor */
-  body::before, body::after {
-    content:'';
+  /* ============================================================
+     BACKGROUND DECOR — PERNAK PERNIK
+     ============================================================ */
+  .bg-decor {
     position:fixed;
-    border-radius:50%;
+    inset:0;
     z-index:0;
     pointer-events:none;
+    overflow:hidden;
   }
-  body::before {
+
+  /* Blob gradient besar di sudut */
+  .blob {
+    position:absolute;
+    border-radius:50%;
+    filter: blur(60px);
+    opacity:0.55;
+    will-change: transform;
+    animation: blobFloat 18s ease-in-out infinite;
+  }
+  .blob-1 {
+    width:340px; height:340px;
+    background: radial-gradient(circle, #F87171 0%, #EF4444 50%, transparent 75%);
+    top:-120px; left:-120px;
+    animation-delay:0s;
+  }
+  .blob-2 {
     width:280px; height:280px;
-    background: radial-gradient(circle at 30% 30%, #C7D5F5, #B0C2EA);
-    top:-100px; left:-100px;
-    box-shadow: inset -10px -10px 30px rgba(255,255,255,0.4), 20px 20px 60px rgba(140,160,200,0.3);
+    background: radial-gradient(circle, #FCA5A5 0%, #F87171 50%, transparent 75%);
+    bottom:-100px; right:-100px;
+    animation-delay:-6s;
   }
-  body::after {
+  .blob-3 {
     width:220px; height:220px;
-    background: radial-gradient(circle at 40% 40%, #D4DEF6, #B8C7E8);
-    bottom:-90px; right:-80px;
-    box-shadow: inset -8px -8px 20px rgba(255,255,255,0.5), 15px 15px 40px rgba(140,160,200,0.25);
+    background: radial-gradient(circle, #FECACA 0%, #FCA5A5 50%, transparent 75%);
+    top:40%; right:-80px;
+    opacity:0.35;
+    animation-delay:-12s;
+  }
+  .blob-4 {
+    width:180px; height:180px;
+    background: radial-gradient(circle, #FEE2E2 0%, #FECACA 50%, transparent 75%);
+    bottom:30%; left:-60px;
+    opacity:0.4;
+    animation-delay:-9s;
+  }
+  @keyframes blobFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(20px, -15px) scale(1.08); }
+    66% { transform: translate(-15px, 20px) scale(0.95); }
+  }
+
+  /* Ring deco — cincin samar */
+  .ring-deco {
+    position:absolute;
+    border-radius:50%;
+    border: 1.5px solid rgba(220, 38, 38, 0.08);
+    pointer-events:none;
+  }
+  .ring-1 {
+    width: 280px; height: 280px;
+    top: 15%; left: -100px;
+  }
+  .ring-2 {
+    width: 200px; height: 200px;
+    top: 15%; left: -60px;
+    border-color: rgba(220, 38, 38, 0.06);
+  }
+  .ring-3 {
+    width: 240px; height: 240px;
+    bottom: 12%; right: -80px;
+  }
+  .ring-4 {
+    width: 160px; height: 160px;
+    bottom: 12%; right: -40px;
+    border-color: rgba(220, 38, 38, 0.06);
+  }
+
+  /* Dots pattern */
+  .dots-pattern {
+    position:absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+    background-image:
+      radial-gradient(circle, rgba(220, 38, 38, 0.09) 1.2px, transparent 1.3px);
+    background-size: 26px 26px;
+    background-position: 0 0;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    opacity: 0.9;
+  }
+
+  /* Sparkle bintang-bintang kecil */
+  .sparkle {
+    position:absolute;
+    pointer-events:none;
+    opacity:0.7;
+    animation: sparkleAnim 3s ease-in-out infinite;
+  }
+  .sparkle svg {
+    width:100%; height:100%;
+    filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.3));
+  }
+  .sparkle-1 { width:16px; height:16px; top: 12%; left: 18%; animation-delay: 0s; }
+  .sparkle-2 { width:12px; height:12px; top: 22%; right: 14%; animation-delay: -0.5s; }
+  .sparkle-3 { width:14px; height:14px; top: 42%; left: 8%; animation-delay: -1s; }
+  .sparkle-4 { width:10px; height:10px; top: 58%; right: 10%; animation-delay: -1.5s; }
+  .sparkle-5 { width:18px; height:18px; bottom: 22%; left: 12%; animation-delay: -2s; }
+  .sparkle-6 { width:11px; height:11px; bottom: 18%; right: 16%; animation-delay: -2.5s; }
+  .sparkle-7 { width:9px;  height:9px;  top: 32%; left: 85%; animation-delay: -0.8s; }
+  .sparkle-8 { width:13px; height:13px; top: 72%; left: 22%; animation-delay: -1.8s; }
+
+  @keyframes sparkleAnim {
+    0%, 100% { transform: scale(0.85) rotate(0deg); opacity: 0.5; }
+    50%      { transform: scale(1.15) rotate(20deg); opacity: 0.9; }
+  }
+
+  /* Garis-garis diagonal halus */
+  .stripe-deco {
+    position:absolute;
+    border-radius:2px;
+    background: linear-gradient(180deg, rgba(220, 38, 38, 0.12), rgba(220, 38, 38, 0.02));
+    pointer-events:none;
+  }
+  .stripe-1 { width:2px; height:80px; top: 28%; left: 15%; transform: rotate(-20deg); }
+  .stripe-2 { width:2px; height:60px; top: 62%; right: 12%; transform: rotate(15deg); }
+  .stripe-3 { width:2px; height:70px; bottom: 10%; left: 35%; transform: rotate(-10deg); }
+  .stripe-4 { width:2px; height:50px; top: 15%; right: 25%; transform: rotate(25deg); }
+
+  /* Vignette halus */
+  .bg-vignette {
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(247,239,241,0) 0%,
+      rgba(247,239,241,0.35) 60%,
+      rgba(247,239,241,0.85) 100%
+    );
   }
 
   /* Theme toggle */
@@ -92,27 +214,58 @@
     min-height:100dvh;
     display:flex;
     flex-direction:column;
-    padding: calc(env(safe-area-inset-top) + 80px) 24px
+    padding: calc(env(safe-area-inset-top) + 60px) 24px
              calc(env(safe-area-inset-bottom) + 24px);
     overflow-y:auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Logo card — teks Y-HUB aja, no icon */
+  /* ============================================================
+     LOGO — Y di atas, HUB di bawah
+     ============================================================ */
   .logo-card {
     width:96px; height:96px;
     border-radius:28px;
-    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 50%, #1E40AF 100%);
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%);
     box-shadow:
-      8px 8px 24px rgba(37,99,235,0.35),
-      -4px -4px 12px rgba(255,255,255,0.6);
-    display:grid; place-items:center;
-    margin: 0 auto 28px;
+      8px 8px 24px rgba(220,38,38,0.4),
+      -4px -4px 12px rgba(255,255,255,0.6),
+      inset 0 2px 0 rgba(255,255,255,0.25);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    margin: 0 auto 24px;
     color: white;
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    line-height:1;
+    letter-spacing:-0.04em;
     animation: float 3s ease-in-out infinite;
+    position:relative;
+    overflow:hidden;
+  }
+  .logo-card::before {
+    content:'';
+    position:absolute;
+    top:-40%; left:-40%;
+    width:80%; height:80%;
+    background: radial-gradient(circle, rgba(255,255,255,0.35), transparent 70%);
+    border-radius:50%;
+    pointer-events:none;
+  }
+  .logo-card .logo-y {
+    font-size:26px;
+    font-weight:900;
+    font-family:'Poppins', sans-serif;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    margin-bottom: -2px;
+  }
+  .logo-card .logo-hub {
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    opacity:0.95;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
   }
   @keyframes float {
     0%,100% { transform: translateY(0); }
@@ -120,26 +273,27 @@
   }
 
   /* Title */
-  .title { text-align:center; margin-bottom:32px; }
+  .title { text-align:center; margin-bottom:28px; }
   .title h1 {
-    font-size:30px;
+    font-size:28px;
     font-weight:800;
     letter-spacing:-0.03em;
     margin-bottom:8px;
+    color: var(--text);
   }
   .title p {
-    font-size:12px;
+    font-size:11px;
     color:var(--muted);
     letter-spacing:0.2em;
     text-transform:uppercase;
-    font-weight:500;
+    font-weight:600;
   }
 
   /* Form */
   .form { width:100%; max-width:400px; margin:0 auto; }
   .field { margin-bottom:16px; }
 
-  /* Neumorphic input — no icon */
+  /* Neumorphic input */
   .neu-input {
     position:relative;
     background:var(--card);
@@ -152,13 +306,13 @@
   .neu-input.error {
     box-shadow: inset 6px 6px 12px rgba(239,68,68,0.15),
                 inset -6px -6px 12px rgba(255,255,255,0.9),
-                0 0 0 2px rgba(239,68,68,0.3);
+                0 0 0 2px rgba(239,68,68,0.4);
     animation: shake .4s;
   }
   .neu-input.success {
     box-shadow: inset 6px 6px 12px rgba(16,185,129,0.12),
                 inset -6px -6px 12px rgba(255,255,255,0.9),
-                0 0 0 2px rgba(16,185,129,0.25);
+                0 0 0 2px rgba(16,185,129,0.3);
   }
   @keyframes shake {
     0%,100% { transform: translateX(0); }
@@ -178,7 +332,7 @@
     outline:none;
   }
   .neu-input input::placeholder {
-    color:#A8B0C5;
+    color:#C4A0A8;
     font-weight:400;
   }
   .neu-input input[readonly] { color:var(--muted); }
@@ -212,7 +366,7 @@
     position:relative;
   }
   .picker:active { box-shadow: var(--shadow-in); }
-  .picker.placeholder { color:#A8B0C5; font-weight:400; }
+  .picker.placeholder { color:#C4A0A8; font-weight:400; }
   .picker .chev {
     position:absolute;
     right:20px;
@@ -253,7 +407,7 @@
   }
   .remember input:checked + .checkbox {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    box-shadow: 4px 4px 10px rgba(37,99,235,0.4);
+    box-shadow: 4px 4px 10px rgba(220,38,38,0.4);
   }
   .checkbox::after { content:'✓'; opacity:0; transition:opacity .2s; }
   .remember input:checked + .checkbox::after { opacity:1; }
@@ -272,7 +426,7 @@
     font-weight:700;
     font-family:'Poppins', sans-serif;
     color:white;
-    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 50%, #1E40AF 100%);
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%);
     border:none;
     border-radius:20px;
     box-shadow: var(--shadow-btn);
@@ -292,7 +446,7 @@
   .btn-login .arrow {
     width:32px; height:32px;
     border-radius:50%;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.22);
     display:grid; place-items:center;
     font-size:14px;
     transition: transform .2s;
@@ -325,7 +479,7 @@
     content:'';
     flex:1;
     height:1px;
-    background: linear-gradient(to right, transparent, #D0D6E5, transparent);
+    background: linear-gradient(to right, transparent, #E5C4CB, transparent);
   }
 
   /* Admin button */
@@ -348,6 +502,10 @@
     transition: all .2s;
   }
   .admin-btn:active { box-shadow: var(--shadow-in); transform: scale(.98); }
+  .admin-btn .wa-icon {
+    color: #25D366;
+    font-size: 18px;
+  }
 
   /* Tagline */
   .tagline {
@@ -364,7 +522,7 @@
   /* Bottom Sheet */
   .sheet-overlay {
     position:fixed; inset:0;
-    background: rgba(20,30,60,0.35);
+    background: rgba(40,15,20,0.35);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     z-index:100;
@@ -386,13 +544,13 @@
     max-height: 85vh;
     display:flex;
     flex-direction:column;
-    box-shadow: 0 -20px 60px rgba(140,160,200,0.3);
+    box-shadow: 0 -20px 60px rgba(180,140,150,0.35);
   }
   .bottom-sheet.open { transform: translateY(0); }
 
   .sheet-handle {
     width:44px; height:5px;
-    background: #C7CFE0;
+    background: #E5C4CB;
     border-radius:3px;
     margin: 0 auto 20px;
   }
@@ -424,7 +582,7 @@
     outline:none;
     font-weight: 500;
   }
-  .search-wrap input::placeholder { color:#A8B0C5; font-weight:400; }
+  .search-wrap input::placeholder { color:#C4A0A8; font-weight:400; }
 
   .sheet-list {
     overflow-y:auto;
@@ -432,7 +590,7 @@
     -webkit-overflow-scrolling:touch;
   }
 
-  /* Option — no icon */
+  /* Option */
   .option {
     display:flex;
     align-items:center;
@@ -449,9 +607,9 @@
   }
   .option:active { transform: scale(.98); }
   .option.selected {
-    background: linear-gradient(135deg, #2563EB, #1E40AF);
+    background: linear-gradient(135deg, #DC2626, #991B1B);
     color:white;
-    box-shadow: 4px 4px 12px rgba(37,99,235,0.35);
+    box-shadow: 4px 4px 12px rgba(220,38,38,0.4);
   }
   .option .check { opacity:0; font-weight:700; }
   .option.selected .check { opacity:1; }
@@ -459,7 +617,7 @@
   /* Modal */
   .modal-overlay {
     position:fixed; inset:0;
-    background: rgba(20,30,60,0.4);
+    background: rgba(40,15,20,0.45);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index:200;
@@ -478,7 +636,7 @@
     background: var(--bg);
     border-radius:28px;
     padding:32px 24px 24px;
-    box-shadow: 0 30px 60px rgba(140,160,200,0.4);
+    box-shadow: 0 30px 60px rgba(180,140,150,0.45);
     transform: scale(.9);
     transition: transform .3s cubic-bezier(.2,.9,.3,1.2);
     text-align:center;
@@ -516,9 +674,9 @@
     color: var(--text);
   }
   .modal-actions .btn-primary {
-    background: linear-gradient(135deg, #2563EB, #1E40AF);
+    background: linear-gradient(135deg, #DC2626, #991B1B);
     color:white;
-    box-shadow: 4px 4px 12px rgba(37,99,235,0.35);
+    box-shadow: 4px 4px 12px rgba(220,38,38,0.4);
   }
   .modal-actions button:active { transform: scale(.97); }
 
@@ -535,7 +693,7 @@
     font-family:'Poppins', sans-serif;
     z-index:300;
     transition: transform .3s cubic-bezier(.2,.9,.3,1.2);
-    box-shadow: 0 10px 30px rgba(140,160,200,0.4);
+    box-shadow: 0 10px 30px rgba(180,140,150,0.4);
     display:flex;
     align-items:center;
     gap:8px;
@@ -558,12 +716,14 @@
     30% { opacity:1; transform:scale(1); }
   }
 
-  /* Dark mode */
+  /* ============================================================
+     DARK MODE — tetap merah
+     ============================================================ */
   body.dark {
-    --bg: #12141C;
-    --card: #1A1D28;
-    --text: #ECEEF5;
-    --muted: #6B7280;
+    --bg: #1A0F12;
+    --card: #25161A;
+    --text: #F5E8EB;
+    --muted: #9B7A82;
     --shadow-out:
       8px 8px 20px rgba(0,0,0,0.5),
       -8px -8px 20px rgba(255,255,255,0.03);
@@ -571,28 +731,99 @@
       inset 6px 6px 12px rgba(0,0,0,0.5),
       inset -6px -6px 12px rgba(255,255,255,0.03);
   }
-  body.dark::before {
-    background: radial-gradient(circle at 30% 30%, #1F2937, #111827);
-    box-shadow: inset -10px -10px 30px rgba(255,255,255,0.03), 20px 20px 60px rgba(0,0,0,0.5);
+  body.dark .bg-vignette {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(26,15,18,0) 0%,
+      rgba(26,15,18,0.4) 60%,
+      rgba(26,15,18,0.9) 100%
+    );
   }
-  body.dark::after {
-    background: radial-gradient(circle at 40% 40%, #1E293B, #0F172A);
-    box-shadow: inset -8px -8px 20px rgba(255,255,255,0.03), 15px 15px 40px rgba(0,0,0,0.4);
+  body.dark .blob { opacity: 0.35; }
+  body.dark .ring-deco { border-color: rgba(220, 38, 38, 0.15); }
+  body.dark .ring-2, body.dark .ring-4 { border-color: rgba(220, 38, 38, 0.1); }
+  body.dark .dots-pattern {
+    background-image: radial-gradient(circle, rgba(220, 38, 38, 0.18) 1.2px, transparent 1.3px);
   }
-  body.dark .bottom-sheet { background: #12141C; }
-  body.dark .sheet-handle { background: #333A48; }
+  body.dark .sparkle svg { filter: drop-shadow(0 2px 6px rgba(239, 68, 68, 0.5)); }
+  body.dark .stripe-deco {
+    background: linear-gradient(180deg, rgba(220, 38, 38, 0.25), rgba(220, 38, 38, 0.05));
+  }
+  body.dark .bottom-sheet { background: #1A0F12; }
+  body.dark .sheet-handle { background: #3A252B; }
   body.dark .divider::before, body.dark .divider::after {
-    background: linear-gradient(to right, transparent, #2A3040, transparent);
+    background: linear-gradient(to right, transparent, #3A252B, transparent);
   }
+  body.dark .neu-input input::placeholder,
+  body.dark .search-wrap input::placeholder { color:#6B454D; }
+  body.dark .picker.placeholder { color:#6B454D; }
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     BACKGROUND DECOR — PERNAK PERNIK
+     ============================================================ -->
+<div class="bg-decor">
+
+  <!-- Blob gradient besar -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+
+  <!-- Ring deco -->
+  <div class="ring-deco ring-1"></div>
+  <div class="ring-deco ring-2"></div>
+  <div class="ring-deco ring-3"></div>
+  <div class="ring-deco ring-4"></div>
+
+  <!-- Dots pattern -->
+  <div class="dots-pattern"></div>
+
+  <!-- Garis-garis diagonal -->
+  <div class="stripe-deco stripe-1"></div>
+  <div class="stripe-deco stripe-2"></div>
+  <div class="stripe-deco stripe-3"></div>
+  <div class="stripe-deco stripe-4"></div>
+
+  <!-- Sparkle bintang -->
+  <div class="sparkle sparkle-1">
+    <svg viewBox="0 0 24 24" fill="#EF4444"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+  </div>
+  <div class="sparkle sparkle-2">
+    <svg viewBox="0 0 24 24" fill="#F87171"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+  </div>
+  <div class="sparkle sparkle-3">
+    <svg viewBox="0 0 24 24" fill="#DC2626"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+  </div>
+  <div class="sparkle sparkle-4">
+    <svg viewBox="0 0 24 24" fill="#FCA5A5"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+  </div>
+  <div class="sparkle sparkle-5">
+    <svg viewBox="0 0 24 24" fill="#EF4444"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+  </div>
+  <div class="sparkle sparkle-6">
+    <svg viewBox="0 0 24 24" fill="#F87171"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+  </div>
+  <div class="sparkle sparkle-7">
+    <svg viewBox="0 0 24 24" fill="#FCA5A5"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+  </div>
+  <div class="sparkle sparkle-8">
+    <svg viewBox="0 0 24 24" fill="#DC2626"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg>
+  </div>
+</div>
+<div class="bg-vignette"></div>
 
 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
 
 <div class="app">
 
-  <div class="logo-card">Y-HUB</div>
+  <!-- LOGO: Y di atas, HUB di bawah -->
+  <div class="logo-card">
+    <span class="logo-y">Y</span>
+    <span class="logo-hub">HUB</span>
+  </div>
 
   <div class="title">
     <h1>Welcome Back</h1>
@@ -641,7 +872,10 @@
     <div class="divider">Or continue with</div>
 
     <button class="admin-btn" id="contactAdmin">
-      Contact Administrator
+      <svg class="wa-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      <span>Contact Administrator</span>
     </button>
 
     <div class="tagline">
@@ -677,14 +911,13 @@
 <script type="module">
 if (typeof redirectIfLoggedIn === "function" && redirectIfLoggedIn()) { throw new Error("Already logged in — redirecting"); }
 /* ============================================
-   FIREBASE CONFIG — Ganti dengan config kamu
+   FIREBASE
    ============================================ */
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import {
-  getFirestore, doc, getDoc, updateDoc, serverTimestamp, collection, getDocs
+  getFirestore, doc, getDoc, updateDoc, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyBGuX3CiF8sEEfuNxcdJpRHetHl6ATtiVQ",
   authDomain: "y-hub-login.firebaseapp.com",
@@ -699,7 +932,7 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
 /* ============================================
-   HIRARKI — hardcode (cuma 5, jarang berubah)
+   HIRARKI
    ============================================ */
 const HIRARKI_LIST = [
   "Ordinary Supervisor II",
@@ -789,7 +1022,7 @@ sheetOverlay.onclick = closeSheet;
 searchInput.oninput = e => renderHirarki(e.target.value);
 
 /* ============================================
-   AUTOFILL FROM FIRESTORE
+   AUTOFILL
    ============================================ */
 let debounce;
 nikInput.addEventListener('input', e => {
@@ -816,7 +1049,6 @@ nikInput.addEventListener('input', e => {
         nikIcon.textContent = '✓';
         nikIcon.className = 'status-icon ok';
 
-        // Auto-set hirarki dari data user
         if (u.hirarki) {
           selectedHirarki = u.hirarki;
           hirarkiText.textContent = u.hirarki;
@@ -906,12 +1138,10 @@ btnLogin.onclick = async () => {
     if (!snap.exists()) { throw new Error('User not found'); }
     const u = snap.data();
 
-    // Validasi hirarki cocok
     if (u.hirarki !== selectedHirarki) {
       throw new Error('Hierarchy does not match our records');
     }
 
-    // Cek device conflict
     const deviceId = localStorage.getItem('deviceId') || crypto.randomUUID();
     localStorage.setItem('deviceId', deviceId);
 
@@ -960,7 +1190,6 @@ async function doLogin(nik, nama, deviceId) {
     };
     localStorage.setItem('session', JSON.stringify(session));
 
-    // Simpan session pakai auth-guard
     if (typeof saveSession === 'function') {
       saveSession({
         nik, nama,
@@ -971,8 +1200,6 @@ async function doLogin(nik, nama, deviceId) {
     }
 
     showToast(`Hello, ${nama.split(' ')[0]}!`, '✅');
-    
-    // Redirect ke home setelah 800ms
     setTimeout(() => {
       window.location.href = '/home.html';
     }, 800);
@@ -989,11 +1216,11 @@ async function doLogin(nik, nama, deviceId) {
 }
 
 /* ============================================
-   CONTACT ADMIN & FORGOT
+   CONTACT ADMIN — WA 089529087652
    ============================================ */
 $('contactAdmin').onclick = () => {
-  const WA = '6281234567890';
-  const msg = encodeURIComponent('Hi Admin, I need help with Y-HUB login.');
+  const WA = '6289529087652';
+  const msg = encodeURIComponent('Halo Admin, saya butuh bantuan untuk login ke Y-HUB.');
   window.open(`https://wa.me/${WA}?text=${msg}`, '_blank');
 };
 
@@ -1001,10 +1228,10 @@ $('forgotBtn').onclick = e => {
   e.preventDefault();
   showModal({
     title: 'Reset Access',
-    desc: 'Please contact your administrator to reset access or register a new device.',
+    desc: 'Silakan hubungi administrator untuk reset akses atau daftar device baru.',
     actions: [
-      { label: 'Cancel', primary: false },
-      { label: 'Contact Admin', primary: true, onClick: () => $('contactAdmin').click() }
+      { label: 'Batal', primary: false },
+      { label: 'Hubungi Admin', primary: true, onClick: () => $('contactAdmin').click() }
     ]
   });
 };
