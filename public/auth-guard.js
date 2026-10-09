@@ -4,7 +4,7 @@
 
 const SESSION_KEY = 'yhub_session';
 const SESSION_DAYS = 30;
-const HEARTBEAT_INTERVAL = 30000;
+const HEARTBEAT_INTERVAL = 999999999; // sementara OFF
 let heartbeatTimer = null;
 
 function saveSession(data) {
