@@ -2,8 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#db1d75">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Breakdown PDM</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,7 +30,6 @@
         #progressCircle { transition: stroke-dashoffset .9s cubic-bezier(.32,.72,0,1), stroke .4s ease; }
         .bar-fill { transition: height .6s cubic-bezier(.32,.72,0,1); }
 
-        /* Kartu dengan tint lembut + border berwarna */
         .card-soft {
             border-radius: 28px;
             box-shadow: 0 2px 12px -4px rgba(219, 29, 117, 0.06), 0 1px 3px rgba(0,0,0,0.02);
@@ -48,7 +50,6 @@
             100% { background-position: -200% 0; }
         }
 
-        /* Floating blobs dekorasi header */
         .blob {
             position: absolute;
             border-radius: 50%;
@@ -56,15 +57,156 @@
             opacity: 0.5;
             pointer-events: none;
         }
+
+        /* ============================================================
+           KALENDER — SMOOTH TRANSITION
+           ============================================================ */
+        .cal-day {
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            border-radius: 8px;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-variant-numeric: tabular-nums;
+            transition: transform .35s cubic-bezier(.16,1,.3,1),
+                        background .35s ease,
+                        color .25s ease,
+                        box-shadow .35s ease;
+            will-change: transform;
+        }
+        .cal-day:active {
+            transform: scale(0.92);
+        }
+        .cal-day.is-today {
+            background: linear-gradient(135deg, #f9a8d4, #ec4899);
+            color: white;
+            box-shadow: 0 4px 10px -2px rgba(236,72,153,0.4);
+            animation: pulseToday 2.4s ease-in-out infinite;
+        }
+        @keyframes pulseToday {
+            0%, 100% { box-shadow: 0 4px 10px -2px rgba(236,72,153,0.4); }
+            50% { box-shadow: 0 6px 16px -2px rgba(236,72,153,0.65); }
+        }
+        .cal-day.is-hit {
+            background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+            color: white;
+            box-shadow: 0 4px 10px -2px rgba(110,231,183,0.4);
+        }
+        .cal-day.is-sunday {
+            background: linear-gradient(135deg, #ffe4e6, #fecdd3);
+            color: #fda4af;
+        }
+        .cal-day.is-past {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+        .cal-day.is-future {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+        /* Fade-in animation saat kalender re-render */
+        .cal-day.fade-in {
+            animation: calFadeIn .45s cubic-bezier(.16,1,.3,1) backwards;
+        }
+        @keyframes calFadeIn {
+            from { opacity: 0; transform: scale(.85); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        /* ============================================================
+           APP CONTAINER — RESPONSIVE FULL SCREEN
+           ============================================================ */
+        #app-shell {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(15, 23, 42, 0.08);
+            background: linear-gradient(160deg, #fff5f8 0%, #fef7f3 40%, #f7f5ff 100%);
+            transition: max-width .3s ease;
+        }
+
+        @media (min-width: 640px) and (max-width: 1023px){
+            #app-shell{ max-width: 720px; }
+            .app-content{ padding-left: 20px !important; padding-right: 20px !important; }
+            .app-bottom{ max-width: 720px; }
+        }
+
+        @media (min-width: 1024px){
+            #app-shell{
+                max-width: 100%;
+                width: 100%;
+                min-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .app-header{
+                border-radius: 0 0 32px 32px;
+                padding-left: max(32px, calc((100vw - 1400px) / 2 + 32px)) !important;
+                padding-right: max(32px, calc((100vw - 1400px) / 2 + 32px)) !important;
+            }
+            .app-content{
+                padding-left: max(32px, calc((100vw - 1400px) / 2 + 32px)) !important;
+                padding-right: max(32px, calc((100vw - 1400px) / 2 + 32px)) !important;
+                padding-top: 24px !important;
+            }
+            .app-bottom{
+                max-width: 1400px;
+                padding-left: 32px;
+                padding-right: 32px;
+            }
+
+            .app-content{
+                display: grid !important;
+                grid-template-columns: repeat(12, minmax(0, 1fr));
+                gap: 18px;
+                align-content: start;
+            }
+            .app-content > .card-hero{ grid-column: span 12; }
+            .app-content > .card-input{ grid-column: span 6; }
+            .app-content > .card-log{ grid-column: span 6; }
+            .app-content > .card-calendar{ grid-column: span 5; }
+            .app-content > .card-status{ grid-column: span 7; }
+            .app-content > .card-sim{ grid-column: span 12; }
+            .app-content > .h-2{ display: none; }
+        }
+
+        @media (min-width: 1440px){
+            .app-header,
+            .app-content,
+            .app-bottom{
+                padding-left: 40px !important;
+                padding-right: 40px !important;
+            }
+            .app-content{
+                max-width: 1560px;
+                margin: 0 auto;
+            }
+        }
+
+        #app-shell:fullscreen,
+        #app-shell:-webkit-full-screen{
+            max-width: 100%;
+            width: 100vw;
+            height: 100vh;
+        }
     </style>
 </head>
 <body class="flex justify-center items-start min-h-screen">
 
-<div class="w-full max-w-[480px] min-h-screen flex flex-col relative shadow-2xl overflow-hidden" style="background: linear-gradient(160deg, #fff5f8 0%, #fef7f3 40%, #f7f5ff 100%);">
+<div id="app-shell">
 
     <!-- ==================== HEADER ==================== -->
-    <div class="relative bg-gradient-to-br from-[#f472b6] via-[#db1d75] to-[#a3125a] text-white px-5 pt-7 pb-8 rounded-b-[32px] shadow-[0_10px_30px_-10px_rgba(219,29,117,0.4)] z-10 shrink-0 overflow-hidden">
-        <!-- Dekorasi lembut -->
+    <div class="app-header relative bg-gradient-to-br from-[#f472b6] via-[#db1d75] to-[#a3125a] text-white px-5 pt-7 pb-8 rounded-b-[32px] shadow-[0_10px_30px_-10px_rgba(219,29,117,0.4)] z-10 shrink-0 overflow-hidden">
         <div class="blob w-32 h-32 -top-10 -right-8" style="background: #fbbf24;"></div>
         <div class="blob w-28 h-28 top-8 -left-6" style="background: #a78bfa;"></div>
 
@@ -73,22 +215,22 @@
                 <i class="fa-solid fa-chart-pie text-sm"></i>
             </div>
             <div class="min-w-0">
-                <h1 class="font-heading class="text-[19px] font-extrabold tracking-tight leading-none" style="font-family:'Plus Jakarta Sans',sans-serif;">Breakdown PDM</h1>
+                <h1 class="text-[19px] font-extrabold tracking-tight leading-none" style="font-family:'Plus Jakarta Sans',sans-serif;">Breakdown PDM</h1>
                 <p id="dateInfo" class="text-[11px] opacity-85 mt-1 font-medium">Memuat tanggal...</p>
             </div>
         </div>
     </div>
 
     <!-- ==================== CONTENT ==================== -->
-    <div class="flex-1 px-4 pt-4 space-y-4 overflow-y-auto pb-32 -mt-4 relative z-10">
+    <div class="app-content flex-1 px-4 pt-4 space-y-4 overflow-y-auto pb-32 -mt-4 relative z-10">
 
-        <!-- ============ HERO: Progress ============ -->
-        <div class="card-soft px-5 pt-5 pb-6 border border-pink-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #fff5f9 100%);">
+        <!-- HERO -->
+        <div class="card-hero card-soft px-5 pt-5 pb-6 border border-pink-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #fff5f9 100%);">
             <div class="flex items-center gap-2 mb-5">
                 <div class="w-6 h-6 rounded-lg bg-pink-100 flex items-center justify-center">
                     <i class="fa-solid fa-bullseye text-[10px] text-pink-500"></i>
                 </div>
-                <h3 class="font-heading class="text-[11px] font-extrabold text-pink-500/80 uppercase tracking-[0.12em]">Progress Bulan Ini</h3>
+                <h3 class="text-[11px] font-extrabold text-pink-500/80 uppercase tracking-[0.12em]">Progress Bulan Ini</h3>
             </div>
 
             <div class="flex items-center gap-5">
@@ -125,14 +267,14 @@
             </div>
         </div>
 
-        <!-- ============ INPUT DATA ============ -->
-        <div class="card-soft px-5 pt-5 pb-6 border border-sky-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);">
+        <!-- INPUT -->
+        <div class="card-input card-soft px-5 pt-5 pb-6 border border-sky-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
                     <div class="w-6 h-6 rounded-lg bg-sky-100 flex items-center justify-center">
                         <i class="fa-solid fa-pen-to-square text-[10px] text-sky-500"></i>
                     </div>
-                    <h3 class="font-heading class="text-[11px] font-extrabold text-sky-600/80 uppercase tracking-[0.12em]">Input Data</h3>
+                    <h3 class="text-[11px] font-extrabold text-sky-600/80 uppercase tracking-[0.12em]">Input Data</h3>
                 </div>
                 <button id="clearInputBtn" onclick="clearInputs()" class="text-[10px] font-bold text-gray-400 hover:text-rose-500 transition px-2 py-1 rounded-md" style="display:none;">
                     <i class="fa-solid fa-xmark mr-0.5"></i>Hapus
@@ -159,21 +301,20 @@
             </div>
         </div>
 
-        <!-- ============ LOG HARIAN ============ -->
-        <div class="card-soft px-5 pt-5 pb-6 border border-orange-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #fffbf5 50%, #fff5f9 100%);">
+        <!-- LOG HARIAN -->
+        <div class="card-log card-soft px-5 pt-5 pb-6 border border-orange-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #fffbf5 50%, #fff5f9 100%);">
             <div class="flex items-center justify-between mb-5">
                 <div class="flex items-center gap-2">
                     <div class="w-6 h-6 rounded-lg bg-orange-100 flex items-center justify-center">
                         <i class="fa-solid fa-fire text-[10px] text-orange-500"></i>
                     </div>
-                    <h3 class="font-heading class="text-[11px] font-extrabold text-orange-500/80 uppercase tracking-[0.12em]">Log Harian</h3>
+                    <h3 class="text-[11px] font-extrabold text-orange-500/80 uppercase tracking-[0.12em]">Log Harian</h3>
                 </div>
                 <div id="streakBadge" class="num text-[10px] font-extrabold bg-gray-100 text-gray-400 px-2.5 py-1 rounded-full">
                     🔥 0 hari
                 </div>
             </div>
 
-            <!-- Grafik 7 hari -->
             <div class="relative mb-5">
                 <div class="h-24 flex items-end gap-1.5 relative">
                     <div id="targetLine" class="absolute left-0 right-0 border-t-2 border-dashed border-pink-300 pointer-events-none" style="bottom: 0%;">
@@ -184,7 +325,6 @@
                 <div id="chartLabels" class="flex justify-between mt-1.5"></div>
             </div>
 
-            <!-- Input hari ini -->
             <div class="flex items-center gap-2 mb-3">
                 <div class="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-2xl border-2 border-amber-100 focus-within:border-amber-300 transition" style="background: linear-gradient(135deg, #fffbeb, #ffffff);">
                     <i class="fa-solid fa-plus text-amber-500 text-[11px] flex-shrink-0"></i>
@@ -197,7 +337,6 @@
                 </button>
             </div>
 
-            <!-- Info & sync -->
             <div class="flex items-center justify-between pt-3 border-t border-dashed border-orange-100">
                 <div class="min-w-0">
                     <p class="text-[9px] font-extrabold text-orange-400/80 uppercase tracking-wide">Total Log Bulan Ini</p>
@@ -209,14 +348,14 @@
             </div>
         </div>
 
-        <!-- ============ KALENDER MINI ============ -->
-        <div class="card-soft px-5 pt-5 pb-5 border border-violet-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);">
+        <!-- KALENDER -->
+        <div class="card-calendar card-soft px-5 pt-5 pb-5 border border-violet-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
                     <div class="w-6 h-6 rounded-lg bg-violet-100 flex items-center justify-center">
                         <i class="fa-solid fa-calendar-days text-[10px] text-violet-500"></i>
                     </div>
-                    <h3 class="font-heading class="text-[11px] font-extrabold text-violet-500/80 uppercase tracking-[0.12em]">Hari Kerja</h3>
+                    <h3 class="text-[11px] font-extrabold text-violet-500/80 uppercase tracking-[0.12em]">Hari Kerja</h3>
                 </div>
                 <span id="txtSisaHari" class="num text-[10px] font-extrabold bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full border border-emerald-100">0 hari</span>
             </div>
@@ -243,13 +382,13 @@
             </div>
         </div>
 
-        <!-- ============ STATUS & PDM ============ -->
-        <div id="statusCard" class="card-soft px-5 pt-5 pb-6 border border-teal-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);">
+        <!-- STATUS & PDM -->
+        <div id="statusCard" class="card-status card-soft px-5 pt-5 pb-6 border border-teal-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);">
             <div class="flex items-center gap-2 mb-4">
                 <div class="w-6 h-6 rounded-lg bg-teal-100 flex items-center justify-center">
                     <i id="statusIcon" class="fa-solid fa-fire text-[10px] text-teal-500"></i>
                 </div>
-                <h3 class="font-heading class="text-[11px] font-extrabold text-teal-500/80 uppercase tracking-[0.12em]">PDM Minimal</h3>
+                <h3 class="text-[11px] font-extrabold text-teal-500/80 uppercase tracking-[0.12em]">PDM Minimal</h3>
             </div>
 
             <div id="statusBody" class="rounded-2xl px-4 py-4 text-center transition-colors duration-300" style="background: linear-gradient(135deg, #f0fdfa, #ffffff); border: 1px solid #ccfbf1;">
@@ -279,14 +418,14 @@
             </div>
         </div>
 
-        <!-- ============ SIMULASI WHAT-IF ============ -->
-        <div class="card-soft px-5 pt-5 pb-6 border border-fuchsia-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #fdf4ff 100%);">
+        <!-- SIMULASI -->
+        <div class="card-sim card-soft px-5 pt-5 pb-6 border border-fuchsia-100/60" style="background: linear-gradient(135deg, #ffffff 0%, #fdf4ff 100%);">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
                     <div class="w-6 h-6 rounded-lg bg-fuchsia-100 flex items-center justify-center">
                         <i class="fa-solid fa-flask text-[10px] text-fuchsia-500"></i>
                     </div>
-                    <h3 class="font-heading class="text-[11px] font-extrabold text-fuchsia-500/80 uppercase tracking-[0.12em]">Simulasi Target</h3>
+                    <h3 class="text-[11px] font-extrabold text-fuchsia-500/80 uppercase tracking-[0.12em]">Simulasi Target</h3>
                 </div>
                 <button id="resetSimBtn" onclick="resetSimulation()" class="text-[10px] font-bold text-gray-400 hover:text-fuchsia-500 transition px-2 py-1 rounded-md" style="display:none;">
                     <i class="fa-solid fa-rotate-left mr-0.5"></i>Reset
@@ -317,8 +456,8 @@
         <div class="h-2"></div>
     </div>
 
-    <!-- ==================== BOTTOM BAR ==================== -->
-    <div class="absolute bottom-0 left-0 right-0 bg-white/85 backdrop-blur-lg px-4 pt-3 pb-5 border-t border-pink-100/60 flex items-center gap-2 z-20">
+    <!-- BOTTOM BAR -->
+    <div class="app-bottom absolute bottom-0 left-0 right-0 bg-white/85 backdrop-blur-lg px-4 pt-3 pb-5 border-t border-pink-100/60 flex items-center gap-2 z-20" style="padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));">
         <button onclick="bagikanKeWhatsApp()" class="flex-1 text-white font-extrabold py-3.5 rounded-2xl flex justify-center items-center gap-2 shadow-[0_8px_24px_-8px_rgba(16,185,129,0.5)] hover:brightness-105 active:scale-[0.98] transition" style="background: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);">
             <i class="fa-brands fa-whatsapp text-lg"></i>
             <span class="text-[14px]">Kirim WhatsApp</span>
@@ -331,7 +470,7 @@
         </button>
     </div>
 
-    <!-- ==================== TOAST ==================== -->
+    <!-- TOAST -->
     <div id="toast" class="absolute bottom-28 left-1/2 -translate-x-1/2 text-white text-xs px-5 py-3 rounded-full shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none z-50 whitespace-nowrap" style="background: linear-gradient(135deg, #db1d75, #a3125a);">
         ✅
     </div>
@@ -368,10 +507,7 @@ function dateKey(d) {
  * ============================================================ */
 function saveState() {
     try {
-        localStorage.setItem(LS_KEY, JSON.stringify({
-            t: inputTarget.value,
-            a: inputAkumulasi.value,
-        }));
+        localStorage.setItem(LS_KEY, JSON.stringify({ t: inputTarget.value, a: inputAkumulasi.value }));
     } catch(_) {}
 }
 function loadState() {
@@ -410,10 +546,7 @@ function saveLog() {
  * ============================================================ */
 function saveToday() {
     const val = parseInt(inputToday.value);
-    if (isNaN(val) || val < 0) {
-        showToast('Isi angka dulu ya ✋');
-        return;
-    }
+    if (isNaN(val) || val < 0) { showToast('Isi angka dulu ya ✋'); return; }
     const key = dateKey(new Date());
     dailyLog[key] = val;
     saveLog();
@@ -430,13 +563,8 @@ function syncFromLog() {
     const m = now.getMonth();
     const prefix = `${y}-${String(m + 1).padStart(2, '0')}-`;
     let total = 0;
-    Object.keys(dailyLog).forEach(k => {
-        if (k.startsWith(prefix)) total += (dailyLog[k] || 0);
-    });
-    if (total <= 0) {
-        showToast('Belum ada log bulan ini 📭');
-        return;
-    }
+    Object.keys(dailyLog).forEach(k => { if (k.startsWith(prefix)) total += (dailyLog[k] || 0); });
+    if (total <= 0) { showToast('Belum ada log bulan ini 📭'); return; }
     haptic(15);
     inputAkumulasi.value = total;
     saveState();
@@ -451,7 +579,6 @@ function getStreak(targetPerHari) {
     const todayKey = dateKey(today);
     const todayVal = dailyLog[todayKey];
     const todayHasRecord = todayKey in dailyLog;
-
     let streak = 0;
     if (todayHasRecord) {
         if (todayVal >= targetPerHari) streak = 1;
@@ -470,7 +597,7 @@ function getStreak(targetPerHari) {
 }
 
 /* ============================================================
- * KALENDER MINI
+ * KALENDER MINI — SMOOTH + PRIORITAS WARNA BENAR
  * ============================================================ */
 function renderCalendar(y, m, today, daysInMonth, targetPerHari) {
     $('monthLabel').innerText = `${MONTHS[m]} ${y}`;
@@ -488,26 +615,25 @@ function renderCalendar(y, m, today, daysInMonth, targetPerHari) {
         const isPast = d < today;
         const key = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const logVal = dailyLog[key];
-        const hitTarget = !isSunday && targetPerHari > 0 && logVal !== undefined && logVal >= targetPerHari;
+        const hasLog = logVal !== undefined;
+        const hitTarget = !isSunday && targetPerHari > 0 && hasLog && logVal >= targetPerHari;
 
-        let style = 'height: 28px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border-radius: 8px; font-family: "Plus Jakarta Sans", sans-serif; font-variant-numeric: tabular-nums; ';
-        let content = d;
+        /* Prioritas warna (sesuai legend):
+           1. Hari ini       → pink
+           2. Minggu         → pink muda
+           3. Capai target   → hijau
+           4. Sudah lewat    → kuning
+           5. Akan datang    → putih
+        */
+        let cls = 'cal-day fade-in';
+        if (isToday)         cls += ' is-today';
+        else if (isSunday)   cls += ' is-sunday';
+        else if (hitTarget)  cls += ' is-hit';
+        else if (isPast)     cls += ' is-past';
+        else                 cls += ' is-future';
 
-        if (isToday) {
-            style += 'background: linear-gradient(135deg, #f9a8d4, #ec4899); color: white; box-shadow: 0 4px 10px -2px rgba(236,72,153,0.4);';
-        } else if (hitTarget) {
-            style += 'background: linear-gradient(135deg, #a7f3d0, #6ee7b7); color: white; box-shadow: 0 4px 10px -2px rgba(110,231,183,0.4);';
-        } else if (isSunday) {
-            style += 'background: linear-gradient(135deg, #ffe4e6, #fecdd3); color: #fda4af;';
-        } else if (logVal !== undefined) {
-            style += 'background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e;';
-        } else if (isPast) {
-            style += 'background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #94a3b8;';
-        } else {
-            style += 'background: white; border: 1px solid #e2e8f0; color: #64748b;';
-        }
-
-        html += `<div style="${style}">${content}</div>`;
+        const delay = (d - 1) * 8;
+        html += `<div class="${cls}" style="animation-delay:${delay}ms">${d}</div>`;
     }
     grid.innerHTML = html;
 }
@@ -519,10 +645,8 @@ const animFrames = new WeakMap();
 function animateNumber(el, to, dur = 500, suffix = '') {
     const from = parseInt(el.dataset.val || '0', 10);
     if (from === to) { el.innerText = fmtNum(to) + suffix; el.dataset.val = to; return; }
-
     const prev = animFrames.get(el);
     if (prev) cancelAnimationFrame(prev);
-
     const start = performance.now();
     const step = now => {
         const p = Math.min(1, (now - start) / dur);
@@ -639,7 +763,6 @@ function calculateDashboard() {
     animateNumber($('txtPdmMinimal'), pdmMinimal, 500);
     $('txtPersen').innerText = Math.round(persenRaw) + '%';
 
-    // Circular progress — pastel adaptive
     const keliling = 289;
     const offset = keliling - (persentase / 100) * keliling;
     const circ = $('progressCircle');
@@ -654,7 +777,6 @@ function calculateDashboard() {
 
     renderChart(targetPerHari);
 
-    // Streak badge — pastel
     const streak = getStreak(targetPerHari);
     const streakBadge = $('streakBadge');
     if (streak === 0) {
@@ -674,12 +796,9 @@ function calculateDashboard() {
 
     const prefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-`;
     let logTotal = 0;
-    Object.keys(dailyLog).forEach(k => {
-        if (k.startsWith(prefix)) logTotal += (dailyLog[k] || 0);
-    });
+    Object.keys(dailyLog).forEach(k => { if (k.startsWith(prefix)) logTotal += (dailyLog[k] || 0); });
     $('txtLogTotal').innerText = fmtNum(logTotal) + ' btl';
 
-    // Status card — pastel
     const statusBody = $('statusBody');
     const badge = $('badgePdmStatus');
     const msg = $('txtMessage');
@@ -730,7 +849,7 @@ function calculateDashboard() {
 }
 
 /* ============================================================
- * SIMULASI WHAT-IF
+ * SIMULASI
  * ============================================================ */
 function updateSimulation() {
     const simTarget = parseFloat(inputSim.value) || 0;
@@ -929,7 +1048,6 @@ function resetClearBtnState() {
 
 function resetAll() {
     const btn = $('clearBtn');
-
     if (!resetArmed) {
         resetArmed = true;
         haptic(15);
@@ -940,7 +1058,6 @@ function resetAll() {
         resetTimer = setTimeout(() => { resetArmed = false; resetClearBtnState(); }, 3000);
         return;
     }
-
     clearTimeout(resetTimer);
     resetArmed = false;
     haptic(20);
@@ -967,8 +1084,6 @@ function showToast(msg) {
     const t = $('toast');
     t.innerText = msg;
     t.classList.remove('opacity-0');
-    clearTimeout(timerTimer);
-    var timerTimer;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.add('opacity-0'), 2000);
 }
@@ -987,9 +1102,7 @@ inputAkumulasi.addEventListener('input', () => {
     calculateDashboard();
 });
 inputSim.addEventListener('input', updateSimulation);
-inputToday.addEventListener('keydown', e => {
-    if (e.key === 'Enter') saveToday();
-});
+inputToday.addEventListener('keydown', e => { if (e.key === 'Enter') saveToday(); });
 
 loadState();
 loadLog();

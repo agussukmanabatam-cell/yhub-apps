@@ -10,7 +10,6 @@
     <meta name="description" content="Rekapitulasi Point Pelanggan & Leaderboard YL">
     <title>Point Pelanggan</title>
 
-    <!-- ============ PERF: DNS + PRECONNECT ============ -->
     <link rel="dns-prefetch" href="//docs.google.com">
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -19,12 +18,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- ============ PERF: FONT SUBSET + PRELOAD ============ -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Poppins:wght@500;600;700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Poppins:wght@500;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Poppins:wght@500;600;700&display=swap"></noscript>
 
-    <!-- ============ PERF: TAILWIND INLINE CONFIG ============ -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -46,20 +43,15 @@
         }
     </script>
 
-    <!-- ============ PERF: FONTAWESOME NON-BLOCKING ============ -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
-    <!-- ============ PERF: PAPA PARSE DEFERRED ============ -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
         /* ============ BASE ============ */
         html { scroll-behavior: smooth; }
-        html, body {
-            margin: 0; padding: 0;
-            overflow-x: hidden;
-        }
+        html, body { margin: 0; padding: 0; overflow-x: hidden; }
         body {
             font-family: 'Plus Jakarta Sans', 'Poppins', system-ui, sans-serif;
             background-color: #f8fafc;
@@ -69,18 +61,13 @@
             transition: background-color .35s cubic-bezier(.16,1,.3,1), color .35s cubic-bezier(.16,1,.3,1);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeSpeed;
         }
         body.dark-mode { background-color: #0f172a; color: #e2e8f0; }
         main { flex: 1; }
 
-        .custom-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .custom-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* ============ PERF: SELECTIVE TRANSITION (bukan `*`) ============ */
         .btn-tactile, .card-hover, .tab-btn, .modal-card, .toast-item {
             transition: transform .22s cubic-bezier(.16,1,.3,1),
                         opacity .22s cubic-bezier(.16,1,.3,1),
@@ -92,13 +79,7 @@
         .btn-tactile:active { transform: scale(.96); }
         .card-hover:hover { transform: translateY(-2px); }
 
-        /* ============ PERF: GPU ACCELERATION ============ */
-        .gpu { transform: translateZ(0); backface-visibility: hidden; }
-
-        /* ============ PERF: CONTENT-VISIBILITY ============ */
-        .cv-auto { content-visibility: auto; contain-intrinsic-size: 0 200px; }
-
-        /* ============ SKELETON SHIMMER ============ */
+        /* ============ SKELETON ============ */
         @keyframes shimmer {
             0% { background-position: -400px 0; }
             100% { background-position: 400px 0; }
@@ -113,20 +94,15 @@
             background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
             background-size: 800px 100%;
         }
-        .skeleton-text { height: 10px; margin: 4px 0; }
-        .skeleton-title { height: 16px; width: 60%; margin-bottom: 6px; }
-        .skeleton-stat { height: 24px; width: 50%; margin: 4px 0; }
 
         /* ============ FADE-IN UP ============ */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .fade-in-up {
-            animation: fadeInUp .4s cubic-bezier(.16,1,.3,1) backwards;
-        }
+        .fade-in-up { animation: fadeInUp .4s cubic-bezier(.16,1,.3,1) backwards; }
 
-        /* ============ TAB SWITCHER: SEGMENTED CONTROL ============ */
+        /* ============ TAB SWITCHER ============ */
         .tab-switcher {
             position: relative;
             display: flex;
@@ -139,65 +115,47 @@
 
         .tab-indicator {
             position: absolute;
-            top: 4px;
-            bottom: 4px;
+            top: 4px; bottom: 4px;
             width: calc(50% - 5px);
             border-radius: 11px;
             background: linear-gradient(135deg, #db2777, #be185d);
             box-shadow: 0 4px 12px rgba(219, 39, 119, .35);
             transition: transform .38s cubic-bezier(.16,1,.3,1);
-            will-change: transform;
             z-index: 1;
             pointer-events: none;
         }
         .tab-indicator.right { transform: translateX(calc(100% + 4px)); }
 
         .tab-btn {
-            position: relative;
-            z-index: 2;
-            flex: 1;
-            padding: 9px 12px;
-            border-radius: 11px;
-            background: transparent;
-            border: none;
-            font-weight: 700;
-            font-size: 12px;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            cursor: pointer;
+            position: relative; z-index: 2; flex: 1;
+            padding: 9px 12px; border-radius: 11px;
+            background: transparent; border: none;
+            font-weight: 700; font-size: 12px; color: #64748b;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; cursor: pointer;
             transition: color .28s cubic-bezier(.16,1,.3,1);
             font-family: inherit;
             -webkit-tap-highlight-color: transparent;
         }
         .tab-btn.active { color: #fff; }
-        .tab-btn:not(.active):active { color: #db2777; }
         body.dark-mode .tab-btn { color: #94a3b8; }
         body.dark-mode .tab-btn.active { color: #fff; }
         .tab-btn i { transition: transform .3s cubic-bezier(.16,1,.3,1); }
         .tab-btn.active i { transform: scale(1.1); }
 
-        /* ============ RIPPLE EFFECT ============ */
+        /* ============ RIPPLE ============ */
         .ripple-container { position: relative; overflow: hidden; }
         .ripple {
-            position: absolute;
-            border-radius: 50%;
+            position: absolute; border-radius: 50%;
             background: rgba(255, 255, 255, 0.5);
             transform: scale(0);
             animation: rippleAnim .6s cubic-bezier(.16,1,.3,1);
             pointer-events: none;
         }
-        @keyframes rippleAnim {
-            to { transform: scale(4); opacity: 0; }
-        }
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
 
-        /* ============ TAB CONTENT TRANSITIONS ============ */
-        .tab-panel {
-            display: none;
-            opacity: 0;
-        }
+        /* ============ TAB PANEL ============ */
+        .tab-panel { display: none; opacity: 0; }
         .tab-panel.active {
             display: block;
             animation: tabSlideIn .42s cubic-bezier(.16,1,.3,1) forwards;
@@ -211,120 +169,50 @@
 
         /* ============ STAT CARD ============ */
         .stat-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 12px 14px;
+            background: #fff; border-radius: 16px; padding: 12px 14px;
             border: 1.5px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             min-height: 68px;
             transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s cubic-bezier(.16,1,.3,1);
-            will-change: transform;
         }
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -8px rgba(0,0,0,.08); }
         body.dark-mode .stat-card { background: #1e293b; border-color: #334155; }
 
         .stat-value {
-            font-size: 18px;
-            font-weight: 800;
-            line-height: 1.1;
+            font-size: 18px; font-weight: 800; line-height: 1.1;
             font-variant-numeric: tabular-nums;
             transition: color .2s ease;
         }
+        .stat-value.counting { color: #db2777; }
 
         /* ============ DARK MODE OVERRIDES ============ */
         body.dark-mode .bg-white { background-color: #1e293b !important; }
         body.dark-mode .bg-slate-50 { background-color: #0f172a !important; }
         body.dark-mode .bg-slate-100 { background-color: #334155 !important; }
-        body.dark-mode .bg-slate-100\/70 { background-color: #334155 !important; }
-        body.dark-mode .bg-slate-50\/50 { background-color: #1e293b !important; }
-        body.dark-mode .bg-slate-50\/80 { background-color: #1e293b !important; }
         body.dark-mode .bg-pink-50 { background-color: #831843 !important; }
-        body.dark-mode .bg-pink-50\/40 { background-color: rgba(131,24,67,.3) !important; }
-        body.dark-mode .bg-pink-50\/30 { background-color: rgba(131,24,67,.2) !important; }
-        body.dark-mode .bg-pink-50\/70 { background-color: rgba(131,24,67,.4) !important; }
         body.dark-mode .bg-pink-100 { background-color: #9f1239 !important; }
-        body.dark-mode .bg-pink-100\/90 { background-color: #9f1239 !important; }
-        body.dark-mode .bg-pink-100\/70 { background-color: #9f1239 !important; }
-        body.dark-mode .bg-brand-50 { background-color: rgba(219,39,119,.2) !important; }
-        body.dark-mode .bg-orange-50\/70 { background-color: rgba(120,53,15,.3) !important; }
-        body.dark-mode .bg-orange-50\/80 { background-color: rgba(120,53,15,.3) !important; }
-        body.dark-mode .bg-orange-100 { background-color: rgba(120,53,15,.5) !important; }
-        body.dark-mode .bg-emerald-50 { background-color: rgba(6,78,59,.4) !important; }
-        body.dark-mode .bg-emerald-100 { background-color: rgba(6,78,59,.6) !important; }
         body.dark-mode .bg-amber-50 { background-color: rgba(120,53,15,.4) !important; }
-        body.dark-mode .bg-blue-50 { background-color: rgba(30,58,138,.4) !important; }
         body.dark-mode .bg-amber-100 { background-color: rgba(120,53,15,.5) !important; }
-        body.dark-mode .bg-amber-200\/30 { background-color: rgba(120,53,15,.2) !important; }
-        body.dark-mode .bg-white\/70 { background-color: rgba(30,41,59,.7) !important; }
-
         body.dark-mode .text-slate-800 { color: #f1f5f9 !important; }
         body.dark-mode .text-slate-700 { color: #e2e8f0 !important; }
         body.dark-mode .text-slate-600 { color: #cbd5e1 !important; }
         body.dark-mode .text-slate-500 { color: #94a3b8 !important; }
         body.dark-mode .text-slate-400 { color: #94a3b8 !important; }
-        body.dark-mode .text-brand-600 { color: #f472b6 !important; }
-        body.dark-mode .text-brand-500 { color: #f472b6 !important; }
-        body.dark-mode .text-emerald-700 { color: #6ee7b7 !important; }
-        body.dark-mode .text-emerald-800 { color: #a7f3d0 !important; }
-        body.dark-mode .text-orange-800 { color: #fdba74 !important; }
-        body.dark-mode .text-orange-950 { color: #fed7aa !important; }
-        body.dark-mode .text-amber-600 { color: #fcd34d !important; }
-        body.dark-mode .text-amber-700 { color: #fcd34d !important; }
-        body.dark-mode .text-amber-900 { color: #fcd34d !important; }
-        body.dark-mode .text-amber-950 { color: #fde68a !important; }
-
         body.dark-mode .border-slate-200 { border-color: #334155 !important; }
         body.dark-mode .border-slate-100 { border-color: #1e293b !important; }
-        body.dark-mode .border-slate-200\/80 { border-color: #334155 !important; }
-        body.dark-mode .border-slate-200\/60 { border-color: #334155 !important; }
-        body.dark-mode .border-pink-100 { border-color: #831843 !important; }
-        body.dark-mode .border-pink-200 { border-color: #831843 !important; }
-        body.dark-mode .border-pink-100\/60 { border-color: #831843 !important; }
-        body.dark-mode .border-pink-300 { border-color: #be185d !important; }
-        body.dark-mode .border-pink-400 { border-color: #db2777 !important; }
-        body.dark-mode .border-orange-200 { border-color: #7c2d12 !important; }
-        body.dark-mode .border-orange-200\/80 { border-color: #7c2d12 !important; }
-        body.dark-mode .border-emerald-200 { border-color: #065f46 !important; }
-        body.dark-mode .border-amber-200 { border-color: #78350f !important; }
-        body.dark-mode .border-amber-200\/60 { border-color: #78350f !important; }
-        body.dark-mode .border-amber-200\/80 { border-color: #78350f !important; }
-        body.dark-mode .border-amber-300 { border-color: #d97706 !important; }
-        body.dark-mode .divide-slate-100 > * + * { border-color: #1e293b !important; }
-
-        body.dark-mode .from-slate-50 { --tw-gradient-from: #1e293b !important; }
-        body.dark-mode .to-white { --tw-gradient-to: #1e293b !important; }
-        body.dark-mode .from-pink-50 { --tw-gradient-from: #831843 !important; }
-        body.dark-mode .from-pink-50\/70 { --tw-gradient-from: rgba(131,24,67,.4) !important; }
-        body.dark-mode .from-orange-50\/70 { --tw-gradient-from: rgba(120,53,15,.3) !important; }
-        body.dark-mode .from-pink-100\/90 { --tw-gradient-from: #9f1239 !important; }
-        body.dark-mode .from-amber-50 { --tw-gradient-from: rgba(120,53,15,.4) !important; }
-        body.dark-mode .to-orange-50 { --tw-gradient-to: rgba(120,53,15,.3) !important; }
-
         body.dark-mode input, body.dark-mode select, body.dark-mode textarea {
             background-color: #334155 !important;
             color: #f1f5f9 !important;
             border-color: #475569 !important;
         }
         body.dark-mode input::placeholder { color: #94a3b8 !important; }
-        body.dark-mode .bg-pink-50\/50 { background-color: rgba(131,24,67,.3) !important; }
-        body.dark-mode .bg-pink-50\/30 { background-color: rgba(131,24,67,.2) !important; }
-        body.dark-mode .hover\:bg-pink-50:hover { background-color: rgba(131,24,67,.4) !important; }
-        body.dark-mode .hover\:bg-slate-200:hover { background-color: #475569 !important; }
-        body.dark-mode .hover\:bg-pink-50\/60:hover { background-color: rgba(131,24,67,.4) !important; }
 
         /* ============ CONNECTION BADGE ============ */
         .conn-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .5px;
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 8px; border-radius: 8px;
+            font-size: 9px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .5px;
             transition: all .3s;
         }
         .conn-badge.online {
@@ -338,72 +226,384 @@
             border: 1px solid rgba(239, 68, 68, .4);
         }
         .conn-badge .dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
+            width: 6px; height: 6px; border-radius: 50%;
             background: currentColor;
             animation: pulseDot 2s infinite;
         }
-        @keyframes pulseDot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .4; }
+        @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+        /* ============================================================
+           PODIUM TOP 3 — LAYOUT BARU YANG MEGAH
+           ============================================================ */
+        .podium-wrapper {
+            position: relative;
+            padding: 8px 4px 0;
+        }
+        .podium-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr 1fr;
+            gap: 8px;
+            align-items: end;
+            padding-bottom: 8px;
         }
 
-        /* ============ LEADERBOARD CARDS ============ */
-        .leader-card {
-            transition: transform .28s cubic-bezier(.16,1,.3,1), box-shadow .28s cubic-bezier(.16,1,.3,1);
+        .podium-card {
             position: relative;
-            overflow: hidden;
+            border-radius: 20px;
+            padding: 14px 8px 16px;
+            text-align: center;
+            border: 2px solid transparent;
+            background: #fff;
+            transition: transform .35s cubic-bezier(.16,1,.3,1),
+                        box-shadow .35s cubic-bezier(.16,1,.3,1);
             will-change: transform;
+            overflow: visible;
         }
-        .leader-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 14px 28px -10px rgba(219, 39, 119, .28);
-        }
-        .leader-card.rank-1 {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        .podium-card:hover { transform: translateY(-4px); }
+        .podium-card:active { transform: scale(.97); }
+
+        /* Peringkat 1 — Tengah, paling tinggi */
+        .podium-1 {
+            background: linear-gradient(160deg, #fef3c7 0%, #fde68a 55%, #fbbf24 100%);
             border-color: #f59e0b;
+            box-shadow:
+                0 20px 40px -14px rgba(245, 158, 11, 0.55),
+                0 8px 20px -8px rgba(245, 158, 11, 0.4),
+                inset 0 2px 0 rgba(255,255,255,.6);
+            padding-top: 36px;
+            padding-bottom: 22px;
+            z-index: 3;
+            animation: podium1Pulse 3s ease-in-out infinite;
         }
-        body.dark-mode .leader-card.rank-1 {
-            background: linear-gradient(135deg, rgba(245,158,11,.3), rgba(217,119,6,.2)) !important;
+        @keyframes podium1Pulse {
+            0%, 100% {
+                box-shadow: 0 20px 40px -14px rgba(245, 158, 11, 0.55),
+                            0 8px 20px -8px rgba(245, 158, 11, 0.4),
+                            inset 0 2px 0 rgba(255,255,255,.6);
+            }
+            50% {
+                box-shadow: 0 24px 50px -14px rgba(245, 158, 11, 0.75),
+                            0 10px 24px -8px rgba(245, 158, 11, 0.55),
+                            inset 0 2px 0 rgba(255,255,255,.6);
+            }
         }
-        .leader-card.rank-2 {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+
+        /* Peringkat 2 — Kiri */
+        .podium-2 {
+            background: linear-gradient(160deg, #f8fafc 0%, #e2e8f0 100%);
             border-color: #94a3b8;
+            box-shadow: 0 12px 24px -10px rgba(100, 116, 139, 0.4),
+                        inset 0 2px 0 rgba(255,255,255,.7);
+            z-index: 2;
+            padding-top: 26px;
         }
-        body.dark-mode .leader-card.rank-2 {
-            background: linear-gradient(135deg, rgba(148,163,184,.2), rgba(100,116,139,.15)) !important;
-        }
-        .leader-card.rank-3 {
-            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+
+        /* Peringkat 3 — Kanan */
+        .podium-3 {
+            background: linear-gradient(160deg, #fed7aa 0%, #fdba74 100%);
             border-color: #ea580c;
+            box-shadow: 0 12px 24px -10px rgba(234, 88, 12, 0.4),
+                        inset 0 2px 0 rgba(255,255,255,.5);
+            z-index: 2;
+            padding-top: 26px;
         }
-        body.dark-mode .leader-card.rank-3 {
-            background: linear-gradient(135deg, rgba(234,88,12,.3), rgba(194,65,12,.2)) !important;
-        }
-        .leader-card.rank-1::before,
-        .leader-card.rank-2::before,
-        .leader-card.rank-3::before {
-            content: '';
+
+        /* Crown untuk juara 1 */
+        .podium-1 .crown {
             position: absolute;
-            top: -30%; right: -10%;
-            width: 120px; height: 120px;
-            background: rgba(255, 255, 255, .3);
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 26px;
+            filter: drop-shadow(0 4px 8px rgba(245, 158, 11, 0.5));
+            animation: crownBounce 2s ease-in-out infinite;
+            z-index: 5;
+        }
+        @keyframes crownBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(-6deg); }
+            50% { transform: translateX(-50%) translateY(-4px) rotate(6deg); }
+        }
+
+        /* Avatar medal */
+        .podium-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: white;
+            box-shadow: 0 6px 14px -4px rgba(0,0,0,.25), inset 0 2px 0 rgba(255,255,255,.4);
+            border: 2px solid rgba(255,255,255,.6);
+            position: relative;
+        }
+        .podium-1 .podium-avatar {
+            width: 64px;
+            height: 64px;
+            font-size: 24px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        .podium-2 .podium-avatar {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+        }
+        .podium-3 .podium-avatar {
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+        }
+
+        /* Badge rank di atas avatar */
+        .podium-rank-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            color: #0f172a;
+            border: 2px solid currentColor;
+            box-shadow: 0 2px 6px rgba(0,0,0,.15);
+        }
+        .podium-1 .podium-rank-badge { color: #d97706; }
+        .podium-2 .podium-rank-badge { color: #64748b; }
+        .podium-3 .podium-rank-badge { color: #c2410c; }
+
+        /* Nama YL */
+        .podium-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.15;
+            margin: 0 0 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            word-break: break-word;
+            min-height: 28px;
+            padding: 0 2px;
+        }
+        .podium-1 .podium-name { font-size: 14px; color: #78350f; }
+
+        /* Point value */
+        .podium-point {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 900;
+            color: #db2777;
+            line-height: 1;
+            letter-spacing: -.02em;
+        }
+        .podium-1 .podium-point {
+            font-size: 22px;
+            color: #b45309;
+        }
+        .podium-2 .podium-point { color: #475569; }
+        .podium-3 .podium-point { color: #9a3412; }
+
+        .podium-point-label {
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #94a3b8;
+            margin-top: 1px;
+        }
+
+        /* Info tambahan (pelanggan) */
+        .podium-info {
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b;
+            margin-top: 6px;
+            background: rgba(255,255,255,.6);
+            border-radius: 6px;
+            padding: 3px 6px;
+            display: inline-block;
+            backdrop-filter: blur(4px);
+        }
+        .podium-1 .podium-info {
+            background: rgba(255,255,255,.8);
+            color: #78350f;
+        }
+
+        /* Base/pedestal di bawah podium */
+        .podium-base {
+            position: relative;
+            height: 18px;
+            border-radius: 6px 6px 12px 12px;
+            background: linear-gradient(180deg, rgba(219,39,119,.08), rgba(219,39,119,.02));
+            margin: -8px 8px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,.05);
+        }
+
+        /* Sparkle background untuk juara 1 */
+        .podium-1::before,
+        .podium-1::after {
+            content: '✨';
+            position: absolute;
+            font-size: 14px;
+            opacity: .7;
             pointer-events: none;
         }
-        body.dark-mode .leader-card.rank-1::before,
-        body.dark-mode .leader-card.rank-2::before,
-        body.dark-mode .leader-card.rank-3::before {
-            background: rgba(255, 255, 255, .05);
+        .podium-1::before { top: 10px; left: 8px; animation: sparkleFloat 2.5s ease-in-out infinite; }
+        .podium-1::after { top: 16px; right: 8px; animation: sparkleFloat 2.5s ease-in-out infinite .8s; }
+        @keyframes sparkleFloat {
+            0%, 100% { transform: translateY(0) scale(1); opacity: .5; }
+            50% { transform: translateY(-4px) scale(1.15); opacity: .9; }
         }
 
+        /* ============================================================
+           LEADER CARD — RANK 4+
+           ============================================================ */
+        .leader-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: #fff;
+            border: 1.5px solid #e2e8f0;
+            transition: transform .25s cubic-bezier(.16,1,.3,1),
+                        box-shadow .25s cubic-bezier(.16,1,.3,1),
+                        border-color .25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .leader-row:hover {
+            transform: translateY(-2px);
+            border-color: #f472b6;
+            box-shadow: 0 10px 20px -10px rgba(219,39,119,.25);
+        }
+        body.dark-mode .leader-row {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .leader-row.rank-4,
+        .leader-row.rank-5 {
+            background: linear-gradient(135deg, #fff 0%, #fef7fb 100%);
+        }
+        body.dark-mode .leader-row.rank-4,
+        body.dark-mode .leader-row.rank-5 {
+            background: linear-gradient(135deg, #1e293b 0%, #2a1f35 100%);
+        }
+
+        .leader-rank-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 900;
+            color: white;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #f472b6, #db2777);
+            box-shadow: 0 4px 10px -4px rgba(219,39,119,.5);
+        }
+
+        .leader-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,.5);
+        }
+
+        .leader-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .leader-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.15;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        body.dark-mode .leader-name { color: #f1f5f9; }
+        .leader-sub {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 600;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .leader-point {
+            text-align: right;
+            flex-shrink: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .leader-point-value {
+            font-size: 15px;
+            font-weight: 900;
+            color: #db2777;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .leader-point-label {
+            font-size: 8px;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 2px;
+        }
+
+        /* Progress bar relatif ke #1 */
+        .leader-progress {
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(219,39,119,.1);
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .leader-progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #f472b6, #db2777);
+            transition: width .8s cubic-bezier(.16,1,.3,1);
+            box-shadow: 0 0 8px rgba(219,39,119,.4);
+        }
+        body.dark-mode .leader-progress {
+            background: rgba(219,39,119,.2);
+        }
+
+        /* Achievement badge */
         .achievement-badge {
             display: inline-flex;
             align-items: center;
             gap: 3px;
-            padding: 3px 7px;
-            border-radius: 7px;
-            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 8px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: .3px;
@@ -412,56 +612,48 @@
         .achievement-top-customer { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
         .achievement-top-efficiency { background: linear-gradient(135deg, #10b981, #059669); color: white; }
 
+        /* Highlight "YOU" */
+        .leader-row.is-me {
+            border-color: #db2777;
+            background: linear-gradient(135deg, #fff1f2 0%, #fce7f3 100%);
+            box-shadow: 0 0 0 3px rgba(219,39,119,.1), 0 10px 20px -10px rgba(219,39,119,.3);
+        }
+        body.dark-mode .leader-row.is-me {
+            background: linear-gradient(135deg, rgba(131,24,67,.3), rgba(159,18,57,.2));
+        }
+        .you-badge {
+            background: linear-gradient(135deg, #db2777, #be185d);
+            color: white;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 999px;
+            letter-spacing: .5px;
+            box-shadow: 0 2px 6px -2px rgba(219,39,119,.6);
+        }
+
         /* ============ PWA BANNER ============ */
         .pwa-banner {
             transform: translateY(-110%);
             transition: transform .45s cubic-bezier(.16,1,.3,1);
-            will-change: transform;
         }
         .pwa-banner.show { transform: translateY(0); }
 
         /* ============ THEME TOGGLE ============ */
         .theme-toggle {
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             border-radius: 12px;
             background: rgba(255, 255, 255, .2);
             border: 1px solid rgba(255, 255, 255, .3);
             color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
             transition: background-color .22s, transform .22s cubic-bezier(.16,1,.3,1);
         }
         .theme-toggle:hover { background: rgba(255, 255, 255, .3); transform: scale(1.05); }
         .theme-toggle:active { transform: scale(.94); }
         .theme-toggle i { transition: transform .5s cubic-bezier(.16,1,.3,1); }
         .theme-toggle.rotating i { transform: rotate(360deg) scale(1.1); }
-
-        /* ============ RIPPLE BUTTON ============ */
-        .ripple-effect-btn {
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* ============ MODAL BACKDROP ============ */
-        .modal-backdrop {
-            backdrop-filter: blur(6px) saturate(1.2);
-            -webkit-backdrop-filter: blur(6px) saturate(1.2);
-        }
-
-        /* ============ TAB SKELETON ============ */
-        .tab-skeleton {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 12px;
-        }
-
-        /* ============ STAT COUNTER ANIMATION ============ */
-        .stat-value.counting { color: #db2777; }
 
         /* ============ REDUCED MOTION ============ */
         @media (prefers-reduced-motion: reduce) {
@@ -470,12 +662,6 @@
                 animation-iteration-count: 1 !important;
                 transition-duration: .01ms !important;
             }
-        }
-
-        /* ============ PRINT ============ */
-        @media print {
-            header, footer, button, .no-print { display: none !important; }
-            body { background: white; color: black; }
         }
     </style>
 </head>
@@ -491,9 +677,7 @@
                 <p class="text-white text-[11px] font-bold leading-tight">Install "Point Pelanggan"</p>
                 <p class="text-pink-100 text-[9px] leading-tight">Akses lebih cepat & bisa offline</p>
             </div>
-            <button onclick="dismissPwaBanner()" class="text-white/80 hover:text-white text-xs px-2 py-1 flex-shrink-0">
-                Nanti
-            </button>
+            <button onclick="dismissPwaBanner()" class="text-white/80 hover:text-white text-xs px-2 py-1 flex-shrink-0">Nanti</button>
             <button onclick="installPwa()" class="bg-white text-brand-600 font-bold text-[11px] px-3 py-1.5 rounded-lg flex-shrink-0 shadow-md flex items-center gap-1 btn-tactile">
                 <i class="fa-solid fa-download text-[10px]"></i> Install
             </button>
@@ -540,7 +724,7 @@
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 -mt-2 sm:mt-4 w-full pb-6">
 
-        <!-- ============ TAB SWITCHER (SEGMENTED CONTROL) ============ -->
+        <!-- TAB SWITCHER -->
         <div class="tab-switcher ripple-effect-btn mb-3" id="tabSwitcher">
             <div class="tab-indicator" id="tabIndicator"></div>
             <button id="tabBtnPelanggan" onclick="switchTab('pelanggan', this)" class="tab-btn active" data-tab="pelanggan">
@@ -556,9 +740,8 @@
         <!-- ============ TAB: PELANGGAN ============ -->
         <div id="tabContentPelanggan" class="tab-panel active">
 
-            <!-- STATS -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-3">
-                <div class="stat-card cv-auto">
+                <div class="stat-card">
                     <div class="min-w-0">
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Pelanggan</p>
                         <h3 id="statTotalCustomer" class="stat-value text-slate-800 mt-0.5">0</h3>
@@ -569,7 +752,7 @@
                     </div>
                 </div>
 
-                <div class="stat-card cv-auto">
+                <div class="stat-card">
                     <div class="min-w-0">
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Point</p>
                         <h3 id="statTotalPoint" class="stat-value text-brand-600 mt-0.5">0</h3>
@@ -580,7 +763,7 @@
                     </div>
                 </div>
 
-                <div class="stat-card cv-auto">
+                <div class="stat-card">
                     <div class="min-w-0">
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Center Aktif</p>
                         <h3 id="statTotalCenter" class="stat-value text-slate-800 mt-0.5">0</h3>
@@ -591,7 +774,7 @@
                     </div>
                 </div>
 
-                <div class="stat-card cv-auto">
+                <div class="stat-card">
                     <div class="min-w-0">
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Total YL</p>
                         <h3 id="statTotalYL" class="stat-value text-slate-800 mt-0.5">0</h3>
@@ -604,7 +787,7 @@
             </div>
 
             <!-- FILTER -->
-            <div class="bg-orange-50/70 rounded-2xl p-3 sm:p-4 shadow-sm border border-orange-200/80 mb-3 cv-auto">
+            <div class="bg-orange-50/70 rounded-2xl p-3 sm:p-4 shadow-sm border border-orange-200/80 mb-3">
                 <div class="flex items-center gap-2 mb-2">
                     <i class="fa-solid fa-filter text-orange-500 text-xs sm:text-sm"></i>
                     <h2 class="text-xs sm:text-sm font-bold text-orange-950">Filter Data (Center, YL & Pelanggan)</h2>
@@ -640,7 +823,7 @@
             </div>
 
             <!-- TABLE -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden mb-4 cv-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden mb-4">
                 <div class="p-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gradient-to-r from-slate-50 to-white">
                     <div>
                         <h3 class="text-xs sm:text-sm font-bold text-slate-800">Daftar Pelanggan & Total Point</h3>
@@ -666,11 +849,11 @@
                     </table>
                 </div>
 
-                <div id="tableSkeleton" class="tab-skeleton">
-                    <div class="skeleton skeleton-title" style="width: 40%;"></div>
-                    <div class="skeleton skeleton-text" style="width: 80%;"></div>
-                    <div class="skeleton skeleton-text" style="width: 70%;"></div>
-                    <div class="skeleton skeleton-text" style="width: 75%;"></div>
+                <div id="tableSkeleton" class="tab-skeleton p-4">
+                    <div class="skeleton skeleton-title" style="width: 40%; height: 14px; margin-bottom: 8px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 80%; height: 10px; margin: 6px 0;"></div>
+                    <div class="skeleton skeleton-text" style="width: 70%; height: 10px; margin: 6px 0;"></div>
+                    <div class="skeleton skeleton-text" style="width: 75%; height: 10px; margin: 6px 0;"></div>
                 </div>
 
                 <div id="emptyState" class="hidden py-8 text-center">
@@ -683,55 +866,78 @@
             </div>
         </div>
 
-        <!-- ============ TAB: LEADERBOARD ============ -->
+        <!-- ============ TAB: LEADERBOARD (REDESIGN) ============ -->
         <div id="tabContentLeaderboard" class="tab-panel">
 
-            <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-3 sm:p-4 shadow-sm border border-amber-200/80 mb-3 relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-amber-200/30 rounded-full -mr-8 -mt-8"></div>
+            <!-- ===== HEADER STATS ===== -->
+            <div class="bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 rounded-3xl p-4 sm:p-5 shadow-sm border-2 border-amber-200/60 mb-4 relative overflow-hidden">
+                <!-- Dekorasi background -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-300/30 to-transparent rounded-full -mr-12 -mt-12 pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-300/30 to-transparent rounded-full -ml-8 -mb-8 pointer-events-none"></div>
+
                 <div class="relative">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-10 h-10 bg-gradient-to-tr from-amber-400 to-orange-500 text-white rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                                <i class="fa-solid fa-trophy text-base"></i>
+                    <div class="flex items-start justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-amber-400 via-amber-500 to-orange-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-300/50 flex-shrink-0">
+                                <i class="fa-solid fa-trophy text-xl"></i>
                             </div>
                             <div>
-                                <h2 class="text-sm font-bold text-amber-950 font-poppins">Leaderboard YL</h2>
-                                <p class="text-[10px] text-amber-700 font-medium">Ranking kombinasi Point (60%) & Pelanggan (40%)</p>
+                                <h2 class="text-base sm:text-lg font-black text-amber-950 font-poppins tracking-tight">Leaderboard YL</h2>
+                                <p class="text-[10px] sm:text-[11px] text-amber-700 font-semibold mt-0.5">Ranking Point (60%) + Pelanggan (40%)</p>
                             </div>
                         </div>
-                        <button onclick="shareLeaderboard()" class="px-2.5 py-1.5 bg-white text-amber-700 hover:bg-amber-100 border border-amber-300 rounded-xl font-bold text-[10px] shadow-sm flex items-center gap-1 flex-shrink-0 btn-tactile">
-                            <i class="fa-brands fa-whatsapp"></i>
+                        <button onclick="shareLeaderboard()" class="px-3 py-2 bg-white text-amber-700 hover:bg-amber-100 border-2 border-amber-300 rounded-xl font-bold text-[11px] shadow-sm flex items-center gap-1.5 flex-shrink-0 btn-tactile">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
                             <span class="hidden sm:inline">Bagikan</span>
                         </button>
                     </div>
-                    
-                    <div class="grid grid-cols-3 gap-1.5 mt-3">
-                        <div class="bg-white/70 backdrop-blur-sm rounded-xl p-2 border border-amber-200 text-center">
-                            <p class="text-[9px] text-amber-700 font-bold uppercase">Total YL</p>
-                            <p id="statLeaderTotalYL" class="text-base font-extrabold text-amber-900 mt-0.5 tabular-nums">0</p>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-2.5 border border-amber-200 text-center shadow-sm">
+                            <div class="flex items-center justify-center gap-1 mb-1">
+                                <i class="fa-solid fa-users text-[10px] text-amber-600"></i>
+                                <p class="text-[9px] text-amber-700 font-bold uppercase tracking-wide">Total YL</p>
+                            </div>
+                            <p id="statLeaderTotalYL" class="text-xl font-black text-amber-900 tabular-nums">0</p>
                         </div>
-                        <div class="bg-white/70 backdrop-blur-sm rounded-xl p-2 border border-amber-200 text-center">
-                            <p class="text-[9px] text-amber-700 font-bold uppercase">Total Point</p>
-                            <p id="statLeaderTotalPoint" class="text-base font-extrabold text-amber-900 mt-0.5 tabular-nums">0</p>
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-2.5 border border-amber-200 text-center shadow-sm">
+                            <div class="flex items-center justify-center gap-1 mb-1">
+                                <i class="fa-solid fa-coins text-[10px] text-pink-500"></i>
+                                <p class="text-[9px] text-amber-700 font-bold uppercase tracking-wide">Point</p>
+                            </div>
+                            <p id="statLeaderTotalPoint" class="text-xl font-black text-brand-600 tabular-nums">0</p>
                         </div>
-                        <div class="bg-white/70 backdrop-blur-sm rounded-xl p-2 border border-amber-200 text-center">
-                            <p class="text-[9px] text-amber-700 font-bold uppercase">Top Scorer</p>
-                            <p id="statLeaderTopName" class="text-[11px] font-extrabold text-amber-900 mt-0.5 truncate">-</p>
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-2.5 border border-amber-200 text-center shadow-sm">
+                            <div class="flex items-center justify-center gap-1 mb-1">
+                                <i class="fa-solid fa-crown text-[10px] text-amber-600"></i>
+                                <p class="text-[9px] text-amber-700 font-bold uppercase tracking-wide">Top YL</p>
+                            </div>
+                            <p id="statLeaderTopName" class="text-[11px] font-black text-amber-900 truncate leading-tight">-</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="leaderboardList" class="space-y-2">
+            <!-- ===== PODIUM TOP 3 ===== -->
+            <div id="podiumContainer" class="podium-wrapper mb-4 hidden">
+                <div class="podium-grid" id="podiumGrid">
+                    <!-- Diisi JS -->
+                </div>
+                <div class="podium-base"></div>
             </div>
 
-            <div id="leaderboardSkeleton" class="space-y-2 tab-skeleton">
+            <!-- ===== LIST RANKING 4+ ===== -->
+            <div id="leaderboardList" class="space-y-2.5">
+            </div>
+
+            <!-- Skeleton -->
+            <div id="leaderboardSkeleton" class="space-y-2.5">
                 <div class="bg-white rounded-2xl p-4 border border-slate-200">
                     <div class="flex gap-3">
                         <div class="skeleton w-12 h-12 rounded-2xl"></div>
                         <div class="flex-1">
-                            <div class="skeleton skeleton-title"></div>
-                            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+                            <div class="skeleton h-4 w-40 mb-2"></div>
+                            <div class="skeleton h-3 w-24"></div>
                         </div>
                     </div>
                 </div>
@@ -739,15 +945,16 @@
                     <div class="flex gap-3">
                         <div class="skeleton w-12 h-12 rounded-2xl"></div>
                         <div class="flex-1">
-                            <div class="skeleton skeleton-title"></div>
-                            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+                            <div class="skeleton h-4 w-40 mb-2"></div>
+                            <div class="skeleton h-3 w-24"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Empty -->
             <div id="leaderboardEmpty" class="hidden py-12 text-center bg-white rounded-2xl border border-slate-200/80">
-                <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
+                <div class="w-16 h-16 bg-gradient-to-br from-amber-100 to-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
                     <i class="fa-solid fa-trophy"></i>
                 </div>
                 <h4 class="text-sm font-bold text-slate-700">Belum Ada Data YL</h4>
@@ -762,8 +969,8 @@
     </footer>
 
     <!-- ============ MODAL CENTER ============ -->
-    <div id="centerModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex flex-col justify-end sm:justify-center sm:items-center hidden opacity-0 transition-opacity duration-300">
-        <div id="centerModalCard" class="modal-card bg-white rounded-t-[2.5rem] sm:rounded-3xl w-full sm:max-w-md max-h-[85vh] flex flex-col shadow-2xl border-t sm:border border-pink-100 relative transform translate-y-full transition-transform duration-300 ease-out">
+    <div id="centerModal" class="fixed inset-0 bg-slate-900/40 z-50 flex flex-col justify-end sm:justify-center sm:items-center hidden opacity-0 transition-opacity duration-300" style="backdrop-filter: blur(6px);">
+        <div id="centerModalCard" class="bg-white rounded-t-[2.5rem] sm:rounded-3xl w-full sm:max-w-md max-h-[85vh] flex flex-col shadow-2xl border-t sm:border border-pink-100 relative transform translate-y-full transition-transform duration-300 ease-out">
             <div class="p-3.5 border-b border-pink-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-white flex-shrink-0">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 bg-pink-100 text-brand-500 rounded-xl flex items-center justify-center text-xs shadow-inner">
@@ -780,8 +987,8 @@
     </div>
 
     <!-- ============ MODAL YL ============ -->
-    <div id="ylModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex flex-col justify-end sm:justify-center sm:items-center hidden opacity-0 transition-opacity duration-300">
-        <div id="ylModalCard" class="modal-card bg-white rounded-t-[2.5rem] sm:rounded-3xl w-full sm:max-w-md max-h-[85vh] flex flex-col shadow-2xl border-t sm:border border-pink-100 relative transform translate-y-full transition-transform duration-300 ease-out">
+    <div id="ylModal" class="fixed inset-0 bg-slate-900/40 z-50 flex flex-col justify-end sm:justify-center sm:items-center hidden opacity-0 transition-opacity duration-300" style="backdrop-filter: blur(6px);">
+        <div id="ylModalCard" class="bg-white rounded-t-[2.5rem] sm:rounded-3xl w-full sm:max-w-md max-h-[85vh] flex flex-col shadow-2xl border-t sm:border border-pink-100 relative transform translate-y-full transition-transform duration-300 ease-out">
             <div class="p-3.5 border-b border-pink-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-white flex-shrink-0">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 bg-pink-100 text-brand-500 rounded-xl flex items-center justify-center text-xs shadow-inner">
@@ -798,8 +1005,8 @@
     </div>
 
     <!-- ============ MODAL PASSWORD ============ -->
-    <div id="passwordModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center hidden p-3">
-        <div class="modal-card bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-pink-100 relative">
+    <div id="passwordModal" class="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center hidden p-3" style="backdrop-filter: blur(6px);">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-pink-100 relative">
             <button onclick="closePasswordModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-7 h-7 rounded-full flex items-center justify-center bg-slate-100 btn-tactile">
                 <i class="fa-solid fa-xmark text-xs"></i>
             </button>
@@ -839,8 +1046,8 @@
     </div>
 
     <!-- ============ MODAL CSV ============ -->
-    <div id="csvModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center hidden p-3">
-        <div class="modal-card bg-white rounded-3xl max-w-lg w-full p-5 shadow-2xl border border-pink-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+    <div id="csvModal" class="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center hidden p-3" style="backdrop-filter: blur(6px);">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-5 shadow-2xl border border-pink-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
             <button onclick="closeCsvModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-7 h-7 rounded-full flex items-center justify-center bg-slate-100 btn-tactile">
                 <i class="fa-solid fa-xmark text-xs"></i>
             </button>
@@ -911,8 +1118,8 @@
     </div>
 
     <!-- ============ MODAL DETAIL ============ -->
-    <div id="detailModal" class="modal-backdrop fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center hidden p-3">
-        <div class="modal-card bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-pink-100 relative overflow-hidden">
+    <div id="detailModal" class="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center hidden p-3" style="backdrop-filter: blur(6px);">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-pink-100 relative overflow-hidden">
             
             <div class="p-4 border-b border-pink-100 flex-shrink-0 relative bg-gradient-to-r from-pink-50 to-white">
                 <button onclick="closeDetailModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-7 h-7 rounded-full flex items-center justify-center bg-white shadow-sm hover:bg-slate-100 btn-tactile">
@@ -1062,7 +1269,6 @@
         let selectedYLValue = '';
         let toastTimer = null;
         let currentFilteredCustomers = [];
-        let dataHasRendered = false;
 
         // ============================================================
         // HELPERS
@@ -1075,6 +1281,13 @@
             return String(str ?? '').replace(/[&<>"']/g, m => ({
                 '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
             }[m]));
+        }
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = name.trim().split(/\s+/).filter(Boolean);
+            if (parts.length === 0) return '?';
+            if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+            return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
         }
         function debounce(fn, delay = 200) {
             let timer;
@@ -1103,11 +1316,8 @@
                 const eased = 1 - Math.pow(1 - progress, 3);
                 const current = Math.round(startValue + (targetValue - startValue) * eased);
                 el.textContent = current.toLocaleString('id-ID');
-                if (progress < 1) {
-                    requestAnimationFrame(update);
-                } else {
-                    el.classList.remove('counting');
-                }
+                if (progress < 1) requestAnimationFrame(update);
+                else el.classList.remove('counting');
             }
             requestAnimationFrame(update);
         }
@@ -1117,9 +1327,7 @@
         // ============================================================
         function initTheme() {
             let saved = localStorage.getItem(THEME_KEY);
-            if (!saved) {
-                saved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
+            if (!saved) saved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             if (saved === 'dark') {
                 document.body.classList.add('dark-mode');
                 document.documentElement.classList.add('dark');
@@ -1132,7 +1340,6 @@
             const btn = document.getElementById('themeToggleBtn');
             btn.classList.add('rotating');
             setTimeout(() => btn.classList.remove('rotating'), 500);
-
             const isDark = document.body.classList.toggle('dark-mode');
             document.documentElement.classList.toggle('dark', isDark);
             localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
@@ -1143,14 +1350,6 @@
             const el = document.getElementById('themeIcon');
             if (el) el.className = `fa-solid fa-${icon} text-sm`;
         }
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (!localStorage.getItem(THEME_KEY)) {
-                const isDark = e.matches;
-                document.body.classList.toggle('dark-mode', isDark);
-                document.documentElement.classList.toggle('dark', isDark);
-                updateThemeIcon(isDark ? 'sun' : 'moon');
-            }
-        });
 
         // ============================================================
         // PWA
@@ -1159,15 +1358,13 @@
             if (!('serviceWorker' in navigator)) return;
             if (location.protocol === 'file:') return;
             const swCode = `
-                const CACHE_NAME = 'point-pelanggan-v2';
+                const CACHE_NAME = 'point-pelanggan-v3';
                 const urlsToCache = ['./'];
                 self.addEventListener('install', e => {
                     e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(urlsToCache).catch(()=>{})));
                     self.skipWaiting();
                 });
-                self.addEventListener('activate', e => {
-                    e.waitUntil(clients.claim());
-                });
+                self.addEventListener('activate', e => e.waitUntil(clients.claim()));
                 self.addEventListener('fetch', e => {
                     if (e.request.method !== 'GET') return;
                     if (e.request.url.includes('docs.google.com')) {
@@ -1183,7 +1380,6 @@
                 navigator.serviceWorker.register(swUrl).catch(err => console.warn('[PWA] SW failed:', err));
             } catch (err) {}
         }
-
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredInstallPrompt = e;
@@ -1196,10 +1392,7 @@
             localStorage.setItem(PWA_DISMISS_KEY, 'true');
         }
         async function installPwa() {
-            if (!deferredInstallPrompt) {
-                showToast('Install tidak tersedia. Coba dari menu browser.', true);
-                return;
-            }
+            if (!deferredInstallPrompt) { showToast('Install tidak tersedia.', true); return; }
             deferredInstallPrompt.prompt();
             const { outcome } = await deferredInstallPrompt.userChoice;
             if (outcome === 'accepted') showToast('✅ Aplikasi berhasil di-install!');
@@ -1397,24 +1590,17 @@
         }
 
         // ============================================================
-        // TAB SWITCHING — SMOOTH SEGMENTED CONTROL
+        // TAB SWITCHING
         // ============================================================
         function switchTab(tab, btnEl) {
             if (activeTab === tab) return;
             activeTab = tab;
-
-            // Ripple effect
             if (btnEl) createRipple(btnEl);
 
-            // Indicator slide
             const indicator = document.getElementById('tabIndicator');
-            if (tab === 'leaderboard') {
-                indicator.classList.add('right');
-            } else {
-                indicator.classList.remove('right');
-            }
+            if (tab === 'leaderboard') indicator.classList.add('right');
+            else indicator.classList.remove('right');
 
-            // Button active states
             const btnPelanggan = document.getElementById('tabBtnPelanggan');
             const btnLeaderboard = document.getElementById('tabBtnLeaderboard');
             if (tab === 'pelanggan') {
@@ -1425,15 +1611,11 @@
                 btnPelanggan.classList.remove('active');
             }
 
-            // Content transition
             const panelPelanggan = document.getElementById('tabContentPelanggan');
             const panelLeaderboard = document.getElementById('tabContentLeaderboard');
-
-            // Hide both
             panelPelanggan.classList.remove('active', 'slide-left', 'slide-right');
             panelLeaderboard.classList.remove('active', 'slide-left', 'slide-right');
 
-            // Show new panel with slide direction
             const newPanel = tab === 'pelanggan' ? panelPelanggan : panelLeaderboard;
             if (tab === 'pelanggan') {
                 newPanel.classList.add('slide-right');
@@ -1442,13 +1624,10 @@
                 newPanel.classList.add('slide-left');
                 renderLeaderboard();
             }
-            
-            // Force reflow then activate
             void newPanel.offsetWidth;
             newPanel.classList.add('active');
         }
 
-        // Ripple generator
         function createRipple(el) {
             const rect = el.getBoundingClientRect();
             const size = Math.max(rect.width, rect.height);
@@ -1471,7 +1650,6 @@
             const modal = document.getElementById('centerModal');
             const card = document.getElementById('centerModalCard');
             const chevron = document.getElementById('centerChevron');
-            
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
@@ -1479,25 +1657,19 @@
                 if (chevron) chevron.classList.add('rotate-180');
             }, 10);
         }
-
         function closeCenterModal() {
             const modal = document.getElementById('centerModal');
             const card = document.getElementById('centerModalCard');
             const chevron = document.getElementById('centerChevron');
-
             modal.classList.add('opacity-0');
             card.classList.add('translate-y-full');
             if (chevron) chevron.classList.remove('rotate-180');
-            
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
-
         function renderCenterList() {
             const container = document.getElementById('centerListContainer');
             const centers = Array.from(new Set(aggregatedCustomers.map(i => i.center))).filter(Boolean).sort();
-
             container.innerHTML = '';
-
             const allItem = document.createElement('div');
             allItem.className = `p-3 rounded-xl cursor-pointer flex items-center justify-between border transition-all active:scale-98 ${
                 selectedCenterValue === '' 
@@ -1518,7 +1690,6 @@
                 renderTable();
             };
             container.appendChild(allItem);
-
             centers.forEach(c => {
                 const isSelected = selectedCenterValue === c;
                 const item = document.createElement('div');
@@ -1552,7 +1723,6 @@
             const modal = document.getElementById('ylModal');
             const card = document.getElementById('ylModalCard');
             const chevron = document.getElementById('ylChevron');
-            
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
@@ -1560,29 +1730,22 @@
                 if (chevron) chevron.classList.add('rotate-180');
             }, 10);
         }
-
         function closeYLModal() {
             const modal = document.getElementById('ylModal');
             const card = document.getElementById('ylModalCard');
             const chevron = document.getElementById('ylChevron');
-
             modal.classList.add('opacity-0');
             card.classList.add('translate-y-full');
             if (chevron) chevron.classList.remove('rotate-180');
-            
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
-
         function renderYLList() {
             const container = document.getElementById('ylListContainer');
             const filteredForYL = selectedCenterValue 
                 ? aggregatedCustomers.filter(i => i.center === selectedCenterValue)
                 : aggregatedCustomers;
-
             const yls = Array.from(new Set(filteredForYL.map(i => i.yl))).filter(Boolean).sort();
-
             container.innerHTML = '';
-
             const allItem = document.createElement('div');
             allItem.className = `p-3 rounded-xl cursor-pointer flex items-center justify-between border transition-all active:scale-98 ${
                 selectedYLValue === '' 
@@ -1600,7 +1763,6 @@
                 renderTable();
             };
             container.appendChild(allItem);
-
             yls.forEach(y => {
                 const isSelected = selectedYLValue === y;
                 const item = document.createElement('div');
@@ -1622,7 +1784,6 @@
                 container.appendChild(item);
             });
         }
-
         function updateCenterOptions() {
             if (selectedCenterValue) {
                 const centers = Array.from(new Set(aggregatedCustomers.map(i => i.center)));
@@ -1632,7 +1793,6 @@
                 }
             }
         }
-
         function updateYLOptions() {
             if (selectedYLValue) {
                 const filteredForYL = selectedCenterValue 
@@ -1664,9 +1824,8 @@
 
             currentFilteredCustomers = filtered;
 
-            // Skeleton logic: tampil saat data pertama belum siap
             if (aggregatedCustomers.length === 0 && activeRawData.length > 0) {
-                tableSkeleton.style.display = 'flex';
+                tableSkeleton.style.display = 'block';
                 tableBody.innerHTML = '';
                 emptyState.classList.add('hidden');
                 return;
@@ -1683,7 +1842,6 @@
                 emptyState.classList.add('hidden');
             }
 
-            // Render table
             let html = '';
             filtered.forEach((item, index) => {
                 let rankBadge = `${index + 1}`;
@@ -1711,7 +1869,6 @@
             });
             tableBody.innerHTML = html;
 
-            // Attach event listeners (anti-XSS)
             tableBody.querySelectorAll('.view-detail-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const idx = parseInt(e.currentTarget.dataset.customerIndex, 10);
@@ -1722,91 +1879,167 @@
             });
 
             updateStats();
-            dataHasRendered = true;
         }
 
         // ============================================================
-        // LEADERBOARD RENDER
+        // LEADERBOARD RENDER — VERSI BARU DENGAN PODIUM
         // ============================================================
         function renderLeaderboard() {
-            const list = document.getElementById('leaderboardList');
+            const listEl = document.getElementById('leaderboardList');
             const empty = document.getElementById('leaderboardEmpty');
             const skeleton = document.getElementById('leaderboardSkeleton');
+            const podiumContainer = document.getElementById('podiumContainer');
+            const podiumGrid = document.getElementById('podiumGrid');
 
-            // Skeleton hanya saat data benar-benar belum siap
+            // Skeleton saat data belum siap
             if (leaderboardData.length === 0 && aggregatedCustomers.length === 0) {
-                skeleton.style.display = 'flex';
-                list.innerHTML = '';
+                skeleton.style.display = 'block';
+                listEl.innerHTML = '';
                 empty.classList.add('hidden');
+                podiumContainer.classList.add('hidden');
                 return;
             } else {
                 skeleton.style.display = 'none';
             }
 
+            // Update header stats
             const totalYL = leaderboardData.length;
             const totalPoint = leaderboardData.reduce((s, l) => s + l.totalPoint, 0);
             const topName = leaderboardData.length > 0 ? leaderboardData[0].yl : '-';
-
             animateCounter(document.getElementById('statLeaderTotalYL'), totalYL);
             animateCounter(document.getElementById('statLeaderTotalPoint'), totalPoint);
             document.getElementById('statLeaderTopName').textContent = topName;
 
             if (leaderboardData.length === 0) {
-                list.innerHTML = '';
+                listEl.innerHTML = '';
                 empty.classList.remove('hidden');
+                podiumContainer.classList.add('hidden');
                 return;
             }
             empty.classList.add('hidden');
 
+            // ====== PODIUM TOP 3 ======
+            if (leaderboardData.length >= 3) {
+                podiumContainer.classList.remove('hidden');
+                renderPodium(leaderboardData.slice(0, 3), podiumGrid);
+                // List mulai dari rank 4
+                renderLeaderList(leaderboardData.slice(3), listEl, 4);
+            } else if (leaderboardData.length > 0) {
+                // Kurang dari 3 YL — gak pakai podium, langsung list
+                podiumContainer.classList.add('hidden');
+                renderLeaderList(leaderboardData, listEl, 1);
+            }
+        }
+
+        // ====== Render Podium ======
+        function renderPodium(top3, container) {
+            const [first, second, third] = top3;
             const medalEmoji = ['🥇', '🥈', '🥉'];
 
-            list.innerHTML = leaderboardData.map((l, index) => {
-                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
-                const medal = index < 3 ? medalEmoji[index] : `#${index + 1}`;
+            // Urutan visual: [2] [1] [3]
+            container.innerHTML = `
+                ${buildPodiumCard(second, 2, medalEmoji[1])}
+                ${buildPodiumCard(first, 1, medalEmoji[0])}
+                ${buildPodiumCard(third, 3, medalEmoji[2])}
+            `;
+
+            // Efek tambahan: click to see details? (opsional)
+            container.querySelectorAll('.podium-card').forEach((card, idx) => {
+                const orderIdx = [2, 1, 3][idx] - 1; // 2 → index 1, 1 → index 0, 3 → index 2
+                const data = top3[orderIdx];
+                if (data) {
+                    card.style.cursor = 'pointer';
+                    card.addEventListener('click', () => {
+                        // Bisa tambahkan detail YL di sini
+                        showToast(`${data.yl} — ${fmtNum(data.totalPoint)} Point`);
+                    });
+                }
+            });
+        }
+
+        function buildPodiumCard(data, rank, medal) {
+            if (!data) return '';
+            const initials = getInitials(data.yl);
+            const achievementsHtml = (data.achievements || []).map(a => {
+                if (a === 'top-point') return '<span class="achievement-badge achievement-top-point">🔥 Top Point</span>';
+                if (a === 'top-customer') return '<span class="achievement-badge achievement-top-customer">👥 Top Plg</span>';
+                if (a === 'top-efficiency') return '<span class="achievement-badge achievement-top-efficiency">⭐ Efisien</span>';
+                return '';
+            }).join('');
+
+            return `
+                <div class="podium-card podium-${rank} fade-in-up" style="animation-delay: ${rank === 1 ? 100 : rank === 2 ? 0 : 200}ms">
+                    ${rank === 1 ? '<div class="crown">👑</div>' : ''}
+                    <div class="podium-avatar">
+                        ${initials}
+                        <div class="podium-rank-badge">${rank}</div>
+                    </div>
+                    <p class="podium-name">${escapeHtml(data.yl)}</p>
+                    <p class="podium-point">${fmtNum(data.totalPoint)}</p>
+                    <p class="podium-point-label">Point</p>
+                    <div class="podium-info">
+                        <i class="fa-solid fa-users text-[8px]"></i> ${data.totalCustomers} Plg
+                    </div>
+                    ${achievementsHtml ? `<div class="mt-1.5 flex flex-wrap justify-center gap-1">${achievementsHtml}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // ====== Render List Rank 4+ ======
+        function renderLeaderList(data, container, startRank) {
+            if (data.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const maxScore = leaderboardData[0]?.score || 1;
+            const currentYLFilter = selectedYLValue; // untuk highlight "YOU"
+
+            let html = '';
+            data.forEach((l, i) => {
+                const rank = startRank + i;
+                const progressPct = Math.min(100, Math.round((l.score / maxScore) * 100));
+                const isMe = currentYLFilter && l.yl === currentYLFilter;
+                const rankCls = rank === 4 ? 'rank-4' : rank === 5 ? 'rank-5' : '';
+
                 const achievementsHtml = (l.achievements || []).map(a => {
-                    if (a === 'top-point') return '<span class="achievement-badge achievement-top-point">🔥 Top Point</span>';
-                    if (a === 'top-customer') return '<span class="achievement-badge achievement-top-customer">👥 Top Pelanggan</span>';
-                    if (a === 'top-efficiency') return '<span class="achievement-badge achievement-top-efficiency">⭐ Top Efisiensi</span>';
+                    if (a === 'top-point') return '<span class="achievement-badge achievement-top-point">🔥</span>';
+                    if (a === 'top-customer') return '<span class="achievement-badge achievement-top-customer">👥</span>';
+                    if (a === 'top-efficiency') return '<span class="achievement-badge achievement-top-efficiency">⭐</span>';
                     return '';
                 }).join('');
 
-                return `
-                    <div class="leader-card ${rankClass} bg-white rounded-2xl p-3 sm:p-4 shadow-sm border border-slate-200/80 fade-in-up" style="animation-delay: ${Math.min(index * 40, 400)}ms">
-                        <div class="flex items-start gap-3 relative">
-                            <div class="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-pink-400 to-brand-500 text-white flex items-center justify-center text-xl font-extrabold shadow-md">
-                                ${medal}
+                html += `
+                    <div class="leader-row ${rankCls} ${isMe ? 'is-me' : ''} fade-in-up" style="animation-delay: ${Math.min(i * 40, 400)}ms">
+                        <div class="leader-rank-badge">
+                            ${rank}
+                        </div>
+                        <div class="leader-avatar">
+                            ${getInitials(l.yl)}
+                        </div>
+                        <div class="leader-info">
+                            <div class="leader-name">
+                                <span class="truncate">${escapeHtml(l.yl)}</span>
+                                ${isMe ? '<span class="you-badge">YOU</span>' : ''}
+                                ${achievementsHtml}
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex flex-wrap items-center gap-1.5 mb-1">
-                                    <h4 class="font-extrabold text-slate-800 text-sm truncate font-poppins">${escapeHtml(l.yl)}</h4>
-                                    ${achievementsHtml}
-                                </div>
-                                <p class="text-[10px] text-slate-500 font-medium mb-2 truncate">
-                                    <i class="fa-solid fa-store text-[9px]"></i> ${escapeHtml(l.centers || '-')}
-                                </p>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                                    <div class="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-200/60">
-                                        <p class="text-[9px] text-slate-500 font-bold uppercase">Pelanggan</p>
-                                        <p class="text-sm font-extrabold text-slate-800 tabular-nums">${l.totalCustomers}</p>
-                                    </div>
-                                    <div class="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-200/60">
-                                        <p class="text-[9px] text-slate-500 font-bold uppercase">Point</p>
-                                        <p class="text-sm font-extrabold text-brand-600 tabular-nums">${fmtNum(l.totalPoint)}</p>
-                                    </div>
-                                    <div class="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-200/60">
-                                        <p class="text-[9px] text-slate-500 font-bold uppercase">Rata-rata</p>
-                                        <p class="text-sm font-extrabold text-slate-700 tabular-nums">${fmtNum(l.avgPoint)}</p>
-                                    </div>
-                                    <div class="bg-amber-50 rounded-lg px-2 py-1.5 border border-amber-200/60">
-                                        <p class="text-[9px] text-amber-700 font-bold uppercase">Skor</p>
-                                        <p class="text-sm font-extrabold text-amber-700 tabular-nums">${fmtNum(l.score)}</p>
-                                    </div>
-                                </div>
+                            <div class="leader-sub">
+                                <span><i class="fa-solid fa-users text-[9px]"></i> ${l.totalCustomers} Pelanggan</span>
+                                <span class="text-slate-300">·</span>
+                                <span><i class="fa-solid fa-arrow-trend-up text-[9px]"></i> avg ${fmtNum(l.avgPoint)}</span>
                             </div>
+                            <div class="leader-progress">
+                                <div class="leader-progress-fill" style="width: ${progressPct}%"></div>
+                            </div>
+                        </div>
+                        <div class="leader-point">
+                            <div class="leader-point-value">${fmtNum(l.totalPoint)}</div>
+                            <div class="leader-point-label">Point</div>
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
+            container.innerHTML = html;
         }
 
         // ============================================================
@@ -1817,7 +2050,6 @@
                 showToast('Belum ada data untuk dibagikan', true);
                 return;
             }
-
             const medalEmoji = ['🥇', '🥈', '🥉'];
             let text = `🏆 *LEADERBOARD YL*\n`;
             text += `_Ranking kombinasi Point (${RANKING_WEIGHT_POINT*100}%) & Pelanggan (${RANKING_WEIGHT_CUSTOMER*100}%)_\n`;
@@ -1833,7 +2065,6 @@
             if (leaderboardData.length > 10) {
                 text += `_...dan ${leaderboardData.length - 10} YL lainnya_\n\n`;
             }
-
             text += `━━━━━━━━━━━━━━━━━\n`;
             text += `_ayo semangat kumpulkan point!_ 💪`;
 
@@ -1843,7 +2074,7 @@
         }
 
         // ============================================================
-        // SYNC (background, non-blocking)
+        // SYNC
         // ============================================================
         let isSyncing = false;
         function sync(urlToSync) {
@@ -1923,7 +2154,6 @@
 
             clearSelectedReward();
             renderRewardsList();
-
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
@@ -1931,7 +2161,6 @@
             activeRewardTabFilter = tab;
             const tabEligible = document.getElementById('tabRewardEligible');
             const tabAll = document.getElementById('tabRewardAll');
-
             if (tab === 'eligible') {
                 tabEligible.className = "px-2 py-0.5 rounded-md bg-white text-brand-600 shadow-sm font-bold";
                 tabAll.className = "px-2 py-0.5 rounded-md text-slate-500 font-medium";
@@ -1944,7 +2173,6 @@
 
         function renderRewardsList() {
             if (!activeCustomerDetailItem) return;
-
             const container = document.getElementById('rewardListContainer');
             const userPoint = activeCustomerDetailItem.totalPoint || 0;
             
@@ -2001,7 +2229,6 @@
             });
             container.innerHTML = html;
 
-            // Attach event listener
             container.querySelectorAll('.reward-item').forEach(el => {
                 el.addEventListener('click', () => {
                     const rewardName = el.dataset.rewardName;
@@ -2049,10 +2276,8 @@
         // ============================================================
         function buildCustomerMessage() {
             if (!activeCustomerDetailItem) return '';
-
             const eligibleRewards = YAKULT_REWARDS_CATALOG.filter(r => activeCustomerDetailItem.totalPoint >= r.point);
             let rewardText = "";
-
             if (selectedRewardItem) {
                 rewardText = `\n🎁 *Hadiah Yang Ingin Ditukar:*\n• ${toTitleCase(selectedRewardItem.name)} (${selectedRewardItem.point} Point)\n`;
             } else if (eligibleRewards.length > 0) {
@@ -2061,7 +2286,6 @@
             } else {
                 rewardText = `\n🎁 *Status Souvenir:* Belum cukup point (Min 60 Point)\n`;
             }
-
             return `*DETAIL POINT & SOUVENIR PELANGGAN*\n` +
                 `-------------------------\n` +
                 `*Nama Pelanggan:* ${activeCustomerDetailItem.pelanggan}\n` +
@@ -2077,7 +2301,6 @@
         async function copyDetailText() {
             const textToCopy = buildCustomerMessage();
             if (!textToCopy) return;
-
             try {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     await navigator.clipboard.writeText(textToCopy);
@@ -2115,19 +2338,13 @@
             const toast = document.getElementById('toastNotification');
             const toastMsg = document.getElementById('toastMessage');
             const toastIcon = document.getElementById('toastIcon');
-
             if (!toast) return;
-
             toastMsg.textContent = message;
-            if (isError) {
-                toastIcon.className = "fa-solid fa-circle-exclamation text-rose-400 text-sm";
-            } else {
-                toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-sm";
-            }
-
+            toastIcon.className = isError
+                ? "fa-solid fa-circle-exclamation text-rose-400 text-sm"
+                : "fa-solid fa-circle-check text-emerald-400 text-sm";
             toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
             toast.classList.add('translate-y-0', 'opacity-100');
-
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
@@ -2141,24 +2358,16 @@
         function openPasswordModal() {
             const pwdInput = document.getElementById('inputPassword');
             const errorEl = document.getElementById('passwordError');
-            if (pwdInput) {
-                pwdInput.value = '';
-                pwdInput.type = 'password';
-            }
+            if (pwdInput) { pwdInput.value = ''; pwdInput.type = 'password'; }
             const icon = document.getElementById('togglePasswordIcon');
             if (icon) icon.className = 'fa-solid fa-eye';
-            if (errorEl) {
-                errorEl.classList.add('hidden');
-                errorEl.classList.remove('flex');
-            }
+            if (errorEl) { errorEl.classList.add('hidden'); errorEl.classList.remove('flex'); }
             document.getElementById('passwordModal').classList.remove('hidden');
             setTimeout(() => { if (pwdInput) pwdInput.focus(); }, 100);
         }
-
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.add('hidden');
         }
-
         function togglePasswordVisibility() {
             const pwdInput = document.getElementById('inputPassword');
             const icon = document.getElementById('togglePasswordIcon');
@@ -2170,13 +2379,10 @@
                 icon.className = 'fa-solid fa-eye';
             }
         }
-
         function handlePasswordSubmit(e) {
             e.preventDefault();
             const inputVal = document.getElementById('inputPassword').value;
             const errorEl = document.getElementById('passwordError');
-            
-            // ⚠️ Password di klien — untuk produksi pindah ke server
             if (inputVal === 'Tampomas24') {
                 closePasswordModal();
                 openCsvModal();
@@ -2187,50 +2393,32 @@
                 document.getElementById('inputPassword').select();
             }
         }
-
-        function openCsvModal() {
-            document.getElementById('csvModal').classList.remove('hidden');
-        }
-
-        function closeCsvModal() {
-            document.getElementById('csvModal').classList.add('hidden');
-        }
+        function openCsvModal() { document.getElementById('csvModal').classList.remove('hidden'); }
+        function closeCsvModal() { document.getElementById('csvModal').classList.add('hidden'); }
 
         // ============================================================
-        // INIT — CACHE-FIRST PAINT
+        // INIT
         // ============================================================
         function bootApp() {
-            // 1. Theme dulu (paling cepat, avoid flash)
             initTheme();
-
-            // 2. Connection badge
             updateConnBadge();
-
-            // 3. URL input default
             const urlInput = document.getElementById('googleSheetUrlInput');
             if (urlInput) urlInput.value = GOOGLE_SHEET_CSV_URL;
 
-            // 4. CACHE-FIRST: load cache dulu, render instan
             const cached = loadCache();
             if (cached && cached.length > 0) {
                 activeRawData = cached;
                 processDataAggregation();
-                // Pastikan tab pelanggan aktif
-                if (activeTab === 'pelanggan') renderTable();
             } else {
-                // Kalau tidak ada cache, pakai default data agar UI tidak kosong
                 activeRawData = [...defaultRawData];
                 processDataAggregation();
             }
 
-            // 5. Register SW (async, tidak blocking)
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(() => registerServiceWorker());
             } else {
                 setTimeout(registerServiceWorker, 1500);
             }
-
-            // 6. Sync fresh di background (tidak blocking UI)
             const startSync = () => sync(GOOGLE_SHEET_CSV_URL);
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(startSync, { timeout: 1000 });
@@ -2239,17 +2427,10 @@
             }
         }
 
-        // ============================================================
-        // EVENT LISTENERS
-        // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
-            // Search debounced
             const inputSearch = document.getElementById('inputSearch');
-            if (inputSearch) {
-                inputSearch.addEventListener('input', debounce(() => renderTable(), 180));
-            }
+            if (inputSearch) inputSearch.addEventListener('input', debounce(() => renderTable(), 180));
 
-            // CSV file input
             const csvFileInput = document.getElementById('csvFileInput');
             if (csvFileInput) {
                 csvFileInput.addEventListener('change', function(e) {
@@ -2271,7 +2452,6 @@
                 });
             }
 
-            // Escape close modal
             document.addEventListener('keydown', e => {
                 if (e.key === 'Escape') {
                     ['centerModal','ylModal','passwordModal','csvModal','detailModal'].forEach(id => {
@@ -2290,7 +2470,6 @@
             showToast('Data demo dimuat.');
         }
 
-        // Boot app
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', bootApp);
         } else {
