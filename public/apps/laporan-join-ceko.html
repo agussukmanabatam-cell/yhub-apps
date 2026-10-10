@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-    <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#dc2626">
-<link rel="apple-touch-icon" href="./icon-512.png">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -315,8 +312,6 @@
             transition: all .18s; letter-spacing: .3px;
             box-shadow: 0 2px 6px rgba(0,0,0,.08);
         }
-
-        /* ===== BANNER COMPACT OVERRIDE ===== */
         .belum-join-banner {
             padding: 10px 12px;
             margin-bottom: 12px;
@@ -503,6 +498,154 @@
         .ci-info-lock svg { width: 12px; height: 12px; }
         .ci-info-item.filled .ci-info-lock { color: #f43f5e; }
 
+        /* ============ MANUAL INPUT (Join Umum) ============ */
+        .ci-manual-input {
+            display: none;
+            margin-top: 8px;
+        }
+        .ci-manual-input.show { display: block; }
+        .ci-manual-input label {
+            font-size: 10.5px; font-weight: 700; color: #6b7280;
+            display: block; margin-bottom: 5px;
+        }
+        [data-theme="dark"] .ci-manual-input label { color: #9ca3af; }
+        .ci-manual-input input {
+            width: 100%; padding: 10px 12px;
+            background: #ffffff;
+            border: 1.5px solid #fbcfe8;
+            border-radius: 10px;
+            font-size: 12.5px; font-weight: 700;
+            color: #1f2937;
+            outline: none;
+            font-family: inherit;
+            transition: all .2s;
+        }
+        [data-theme="dark"] .ci-manual-input input { background: #1c1420; border-color: #4a2c40; color: #fce7f3; }
+        .ci-manual-input input:focus {
+            border-color: #f43f5e;
+            box-shadow: 0 0 0 3px rgba(244, 63, 94, .12);
+            background: #fff1f2;
+        }
+        [data-theme="dark"] .ci-manual-input input:focus { background: #2a1a2e; }
+        .ci-manual-input input::placeholder { color: #d1d5db; font-weight: 600; }
+        [data-theme="dark"] .ci-manual-input input::placeholder { color: #6b7280; }
+
+        /* ============ JOIN TYPE SELECTOR ============ */
+        .join-type-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%);
+            border: 1.5px solid #fbcfe8; border-radius: 20px;
+            padding: 16px; margin-bottom: 4px;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(225, 29, 72, 0.05);
+        }
+        [data-theme="dark"] .join-type-card {
+            background: linear-gradient(135deg, #1c1420 0%, #2a1a2e 100%);
+            border-color: #4a2c40;
+        }
+        .join-type-head {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; padding-bottom: 12px; margin-bottom: 14px;
+            border-bottom: 1.5px dashed #fbcfe8;
+        }
+        [data-theme="dark"] .join-type-head { border-color: #4a2c40; }
+        .jt-head-left { display: flex; align-items: center; gap: 10px; }
+        .jt-icon {
+            width: 38px; height: 38px; border-radius: 11px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(139,92,246,.3); flex-shrink: 0;
+        }
+        .jt-title {
+            font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 800;
+            color: #1f2937; letter-spacing: -.2px; line-height: 1.2;
+        }
+        [data-theme="dark"] .jt-title { color: #fce7f3; }
+        .jt-sub { font-size: 10.5px; color: #9ca3af; font-weight: 500; margin-top: 2px; }
+
+        .join-type-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .join-opt {
+            position: relative;
+            padding: 14px 12px;
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all .25s cubic-bezier(.16,1,.3,1);
+            text-align: center;
+            overflow: hidden;
+        }
+        [data-theme="dark"] .join-opt { background: #1c1420; border-color: #2a2a35; }
+        .join-opt::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(244,63,94,.06), transparent);
+            opacity: 0;
+            transition: opacity .25s;
+            pointer-events: none;
+        }
+        .join-opt:active { transform: scale(.97); }
+        .join-opt.active {
+            border-color: #f43f5e;
+            background: linear-gradient(135deg, #fff1f2, #ffffff);
+            box-shadow: 0 4px 14px rgba(244, 63, 94, .18);
+        }
+        [data-theme="dark"] .join-opt.active {
+            background: linear-gradient(135deg, #3a1a2e, #1c1420);
+        }
+        .join-opt.active::before { opacity: 1; }
+        .join-opt-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: #f3f4f6;
+            color: #9ca3af;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 8px;
+            transition: all .25s;
+        }
+        [data-theme="dark"] .join-opt-icon { background: #2a2a35; color: #6b7280; }
+        .join-opt-icon svg { width: 20px; height: 20px; }
+        .join-opt.active .join-opt-icon {
+            background: linear-gradient(135deg, #f43f5e, #e11d48);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(225,29,72,.32);
+        }
+        .join-opt-label {
+            font-size: 13px; font-weight: 800;
+            color: #6b7280;
+            letter-spacing: -.1px;
+            margin-bottom: 2px;
+        }
+        [data-theme="dark"] .join-opt-label { color: #9ca3af; }
+        .join-opt.active .join-opt-label { color: #be123c; }
+        [data-theme="dark"] .join-opt.active .join-opt-label { color: #fda4af; }
+        .join-opt-desc {
+            font-size: 10px; font-weight: 600;
+            color: #9ca3af;
+            line-height: 1.3;
+        }
+        [data-theme="dark"] .join-opt-desc { color: #6b7280; }
+        .join-opt.active .join-opt-desc { color: #f43f5e; }
+        [data-theme="dark"] .join-opt.active .join-opt-desc { color: #fb7185; }
+        .join-opt-check {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: #f43f5e;
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0;
+            transform: scale(.5);
+            transition: all .25s cubic-bezier(.16,1,.3,1);
+            box-shadow: 0 2px 6px rgba(244,63,94,.4);
+        }
+        .join-opt-check svg { width: 10px; height: 10px; }
+        .join-opt.active .join-opt-check { opacity: 1; transform: scale(1); }
+
         /* ============ HISTORY CARD ============ */
         .history-card {
             background: linear-gradient(135deg, rgba(254, 205, 211, .35), rgba(254, 226, 226, .2));
@@ -567,6 +710,20 @@
             display: flex; gap: 10px; flex-wrap: wrap;
         }
         .history-item-meta b { color: var(--text-main); }
+        .history-join-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 9px; font-weight: 800;
+            padding: 2px 6px; border-radius: 5px;
+            letter-spacing: .3px; text-transform: uppercase;
+        }
+        .history-join-badge.pe {
+            background: linear-gradient(135deg, #f43f5e, #e11d48);
+            color: #fff;
+        }
+        .history-join-badge.umum {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: #fff;
+        }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
@@ -766,7 +923,6 @@
         }
         .header-icon-btn:active { transform: scale(.94); }
 
-        /* ===== CLOUD ICON ONLY (below theme toggle) ===== */
         .cloud-icon-status {
             width: 40px; height: 40px;
             border-radius: 12px;
@@ -793,7 +949,6 @@
         .cloud-icon-status.offline::after { background: #ef4444; }
         .cloud-icon-status.syncing::after { background: #f59e0b; }
 
-        /* ===== PREVIEW MODAL RESPONSIVE ===== */
         .preview-modal-content {
             background: var(--card-bg);
             border-radius: 20px;
@@ -938,7 +1093,6 @@
         .preview-btn-send svg { width: 14px; height: 14px; }
         .preview-btn-send:active, .preview-btn-cancel:active { transform: scale(.97); }
 
-        /* ===== STATUS DOT CLOUD (legacy, tidak dipakai) ===== */
         .cloud-status {
             display: inline-flex;
             align-items: center;
@@ -972,7 +1126,6 @@
             .cloud-icon-status { width: 44px; height: 44px; }
         }
 
-        /* ===== FAB SCROLL TO TOP ===== */
         #fabScrollTop {
             position: fixed;
             right: 18px;
@@ -1012,11 +1165,75 @@
         [data-theme="dark"] #fabScrollTop {
             border-color: #1c1420;
         }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 1024px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: 24px;
+            overflow: hidden;
+            transition: max-width .3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .app-wrapper {
+                border-radius: 1.5rem;
+                min-height: fit-content;
+                padding-bottom: 0;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1279px) {
+            .app-wrapper { max-width: 1024px; }
+        }
+
+        @media (min-width: 1280px) {
+            body {
+                align-items: flex-start;
+                padding: 24px 32px 40px;
+            }
+            .app-wrapper {
+                max-width: 100%;
+                width: 100%;
+                border-radius: 1.75rem;
+                min-height: fit-content;
+                margin: 0 auto;
+            }
+            .app-wrapper form {
+                padding: 32px 40px !important;
+            }
+            .app-wrapper > div:first-child {
+                padding-left: 40px !important;
+                padding-right: 40px !important;
+            }
+            .app-wrapper form .grid.md\:grid-cols-2 {
+                gap: 24px !important;
+            }
+        }
+
+        @media (min-width: 1600px) {
+            .app-wrapper { max-width: 1400px; }
+        }
+
+        .app-wrapper:fullscreen,
+        .app-wrapper:-webkit-full-screen {
+            max-width: 100%;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="p-0 md:p-8 flex justify-center items-start md:items-center min-h-screen">
 
-    <div class="w-full max-w-5xl bg-white md:rounded-3xl shadow-2xl min-h-screen md:min-h-fit flex flex-col relative pb-6 md:pb-0 overflow-hidden">
+    <div class="app-wrapper">
         
         <!-- HEADER -->
         <div class="sticky top-0 z-40 bg-gradient-to-br from-red-600 via-rose-600 to-rose-700 px-4 pt-5 pb-5 md:px-8 md:pt-7 md:pb-7 text-white shadow-lg md:rounded-t-3xl rounded-b-3xl md:rounded-b-none overflow-hidden relative">
@@ -1039,7 +1256,7 @@
             </div>
 
             <div class="relative z-10 text-center px-14 md:px-20 pt-1 md:pt-0">
-                <h1 class="font-heading class="header-title text-xl md:text-3xl font-bold">Laporan Hasil Join Ceko</h1>
+                <h1 class="header-title text-xl md:text-3xl font-bold">Laporan Hasil Join Ceko</h1>
                 <p class="header-subtitle text-red-50/90 mt-1 md:mt-1.5 text-[11px] md:text-sm">Silakan lengkapi formulir hasil join di bawah ini.</p>
             </div>
         </div>
@@ -1104,6 +1321,34 @@
                     </div>
                 </div>
 
+                <!-- ✨ JOIN TYPE SELECTOR -->
+                <div class="join-type-card md:col-span-2">
+                    <div class="join-type-head">
+                        <div class="jt-head-left">
+                            <div class="jt-icon"><i data-lucide="git-branch" class="w-5 h-5"></i></div>
+                            <div>
+                                <div class="jt-title">Jenis Join</div>
+                                <div class="jt-sub">Pilih tipe join yang dilakukan</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="join-type-options" id="joinTypeOptions">
+                        <button type="button" class="join-opt" data-jointype="PE">
+                            <div class="join-opt-check"><i data-lucide="check" class="w-3 h-3"></i></div>
+                            <div class="join-opt-icon"><i data-lucide="user-check"></i></div>
+                            <div class="join-opt-label">Join PE</div>
+                            <div class="join-opt-desc">Ceko · YL · Area auto</div>
+                        </button>
+                        <button type="button" class="join-opt" data-jointype="UMUM">
+                            <div class="join-opt-check"><i data-lucide="check" class="w-3 h-3"></i></div>
+                            <div class="join-opt-icon"><i data-lucide="users"></i></div>
+                            <div class="join-opt-label">Join Umum</div>
+                            <div class="join-opt-desc">Isi YL & Area manual</div>
+                        </button>
+                    </div>
+                    <input type="hidden" id="jenisJoin" name="jenisJoin" value="">
+                </div>
+
                 <div class="center-info-card md:col-span-2">
                     <div class="center-info-head">
                         <div class="ci-head-left">
@@ -1166,6 +1411,16 @@
                             </div>
                             <span class="ci-info-lock"><i data-lucide="lock"></i></span>
                         </div>
+                    </div>
+
+                    <!-- ✨ MANUAL INPUT (muncul saat Join Umum) -->
+                    <div class="ci-manual-input" id="manualYlInput">
+                        <label for="manualNamaYl">Nama YL <span style="color:#ef4444;">*</span></label>
+                        <input type="text" id="manualNamaYl" placeholder="Ketik nama YL..." autocomplete="off">
+                    </div>
+                    <div class="ci-manual-input" id="manualAreaInput">
+                        <label for="manualAreaYl">Area YL <span style="color:#ef4444;">*</span></label>
+                        <input type="text" id="manualAreaYl" placeholder="Contoh: 05" autocomplete="off" inputmode="numeric">
                     </div>
 
                     <input type="text" id="namaCeko" name="namaCeko" hidden>
@@ -1328,14 +1583,13 @@
                 <div id="modalIconContainer" class="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-100 to-rose-50 flex items-center justify-center mx-auto mb-4 text-pink-500 shadow-inner border border-white">
                     <i id="modalIcon" data-lucide="check-circle" class="w-10 h-10"></i>
                 </div>
-                <h3 class="font-heading id="modalTitle" class="text-2xl font-bold text-center text-gray-800 mb-2">Sukses</h3>
+                <h3 id="modalTitle" class="text-2xl font-bold text-center text-gray-800 mb-2">Sukses</h3>
                 <p id="modalMessage" class="text-center text-gray-500 mb-6 text-sm md:text-base whitespace-pre-line">Operasi berhasil dilakukan.</p>
                 <button id="modalCloseBtn" class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold active:scale-95">Tutup</button>
             </div>
         </div>
     </div>
 
-    <!-- PREVIEW MODAL -->
     <div id="previewModal" class="fixed inset-0 z-[100003] flex items-end md:items-center justify-center hidden bg-gray-900/60 backdrop-blur-sm">
         <div class="preview-modal-content">
             <div class="preview-head">
@@ -1519,7 +1773,6 @@
             } catch(e) {}
         }
 
-        // ============ UTILS ============
         function haptic(ms) { try { if (navigator.vibrate) navigator.vibrate(ms || 10); } catch(e){} }
         function showToast(msg, type, duration) {
             const container = document.getElementById('toastContainer');
@@ -1751,6 +2004,83 @@
         const modalMessage = document.getElementById('modalMessage');
         const modalCloseBtn = document.getElementById('modalCloseBtn');
 
+        // ============ JOIN TYPE HANDLER ============
+        function setJoinType(type) {
+            const hiddenInput = document.getElementById('jenisJoin');
+            hiddenInput.value = type || '';
+
+            // Update visual active state
+            document.querySelectorAll('#joinTypeOptions .join-opt').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.jointype === type);
+            });
+
+            // Show/hide manual inputs
+            const manualYl = document.getElementById('manualYlInput');
+            const manualArea = document.getElementById('manualAreaInput');
+            if (type === 'UMUM') {
+                manualYl.classList.add('show');
+                manualArea.classList.add('show');
+            } else {
+                manualYl.classList.remove('show');
+                manualArea.classList.remove('show');
+                // Kalau switch dari UMUM ke PE, reset manual input
+                document.getElementById('manualNamaYl').value = '';
+                document.getElementById('manualAreaYl').value = '';
+            }
+
+            // Re-apply center logic based on new type (if center already selected)
+            const currentCenter = document.getElementById('namaCenter').value;
+            if (currentCenter) {
+                updateCenterInfoCard(currentCenter);
+            }
+        }
+
+        document.querySelectorAll('#joinTypeOptions .join-opt').forEach(opt => {
+            opt.addEventListener('click', () => {
+                haptic(15);
+                setJoinType(opt.dataset.jointype);
+                saveDraft();
+            });
+        });
+
+        // Manual input listeners → sync ke hidden input
+        document.getElementById('manualNamaYl').addEventListener('input', (e) => {
+            inputYl.value = e.target.value;
+            updateInfoCardVisual();
+            saveDraft();
+        });
+        document.getElementById('manualAreaYl').addEventListener('input', (e) => {
+            inputArea.value = e.target.value;
+            updateInfoCardVisual();
+            saveDraft();
+        });
+
+        function updateInfoCardVisual() {
+            const infoYl = document.getElementById('infoYl');
+            const infoArea = document.getElementById('infoArea');
+            const displayYl = document.getElementById('displayYl');
+            const displayArea = document.getElementById('displayArea');
+
+            const ylVal = inputYl.value.trim();
+            const areaVal = inputArea.value.trim();
+
+            if (ylVal) {
+                displayYl.textContent = ylVal;
+                infoYl.classList.add('filled');
+            } else {
+                displayYl.textContent = 'Belum dipilih';
+                infoYl.classList.remove('filled');
+            }
+
+            if (areaVal) {
+                displayArea.textContent = areaVal;
+                infoArea.classList.add('filled');
+            } else {
+                displayArea.textContent = 'Belum dipilih';
+                infoArea.classList.remove('filled');
+            }
+        }
+
         function setupDropdown(containerId, btnId, textId, inputId, menuId, onChange = null) {
             const container = document.getElementById(containerId);
             const btn = document.getElementById(btnId);
@@ -1816,20 +2146,63 @@
             const displayYl = document.getElementById('displayYl');
             const displayArea = document.getElementById('displayArea');
             const dataMap = selectedValue ? mappingData[selectedValue] : null;
+            const joinType = document.getElementById('jenisJoin').value;
+
             if (dataMap) {
+                // Ceko selalu auto-fill dari mapping
                 inputCeko.value = dataMap.ceko;
-                inputYl.value = dataMap.yl;
-                inputArea.value = dataMap.area;
                 displayCeko.textContent = dataMap.ceko;
-                displayYl.textContent = dataMap.yl;
-                displayArea.textContent = dataMap.area;
-                [infoCeko, infoYl, infoArea].forEach(el => {
-                    el.classList.add('filled');
-                    el.style.transform = 'scale(1.03)';
-                    setTimeout(() => el.style.transform = '', 250);
-                });
+                infoCeko.classList.add('filled');
+                infoCeko.style.transform = 'scale(1.03)';
+                setTimeout(() => infoCeko.style.transform = '', 250);
+
+                if (joinType === 'PE') {
+                    // Join PE → YL & Area auto-fill
+                    inputYl.value = dataMap.yl;
+                    inputArea.value = dataMap.area;
+                    displayYl.textContent = dataMap.yl;
+                    displayArea.textContent = dataMap.area;
+                    [infoYl, infoArea].forEach(el => {
+                        el.classList.add('filled');
+                        el.style.transform = 'scale(1.03)';
+                        setTimeout(() => el.style.transform = '', 250);
+                    });
+                } else if (joinType === 'UMUM') {
+                    // Join Umum → YL & Area manual
+                    // Cek apakah sudah ada isi dari manual input
+                    const manualYlVal = document.getElementById('manualNamaYl').value.trim();
+                    const manualAreaVal = document.getElementById('manualAreaYl').value.trim();
+
+                    inputYl.value = manualYlVal;
+                    inputArea.value = manualAreaVal;
+
+                    if (manualYlVal) {
+                        displayYl.textContent = manualYlVal;
+                        infoYl.classList.add('filled');
+                    } else {
+                        displayYl.textContent = 'Isi manual ↓';
+                        infoYl.classList.remove('filled');
+                    }
+
+                    if (manualAreaVal) {
+                        displayArea.textContent = manualAreaVal;
+                        infoArea.classList.add('filled');
+                    } else {
+                        displayArea.textContent = 'Isi manual ↓';
+                        infoArea.classList.remove('filled');
+                    }
+                } else {
+                    // Belum pilih jenis join → default tampilan
+                    inputYl.value = '';
+                    inputArea.value = '';
+                    displayYl.textContent = 'Pilih jenis join dulu';
+                    displayArea.textContent = 'Pilih jenis join dulu';
+                    infoYl.classList.remove('filled');
+                    infoArea.classList.remove('filled');
+                }
                 haptic(15);
             } else {
+                // Reset
                 inputCeko.value = "";
                 inputYl.value = "";
                 inputArea.value = "";
@@ -1886,7 +2259,9 @@
 
         function generateReportText() {
             const formData = new FormData(form);
+            const joinType = formData.get('jenisJoin') || '-';
             let report = `*LAPORAN HASIL JOIN CEKO*\n\n`;
+            report += `*Jenis Join:* ${joinType === 'PE' ? 'Join PE' : joinType === 'UMUM' ? 'Join Umum' : '-'}\n`;
             report += `*Tgl Join:* ${fmtTanggal(formData.get('tglJoin')) || '-'}\n`;
             report += `*Waktu:* ${formData.get('waktu') || '-'}\n`;
             report += `*Nama Center:* ${formData.get('namaCenter') || '-'}\n`;
@@ -1906,6 +2281,13 @@
             haptic(15);
             if (!form.checkValidity()) { form.reportValidity(); showToast('Lengkapi dulu semua data wajib', 'warn'); return; }
             if (!validateAllFields(true)) { showToast('Beberapa field belum valid', 'error'); return; }
+            const joinType = document.getElementById('jenisJoin').value;
+            if (!joinType) { showToast('Pilih Jenis Join dulu', 'warn'); return; }
+            if (joinType === 'UMUM') {
+                if (!document.getElementById('manualNamaYl').value.trim() || !document.getElementById('manualAreaYl').value.trim()) {
+                    showToast('Isi Nama YL & Area dulu', 'warn'); return;
+                }
+            }
             const textToCopy = generateReportText();
             const waUrl = 'https://wa.me/?text=' + encodeURIComponent(textToCopy);
             const win = window.open(waUrl, '_blank');
@@ -2066,12 +2448,15 @@
         const DRAFT_KEY = 'laporan_join_draft';
         function collectFormData() {
             const data = {};
-            ['tglJoin', 'waktu', 'namaCenter', 'namaCeko', 'namaYl', 'areaYl',
+            ['tglJoin', 'waktu', 'jenisJoin', 'namaCenter', 'namaCeko', 'namaYl', 'areaYl',
              'targetTerukur', 'targetTidakTerukur', 'hasilTerukur', 'hasilTidakTerukur',
              'kondisiYl', 'rencanaFollowUp'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) data[id] = el.value;
             });
+            // Simpan juga nilai manual input
+            data._manualNamaYl = document.getElementById('manualNamaYl').value;
+            data._manualAreaYl = document.getElementById('manualAreaYl').value;
             return data;
         }
         function saveDraft() {
@@ -2093,6 +2478,12 @@
                 const savedAt = parsed.savedAt ? new Date(parsed.savedAt).toLocaleString('id-ID') : '?';
                 const ok = confirm(`Ada draft laporan yang belum dikirim (${savedAt}).\n\nLanjutkan mengisi?`);
                 if (!ok) { localStorage.removeItem(DRAFT_KEY); return false; }
+
+                // Restore jenis join dulu
+                if (parsed.data.jenisJoin) {
+                    setJoinType(parsed.data.jenisJoin);
+                }
+
                 ['targetTerukur', 'targetTidakTerukur', 'hasilTerukur', 'hasilTidakTerukur',
                  'kondisiYl', 'rencanaFollowUp'].forEach(id => {
                     const el = document.getElementById(id);
@@ -2106,6 +2497,17 @@
                     if (el) el.value = parsed.data.waktu;
                 }
                 if (parsed.data.tglJoin) { try { fpTgl.setDate(parsed.data.tglJoin, false); } catch(e){} }
+
+                // Restore manual inputs
+                if (parsed.data._manualNamaYl) {
+                    document.getElementById('manualNamaYl').value = parsed.data._manualNamaYl;
+                    inputYl.value = parsed.data._manualNamaYl;
+                }
+                if (parsed.data._manualAreaYl) {
+                    document.getElementById('manualAreaYl').value = parsed.data._manualAreaYl;
+                    inputArea.value = parsed.data._manualAreaYl;
+                }
+
                 if (parsed.data.namaCenter && mappingData[parsed.data.namaCenter]) {
                     document.getElementById('namaCenter').value = parsed.data.namaCenter;
                     const txt = document.getElementById('textCenter');
@@ -2158,6 +2560,7 @@
             const item = {
                 tglJoin: payload.tglJoin || '',
                 waktu: payload.waktu || '',
+                jenisJoin: payload.jenisJoin || '',
                 center: payload.namaCenter || '',
                 ceko: payload.namaCeko || '',
                 yl: payload.namaYl || '',
@@ -2205,10 +2608,17 @@
             items = items.slice().sort((a,b) => (b.at||0) - (a.at||0)).slice(0, 5);
             if (!items.length) { card.classList.remove('show'); return; }
             count.textContent = items.length + ' hasil';
-            list.innerHTML = items.map(h => `
+            list.innerHTML = items.map(h => {
+                const jt = h.jenisJoin || '';
+                const badge = jt === 'PE' 
+                    ? '<span class="history-join-badge pe">PE</span>'
+                    : jt === 'UMUM' 
+                    ? '<span class="history-join-badge umum">UMUM</span>'
+                    : '';
+                return `
                 <div class="history-item">
                     <div class="history-item-head">
-                        <div class="history-item-date">${escapeHtml(h.center || '-')}</div>
+                        <div class="history-item-date">${escapeHtml(h.center || '-')} ${badge}</div>
                         <div class="history-item-time">${escapeHtml(fmtTanggal(h.tglJoin))} · ${escapeHtml(h.waktu || '-')}</div>
                     </div>
                     <div class="history-item-meta">
@@ -2217,7 +2627,8 @@
                         <span>📍 Area <b>${escapeHtml(h.area || '-')}</b></span>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
             card.classList.add('show');
         }
 
@@ -2384,8 +2795,14 @@
             const photoHtml = data.base64Data
                 ? `<div class="preview-section"><div class="ps-label">Foto Selfie</div><img src="data:image/jpeg;base64,${data.base64Data}" class="preview-photo" /></div>`
                 : '';
+            const joinBadge = data.jenisJoin === 'PE' 
+                ? '<span style="display:inline-block;padding:2px 8px;background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-size:9px;font-weight:800;border-radius:5px;letter-spacing:.3px;">JOIN PE</span>'
+                : data.jenisJoin === 'UMUM'
+                ? '<span style="display:inline-block;padding:2px 8px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:9px;font-weight:800;border-radius:5px;letter-spacing:.3px;">JOIN UMUM</span>'
+                : '';
             body.innerHTML = `
                 <div class="preview-rows">
+                    <div class="preview-row"><span class="pr-label">Jenis Join</span><span class="pr-value">${joinBadge || '-'}</span></div>
                     <div class="preview-row"><span class="pr-label">Tanggal</span><span class="pr-value">${escapeHtml(fmtTanggal(data.tglJoin))}</span></div>
                     <div class="preview-row"><span class="pr-label">Waktu</span><span class="pr-value">${escapeHtml(data.waktu || '-')}</span></div>
                     <div class="preview-row"><span class="pr-label">Center</span><span class="pr-value">${escapeHtml(data.namaCenter)}</span></div>
@@ -2522,6 +2939,9 @@
             document.getElementById('textCenter').className = 'text-gray-400 select-none truncate pr-1';
             document.getElementById('namaCenter').value = '';
             document.querySelectorAll('#menuCenter li').forEach(i => i.classList.remove('bg-pink-100', 'text-red-600', 'font-bold'));
+            setJoinType('');
+            document.getElementById('manualNamaYl').value = '';
+            document.getElementById('manualAreaYl').value = '';
             updateCenterInfoCard(null);
             document.getElementById('uploadUI').classList.remove('hidden');
             document.getElementById('previewUI').classList.add('hidden');
@@ -2554,12 +2974,37 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             haptic(15);
+            const joinTypeVal = document.getElementById('jenisJoin').value;
+            if (!joinTypeVal) {
+                haptic(80);
+                showToast('Pilih Jenis Join dulu (PE / Umum)', 'warn', 3000);
+                document.getElementById('joinTypeOptions').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
             const centerVal = document.getElementById('namaCenter').value;
             if (!centerVal) {
                 haptic(80);
                 showToast('Pilih Center dulu', 'warn', 3000);
                 document.getElementById('btnCenter').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
+            }
+            if (joinTypeVal === 'UMUM') {
+                const manualYl = document.getElementById('manualNamaYl').value.trim();
+                const manualArea = document.getElementById('manualAreaYl').value.trim();
+                if (!manualYl) {
+                    haptic(80);
+                    showToast('Isi Nama YL dulu', 'warn', 3000);
+                    document.getElementById('manualNamaYl').focus();
+                    document.getElementById('manualNamaYl').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+                if (!manualArea) {
+                    haptic(80);
+                    showToast('Isi Area YL dulu', 'warn', 3000);
+                    document.getElementById('manualAreaYl').focus();
+                    document.getElementById('manualAreaYl').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
             }
             const waktuVal = document.getElementById('waktu').value.trim();
             if (!waktuVal) {
@@ -2628,13 +3073,6 @@
             setTimeout(() => { loadDraft(); }, 300);
             if (firebaseStatus === 'offline') loadLocalHistoryFallback();
         })();
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(r => console.log('[SW] OK:', r.scope))
-        .catch(e => console.error('[SW] Gagal:', e));
-    });
-  }
-</script>
+    </script>
 </body>
 </html>
