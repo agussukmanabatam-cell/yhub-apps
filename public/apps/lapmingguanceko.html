@@ -9,9 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -64,6 +61,8 @@
             min-height: 100vh;
             -webkit-overflow-scrolling: touch;
             overflow-x: hidden;
+            scroll-behavior: smooth;
+            scroll-padding-top: 110px;
         }
         body {
             -webkit-transform: translate3d(0,0,0);
@@ -71,7 +70,6 @@
         }
         ::-webkit-scrollbar { width: 0; height: 0; }
 
-        /* Display font */
         h1, h2, h3, h4,
         .header-glass h1,
         .modal-title,
@@ -126,7 +124,47 @@
             75% { transform: translateX(4px); }
         }
 
-        /* Buttons */
+        /* ✅ Native date picker styling */
+        input[type="date"] {
+            appearance: none;
+            -webkit-appearance: none;
+            position: relative;
+            font-family: inherit;
+            color: var(--text-main);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            background: transparent;
+            cursor: pointer;
+            position: absolute;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            opacity: 0.6;
+            z-index: 2;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+        [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) brightness(1.5);
+        }
+        input[type="date"]::-webkit-datetime-edit {
+            padding: 0;
+        }
+        input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+            font-weight: 700;
+        }
+        input[type="date"]:focus::-webkit-datetime-edit-text,
+        input[type="date"]:focus::-webkit-datetime-edit-month-field,
+        input[type="date"]:focus::-webkit-datetime-edit-day-field,
+        input[type="date"]:focus::-webkit-datetime-edit-year-field {
+            color: var(--accent);
+            background: rgba(225, 29, 72, 0.08);
+            border-radius: 4px;
+        }
+        /* Firefox */
+        input[type="date"]::-moz-focus-inner { border: 0; }
+
         .btn-3d {
             position: relative;
             transition: all .15s cubic-bezier(.16,1,.3,1);
@@ -140,7 +178,6 @@
         .btn-3d:disabled { opacity: .6; cursor: not-allowed; }
         .btn-wa .wa-icon { width: 20px; height: 20px; display: block; }
 
-        /* Dropdown */
         .dropdown-menu {
             transition: all .22s cubic-bezier(.16,1,.3,1);
             transform-origin: top;
@@ -253,7 +290,6 @@
         }
         .header-btn:active { transform: scale(.94); }
 
-        /* Urgent bell */
         .urgent-btn {
             background: linear-gradient(135deg, #fff1f2 0%, #fecdd3 100%) !important;
             color: #dc2626 !important;
@@ -297,7 +333,6 @@
             50% { transform: scale(1.15); }
         }
 
-        /* Cloud status */
         .cloud-status {
             width: 40px; height: 40px;
             border-radius: 12px;
@@ -605,7 +640,6 @@
         }
         [data-theme="dark"] .history-count { color: #5eead4; }
 
-        /* Icon action buttons */
         .icon-action-btn {
             width: 30px; height: 30px;
             border-radius: 9px;
@@ -654,7 +688,6 @@
         }
         .icon-action-btn.danger:hover { background: #ef4444; color: #fff; }
 
-        /* Search */
         .history-search-wrap { position: relative; margin-bottom: 10px; }
         .history-search-wrap > i {
             position: absolute; left: 12px; top: 50%;
@@ -687,7 +720,6 @@
         }
         .history-search-clear.show { display: flex; }
 
-        /* History items */
         .history-item {
             background: var(--card-bg);
             border-radius: 12px;
@@ -793,11 +825,11 @@
         .modal-body {
             padding: 14px 20px;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;   /* ✅ scroll halus iOS */
-            overscroll-behavior: contain;        /* ✅ tidak "bocor" ke page belakang */
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
             scroll-behavior: smooth;
             flex: 1;
-            min-height: 0;                       /* ✅ wajib agar flex child bisa scroll */
+            min-height: 0;
         }
         .modal-foot {
             padding: 14px 18px;
@@ -1163,75 +1195,7 @@
         }
 
         /* ============================================================
-           19. FLATPICKR OVERRIDE
-           ============================================================ */
-        .flatpickr-calendar {
-            font-family: 'Poppins', sans-serif !important;
-            width: 300px !important;
-            padding: 12px 10px !important;
-            border-radius: 20px !important;
-            box-shadow: 0 25px 50px -12px rgba(225,29,72,.35), 0 10px 20px -5px rgba(0,0,0,.1) !important;
-            border: 2px solid var(--card-bg) !important;
-            background: var(--card-bg) !important;
-            box-sizing: content-box !important;
-            z-index: 100000 !important;
-        }
-        .flatpickr-calendar.open {
-            position: fixed !important;
-            top: 50% !important; left: 50% !important;
-            right: auto !important; bottom: auto !important;
-            margin: 0 !important;
-            transform: translate(-50%, -50%) !important;
-            animation: calPop .3s cubic-bezier(.16,1,.3,1) !important;
-        }
-        @keyframes calPop {
-            0% { opacity: 0; transform: translate(-50%,-46%) scale(.94); }
-            100% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
-        }
-        .flatpickr-calendar::before, .flatpickr-calendar::after { display: none !important; }
-        .flatpickr-months .flatpickr-month,
-        .flatpickr-current-month .flatpickr-monthDropdown-months,
-        .flatpickr-current-month input.cur-year {
-            color: var(--accent) !important;
-            fill: var(--accent) !important;
-            font-weight: 700 !important;
-            background: transparent !important;
-        }
-        .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month {
-            fill: var(--accent) !important;
-            color: var(--accent) !important;
-        }
-        span.flatpickr-weekday { color: var(--accent) !important; font-weight: 700 !important; }
-        .flatpickr-day {
-            color: var(--text-main) !important;
-            border-radius: 10px !important;
-            max-width: 36px !important;
-            height: 36px !important;
-            line-height: 34px !important;
-            font-size: .85rem !important;
-            font-weight: 600 !important;
-        }
-        .flatpickr-day:hover { background: rgba(225,29,72,.08) !important; color: var(--accent) !important; }
-        .flatpickr-day.today { border-color: var(--accent) !important; color: var(--accent) !important; font-weight: 800 !important; }
-        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange {
-            background: linear-gradient(135deg, #e11d48, #ec4899) !important;
-            border-color: transparent !important;
-            color: #fff !important;
-            font-weight: 800 !important;
-            box-shadow: 0 6px 14px rgba(225,29,72,.4) !important;
-        }
-
-        #dateBackdrop {
-            position: fixed; inset: 0;
-            z-index: 99998;
-            background: rgba(15,23,42,.4);
-            backdrop-filter: blur(2px);
-            display: none;
-        }
-        #dateBackdrop.show { display: block; }
-
-        /* ============================================================
-           20. DARK MODE OVERRIDES
+           19. DARK MODE OVERRIDES
            ============================================================ */
         [data-theme="dark"] .text-gray-800 { color: var(--text-main) !important; }
         [data-theme="dark"] .text-gray-700 { color: var(--text-main) !important; }
@@ -1244,6 +1208,108 @@
         [data-theme="dark"] .border-pink-200 { border-color: var(--border-main) !important; }
         [data-theme="dark"] .border-red-200 { border-color: rgba(225,29,72,.3) !important; }
 
+        /* ============================================================
+           20. AUTO-SCROLL & CUSTOM CONFIRM
+           ============================================================ */
+        .highlight-target {
+            animation: highlightPulse 1.7s ease;
+        }
+        @keyframes highlightPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(225,29,72,0); }
+            20% { box-shadow: 0 0 0 6px rgba(225,29,72,.22); }
+            60% { box-shadow: 0 0 0 4px rgba(225,29,72,.12); }
+        }
+
+        .confirm-overlay {
+            position: fixed; inset: 0; z-index: 100050;
+            display: none; align-items: center; justify-content: center;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            padding: 20px;
+            opacity: 0;
+            transition: opacity .25s ease;
+        }
+        .confirm-overlay.show { display: flex; opacity: 1; }
+        .confirm-box {
+            background: var(--card-bg);
+            border-radius: 22px;
+            padding: 22px 20px 18px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 25px 60px -12px rgba(0,0,0,.5);
+            border: 1.5px solid var(--border-main);
+            position: relative; overflow: hidden;
+            transform: scale(.92) translateY(10px);
+            transition: transform .3s cubic-bezier(.16,1,.3,1);
+        }
+        .confirm-overlay.show .confirm-box { transform: scale(1) translateY(0); }
+        .confirm-icon-wrap {
+            width: 56px; height: 56px; border-radius: 18px;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #dc2626;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+            border: 2px solid #fca5a5;
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+        }
+        .confirm-icon-wrap.info {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #2563eb; border-color: #93c5fd;
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
+        }
+        .confirm-icon-wrap.success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #059669; border-color: #6ee7b7;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+        }
+        .confirm-icon-wrap.warn {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #d97706; border-color: #fcd34d;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
+        }
+        .confirm-title {
+            font-family: var(--font-display);
+            font-size: 16px; font-weight: 800;
+            color: var(--text-main); text-align: center; margin-bottom: 6px;
+            letter-spacing: -.2px;
+        }
+        .confirm-desc {
+            font-size: 12.5px; color: var(--text-muted);
+            text-align: center; line-height: 1.5; margin-bottom: 16px;
+            white-space: pre-line;
+        }
+        .confirm-actions { display: flex; gap: 8px; margin-top: 4px; }
+        .confirm-btn {
+            flex: 1; padding: 12px;
+            border-radius: 12px;
+            font-size: 13px; font-weight: 800;
+            cursor: pointer; font-family: inherit;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; transition: all .18s; border: none;
+        }
+        .confirm-btn:active { transform: scale(.97); }
+        .confirm-btn-cancel {
+            border: 1.5px solid var(--border-main);
+            background: transparent; color: var(--text-muted);
+        }
+        .confirm-btn-cancel:hover { background: var(--card-soft); }
+        .confirm-btn-primary {
+            background: linear-gradient(135deg, #e11d48, #f43f5e);
+            color: white;
+            box-shadow: 0 4px 12px rgba(225, 29, 72, .3);
+        }
+        .confirm-btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, .3);
+        }
+        .confirm-btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, .3);
+        }
+
         @media (min-width: 768px) {
             .header-btn, .cloud-status { width: 44px; height: 44px; }
         }
@@ -1251,9 +1317,7 @@
 </head>
 <body class="antialiased relative min-h-screen pb-10">
 
-    <!-- ============================================================
-         HEADER
-         ============================================================ -->
+    <!-- HEADER -->
     <header class="header-glass">
         <div class="relative px-6 py-5 flex items-center justify-center">
             <div class="absolute top-1/2 left-5 -translate-y-1/2 flex items-center gap-2">
@@ -1263,7 +1327,7 @@
             </div>
 
             <div class="text-center px-16">
-                <h1 class="font-heading class="text-xl md:text-2xl font-extrabold tracking-wide text-white leading-tight">Laporan Mingguan Ceko</h1>
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-white leading-tight">Laporan Mingguan Ceko</h1>
                 <p class="text-pink-100/90 text-[11px] md:text-xs mt-0.5 font-medium">Sistem Reporting Ceko Bandung Raya</p>
             </div>
 
@@ -1446,14 +1510,11 @@
                 </div>
             </div>
 
-            <!-- Kapan -->
+            <!-- ✅ KAPAN — Native Date Picker -->
             <div class="flex flex-col gap-1.5 relative">
                 <label class="text-sm font-semibold text-gray-600 pl-1">Kapan <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <input type="text" id="kapan" name="kapan" class="w-full px-4 py-3.5 rounded-xl emboss-input focus:ring-0 cursor-pointer text-[13.5px]" placeholder="Pilih tanggal..." readonly required>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                        <i data-lucide="calendar" class="w-5 h-5 text-red-400"></i>
-                    </div>
+                    <input type="date" id="kapan" name="kapan" class="w-full px-4 py-3.5 rounded-xl emboss-input focus:ring-0 cursor-pointer text-[13.5px]" required>
                 </div>
             </div>
 
@@ -1538,15 +1599,11 @@
         </form>
     </main>
 
-    <!-- ============================================================
-         FLOATING ELEMENTS
-         ============================================================ -->
+    <!-- FLOATING ELEMENTS -->
     <div id="draftIndicator">
         <i data-lucide="cloud-check" class="w-3.5 h-3.5"></i>
         <span id="draftIndicatorText">✓ Draft tersimpan</span>
     </div>
-
-    <div id="dateBackdrop"></div>
 
     <div id="progressOverlay">
         <div class="progress-box">
@@ -1557,11 +1614,21 @@
         </div>
     </div>
 
-    <div id="toastContainer"></div>
+    <div id="confirmModal" class="confirm-overlay" aria-hidden="true">
+        <div class="confirm-box">
+            <div id="confirmIconWrap" class="confirm-icon-wrap">
+                <i id="confirmIcon" data-lucide="help-circle"></i>
+            </div>
+            <div id="confirmTitle" class="confirm-title">Konfirmasi</div>
+            <div id="confirmDesc" class="confirm-desc">Yakin?</div>
+            <div class="confirm-actions">
+                <button type="button" id="confirmCancelBtn" class="confirm-btn confirm-btn-cancel">Batal</button>
+                <button type="button" id="confirmOkBtn" class="confirm-btn confirm-btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- ============================================================
-         MODALS
-         ============================================================ -->
+    <div id="toastContainer"></div>
 
     <!-- PREVIEW MODAL -->
     <div id="previewModal" class="modal-backdrop hidden">
@@ -1591,7 +1658,7 @@
                 <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #d1fae5, #a7f3d0); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; border: 4px solid #fff; box-shadow: 0 8px 20px rgba(16,185,129,.3);">
                     <i data-lucide="check-circle" class="w-9 h-9 text-emerald-500"></i>
                 </div>
-                <h3 class="font-heading style="font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">Terkirim!</h3>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">Terkirim!</h3>
                 <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px;">Laporan berhasil disimpan ke Google Spreadsheet & Cloud.</p>
             </div>
             <div class="modal-foot">
@@ -1681,14 +1748,10 @@
         </div>
     </div>
 
-    <!-- ============================================================
-         SCRIPT
-         ============================================================ -->
     <script>
         // ============================================================
         // CONFIG
         // ============================================================
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
           apiKey: "AIzaSyDzvdqupOV2DIq_i3-drHrM2epgz1phYJQ",
           authDomain: "laporan-mingguan-ceko.firebaseapp.com",
@@ -1701,7 +1764,7 @@
         };
         const CLEANUP_PASSWORD = 'Yakult2027';
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbyhIUgjVPzjolCeR4YKwCQdJ_CKdRPFr9Cvs9KhMfz3dkdB8GpQu3GTOu5n646QSgrxkQ/exec';
-        const COLLECTION_PATH = 'laporan_ceko'; // ⚠️ sesuaikan dengan nama collection Firestore-mu
+        const COLLECTION_PATH = 'laporan_ceko';
 
         const BULAN_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
         const BULAN_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -1719,9 +1782,6 @@
         };
         const CEKO_LIST = Object.values(pasanganCenterCeko);
 
-        // ============================================================
-        // STATE
-        // ============================================================
         let db = null;
         let currentUser = null;
         let firebaseStatus = 'init';
@@ -1766,24 +1826,148 @@
         }
 
         // ============================================================
-        // WEEK RANGE (Senin - Sabtu)
+        // AUTO SCROLL
+        // ============================================================
+        function smoothScrollTo(el, options = {}) {
+            if (!el) return;
+            const { offset = 110, highlight = true, delay = 60, block = 'center' } = options;
+            setTimeout(() => {
+                try {
+                    const rect = el.getBoundingClientRect();
+                    const vh = window.innerHeight || document.documentElement.clientHeight;
+                    const inView = rect.top >= offset && rect.bottom <= vh - 20;
+                    if (!inView) {
+                        const y = window.scrollY + rect.top - Math.max(offset, (vh - rect.height) / 2);
+                        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+                    }
+                    if (highlight) {
+                        el.classList.add('highlight-target');
+                        setTimeout(() => el.classList.remove('highlight-target'), 1700);
+                    }
+                } catch(e) {
+                    try { el.scrollIntoView({ behavior: 'smooth', block }); } catch(_){}
+                }
+            }, delay);
+        }
+
+        function blurActive() {
+            try {
+                if (document.activeElement && document.activeElement.blur) {
+                    document.activeElement.blur();
+                }
+            } catch(e){}
+        }
+
+        // ============================================================
+        // CUSTOM CONFIRM MODAL
+        // ============================================================
+        let _confirmResolve = null;
+        const confirmModalEl = document.getElementById('confirmModal');
+        const confirmIconWrap = document.getElementById('confirmIconWrap');
+        const confirmIcon = document.getElementById('confirmIcon');
+        const confirmTitleEl = document.getElementById('confirmTitle');
+        const confirmDescEl = document.getElementById('confirmDesc');
+        const confirmOkBtn = document.getElementById('confirmOkBtn');
+        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+
+        function _actuallyCloseConfirm(result) {
+            confirmModalEl.classList.remove('show');
+            setTimeout(() => { confirmModalEl.style.display = 'none'; }, 260);
+            document.body.style.overflow = '';
+            if (_confirmResolve) {
+                _confirmResolve(result);
+                _confirmResolve = null;
+            }
+        }
+
+        function showConfirm(opts = {}) {
+            return new Promise((resolve) => {
+                _confirmResolve = resolve;
+                const {
+                    type = 'danger',
+                    title = 'Konfirmasi',
+                    desc = 'Yakin?',
+                    okText = 'OK',
+                    cancelText = 'Batal'
+                } = opts;
+
+                confirmIconWrap.className = 'confirm-icon-wrap';
+                if (type === 'info') confirmIconWrap.classList.add('info');
+                else if (type === 'success') confirmIconWrap.classList.add('success');
+                else if (type === 'warn') confirmIconWrap.classList.add('warn');
+
+                const iconName = type === 'info' ? 'info'
+                    : type === 'success' ? 'check-circle'
+                    : type === 'warn' ? 'alert-triangle'
+                    : 'alert-triangle';
+                confirmIcon.setAttribute('data-lucide', iconName);
+
+                confirmTitleEl.textContent = title;
+                confirmDescEl.textContent = desc;
+                confirmOkBtn.textContent = okText;
+                confirmCancelBtn.textContent = cancelText;
+
+                confirmOkBtn.className = 'confirm-btn ' + (
+                    type === 'info' ? 'confirm-btn-primary'
+                    : type === 'success' ? 'confirm-btn-success'
+                    : 'confirm-btn-danger'
+                );
+
+                icons();
+
+                confirmModalEl.style.display = 'flex';
+                void confirmModalEl.offsetHeight;
+                confirmModalEl.classList.add('show');
+                document.body.style.overflow = 'hidden';
+
+                let handled = false;
+                const cleanup = () => {
+                    document.removeEventListener('keydown', keyHandler);
+                    confirmOkBtn.onclick = null;
+                    confirmCancelBtn.onclick = null;
+                    confirmModalEl.onclick = null;
+                };
+
+                const handleOk = () => {
+                    if (handled) return;
+                    handled = true;
+                    cleanup();
+                    _actuallyCloseConfirm(true);
+                };
+                const handleCancel = () => {
+                    if (handled) return;
+                    handled = true;
+                    cleanup();
+                    _actuallyCloseConfirm(null);
+                };
+
+                confirmOkBtn.onclick = handleOk;
+                confirmCancelBtn.onclick = handleCancel;
+                confirmModalEl.onclick = (e) => { if (e.target === confirmModalEl) handleCancel(); };
+
+                const keyHandler = (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); handleOk(); }
+                    else if (e.key === 'Escape') { e.preventDefault(); handleCancel(); }
+                };
+                document.addEventListener('keydown', keyHandler);
+            });
+        }
+
+        // ============================================================
+        // WEEK RANGE
         // ============================================================
         function getWeekRange() {
             const now = new Date();
-            const dayOfWeek = now.getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
-
+            const dayOfWeek = now.getDay();
             const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-
             const monday = new Date(now);
             monday.setDate(now.getDate() + diffToMonday);
-
             const saturday = new Date(monday);
             saturday.setDate(monday.getDate() + 5);
 
             const yyyyM = monday.getFullYear();
             const mmM = String(monday.getMonth() + 1).padStart(2, '0');
             const ddM = String(monday.getDate()).padStart(2, '0');
-
             const yyyyS = saturday.getFullYear();
             const mmS = String(saturday.getMonth() + 1).padStart(2, '0');
             const ddS = String(saturday.getDate()).padStart(2, '0');
@@ -1798,18 +1982,42 @@
         }
 
         // ============================================================
-        // DATE PARSING
+        // DATE PARSING — native date picker (format ISO)
         // ============================================================
         function parseKapanDate(kapanStr) {
             if (!kapanStr) return null;
-            const m = kapanStr.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})$/);
-            if (!m) {
-                const d = new Date(kapanStr);
-                return isNaN(d.getTime()) ? null : d;
+
+            // Format ISO: 2026-10-11
+            const isoMatch = kapanStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (isoMatch) {
+                return new Date(
+                    parseInt(isoMatch[1]),
+                    parseInt(isoMatch[2]) - 1,
+                    parseInt(isoMatch[3]),
+                    12, 0, 0
+                );
             }
-            const monthIdx = BULAN_ID.findIndex(b => b.toLowerCase() === m[2].toLowerCase());
-            if (monthIdx === -1) return null;
-            return new Date(parseInt(m[3]), monthIdx, parseInt(m[1]));
+
+            // Format lama: 11 Oktober 2026 (untuk backward compat)
+            const m = kapanStr.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})$/);
+            if (m) {
+                const monthIdx = BULAN_ID.findIndex(b => b.toLowerCase() === m[2].toLowerCase());
+                if (monthIdx !== -1) {
+                    return new Date(parseInt(m[3]), monthIdx, parseInt(m[1]), 12, 0, 0);
+                }
+            }
+
+            const d = new Date(kapanStr);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function formatKapanDisplay(kapanStr) {
+            if (!kapanStr) return '-';
+            // Kalau sudah format lama, return as-is
+            if (/\d{1,2}\s+\w+\s+\d{4}/.test(kapanStr)) return kapanStr;
+            const d = parseKapanDate(kapanStr);
+            if (!d) return kapanStr;
+            return `${d.getDate()} ${BULAN_ID[d.getMonth()]} ${d.getFullYear()}`;
         }
 
         function getItemMonth(h) {
@@ -1891,7 +2099,7 @@
         // FIREBASE INIT
         // ============================================================
         try {
-            if (typeof firebase !== 'undefined' && !firebaseConfig.apiKey.startsWith('GANTI')) {
+            if (typeof firebase !== 'undefined') {
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
                 updateCloudBadge('', 'Menghubungkan...');
@@ -1911,7 +2119,7 @@
                     });
             } else {
                 firebaseStatus = 'offline';
-                updateCloudBadge('offline', 'Mode Lokal (config belum diisi)');
+                updateCloudBadge('offline', 'Mode Lokal');
                 loadLocal();
             }
         } catch(e) {
@@ -1969,6 +2177,11 @@
             const arrow = document.getElementById(arrowId);
             const isHidden = menu.classList.contains('hidden');
 
+            const container = menu.closest('.dropdown-wrap');
+            if (container && isHidden) {
+                smoothScrollTo(container, { offset: 120, highlight: false, delay: 30 });
+            }
+
             document.querySelectorAll('.dropdown-menu').forEach(m => {
                 m.classList.add('hidden','opacity-0','scale-95');
                 m.classList.remove('opacity-100','scale-100');
@@ -2007,6 +2220,25 @@
             if (isCenter) updateCeko();
             saveDraft(true);
             markFieldValid(inp);
+
+            if (isCenter) {
+                setTimeout(() => {
+                    const nextField = document.getElementById('namaCeko');
+                    if (nextField) smoothScrollTo(nextField, { offset: 130, highlight: true, delay: 250 });
+                }, 320);
+            }
+            if (textId === 'kategoriText') {
+                setTimeout(() => {
+                    const nextWrap = document.getElementById('prioritasText')?.closest('.dropdown-wrap');
+                    if (nextWrap) smoothScrollTo(nextWrap, { offset: 130, highlight: false, delay: 250 });
+                }, 320);
+            }
+            if (textId === 'prioritasText') {
+                setTimeout(() => {
+                    const nextWrap = document.getElementById('centerText')?.closest('.dropdown-wrap');
+                    if (nextWrap) smoothScrollTo(nextWrap, { offset: 130, highlight: false, delay: 250 });
+                }, 320);
+            }
         }
 
         function updateCeko() {
@@ -2044,24 +2276,33 @@
         });
 
         // ============================================================
-        // FLATPICKR
+        // ✅ NATIVE DATE PICKER
         // ============================================================
-        const dateBackdrop = document.getElementById('dateBackdrop');
-        const fpKapan = flatpickr("#kapan", {
-            dateFormat: "d F Y",
-            locale: "id",
-            disableMobile: true,
-            defaultDate: "today",
-            onOpen: () => { haptic(8); dateBackdrop.classList.add('show'); },
-            onClose: () => dateBackdrop.classList.remove('show'),
-            onChange: () => { markFieldValid(document.getElementById('kapan')); saveDraft(true); }
+        const kapanInput = document.getElementById('kapan');
+
+        // Set default = hari ini (local timezone)
+        (function setDefaultKapan(){
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            kapanInput.value = `${yyyy}-${mm}-${dd}`;
+        })();
+
+        kapanInput.addEventListener('change', () => {
+            markFieldValid(kapanInput);
+            saveDraft(true);
         });
-        dateBackdrop.addEventListener('click', () => fpKapan.close());
+
+        kapanInput.addEventListener('input', () => {
+            if (kapanInput.value) markFieldValid(kapanInput);
+        });
 
         // ============================================================
         // LIVE VALIDATION
         // ============================================================
         function checkFieldValidity(el) {
+            if (!el) return { valid: false, reason: 'empty', msg: 'wajib diisi' };
             const val = (el.value || '').trim();
             const min = parseInt(el.dataset.min || 0);
             const reqNum = el.dataset.requireNumber === 'true';
@@ -2219,7 +2460,7 @@
             } catch(e){}
         }
 
-        function loadDraft() {
+        async function loadDraft() {
             try {
                 const raw = localStorage.getItem(DRAFT_KEY);
                 if (!raw) return;
@@ -2229,7 +2470,16 @@
                 if (!hasContent) return;
 
                 const savedAt = parsed.savedAt ? new Date(parsed.savedAt).toLocaleString('id-ID') : '?';
-                if (!confirm(`Ada draft laporan yang belum dikirim (${savedAt}).\n\nLanjutkan mengisi?`)) {
+
+                const ok = await showConfirm({
+                    type: 'info',
+                    title: 'Lanjutkan Draft?',
+                    desc: `Ada draft laporan yang belum dikirim.\nTerakhir disimpan: ${savedAt}`,
+                    okText: 'Lanjutkan',
+                    cancelText: 'Hapus Draft'
+                });
+
+                if (!ok) {
                     localStorage.removeItem(DRAFT_KEY);
                     return;
                 }
@@ -2244,7 +2494,24 @@
                 if (parsed.data.kategori) selectOption('kategoriText','kategoriInput', parsed.data.kategori, 'kategoriDropdown','kategoriArrow');
                 if (parsed.data.prioritas) selectOption('prioritasText','prioritasInput', parsed.data.prioritas, 'prioritasDropdown','prioritasArrow');
                 if (parsed.data.namaCenter) selectOption('centerText','centerInput', parsed.data.namaCenter, 'centerDropdown','centerArrow', true);
-                if (parsed.data.kapan) { try { fpKapan.setDate(parsed.data.kapan, false); } catch(e){} }
+                if (parsed.data.kapan) {
+                    // Support format lama & baru
+                    const isoMatch = parsed.data.kapan.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                    if (isoMatch) {
+                        document.getElementById('kapan').value = parsed.data.kapan;
+                    } else {
+                        const m = parsed.data.kapan.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})$/);
+                        if (m) {
+                            const monthIdx = BULAN_ID.findIndex(b => b.toLowerCase() === m[2].toLowerCase());
+                            if (monthIdx !== -1) {
+                                const yyyy = m[3];
+                                const mm = String(monthIdx + 1).padStart(2, '0');
+                                const dd = String(m[1]).padStart(2, '0');
+                                document.getElementById('kapan').value = `${yyyy}-${mm}-${dd}`;
+                            }
+                        }
+                    }
+                }
                 showToast('Draft dipulihkan ✓', 'info', 2400);
             } catch(e){}
         }
@@ -2260,17 +2527,26 @@
         // ============================================================
         function validateAll(silent) {
             const checks = [
-                { el: document.getElementById('kategoriInput'), label: 'Kategori', msg: 'wajib dipilih' },
-                { el: document.getElementById('prioritasInput'), label: 'Prioritas', msg: 'wajib dipilih' },
-                { el: document.getElementById('centerInput'), label: 'Nama Center', msg: 'wajib dipilih' },
-                { el: document.getElementById('namaCeko'), label: 'Nama Ceko', msg: 'wajib diisi' },
-                { el: document.getElementById('kapan'), label: 'Kapan', msg: 'wajib diisi' }
+                { el: document.getElementById('kategoriInput'), label: 'Kategori', msg: 'wajib dipilih', targetId: 'kategoriText' },
+                { el: document.getElementById('prioritasInput'), label: 'Prioritas', msg: 'wajib dipilih', targetId: 'prioritasText' },
+                { el: document.getElementById('centerInput'), label: 'Nama Center', msg: 'wajib dipilih', targetId: 'centerText' },
+                { el: document.getElementById('namaCeko'), label: 'Nama Ceko', msg: 'wajib diisi', targetId: 'namaCeko' },
+                { el: document.getElementById('kapan'), label: 'Kapan', msg: 'wajib diisi', targetId: 'kapan' }
             ];
             for (const c of checks) {
                 if (!c.el.value.trim()) {
                     if (!silent) {
-                        c.el.classList.add('field-invalid');
-                        c.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        const target = document.getElementById(c.targetId) || c.el;
+                        if (c.el.classList.contains('hidden')) {
+                            const wrap = target.closest('.emboss-input');
+                            if (wrap) {
+                                wrap.classList.add('field-invalid');
+                                setTimeout(() => wrap.classList.remove('field-invalid'), 1500);
+                            }
+                        } else {
+                            c.el.classList.add('field-invalid');
+                        }
+                        smoothScrollTo(target, { offset: 120, highlight: true });
                         showToast(`"${c.label}" ${c.msg}`, 'error', 3200);
                         haptic(80);
                     }
@@ -2283,7 +2559,7 @@
                 if (!r.valid) {
                     if (!silent) {
                         f.classList.add('field-invalid');
-                        f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        smoothScrollTo(f, { offset: 120, highlight: true });
                         const labelMap = { topik:'Topik', siapa:'Siapa', dimana:'Dimana', mengapa:'Mengapa', tindakan:'Tindakan', hasil:'Hasil' };
                         showToast(`"${labelMap[f.id] || f.id}" ${r.msg}`, 'error', 3600);
                         haptic(80);
@@ -2309,7 +2585,7 @@
             body.innerHTML = `
                 <div class="preview-row"><span class="pr-label">Kategori</span><span class="pr-value">${escapeHtml(data.kategori)}</span></div>
                 <div class="preview-row"><span class="pr-label">Prioritas</span><span class="pr-value">${getPrioTag(data.prioritas)}</span></div>
-                <div class="preview-row"><span class="pr-label">Kapan</span><span class="pr-value">${escapeHtml(data.kapan)}</span></div>
+                <div class="preview-row"><span class="pr-label">Kapan</span><span class="pr-value">${escapeHtml(formatKapanDisplay(data.kapan))}</span></div>
                 <div class="preview-row"><span class="pr-label">Center</span><span class="pr-value">${escapeHtml(data.namaCenter)}</span></div>
                 <div class="preview-row"><span class="pr-label">Ceko</span><span class="pr-value">${escapeHtml(data.namaCeko)}</span></div>
                 <div class="preview-row"><span class="pr-label">Topik</span><span class="pr-value">${escapeHtml(data.topik)}</span></div>
@@ -2330,14 +2606,12 @@
             const m = document.getElementById(id);
             const body = m.querySelector('.modal-body');
 
-            // ✅ Reset scroll tiap kali modal dibuka
             if (body) body.scrollTop = 0;
 
             m.classList.remove('hidden');
             m.classList.remove('show');
             requestAnimationFrame(() => {
                 m.classList.add('show');
-
                 if (focusTarget) {
                     setTimeout(() => {
                         const el = typeof focusTarget === 'string'
@@ -2345,12 +2619,11 @@
                             : focusTarget;
                         if (!el) return;
                         try {
-                            el.focus({ preventScroll: true });       // ✅ jangan auto scroll page
+                            el.focus({ preventScroll: true });
                             if (typeof el.setSelectionRange === 'function' && el.value !== undefined) {
                                 const len = (el.value || '').length;
                                 el.setSelectionRange(len, len);
                             }
-                            // ✅ scroll ke elemen DI DALAM modal body saja
                             if (body && body.contains(el)) {
                                 const offset = el.offsetTop - 20;
                                 body.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
@@ -2422,7 +2695,7 @@
                 pct = Math.min(pct + Math.random() * 12 + 4, 92);
                 if (pct < 40) showProgress(pct, 'Menyiapkan data...', 'Mengumpulkan field');
                 else if (pct < 70) showProgress(pct, 'Mengirim...', 'Menghubungi server...');
-                else showProgress(pct, 'Antosan Geulis', 'Sing sabar yaa...-Sing Gede Milik Nya')
+                else showProgress(pct, 'Antosan Geulis', 'Sing sabar yaa...');
             }, 220);
 
             try {
@@ -2490,20 +2763,32 @@
             });
             document.getElementById('namaCeko').value = '';
             document.getElementById('namaCeko').classList.add('text-gray-500');
-            try { fpKapan.setDate(new Date(), false); } catch(e){}
+            // Reset kapan ke hari ini
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            document.getElementById('kapan').value = `${yyyy}-${mm}-${dd}`;
             localStorage.removeItem(DRAFT_KEY);
             renderAll();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        document.getElementById('btnReset').addEventListener('click', () => {
+        document.getElementById('btnReset').addEventListener('click', async () => {
             haptic(15);
             const hasContent = Object.values(collectForm()).some(v => v && v.trim());
             if (!hasContent) {
                 showToast('Form sudah kosong', 'info', 2000);
                 return;
             }
-            if (!confirm('Yakin reset form? Semua data terisi akan hilang.')) return;
+            const ok = await showConfirm({
+                type: 'danger',
+                title: 'Reset Form?',
+                desc: 'Semua data yang sudah diisi akan hilang.\nTindakan ini tidak bisa dibatalkan.',
+                okText: 'Ya, Reset',
+                cancelText: 'Batal'
+            });
+            if (!ok) return;
             resetForm();
             showToast('Form direset', 'info', 2000);
         });
@@ -2518,7 +2803,7 @@
             const teks = `*LAPORAN MINGGUAN CEKO*\n\n`
                 + `*Kategori:* ${d.kategori}\n`
                 + `*Prioritas:* ${d.prioritas}\n`
-                + `*Kapan:* ${d.kapan}\n`
+                + `*Kapan:* ${formatKapanDisplay(d.kapan)}\n`
                 + `*Nama Center:* ${d.namaCenter}\n`
                 + `*Nama Ceko:* ${d.namaCeko}\n`
                 + `*Topik:* ${d.topik}\n`
@@ -2577,7 +2862,7 @@
         }
 
         // ============================================================
-        // RENDER — MAIN
+        // RENDER
         // ============================================================
         function renderAll() {
             renderQuickStats();
@@ -2603,9 +2888,6 @@
             document.getElementById('qsTopKategori').textContent = sorted.length ? sorted[0][0] : '—';
         }
 
-        // ============================================================
-        // URGENT NOTIFICATION
-        // ============================================================
         function getUrgentItems() {
             const all = state.history || [];
             const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -2643,7 +2925,7 @@
                             <div class="urgent-list-meta">
                                 <span>👤 <b>${escapeHtml(h.namaCeko || '-')}</b></span>
                                 <span>🏢 ${escapeHtml(h.namaCenter || '-')}</span>
-                                <span>📅 ${escapeHtml(h.kapan || '-')}</span>
+                                <span>📅 ${escapeHtml(formatKapanDisplay(h.kapan))}</span>
                             </div>
                         </div>
                     </div>
@@ -2653,9 +2935,6 @@
             openModal('urgentModal');
         });
 
-        // ============================================================
-        // HISTORY
-        // ============================================================
         function renderHistory() {
             const card = document.getElementById('historyCard');
             const list = document.getElementById('historyList');
@@ -2666,7 +2945,6 @@
 
             let allItems = (state.history || []).slice().sort((a, b) => (b.at || 0) - (a.at || 0));
 
-            // Filter search
             if (search) {
                 allItems = allItems.filter(h =>
                     (h.topik || '').toLowerCase().includes(search) ||
@@ -2717,7 +2995,7 @@
                     <div class="history-item-meta">
                         <span>👤 <b>${escapeHtml(h.namaCeko || '-')}</b></span>
                         <span>🏢 <b>${escapeHtml(h.namaCenter || '-')}</b></span>
-                        <span>📅 <b>${escapeHtml(h.kapan || '-')}</b></span>
+                        <span>📅 <b>${escapeHtml(formatKapanDisplay(h.kapan))}</b></span>
                     </div>
                 </div>`;
             }).join('');
@@ -2732,9 +3010,6 @@
             renderHistory();
         });
 
-        // ============================================================
-        // BANNER BELUM LAPOR
-        // ============================================================
         function renderBanner() {
             const banner = document.getElementById('bannerBelum');
             const listEl = document.getElementById('bannerList');
@@ -2780,60 +3055,55 @@
             btn.classList.toggle('open', bannerExpanded);
         });
 
+        function renderRaport() {
+            const card = document.getElementById('raportCard');
+            const pills = document.getElementById('raportPills');
+            const monthEl = document.getElementById('raportMonth');
+            const all = state.history || [];
+            const now = new Date();
+            const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            monthEl.textContent = fmtBulan(now);
+
+            const m = all.filter(h => getItemMonth(h) === thisMonth);
+            if (!m.length) {
+                pills.innerHTML = `<div class="raport-empty">Belum ada laporan bulan ini</div>`;
+                card.classList.add('show');
+                return;
+            }
+
+            const byCeko = {};
+            const displayName = {};
+            m.forEach(h => {
+                const full = (h.namaCeko || '').trim();
+                if (!full) return;
+                const firstNameRaw = full.split(/\s+/)[0];
+                const key = firstNameRaw.toLowerCase();
+                if (!displayName[key]) displayName[key] = firstNameRaw;
+                byCeko[key] = (byCeko[key] || 0) + 1;
+            });
+
+            if (!Object.keys(byCeko).length) {
+                pills.innerHTML = `<div class="raport-empty">Belum ada data ceko</div>`;
+                card.classList.add('show');
+                return;
+            }
+
+            const sorted = Object.entries(byCeko).sort((a, b) => {
+                if (b[1] !== a[1]) return b[1] - a[1];
+                return displayName[a[0]].localeCompare(displayName[b[0]]);
+            });
+
+            pills.innerHTML = sorted.map(([key, count]) => `
+                <div class="ceko-pill">
+                    <span>${escapeHtml(displayName[key])}</span>
+                    <span class="ceko-count">${count}x</span>
+                </div>
+            `).join('');
+            card.classList.add('show');
+        }
+
         // ============================================================
-        // RAPORT — ✅ Nama depan saja
-        // ============================================================
-function renderRaport() {
-    const card = document.getElementById('raportCard');
-    const pills = document.getElementById('raportPills');
-    const monthEl = document.getElementById('raportMonth');
-    const all = state.history || [];
-    const now = new Date();
-    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    monthEl.textContent = fmtBulan(now);
-
-    const m = all.filter(h => getItemMonth(h) === thisMonth);
-    if (!m.length) {
-        pills.innerHTML = `<div class="raport-empty">Belum ada laporan bulan ini</div>`;
-        card.classList.add('show');
-        return;
-    }
-
-    // ✅ Agregasi dengan normalisasi nama depan (case-insensitive)
-    const byCeko = {};
-    const displayName = {};   // simpan ejaan asli untuk tampilan
-    m.forEach(h => {
-        const full = (h.namaCeko || '').trim();
-        if (!full) return;
-        const firstNameRaw = full.split(/\s+/)[0];
-        const key = firstNameRaw.toLowerCase();          // ✅ key lowercase
-        if (!displayName[key]) displayName[key] = firstNameRaw;
-        byCeko[key] = (byCeko[key] || 0) + 1;
-    });
-
-    if (!Object.keys(byCeko).length) {
-        pills.innerHTML = `<div class="raport-empty">Belum ada data ceko</div>`;
-        card.classList.add('show');
-        return;
-    }
-
-    // ✅ Sort: count desc → lalu nama A-Z (biar stabil, gak random)
-    // ✅ TAMPILKAN SEMUA (tidak ada slice(0,8))
-    const sorted = Object.entries(byCeko).sort((a, b) => {
-        if (b[1] !== a[1]) return b[1] - a[1];
-        return displayName[a[0]].localeCompare(displayName[b[0]]);
-    });
-
-    pills.innerHTML = sorted.map(([key, count]) => `
-        <div class="ceko-pill">
-            <span>${escapeHtml(displayName[key])}</span>
-            <span class="ceko-count">${count}x</span>
-        </div>
-    `).join('');
-    card.classList.add('show');
-}
-        // ============================================================
-        // CLEANUP (Hapus semua)
+        // CLEANUP
         // ============================================================
         document.getElementById('historyCleanupBtn').addEventListener('click', () => {
             haptic(15);
@@ -2956,10 +3226,16 @@ function renderRaport() {
                 const d = bulkDateInput.value;
                 if (!d) { showToast('Pilih tanggal dulu', 'warn', 2000); return; }
                 matched = all.filter(h => { const iso = getItemDateISO(h); return iso && iso > d; });
-            } else if (t === 'by-ceko') matched = all.filter(h => h.namaCeko === bulkSelect.value);
-            else if (t === 'by-center') matched = all.filter(h => h.namaCenter === bulkSelect.value);
-            else if (t === 'by-kategori') matched = all.filter(h => h.kategori === bulkSelect.value);
-            else if (t === 'by-prioritas') matched = all.filter(h => h.prioritas === bulkSelect.value);
+            } else {
+                if (!bulkSelect.value) {
+                    showToast('Pilih dulu filternya', 'warn', 2000);
+                    return;
+                }
+                if (t === 'by-ceko') matched = all.filter(h => h.namaCeko === bulkSelect.value);
+                else if (t === 'by-center') matched = all.filter(h => h.namaCenter === bulkSelect.value);
+                else if (t === 'by-kategori') matched = all.filter(h => h.kategori === bulkSelect.value);
+                else if (t === 'by-prioritas') matched = all.filter(h => h.prioritas === bulkSelect.value);
+            }
 
             bulkMatched = matched;
             document.getElementById('bulkCount').textContent = matched.length;
@@ -2971,7 +3247,7 @@ function renderRaport() {
                 bulkBtn.style.opacity = '.5';
             } else {
                 listEl.innerHTML = matched.slice(0, 8)
-                    .map(h => `• ${escapeHtml(h.topik)} · ${escapeHtml(h.namaCeko)} · ${escapeHtml(h.kapan)}`)
+                    .map(h => `• ${escapeHtml(h.topik)} · ${escapeHtml(h.namaCeko)} · ${escapeHtml(formatKapanDisplay(h.kapan))}`)
                     .join('<br>') + (matched.length > 8 ? `<br><em>+${matched.length - 8} lainnya</em>` : '');
                 bulkBtn.disabled = false;
                 bulkBtn.style.opacity = '1';
@@ -2981,7 +3257,22 @@ function renderRaport() {
 
         bulkBtn.addEventListener('click', async () => {
             if (!bulkMatched.length) return;
-            if (!confirm(`Hapus ${bulkMatched.length} laporan? Tidak bisa dibatalkan.`)) return;
+
+            const t = bulkFilter.value;
+            if ((t === 'by-ceko' || t === 'by-center' || t === 'by-kategori' || t === 'by-prioritas') && !bulkSelect.value) {
+                showToast('Pilih dulu filternya', 'warn', 2200);
+                return;
+            }
+
+            const ok = await showConfirm({
+                type: 'danger',
+                title: 'Hapus ' + bulkMatched.length + ' Laporan?',
+                desc: 'Tindakan ini tidak bisa dibatalkan.\nData di Google Sheets tetap aman.',
+                okText: 'Ya, Hapus',
+                cancelText: 'Batal'
+            });
+            if (!ok) return;
+
             haptic(50);
             const n = bulkMatched.length;
             try {
@@ -3032,7 +3323,7 @@ function renderRaport() {
             };
             const headers = ['No','Kategori','Prioritas','Kapan','Nama Center','Nama Ceko','Topik','Siapa','Dimana','Mengapa','Tindakan','Hasil','Waktu Submit'];
             const rows = items.map((h, i) => [
-                i+1, h.kategori||'', h.prioritas||'', h.kapan||'', h.namaCenter||'', h.namaCeko||'', h.topik||'',
+                i+1, h.kategori||'', h.prioritas||'', formatKapanDisplay(h.kapan), h.namaCenter||'', h.namaCeko||'', h.topik||'',
                 h.siapa||'', h.dimana||'', h.mengapa||'', h.tindakan||'', h.hasil||'',
                 h.at ? new Date(h.at).toLocaleString('id-ID') : '-'
             ]);
@@ -3084,3 +3375,12 @@ function renderRaport() {
     </script>
 </body>
 </html>
+<style id="yhub-fullscreen">
+@media (min-width: 768px) {
+  html, body { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
+  body > div, body > main, body > section { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
+  [class*="max-w-"] { max-width: 100% !important; }
+  .mx-auto { margin-left: 0 !important; margin-right: 0 !important; }
+}
+</style>
+
