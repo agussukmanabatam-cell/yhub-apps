@@ -199,7 +199,7 @@ const templates = {
 const APP_PATHS = {
     'penjualan':         '/apps/penjualanbdl.html',
     'yakult-lady':       '/apps/kondisiyl.html',
-    'kompensasi':        '/apps/kompenasasi.html',
+    'kompensasi':        '/apps/kompensasi.html',
     'seragam':           '/apps/seragam.html',
     'breakdown':         '/apps/breakdown.html',
     'birthday':          '/apps/birthday.html',
