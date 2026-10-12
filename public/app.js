@@ -24,6 +24,7 @@ const Icons = {
 // 2. MENU UTAMA
 const homeMenu = [
     { id: 'penjualan',   label: 'Penjualan',   img: '/assets/menu/penjualan.png' },
+    { id: 'inputpjl',    label: 'Input PJL',   img: '/assets/menu/inputpjl.png' },
     { id: 'yakult-lady', label: 'Yakult Lady', img: '/assets/menu/yakult-lady.png' },
     { id: 'kompensasi',  label: 'Kompensasi',  img: '/assets/menu/kompensasi.png' },
     { id: 'seragam',     label: 'Seragam',     img: '/assets/menu/seragam.png' },
@@ -213,6 +214,7 @@ const APP_PATHS = {
     'apk-tukar-botol':   '/apps/pointplg.html',
     'informasi':         '/apps/Informasibdl.html',
     'report':            '/apps/report.html',
+    'inputpjl':          '/apps/inputpjl.html',
 };
 
 // 10. NAVIGASI
