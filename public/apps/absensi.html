@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#E30613">
+  <title>Yakult Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* Logo langsung jadi tombol */
+    .logo-link {
+      display: block;
+      width: 180px;
+      height: 180px;
+      border-radius: 36px;
+      outline: none;
+      transition: transform 0.18s ease, filter 0.18s ease;
+      filter: drop-shadow(0 12px 20px rgba(227, 6, 19, 0.28));
+      cursor: pointer;
+    }
+
+    .logo-link:active {
+      transform: scale(0.94);
+      filter: drop-shadow(0 6px 12px rgba(227, 6, 19, 0.35));
+    }
+
+    .logo-link:focus-visible {
+      outline: 3px solid #E30613;
+      outline-offset: 6px;
+    }
+
+    .logo-link img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: inherit;
+    }
+
+    /* Ukuran responsif */
+    @media (max-width: 380px) {
+      .logo-link {
+        width: 140px;
+        height: 140px;
+        border-radius: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo langsung klik → buka halaman login Yakult -->
+  <a
+    href="https://yakultdashboard.yakult.co.id/pesan/login.php"
+    class="logo-link"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Buka Yakult Dashboard"
+  >
+    <!--
+      Ganti "logo.png" dengan nama file logo kamu.
+      Contoh: "img/yakult-logo.png" atau "logo.svg"
+    -->
+    <img
+      src="logo.png"
+      alt="Yakult Dashboard"
+      loading="eager"
+      decoding="async"
+      onerror="this.onerror=null; this.parentNode.innerHTML='<span style=\'font-size:5rem;line-height:1;display:flex;align-items:center;justify-content:center;width:100%;height:100%;\'>🥛</span>';"
+    >
+  </a>
+
+</body>
+</html>

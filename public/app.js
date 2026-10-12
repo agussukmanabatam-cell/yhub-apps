@@ -23,7 +23,7 @@ const Icons = {
 
 // 2. MENU UTAMA
 const homeMenu = [
-    { id: 'penjualan',   label: 'Penjualan',   img: '/assets/menu/penjualan.png' },
+    { id: 'yakult-dashboard', label: 'Yakult Dashboard', img: '/assets/menu/yakult-dashboard.png' },    { id: 'penjualan',   label: 'Penjualan',   img: '/assets/menu/penjualan.png' },
     { id: 'inputpjl',    label: 'Input PJL',   img: '/assets/menu/inputpjl.png' },
     { id: 'yakult-lady', label: 'Yakult Lady', img: '/assets/menu/yakult-lady.png' },
     { id: 'kompensasi',  label: 'Kompensasi',  img: '/assets/menu/kompensasi.png' },
@@ -197,6 +197,12 @@ const templates = {
 };
 
 // 9. PETA APP → FILE
+
+// External Links — buka di tab baru
+const externalLinks = {
+    'yakult-dashboard': 'https://yakultdashboard.yakult.co.id/pesan/login.php'
+};
+
 const APP_PATHS = {
     'penjualan':         '/apps/penjualanbdl.html',
     'yakult-lady':       '/apps/kondisiyl.html',
@@ -219,6 +225,12 @@ const APP_PATHS = {
 
 // 10. NAVIGASI
 function navigateTo(pageId, pushHistory = true) {
+    // Cek external links dulu
+    if (typeof externalLinks !== 'undefined' && externalLinks[pageId]) {
+        window.open(externalLinks[pageId], '_blank', 'noopener,noreferrer');
+        return;
+    }
+    
     const contentArea = document.getElementById('app-content');
     contentArea.style.opacity = '0';
     
