@@ -1,0 +1,3024 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#E11D48">
+<title>Y-Jual · Laporan Penjualan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ================================================================
+   THEME
+================================================================ */
+:root{
+  --brand:#E11D48; --brand-2:#F43F5E;
+  --brand-soft:rgba(225,29,72,.08); --brand-ring:rgba(225,29,72,.18);
+  --bg:#FAFAFB; --surface:#FFF; --surface-2:#F5F6F8; --surface-3:#EAECEF;
+  --text:#0B1220; --text-soft:#475569; --text-mute:#64748B; --text-dim:#94A3B8;
+  --border:#E7E9EE;
+  --emerald:#059669; --emerald-soft:rgba(5,150,105,.08);
+  --amber:#D97706; --amber-soft:rgba(217,119,6,.08);
+  --wa:#25D366;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --ease-bounce:cubic-bezier(.34,1.56,.64,1);
+  /* ✅ APP WIDTH — akan di-override per breakpoint */
+  --app-max: 560px;
+  --app-pad: 16px;
+}
+[data-theme="dark"]{
+  --bg:#0A0F1E; --surface:#111827; --surface-2:#1A2235; --surface-3:#26314A;
+  --text:#F1F5F9; --text-soft:#CBD5E1; --text-mute:#94A3B8; --text-dim:#64748B;
+  --border:#1E293B;
+  --brand-soft:rgba(225,29,72,.14); --brand-ring:rgba(244,63,94,.28);
+}
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
+html, body{ height:100%; }
+html, body, *{ scrollbar-width:none; -ms-overflow-style:none; }
+*::-webkit-scrollbar{ display:none; width:0; height:0; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family:'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size:13.5px; font-weight:500; line-height:1.5;
+  color:var(--text); background:var(--bg);
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+  transition: background .35s var(--ease), color .35s var(--ease);
+}
+h1,h2,h3,h4,h5,h6{ font-family:'Poppins', sans-serif; letter-spacing:-.015em; line-height:1.25; }
+button, input, select, textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+button{ background:none; border:0; cursor:pointer; padding:0; }
+input{ outline:none; border:0; background:transparent; }
+.num{ font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+/* ================================================================
+   DECORATION
+================================================================ */
+.deco-layer{ position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.deco-layer::before{
+  content:''; position:absolute; top:-15%; left:-20%;
+  width:75%; height:55%;
+  background: radial-gradient(circle at center, var(--brand-soft), transparent 65%);
+}
+.deco-layer::after{
+  content:''; position:absolute; bottom:-10%; right:-15%;
+  width:60%; height:50%;
+  background: radial-gradient(circle at center, var(--brand-soft), transparent 65%);
+  opacity:.6;
+}
+.deco-layer svg{ position:absolute; inset:0; width:100%; height:100%; color:var(--brand); }
+.deco-layer .dots{
+  position:absolute; right:8%; bottom:18%;
+  width:120px; height:120px;
+  background-image: radial-gradient(circle, var(--brand) 1px, transparent 1.4px);
+  background-size: 12px 12px; opacity:.14;
+  mask-image: radial-gradient(circle at center, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(circle at center, #000 30%, transparent 75%);
+}
+
+/* ================================================================
+   APP  →  full width on tablet
+================================================================ */
+.app{
+  position:relative; width:100%; max-width: var(--app-max);
+  min-height:100vh; min-height:100dvh; margin:0 auto;
+  display:flex; flex-direction:column; z-index:1;
+}
+
+/* ================================================================
+   BANNER
+================================================================ */
+.banner{
+  position:relative;
+  padding: calc(env(safe-area-inset-top,0px) + 14px) var(--app-pad) 20px;
+  background: linear-gradient(135deg, #E11D48 0%, #BE123C 60%, #9F1239 100%);
+  color:#fff;
+  border-radius: 0 0 22px 22px;
+  box-shadow: 0 8px 24px -12px rgba(225,29,72,.45);
+  overflow:hidden;
+}
+.banner::before{
+  content:''; position:absolute; top:-70%; right:-30%;
+  width:260px; height:260px; border-radius:50%;
+  background: radial-gradient(circle, rgba(255,255,255,.18), transparent 68%);
+}
+.banner::after{
+  content:''; position:absolute; bottom:-40%; left:-25%;
+  width:180px; height:180px; border-radius:50%;
+  background: radial-gradient(circle, rgba(255,255,255,.1), transparent 68%);
+}
+.banner-top{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:14px;
+  position:relative; z-index:1;
+}
+.banner-icon-btn{
+  width:34px; height:34px; border-radius:10px;
+  background: rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.2);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:13px;
+  transition: all .18s var(--ease);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.banner-icon-btn:active{ transform: scale(.9); background: rgba(255,255,255,.24); }
+.banner-title{
+  font-family:'Poppins', sans-serif; font-weight:700;
+  font-size:15.5px; letter-spacing:-.02em; line-height:1.2;
+}
+.banner-sub{
+  font-size:10.5px; font-weight:500;
+  color:rgba(255,255,255,.78);
+  margin-top:3px;
+}
+.banner-stats{
+  display:grid; grid-template-columns: 1fr 1fr 1fr;
+  gap:8px; margin-top:14px;
+  position:relative; z-index:1;
+}
+.banner-stat{
+  background: rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:11px; padding:9px 10px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.banner-stat-val{
+  font-family:'Poppins', sans-serif; font-weight:700;
+  font-size:14px; letter-spacing:-.02em; line-height:1; color:#fff;
+}
+.banner-stat-lbl{
+  font-size:8.5px; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:rgba(255,255,255,.72);
+  margin-top:4px;
+}
+.banner-progress{
+  margin-top:12px; height:4px; border-radius:999px;
+  background: rgba(0,0,0,.22); overflow:hidden;
+  position:relative; z-index:1;
+}
+.banner-progress-fill{
+  height:100%; border-radius:999px;
+  background: linear-gradient(90deg, rgba(255,255,255,.7), #fff);
+  box-shadow: 0 0 10px rgba(255,255,255,.55);
+  transition: width .7s var(--ease);
+  width:0%;
+}
+
+/* ================================================================
+   TAB BAR
+================================================================ */
+.tabbar{
+  display:flex; gap:4px;
+  margin: -12px var(--app-pad) 0;
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:5px;
+  box-shadow: 0 6px 18px -10px rgba(15,23,42,.14);
+  position:relative; z-index:5;
+}
+.tab-btn{
+  flex:1; padding:9px 6px;
+  border-radius:10px;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  color: var(--text-dim);
+  font-size:9.5px; font-weight:700;
+  letter-spacing:.03em; text-transform:uppercase;
+  transition: all .2s var(--ease);
+}
+.tab-btn i{ font-size:14px; }
+.tab-btn.active{
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.tab-btn.active i{ transform: translateY(-1px); }
+.tab-btn:active{ transform: scale(.95); }
+
+/* ================================================================
+   MAIN
+================================================================ */
+.main{
+  flex:1;
+  padding: 16px var(--app-pad) calc(env(safe-area-inset-bottom,0px) + 24px);
+  display:flex; flex-direction:column; gap:12px;
+  animation: fadeIn .3s var(--ease);
+}
+@keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+/* ================================================================
+   FORM CARD
+================================================================ */
+.form-card{
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+  box-shadow: 0 4px 14px -10px rgba(15,23,42,.08);
+  display:flex; flex-direction:column; gap:14px;
+  position:relative;
+}
+.form-card::before{
+  content:''; position:absolute; top:0; left:14px; right:14px;
+  height:2.5px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2), transparent);
+  border-radius:0 0 4px 4px;
+}
+.field-label{
+  font-size:10px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-mute);
+  margin-bottom:8px;
+  display:flex; align-items:center; gap:6px;
+}
+.field-label i{ color:var(--brand); font-size:10.5px; }
+.field-label .count{
+  margin-left:auto; font-size:9.5px; font-weight:600;
+  color:var(--text-dim); letter-spacing:.02em; text-transform:none;
+}
+
+/* ================================================================
+   DROPDOWN
+================================================================ */
+.dd{ position:relative; }
+.dd-trigger{
+  width:100%; padding: 11px 13px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px;
+  font-family:'Plus Jakarta Sans', sans-serif;
+  font-size:12.5px; font-weight:600;
+  color:var(--text); text-align:left;
+  transition: all .2s var(--ease); cursor:pointer;
+}
+.dd-trigger:hover{ border-color: var(--brand-ring); }
+.dd.open .dd-trigger{
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+.dd-trigger-text{
+  flex:1; min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.dd-trigger-text.placeholder{ color:var(--text-dim); font-weight:500; }
+.dd-arrow{
+  color: var(--brand); font-size:11px;
+  transition: transform .3s var(--ease); flex-shrink:0;
+}
+.dd.open .dd-arrow{ transform: rotate(180deg); }
+
+.dd-menu{
+  position:absolute; top: calc(100% + 6px); left:0; right:0;
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow: 0 20px 50px -12px rgba(15,23,42,.18), 0 4px 12px -4px rgba(15,23,42,.06);
+  padding:6px; z-index:50;
+  max-height:340px; overflow-y:auto;
+  overscroll-behavior: contain;
+  opacity:0; visibility:hidden;
+  transform: translateY(-6px) scale(.98);
+  transform-origin: top center;
+  transition: opacity .2s var(--ease), transform .25s var(--ease), visibility .2s;
+}
+.dd.open .dd-menu{
+  opacity:1; visibility:visible;
+  transform: translateY(0) scale(1);
+}
+.dd-search{
+  display:flex; align-items:center; gap:8px;
+  padding: 8px 10px;
+  border-bottom:1px solid var(--border);
+  margin: -6px -6px 4px;
+  position:sticky; top:-6px; background: var(--surface); z-index:2;
+  border-radius: 8px 8px 0 0;
+}
+.dd-search i{ color:var(--text-dim); font-size:11px; }
+.dd-search input{
+  flex:1; font-size:12px; font-weight:500; color:var(--text);
+}
+.dd-search input::placeholder{ color:var(--text-dim); }
+.dd-group-label{
+  font-size:9.5px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-dim);
+  padding: 8px 10px 4px;
+  position:sticky; top:30px;
+  background: var(--surface); z-index:1;
+}
+.dd-item{
+  width:100%; padding: 10px 11px;
+  border-radius:9px;
+  display:flex; align-items:center; gap:10px;
+  text-align:left;
+  font-size:12.5px; font-weight:600; color:var(--text);
+  transition: background .15s var(--ease);
+  cursor:pointer;
+}
+.dd-item:hover, .dd-item:focus-visible{
+  background: var(--surface-2); outline:none;
+}
+.dd-item.selected{ background: var(--brand-soft); color: var(--brand); }
+.dd-item-main{ flex:1; min-width:0; overflow:hidden; }
+.dd-item-name{
+  font-weight:700; font-size:12.5px; line-height:1.25;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.dd-item-meta{
+  font-size:10px; font-weight:500; color:var(--text-mute);
+  margin-top:1px;
+}
+.dd-item.selected .dd-item-meta{ color: rgba(225,29,72,.7); }
+.dd-item-code{
+  flex-shrink:0; padding:2px 6px; border-radius:5px;
+  background: var(--surface-3); color: var(--text-mute);
+  font-size:9.5px; font-weight:700; letter-spacing:.05em;
+}
+.dd-item.selected .dd-item-code{
+  background: rgba(225,29,72,.14); color: var(--brand);
+}
+.dd-check{
+  color: var(--brand); font-size:13px; opacity:0;
+  transform: scale(.6);
+  transition: opacity .2s, transform .25s var(--ease-bounce);
+  flex-shrink:0;
+}
+.dd-item.selected .dd-check{ opacity:1; transform: scale(1); }
+.dd-empty{
+  text-align:center; padding: 20px 12px;
+  font-size:11.5px; font-weight:600; color: var(--text-dim);
+}
+.dd-empty i{ display:block; font-size:20px; margin-bottom:8px; opacity:.4; }
+
+/* ================================================================
+   SUMMARY STRIP
+================================================================ */
+.summary-strip{
+  display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;
+}
+.summary-cell{
+  background: var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding: 10px 11px;
+  box-shadow: 0 2px 8px -6px rgba(15,23,42,.06);
+}
+.summary-cell-lbl{
+  font-size:9px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-dim);
+}
+.summary-cell-val{
+  font-family:'Poppins', sans-serif; font-weight:700;
+  font-size:16px; letter-spacing:-.02em; line-height:1.1;
+  color:var(--text); margin-top:5px;
+}
+.summary-cell-val.good{ color: var(--emerald); }
+.summary-cell-val.warn{ color: var(--amber); }
+
+/* ================================================================
+   SECTION
+================================================================ */
+.section{
+  background: var(--surface); border:1px solid var(--border);
+  border-radius:14px; overflow:hidden;
+  box-shadow: 0 2px 10px -6px rgba(15,23,42,.06);
+}
+.section-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 12px 14px; cursor:pointer; user-select:none; gap:8px;
+  transition: background .18s;
+}
+.section-head:active{ background: var(--surface-2); }
+.section-head-left{ display:flex; align-items:center; gap:10px; min-width:0; }
+.section-icon{
+  width:26px; height:26px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; flex-shrink:0;
+}
+.section-icon.pending{ background: var(--amber-soft); color: var(--amber); }
+.section-icon.done{ background: var(--emerald-soft); color: var(--emerald); }
+.section-title{ font-size:12.5px; font-weight:700; letter-spacing:-.01em; }
+.section-sub{ font-size:10px; font-weight:500; color:var(--text-dim); margin-top:1px; }
+.section-badge{
+  font-family:'Poppins', sans-serif;
+  font-size:11px; font-weight:700;
+  padding: 2px 8px; border-radius:999px;
+  min-width:24px; text-align:center;
+}
+.section-badge.pending{ background: var(--amber-soft); color: var(--amber); }
+.section-badge.done{ background: var(--emerald-soft); color: var(--emerald); }
+.chevron{
+  color: var(--text-dim); font-size:10.5px;
+  transition: transform .3s var(--ease);
+}
+.section.collapsed .chevron{ transform: rotate(-90deg); }
+.section-body{
+  border-top:1px solid var(--border);
+  overflow:hidden; max-height:2400px;
+  transition: max-height .4s var(--ease);
+}
+.section.collapsed .section-body{ max-height:0 !important; border-top:0; }
+
+/* ================================================================
+   YL ROW
+================================================================ */
+.yl-row{
+  display:flex; align-items:center; gap:11px;
+  padding: 10px 14px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer; transition: background .15s;
+  position:relative;
+}
+.yl-row:last-child{ border-bottom:0; }
+.yl-row:active{ background: var(--brand-soft); }
+.yl-row.filled{ background: linear-gradient(90deg, var(--emerald-soft), transparent 50%); }
+.yl-row.filled::before{
+  content:''; position:absolute; left:0; top:0; bottom:0; width:2.5px;
+  background: var(--emerald);
+}
+.yl-avatar{
+  width:34px; height:34px; border-radius:11px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Poppins', sans-serif;
+  font-size:11.5px; font-weight:700; color:#fff; flex-shrink:0;
+  box-shadow: 0 3px 8px -3px rgba(15,23,42,.2);
+}
+.yl-info{ flex:1; min-width:0; }
+.yl-name{
+  font-size:12.5px; font-weight:700; letter-spacing:-.005em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  line-height:1.25; color:var(--text);
+}
+.yl-meta{
+  display:flex; align-items:center; gap:6px;
+  font-size:10px; font-weight:600; color:var(--text-mute);
+  margin-top:3px;
+}
+.yl-chip{
+  padding: 2px 6px; border-radius:5px;
+  font-size:9px; font-weight:700;
+  letter-spacing:.04em; text-transform:uppercase;
+}
+.yl-chip.empty{ background: var(--surface-3); color: var(--text-mute); }
+.yl-chip.done{ background: var(--emerald-soft); color: var(--emerald); }
+.yl-rp{ font-size:10.5px; font-weight:600; color: var(--emerald); }
+.yl-total{
+  font-family:'Poppins', sans-serif;
+  font-size:13.5px; font-weight:700;
+  letter-spacing:-.02em; text-align:right; line-height:1;
+  color:var(--text);
+}
+.yl-total.filled{ color: var(--emerald); }
+.yl-total-lbl{
+  font-size:8.5px; font-weight:600; color: var(--text-dim);
+  letter-spacing:.06em; text-transform:uppercase;
+  margin-top:3px; text-align:right;
+}
+.yl-arrow{ color: var(--text-dim); font-size:10.5px; flex-shrink:0; }
+.section-empty{
+  text-align:center; padding: 22px 20px;
+  color: var(--text-dim); font-size:11.5px; font-weight:600;
+}
+.section-empty i{ font-size:22px; opacity:.35; margin-bottom:6px; display:block; }
+
+/* ================================================================
+   BOTTOM ACTIONS
+================================================================ */
+.bottom-actions{
+  display:grid; grid-template-columns: 1fr 1.2fr; gap:10px;
+  margin-top:4px;
+}
+.btn-wa{
+  padding: 14px 12px;
+  background: var(--surface);
+  border:1.5px solid var(--wa);
+  border-radius:13px;
+  color: var(--wa);
+  font-size:12.5px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition: all .18s var(--ease);
+}
+.btn-wa:active{ transform: scale(.97); background: rgba(37,211,102,.08); }
+.btn-wa i{ font-size:15px; }
+.btn-submit{
+  padding: 14px 12px;
+  background: linear-gradient(135deg, #F43F5E 0%, #BE123C 100%);
+  border:0; border-radius:13px;
+  color:#fff; font-size:12.5px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  box-shadow: 0 10px 22px -10px rgba(225,29,72,.5);
+  transition: all .18s var(--ease);
+}
+.btn-submit:active{ transform: scale(.97); }
+.btn-submit i{ font-size:14px; }
+.btn-submit.loading{ opacity:.7; pointer-events:none; }
+.btn-submit.loading i{ animation: spin 1s linear infinite; }
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
+/* ================================================================
+   DASHBOARD
+================================================================ */
+.dash-card{
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+  box-shadow: 0 2px 10px -6px rgba(15,23,42,.06);
+}
+.dash-title{
+  font-size:10.5px; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:var(--text-mute);
+  display:flex; align-items:center; gap:6px;
+  margin-bottom:12px;
+}
+.dash-title i{ color: var(--brand); font-size:11px; }
+
+.rr-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.rr-item{
+  background: var(--surface-2);
+  border-radius:11px;
+  padding: 10px 11px;
+}
+.rr-lbl{
+  font-size:9px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-dim);
+}
+.rr-val{
+  font-family:'Poppins', sans-serif;
+  font-size:16px; font-weight:700;
+  letter-spacing:-.02em; line-height:1.15;
+  color: var(--text); margin-top:5px;
+}
+.rr-val.good{ color: var(--emerald); }
+.rr-val.warn{ color: var(--amber); }
+.rr-val.bad{ color: var(--brand); }
+.rr-sub{
+  font-size:9.5px; font-weight:500;
+  color: var(--text-dim); margin-top:2px;
+}
+
+.donut-wrap{ display:flex; align-items:center; gap:14px; }
+.donut-svg{ width:120px; height:120px; flex-shrink:0; }
+.donut-total{
+  font-family:'Poppins', sans-serif;
+  font-size:21px; font-weight:700;
+  fill: var(--text); letter-spacing:-.03em;
+}
+.donut-label{
+  font-family:'Plus Jakarta Sans', sans-serif;
+  font-size:8.5px; font-weight:600;
+  fill: var(--text-dim); letter-spacing:.08em;
+}
+.donut-legend{ flex:1; display:flex; flex-direction:column; gap:6px; }
+.legend-item{
+  display:flex; align-items:center; gap:8px;
+  font-size:11px; font-weight:600;
+}
+.legend-dot{ width:8px; height:8px; border-radius:3px; flex-shrink:0; }
+.legend-name{ flex:1; color: var(--text-mute); }
+.legend-val{
+  font-family:'Poppins', sans-serif;
+  font-weight:700; color: var(--text); font-size:11.5px;
+}
+
+.bars-chart{
+  display:flex; align-items:flex-end; gap:4px;
+  height:100px; margin-bottom:4px;
+}
+.bar-col{
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  gap:4px; height:100%; justify-content:flex-end;
+}
+.bar-fill{
+  width:100%; border-radius:5px 5px 2px 2px;
+  background: linear-gradient(180deg, var(--brand), #BE123C);
+  min-height:3px;
+  transition: height .5s var(--ease);
+}
+.bar-fill.today{ background: linear-gradient(180deg, #34D399, #059669); }
+.bar-label{
+  font-size:9px; font-weight:700;
+  color: var(--text-dim); text-transform:uppercase;
+}
+.bar-val{
+  font-size:9px; font-weight:700;
+  color: var(--text); font-family:'Poppins', sans-serif;
+}
+
+.heat-grid{
+  display:grid;
+  grid-template-columns: 30px repeat(auto-fill, minmax(0, 1fr));
+  gap:3px;
+}
+.heat-hdr{
+  font-size:8px; font-weight:700;
+  color: var(--text-dim); text-align:center;
+}
+.heat-label{
+  font-size:9.5px; font-weight:700;
+  color: var(--text-mute);
+  display:flex; align-items:center;
+}
+.heat-cell{
+  aspect-ratio:1;
+  border-radius:3px;
+  background: var(--surface-2);
+  transition: background .3s;
+}
+
+.insight-row{
+  display:flex; align-items:flex-start; gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid var(--border);
+}
+.insight-row:last-child{ border-bottom:0; padding-bottom:0; }
+.insight-row:first-child{ padding-top:0; }
+.insight-ico{
+  width:26px; height:26px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10.5px; flex-shrink:0;
+}
+.insight-ico.up{ background: var(--emerald-soft); color: var(--emerald); }
+.insight-ico.warn{ background: var(--amber-soft); color: var(--amber); }
+.insight-ico.info{ background: var(--brand-soft); color: var(--brand); }
+.insight-txt{
+  font-size:11.5px; font-weight:500;
+  line-height:1.5; color: var(--text);
+}
+.insight-txt b{ font-weight:700; }
+
+/* ================================================================
+   RANKING
+================================================================ */
+.rank-toggle{
+  display:flex; background: var(--surface-2);
+  border-radius:11px; padding:3px;
+  margin-bottom:12px;
+}
+.rank-toggle button{
+  flex:1; padding:7px 10px;
+  border-radius:8px; background:transparent;
+  font-size:11.5px; font-weight:700;
+  color: var(--text-mute);
+  transition: all .2s;
+}
+.rank-toggle button.active{
+  background: var(--surface);
+  color: var(--brand);
+  box-shadow: 0 2px 6px -2px rgba(15,23,42,.15);
+}
+.rank-row{
+  display:flex; align-items:center; gap:11px;
+  padding: 10px 11px;
+  background: var(--surface-2);
+  border-radius:12px;
+  margin-bottom:7px;
+}
+.rank-row:last-child{ margin-bottom:0; }
+.rank-medal{
+  width:30px; height:30px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Poppins', sans-serif;
+  font-size:12.5px; font-weight:700; color:#fff;
+  flex-shrink:0;
+}
+.rank-medal.g1{ background: linear-gradient(135deg,#FBBF24,#D97706); box-shadow:0 3px 8px -3px rgba(217,119,6,.5); }
+.rank-medal.g2{ background: linear-gradient(135deg,#E5E7EB,#9CA3AF); color:#475569; }
+.rank-medal.g3{ background: linear-gradient(135deg,#FCD34D,#B45309); }
+.rank-medal.gn{ background: var(--surface-3); color: var(--text-mute); }
+.rank-info{ flex:1; min-width:0; }
+.rank-name{
+  font-size:12px; font-weight:700; letter-spacing:-.01em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.rank-sub{
+  font-size:10px; font-weight:500;
+  color: var(--text-dim); margin-top:2px;
+}
+.rank-val{
+  font-family:'Poppins', sans-serif;
+  font-size:14px; font-weight:700;
+  letter-spacing:-.02em; text-align:right; color: var(--text);
+}
+.rank-val-lbl{
+  font-size:8.5px; font-weight:600;
+  letter-spacing:.06em; text-transform:uppercase;
+  color: var(--text-dim);
+  text-align:right; margin-top:2px;
+}
+
+/* ================================================================
+   SETTINGS
+================================================================ */
+.set-group{
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+}
+.set-row{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+  padding: 12px 14px;
+  border-bottom:1px solid var(--border);
+}
+.set-row:last-child{ border-bottom:0; }
+.set-lbl{ font-size:12.5px; font-weight:700; }
+.set-sub{ font-size:10px; font-weight:500; color: var(--text-dim); margin-top:2px; }
+.seg{
+  display:flex; background: var(--surface-2);
+  border-radius:9px; padding:2px;
+}
+.seg button{
+  padding:5px 10px;
+  border-radius:7px; background:transparent;
+  font-size:10.5px; font-weight:700;
+  color: var(--text-mute);
+  transition: all .2s;
+}
+.seg button.active{
+  background: var(--surface);
+  color: var(--brand);
+  box-shadow: 0 1px 4px -1px rgba(15,23,42,.12);
+}
+.set-btn{
+  padding:7px 12px;
+  border:1.5px solid var(--border);
+  border-radius:9px;
+  background: var(--surface);
+  color: var(--text);
+  font-size:11px; font-weight:700;
+  display:inline-flex; align-items:center; gap:6px;
+  transition: all .18s;
+}
+.set-btn:active{ transform:scale(.96); background: var(--surface-2); }
+.set-btn.danger{ color: var(--brand); border-color: var(--brand-ring); }
+.set-btn.primary{ background: var(--brand); color:#fff; border-color: var(--brand); }
+
+/* ================================================================
+   SHEET  →  full width on tablet
+================================================================ */
+.overlay{
+  position:fixed; inset:0;
+  background: rgba(10,15,30,.5);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  z-index:90;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition: opacity .28s var(--ease), visibility .28s;
+}
+.overlay.open{ opacity:1; visibility:visible; pointer-events:auto; }
+.sheet{
+  position:fixed; left:50%; bottom:0;
+  transform: translateX(-50%) translateY(100%);
+  width:100%; max-width: var(--app-max);
+  max-height: 88vh;
+  max-height: 88dvh;
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  z-index:95; overflow-y:auto;
+  visibility:hidden;
+  pointer-events:none;
+  will-change: transform;
+  transition: transform .38s var(--ease), visibility .38s;
+  box-shadow: 0 -20px 50px rgba(10,15,30,.25);
+  padding-bottom: calc(env(safe-area-inset-bottom,0px) + 16px);
+}
+.sheet.open{ transform: translateX(-50%) translateY(0); visibility:visible; pointer-events:auto; }
+.sheet-handle{
+  width:40px; height:3.5px; border-radius:999px;
+  background: var(--border); margin: 10px auto 0;
+}
+.sheet-header{
+  padding: 14px 18px 12px;
+  display:flex; align-items:center; gap:12px;
+  border-bottom:1px solid var(--border);
+  position:sticky; top:0; background: var(--surface); z-index:2;
+}
+.sheet-avatar{
+  width:40px; height:40px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Poppins', sans-serif;
+  font-size:13.5px; font-weight:700; color:#fff;
+  flex-shrink:0;
+  box-shadow: 0 5px 12px -5px rgba(225,29,72,.4);
+}
+.sheet-info{ flex:1; min-width:0; }
+.sheet-name{
+  font-family:'Poppins', sans-serif;
+  font-size:14px; font-weight:700;
+  letter-spacing:-.015em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  line-height:1.2;
+}
+.sheet-meta{
+  font-size:10.5px; font-weight:500;
+  color: var(--text-mute); margin-top:2px;
+}
+.sheet-close{
+  width:30px; height:30px; border-radius:50%;
+  background: var(--surface-2); color: var(--text-mute);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; flex-shrink:0;
+  transition: all .18s;
+}
+.sheet-close:active{ transform: scale(.9); background: var(--surface-3); }
+.sheet-body{ padding: 14px 18px 18px; }
+
+/* ================================================================
+   TOTAL CARD
+================================================================ */
+.total-card{
+  border-radius:14px;
+  padding:14px 15px;
+  background: linear-gradient(135deg, var(--brand-soft), rgba(244,63,94,.04));
+  border:1px solid var(--brand-ring);
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.total-lbl{
+  font-size:9.5px; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase;
+  color: var(--brand);
+}
+.total-val{
+  font-family:'Poppins', sans-serif;
+  font-size:24px; font-weight:700;
+  letter-spacing:-.03em; line-height:1;
+  color: var(--text); margin-top:5px;
+  display:flex; align-items:baseline; gap:5px;
+}
+.total-unit{ font-size:10.5px; font-weight:600; color: var(--brand); }
+.total-rp{ font-size:12px; font-weight:700; color: var(--emerald); margin-top:5px; }
+.total-icon{
+  width:42px; height:42px; border-radius:12px;
+  background: linear-gradient(135deg, var(--brand), #BE123C);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:17px; flex-shrink:0;
+  box-shadow: 0 6px 14px -6px rgba(225,29,72,.5);
+}
+
+/* ================================================================
+   VARIAN CARD
+================================================================ */
+.var-grid{
+  display:grid; grid-template-columns: 1fr 1fr; gap:9px;
+}
+.var-card{
+  background: var(--surface-2);
+  border:1.5px solid transparent;
+  border-radius:14px;
+  padding: 11px 11px 11px;
+  position:relative; overflow:hidden;
+  transition: all .22s var(--ease);
+}
+.var-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:2.5px;
+  background: var(--accent); opacity:.85;
+}
+.var-card.has-val{
+  border-color: var(--accent);
+  background: linear-gradient(180deg, var(--accent-soft), var(--surface-2) 55%);
+}
+.var-head{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:2px;
+}
+.var-name{
+  font-family:'Poppins', sans-serif;
+  font-size:12.5px; font-weight:700;
+  letter-spacing:-.01em; color: var(--accent);
+}
+.var-icon{
+  width:20px; height:20px; border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--accent-soft); color: var(--accent);
+  font-size:9px;
+}
+.var-price{
+  font-size:9px; font-weight:600;
+  color: var(--text-dim); margin-bottom:8px;
+  letter-spacing:.02em;
+}
+.var-input-wrap{ position:relative; }
+.var-input{
+  width:100%; padding: 12px 8px;
+  background: var(--surface);
+  border:1.5px solid transparent;
+  border-radius:10px;
+  font-family:'Poppins', sans-serif;
+  font-size:22px; font-weight:700;
+  letter-spacing:-.02em;
+  color: var(--text); text-align:center;
+  line-height:1.1;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+  cursor: text;
+  caret-color: var(--accent);
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-user-modify: read-write-plaintext-only;
+  -webkit-touch-callout: default;
+}
+.var-input::placeholder{ color: var(--text-dim); font-weight:600; font-size:20px; }
+.var-input:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline:none;
+}
+.var-card.has-val .var-input{
+  background: #fff;
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+[data-theme="dark"] .var-card.has-val .var-input{ background:#0F1626; }
+
+.var-subtotal{
+  font-family:'Poppins', sans-serif;
+  font-size:10.5px; font-weight:700;
+  color: var(--accent); text-align:center;
+  margin-top:7px; letter-spacing:-.01em;
+  opacity:0; transition: opacity .2s;
+}
+.var-card.has-val .var-subtotal{ opacity:1; }
+
+/* ================================================================
+   ACTION BAR
+================================================================ */
+.action-bar{ display:flex; gap:8px; margin-top:14px; }
+.btn-save{
+  flex:1; padding: 14px 18px;
+  border:0; border-radius:13px;
+  font-size:12.5px; font-weight:700; color:#fff;
+  background: linear-gradient(135deg, #10B981, #059669);
+  box-shadow: 0 10px 22px -10px rgba(5,150,105,.5);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition: all .18s var(--ease); cursor:pointer;
+}
+.btn-save:active{ transform: scale(.97); }
+.btn-save.zero{ background: var(--surface-3); color: var(--text-mute); box-shadow:none; }
+.btn-clear{
+  padding: 14px 16px;
+  border:1.5px solid var(--border);
+  border-radius:13px;
+  background: var(--surface);
+  color: var(--text-mute);
+  font-size:12px; font-weight:700;
+  display:flex; align-items:center; gap:6px;
+  transition: all .18s var(--ease); cursor:pointer;
+}
+.btn-clear:active{ transform: scale(.96); background: var(--surface-2); }
+
+/* ================================================================
+   OUTPUT PREVIEW
+================================================================ */
+.img-preview{
+  width:100%; border-radius:12px;
+  border:1px solid var(--border);
+  background: var(--surface-2);
+  display:flex; align-items:center; justify-content:center;
+  padding: 14px; min-height:180px;
+}
+.img-preview img{
+  max-width:100%; border-radius:8px;
+  box-shadow: 0 10px 30px -12px rgba(15,23,42,.25);
+}
+
+/* ================================================================
+   SYNC SHEET
+================================================================ */
+.gas-field{
+  background: var(--surface-2);
+  border-radius:12px; padding:12px;
+  margin-bottom:12px;
+}
+.gas-label{
+  font-size:10px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  color: var(--text-mute); margin-bottom:6px;
+  display:flex; align-items:center; gap:6px;
+}
+.gas-label i{ color: var(--brand); }
+.gas-input{
+  width:100%; padding: 10px 12px;
+  border-radius:9px;
+  border:1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size:11.5px; font-weight:500;
+  transition: all .2s;
+}
+.gas-input:focus{
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+.gas-hint{
+  font-size:10px; font-weight:500;
+  color: var(--text-dim);
+  margin-top:6px; line-height:1.5;
+}
+
+/* ================================================================
+   TOAST + CONFETTI
+================================================================ */
+.toast{
+  position:fixed; left:50%; bottom:100px;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--text); color: var(--bg);
+  padding: 10px 16px;
+  border-radius:999px;
+  font-size:11.5px; font-weight:600;
+  box-shadow: 0 12px 28px rgba(10,15,30,.3);
+  opacity:0; pointer-events:none;
+  transition: all .28s var(--ease);
+  z-index:200; white-space:nowrap;
+  max-width: 88vw; overflow:hidden; text-overflow:ellipsis;
+}
+.toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+#confetti{
+  position:fixed; inset:0;
+  pointer-events:none; z-index:9999; display:none;
+}
+#confetti.show{ display:block; }
+.hidden{ display:none !important; }
+
+/* ================================================================
+   ✅ RESPONSIVE  →  FULL WIDTH ON TABLET (PWA)
+   Breakpoints:
+   • HP (default)          → max 560px, center
+   • Tablet ≥ 720px        → 100% width, padding lebih lega
+   • Tablet besar ≥ 1024px → padding lebih lega lagi + 4-col grids
+================================================================ */
+
+/* ≥ 720px — TABLET PORTRAIT / PWA */
+@media (min-width: 720px){
+  :root{
+    --app-max: 100%;       /* ✅ FULL WIDTH */
+    --app-pad: 24px;
+  }
+  body{ font-size:14px; }
+
+  .app{ max-width:100%; }
+
+  /* Banner lebih lapang */
+  .banner{
+    padding: calc(env(safe-area-inset-top,0px) + 22px) var(--app-pad) 26px;
+    border-radius: 0 0 28px 28px;
+  }
+  .banner-title{ font-size:18px; }
+  .banner-sub{ font-size:11.5px; margin-top:4px; }
+  .banner-icon-btn{ width:40px; height:40px; font-size:15px; border-radius:12px; }
+  .banner-stats{ gap:12px; margin-top:18px; }
+  .banner-stat{ padding:12px 14px; border-radius:13px; }
+  .banner-stat-val{ font-size:17px; }
+  .banner-stat-lbl{ font-size:9.5px; }
+
+  /* Tab bar lebih lega */
+  .tabbar{ margin: -16px var(--app-pad) 0; padding:6px; gap:6px; border-radius:16px; }
+  .tab-btn{ padding:11px 8px; font-size:10.5px; gap:5px; border-radius:11px; }
+  .tab-btn i{ font-size:16px; }
+
+  /* Main lebih lega */
+  .main{ padding: 20px var(--app-pad) calc(env(safe-area-inset-bottom,0px) + 32px); gap:14px; }
+
+  /* Card more space */
+  .form-card{ padding:18px; border-radius:18px; gap:16px; }
+  .dash-card{ padding:18px; border-radius:18px; }
+  .form-card::before{ left:18px; right:18px; }
+
+  /* DD */
+  .dd-trigger{ padding:13px 15px; font-size:13.5px; border-radius:13px; }
+  .dd-menu{ max-height:420px; border-radius:16px; }
+  .dd-item{ padding:12px 13px; font-size:13.5px; }
+  .dd-item-name{ font-size:13.5px; }
+  .dd-item-meta{ font-size:10.5px; }
+  .dd-search input{ font-size:13px; }
+
+  /* Summary */
+  .summary-strip{ gap:12px; }
+  .summary-cell{ padding:14px; border-radius:14px; }
+  .summary-cell-val{ font-size:19px; }
+
+  /* Sections */
+  .section-head{ padding:14px 18px; }
+  .yl-row{ padding:12px 18px; gap:13px; }
+  .yl-avatar{ width:38px; height:38px; font-size:13px; border-radius:12px; }
+  .yl-name{ font-size:13.5px; }
+  .yl-meta{ font-size:10.5px; }
+
+  /* Bottom actions */
+  .bottom-actions{ gap:12px; }
+  .btn-wa, .btn-submit{ padding:16px 14px; font-size:13.5px; border-radius:14px; }
+
+  /* Dash internals */
+  .rr-grid{ grid-template-columns: repeat(4, 1fr); gap:10px; }
+  .rr-item{ padding:12px 13px; border-radius:12px; }
+  .rr-val{ font-size:18px; }
+  .rank-row{ padding:12px 14px; }
+  .set-row{ padding:14px 18px; }
+
+  /* Sheets: full width, tapi tetap bottom-sheet */
+  .sheet{
+    max-width: 100%;
+    border-radius: 26px 26px 0 0;
+    max-height: 90vh;
+    max-height: 90dvh;
+  }
+  .sheet-header{ padding:16px 24px 14px; }
+  .sheet-body{ padding:18px 24px 22px; }
+
+  /* Total + Var grid */
+  .total-card{ padding:16px 18px; border-radius:16px; }
+  .total-val{ font-size:28px; }
+  .var-grid{ grid-template-columns: repeat(4, 1fr); gap:12px; }
+  .var-input{ font-size:26px; padding:14px 10px; }
+  .var-name{ font-size:14px; }
+  .var-subtotal{ font-size:11.5px; }
+}
+
+/* ≥ 1024px — TABLET LANDSCAPE / LAYAR LEBAR */
+@media (min-width: 1024px){
+  :root{ --app-pad: 40px; }
+
+  .main{ padding-left:40px; padding-right:40px; gap:16px; }
+  .banner{ padding-left:40px; padding-right:40px; }
+  .tabbar{ margin-left:40px; margin-right:40px; }
+
+  /* Banner stats jangan kepanjangan — kasih max-width */
+  .banner-stats{ max-width: 720px; }
+  .summary-strip{ max-width: 900px; }
+
+  /* Form fields jadi 2 kolom untuk mengisi ruang horizontal */
+  .form-card{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:16px;
+    align-items:end;
+  }
+  .form-card::before{ left:18px; right:18px; }
+
+  /* Varian grid tetap 4 kolom */
+  .var-grid{ grid-template-columns: repeat(4, 1fr); gap:14px; }
+
+  /* List YL jadi multi-column pada layar lebar */
+  #pendingList, #doneList{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  #pendingList .yl-row:nth-child(odd),
+  #doneList .yl-row:nth-child(odd){
+    border-right:1px solid var(--border);
+  }
+
+  /* Dash internals lebih lega */
+  .donut-svg{ width:150px; height:150px; }
+  .bars-chart{ height:120px; }
+}
+
+/* ≥ 1400px — tambahan untuk sangat lebar */
+@media (min-width: 1400px){
+  :root{ --app-pad: 56px; }
+  .main{ padding-left:56px; padding-right:56px; }
+  .banner{ padding-left:56px; padding-right:56px; }
+  .tabbar{ margin-left:56px; margin-right:56px; }
+  #pendingList, #doneList{ grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ✅ STANDALONE (PWA terinstall) — pastikan benar-benar full */
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui){
+  html, body{
+    overscroll-behavior-y: none;
+    min-height: 100dvh;
+    background-color: var(--bg);
+  }
+  .app{ min-height: 100dvh; }
+}
+
+/* Landscape phone: beri breathing room */
+@media (max-width: 719px) and (orientation: landscape){
+  .banner{ padding-top: calc(env(safe-area-inset-top,0px) + 10px); padding-bottom:14px; }
+  .banner-stats{ margin-top:10px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="deco-layer" aria-hidden="true">
+  <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+    <g fill="currentColor" opacity="0.12">
+      <path d="M 82 118 c 1.5 5 5 8.5 10 10 c -5 1.5 -8.5 5 -10 10 c -1.5 -5 -5 -8.5 -10 -10 c 5 -1.5 8.5 -5 10 -10 z"/>
+      <path d="M 320 92 c 1 3.5 3.5 6 7 7 c -3.5 1 -6 3.5 -7 7 c -1 -3.5 -3.5 -6 -7 -7 c 3.5 -1 6 -3.5 7 -7 z"/>
+      <path d="M 290 520 c 1.5 5 5 8.5 10 10 c -5 1.5 -8.5 5 -10 10 c -1.5 -5 -5 -8.5 -10 -10 c 5 -1.5 8.5 -5 10 -10 z"/>
+      <path d="M 60 640 c 1 3.5 3.5 6 7 7 c -3.5 1 -6 3.5 -7 7 c -1 -3.5 -3.5 -6 -7 -7 c 3.5 -1 6 -3.5 7 -7 z"/>
+    </g>
+    <g stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.14" fill="none">
+      <path d="M 350 300 l 6 0 M 353 297 l 0 6"/>
+      <path d="M 40 380 l 6 0 M 43 377 l 0 6"/>
+      <path d="M 200 700 l 6 0 M 203 697 l 0 6"/>
+    </g>
+    <g stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.09">
+      <line x1="270" y1="200" x2="285" y2="228"/>
+      <line x1="110" y1="480" x2="120" y2="500"/>
+      <line x1="360" y1="600" x2="370" y2="622"/>
+    </g>
+  </svg>
+  <div class="dots"></div>
+</div>
+
+<div class="app">
+
+  <header class="banner">
+    <div class="banner-top">
+      <button class="banner-icon-btn" id="btnRefresh" title="Refresh"><i class="fa-solid fa-rotate"></i></button>
+      <div style="flex:1;">
+        <div class="banner-title">Laporan Penjualan Harian</div>
+        <div class="banner-sub" id="bannerSub">Lengkapi form hasil penjualan YL</div>
+      </div>
+      <button class="banner-icon-btn" id="btnTheme" title="Tema"><i class="fa-solid fa-moon"></i></button>
+    </div>
+
+    <div class="banner-stats">
+      <div class="banner-stat">
+        <div class="banner-stat-val num" id="bsBotol">0</div>
+        <div class="banner-stat-lbl">Botol</div>
+      </div>
+      <div class="banner-stat">
+        <div class="banner-stat-val num" id="bsYL">0/0</div>
+        <div class="banner-stat-lbl">YL</div>
+      </div>
+      <div class="banner-stat">
+        <div class="banner-stat-val num" id="bsRp">Rp 0</div>
+        <div class="banner-stat-lbl">Setoran</div>
+      </div>
+    </div>
+
+    <div class="banner-progress">
+      <div class="banner-progress-fill" id="bsProgress"></div>
+    </div>
+  </header>
+
+  <div class="tabbar">
+    <button class="tab-btn active" data-tab="input"><i class="fa-solid fa-pen-to-square"></i><span>Input</span></button>
+    <button class="tab-btn" data-tab="stats"><i class="fa-solid fa-chart-simple"></i><span>Analisa</span></button>
+    <button class="tab-btn" data-tab="rank"><i class="fa-solid fa-trophy"></i><span>Rank</span></button>
+    <button class="tab-btn" data-tab="set"><i class="fa-solid fa-gear"></i><span>Set</span></button>
+  </div>
+
+  <main class="main" id="main"></main>
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- SHEET: INPUT YL -->
+  <div class="sheet" id="inputSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-avatar" id="sAvatar">?</div>
+      <div class="sheet-info">
+        <div class="sheet-name" id="sName">—</div>
+        <div class="sheet-meta" id="sMeta">—</div>
+      </div>
+      <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="sheet-body">
+      <div class="total-card">
+        <div>
+          <div class="total-lbl">Total YL Ini</div>
+          <div class="total-val">
+            <span class="num" id="sTotal">0</span>
+            <span class="total-unit">botol</span>
+          </div>
+          <div class="total-rp num" id="sRp">Rp 0</div>
+        </div>
+        <div class="total-icon"><i class="fa-solid fa-bottle-droplet"></i></div>
+      </div>
+
+      <div class="var-grid">
+        <div class="var-card" data-key="om" style="--accent:#F97316; --accent-soft:rgba(249,115,22,.09);">
+          <div class="var-head">
+            <div class="var-name">OM05</div>
+            <div class="var-icon"><i class="fa-solid fa-lemon"></i></div>
+          </div>
+          <div class="var-price">Rp 2.130</div>
+          <div class="var-input-wrap">
+            <input type="tel" class="var-input" id="input-om" autocomplete="off" placeholder="0" value="">
+          </div>
+          <div class="var-subtotal num" id="sub-om">Rp 0</div>
+        </div>
+
+        <div class="var-card" data-key="os" style="--accent:#EC4899; --accent-soft:rgba(236,72,153,.09);">
+          <div class="var-head">
+            <div class="var-name">OS05</div>
+            <div class="var-icon"><i class="fa-solid fa-seedling"></i></div>
+          </div>
+          <div class="var-price">Rp 2.130</div>
+          <div class="var-input-wrap">
+            <input type="tel" class="var-input" id="input-os" autocomplete="off" placeholder="0" value="">
+          </div>
+          <div class="var-subtotal num" id="sub-os">Rp 0</div>
+        </div>
+
+        <div class="var-card" data-key="yo" style="--accent:#EF4444; --accent-soft:rgba(239,68,68,.09);">
+          <div class="var-head">
+            <div class="var-name">YO05</div>
+            <div class="var-icon"><i class="fa-solid fa-bottle-droplet"></i></div>
+          </div>
+          <div class="var-price">Rp 2.040</div>
+          <div class="var-input-wrap">
+            <input type="tel" class="var-input" id="input-yo" autocomplete="off" placeholder="0" value="">
+          </div>
+          <div class="var-subtotal num" id="sub-yo">Rp 0</div>
+        </div>
+
+        <div class="var-card" data-key="yt" style="--accent:#3B82F6; --accent-soft:rgba(59,130,246,.09);">
+          <div class="var-head">
+            <div class="var-name">YT05</div>
+            <div class="var-icon"><i class="fa-solid fa-feather"></i></div>
+          </div>
+          <div class="var-price">Rp 2.460</div>
+          <div class="var-input-wrap">
+            <input type="tel" class="var-input" id="input-yt" autocomplete="off" placeholder="0" value="">
+          </div>
+          <div class="var-subtotal num" id="sub-yt">Rp 0</div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button class="btn-clear" data-action="clear-input">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+        <button class="btn-save" id="btnSaveInput" data-action="save-input">
+          <i class="fa-solid fa-check"></i>
+          <span>Simpan</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHEET: OUTPUT IMAGE -->
+  <div class="sheet" id="outputSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-avatar" style="background:linear-gradient(135deg,#0EA5E9,#0369A1);">
+        <i class="fa-solid fa-image"></i>
+      </div>
+      <div class="sheet-info">
+        <div class="sheet-name">Preview Laporan</div>
+        <div class="sheet-meta">Bagikan sebagai gambar</div>
+      </div>
+      <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="sheet-body">
+      <div class="img-preview" id="imgPreview">
+        <span style="color:var(--text-dim); font-size:11.5px; font-weight:600;">
+          <i class="fa-solid fa-spinner fa-spin"></i> Membuat gambar...
+        </span>
+      </div>
+      <div class="action-bar" style="margin-top:14px;">
+        <button class="btn-clear" data-action="regenerate-img"><i class="fa-solid fa-rotate"></i></button>
+        <button class="btn-save" data-action="download-img" style="background:linear-gradient(135deg,#0EA5E9,#0369A1); box-shadow:0 10px 22px -10px rgba(14,165,233,.5);">
+          <i class="fa-solid fa-download"></i><span>Download PNG</span>
+        </button>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="btn-clear" style="flex:1; justify-content:center;" data-action="share-img">
+          <i class="fa-solid fa-share-nodes"></i><span>Bagikan</span>
+        </button>
+        <button class="btn-clear" style="flex:1; justify-content:center;" data-action="copy-img">
+          <i class="fa-solid fa-copy"></i><span>Salin</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHEET: SYNC SETTINGS -->
+  <div class="sheet" id="syncSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-avatar" style="background:linear-gradient(135deg,#34D399,#047857);">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+      </div>
+      <div class="sheet-info">
+        <div class="sheet-name">Koneksi Cloud</div>
+        <div class="sheet-meta">Google Sheets + Firebase</div>
+      </div>
+      <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="sheet-body">
+      <div class="gas-field">
+        <div class="gas-label"><i class="fa-solid fa-table"></i> Google Sheets · GAS URL</div>
+        <input type="url" class="gas-input" id="gasUrl" placeholder="https://script.google.com/macros/s/AKfycbw-Liv0vBhkMb1rP2JLhlLdfq5kP9igh9yMCQ6Qx09KjysukTpzfBZ_aJAqDQpuU26W/exec">
+        <div class="gas-hint">Tempel URL Web App dari Apps Script.</div>
+      </div>
+      <div class="gas-field">
+        <div class="gas-label"><i class="fa-solid fa-fire"></i> Firebase Realtime DB URL</div>
+        <input type="url" class="gas-input" id="fbUrl" placeholder="https://xxx.firebaseio.com/">
+        <div class="gas-hint">Opsional. Root URL Firebase RTDB (tanpa trailing slash).</div>
+      </div>
+      <div class="action-bar">
+        <button class="btn-save" data-action="save-endpoints" style="background:linear-gradient(135deg,#34D399,#059669);">
+          <i class="fa-solid fa-floppy-disk"></i><span>Simpan Endpoint</span>
+        </button>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn-clear" style="width:100%; justify-content:center;" data-action="show-gas-code">
+          <i class="fa-solid fa-file-code"></i> <span>Lihat Kode GAS</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<canvas id="confetti"></canvas>
+<div class="toast" id="toast">Tersimpan</div>
+
+<script>
+/* ==================================================================
+   CONSTANTS
+================================================================== */
+const HARGA = { om:2130, os:2130, yo:2040, yt:2460 };
+
+const TKU_DATA = {
+  PNY:{ center:'PANYILEUKAN', target:4250, yl:['TINI ROFIAH','DEWI CHANDRA','SUSANTI RUSMIANTI','YUYUN YUNENGSIH','SATIRAH','SUPIAH','ARIMBI HANAWATY','ERNA KURNIAWATI','NENENG RODIAH','IRA MAYA SEPTIANI','LILIS ROHANAH','DEDE WANDA HAMIDAH','HERTI APRIANTI']},
+  ARC:{ center:'ARCAMANIK', target:2950, yl:['ENENG LISNAWATI','DINI WAHYUNI','EMI SUKAEMI','IWIK SULASTRI','SITI NURJANAH','NUR CITRA NURANI','EMMY YUHAEMI','NENG RINA W. S','ATI DANIATI']},
+  UBR:{ center:'UJUNGBERUNG', target:3600, yl:['ILMA FARADILA','RAHAYUWATI','SITI ROHAETI','IRMA NURYANTI','RIKA ROSITA','NENDEN ROHIMAH','ELSA JULIANTI','ENUNG ANAH HASANAH','DINA ANDRIANA','HESTI NUR SAFITRI','PITRI']},
+  KRC:{ center:'KIARACONDONG', target:4250, yl:['HADIANI','KARTINI','NENG WIDAH','DINA ASPRIKASARI','LIA JULIANI','ENDAH WAHYUNI','IMAS HANDAYANI','NUNUNG NURHAYATI','HERYANI','MARLIAH','RIKA SUTIANI','ELI MARLIAH','ROSMALASARI']},
+  ANT:{ center:'ANTAPANI', target:4250, yl:['SRI WIDYA TIKA SARI','DIAN HANDAYANI','RISMAYANTI','WIDA','LELA SITI AMANAH','IKA KARTIKA','RINA SUSANTI','IRA PUSPITA SARI','ANI JUHAENI','MIRANTI','RATNA DEWI','DIANNE RACHMAWATI','NUR ISMAWATI']},
+  MGY:{ center:'MARGAHAYU', target:4900, yl:['KOMALASARI','WIWIN WIDANENGSIH','TETI DAMILAH','ANI SURYANI','GITA JUWITA SARI','LINDA NURFARIDA','ANI','IIS SURYANI','AMIMAH','PIAH SOPIAH','ELI SUGESTI','WIWIN','YENI RACHMAN','NYIMAS RAHAYU','SURATMI']},
+  BJS:{ center:'BOJONGSOANG', target:3950, yl:['TANTRI HENDRIYANI','YATI','ROSPIDA LIMBONG','NURHAYATI','YAYU ANGGRAENI','TUTI','AYU GUSTIRA','DEA WULANSARI','NORA WATI','MIRA RUSMIANTI','SITI ASIAH','NOVA MARLIANA']},
+  BBT:{ center:'BUAHBATU', target:4600, yl:['SYAIDA NURJAENI','SARI LESTARI','SRI MULYATI','WULANSARI','SAFITRI','USWATUN KHASANAH','RENI RAFIKASARI','TIARA ASYANTHIA','YOREN ZAQUALILINE','SITI KHOLIFAH','SUKAESIH','MELIA SANTI','LIA HARYANI','JARIYAH']},
+  GBG:{ center:'GEDE BAGE', target:3800, yl:['NURUL HIDAYAH','SITI AMINAH','RINA MARLINA','YULIA SARI','IMAS MASITOH','DEVI ANGGRAINI','LILIS SURYANI','NENENG HASANAH','TUTI HERAWATI','SOPIAH','MILA KARMILA','RATIH PURWASIH']}
+};
+const TKU_ORDER = ['PNY','ARC','UBR','KRC','ANT','MGY','BJS','BBT','GBG'];
+
+/* ==================================================================
+   STATE
+================================================================== */
+const state = {
+  activeTab: 'input',
+  activeTKU: 'PNY',
+  activeYL: null,
+  currentDate: dateKey(new Date()),
+  dataByTKU: {},
+  historyCache: {},
+  settings: { theme:'auto' },
+  sectionOpen: { pending:true, done:false },
+  gasUrl: '',
+  fbUrl: '',
+  rankType: 'yl',
+  _lastImageBlob: null,
+  _milestoneFired: {},
+  ddSearch: { tku:'', yl:'' }
+};
+
+/* ==================================================================
+   UTILS
+================================================================== */
+const $ = id => document.getElementById(id);
+const haptic = (ms=8)=>{ try{ navigator.vibrate?.(ms); }catch(_){} };
+const fmtNum = n => Math.round(n||0).toLocaleString('id-ID');
+const fmtRp = n => 'Rp ' + Math.round(n||0).toLocaleString('id-ID');
+
+function getInitials(name){
+  if(!name) return '?';
+  const p = name.trim().split(/\s+/).filter(Boolean);
+  if(!p.length) return '?';
+  if(p.length===1) return p[0].charAt(0).toUpperCase();
+  return (p[0].charAt(0)+p[p.length-1].charAt(0)).toUpperCase();
+}
+function hashHue(str){
+  let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))>>>0;
+  return h%360;
+}
+function avatarBg(name){
+  const h = hashHue(name);
+  return `linear-gradient(135deg, hsl(${h} 60% 58%), hsl(${(h+30)%360} 60% 42%))`;
+}
+function dateKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function parseDateKey(dk){ const [y,m,d]=dk.split('-').map(Number); return new Date(y,m-1,d); }
+function dateKeyOffset(base, days){ const d = parseDateKey(base); d.setDate(d.getDate()+days); return dateKey(d); }
+function isToday(dk){ return dk === dateKey(new Date()); }
+function fmtDateShort(dk){
+  const d = parseDateKey(dk);
+  const m = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+  return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+function fmtDateLong(dk){
+  const d = parseDateKey(dk);
+  const m = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+function relativeDay(dk){
+  const diff = Math.round((parseDateKey(dk) - parseDateKey(dateKey(new Date())))/86400000);
+  if(diff === 0) return 'Hari ini';
+  if(diff === -1) return 'Kemarin';
+  if(diff === -2) return '2 hari lalu';
+  if(diff === 1) return 'Besok';
+  const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  return days[parseDateKey(dk).getDay()];
+}
+function shortDayLabel(dk){
+  const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  return days[parseDateKey(dk).getDay()];
+}
+function dayNumber(dk){ return Number(dk.split('-')[2]); }
+function monthDayCount(y,m){ return new Date(y,m,0).getDate(); }
+
+/* ==================================================================
+   HITUNGAN
+================================================================== */
+function hitungSetoran(d){
+  if(!d) return 0;
+  return (d.om||0)*HARGA.om + (d.os||0)*HARGA.os + (d.yo||0)*HARGA.yo + (d.yt||0)*HARGA.yt;
+}
+function getYLData(tku, yl){ return state.dataByTKU[tku]?.[yl] || { om:0, os:0, yo:0, yt:0 }; }
+function setYLData(tku, yl, data){
+  if(!state.dataByTKU[tku]) state.dataByTKU[tku] = {};
+  state.dataByTKU[tku][yl] = data;
+}
+function getTotal(tku, yl, fromData){
+  const src = fromData || state.dataByTKU;
+  const d = src[tku]?.[yl];
+  if(!d) return 0;
+  return (d.om||0)+(d.os||0)+(d.yo||0)+(d.yt||0);
+}
+function getSetoran(tku, yl, fromData){
+  const src = fromData || state.dataByTKU;
+  return hitungSetoran(src[tku]?.[yl]);
+}
+function isFilled(tku, yl, fromData){ return getTotal(tku, yl, fromData) > 0; }
+function getTKUStats(tkuKey, fromData){
+  const src = fromData || state.dataByTKU;
+  const tku = TKU_DATA[tkuKey];
+  let total=0, rp=0, filled=0, mix={om:0,os:0,yo:0,yt:0};
+  tku.yl.forEach(yl=>{
+    const d = src[tkuKey]?.[yl];
+    if(!d) return;
+    const t = (d.om||0)+(d.os||0)+(d.yo||0)+(d.yt||0);
+    if(t>0){
+      total+=t; rp+=hitungSetoran(d); filled++;
+      mix.om += d.om||0; mix.os += d.os||0; mix.yo += d.yo||0; mix.yt += d.yt||0;
+    }
+  });
+  return { total, rp, filled, mix, target: tku.target, count: tku.yl.length, pending: tku.yl.length - filled };
+}
+
+/* ==================================================================
+   INDEXEDDB
+================================================================== */
+const DB_NAME='yjual_v5', STORE='daily';
+let _db = null;
+function openDB(){
+  if(_db) return Promise.resolve(_db);
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open(DB_NAME, 1);
+    r.onupgradeneeded = e => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath:'date' });
+    };
+    r.onsuccess = ()=>{ _db = r.result; res(_db); };
+    r.onerror = ()=> rej(r.error);
+  });
+}
+async function idbGetAll(){
+  try{
+    const db = await openDB();
+    return new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readonly');
+      const req = tx.objectStore(STORE).getAll();
+      req.onsuccess = ()=> res(req.result||[]);
+      req.onerror = ()=> rej(req.error);
+    });
+  }catch(_){ return []; }
+}
+async function idbGet(dk){
+  try{
+    const db = await openDB();
+    return new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readonly');
+      const req = tx.objectStore(STORE).get(dk);
+      req.onsuccess = ()=> res(req.result||null);
+      req.onerror = ()=> rej(req.error);
+    });
+  }catch(_){ return null; }
+}
+async function idbPut(record){
+  try{
+    const db = await openDB();
+    return new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readwrite');
+      tx.objectStore(STORE).put(record);
+      tx.oncomplete = ()=> res();
+      tx.onerror = ()=> rej(tx.error);
+    });
+  }catch(_){}
+}
+async function persistCurrentDate(){
+  state.historyCache[state.currentDate] = JSON.parse(JSON.stringify(state.dataByTKU));
+  await idbPut({ date: state.currentDate, dataByTKU: state.dataByTKU, updatedAt: Date.now() });
+}
+async function switchDate(newDate){
+  await persistCurrentDate();
+  const rec = await idbGet(newDate);
+  state.currentDate = newDate;
+  state.dataByTKU = rec ? JSON.parse(JSON.stringify(rec.dataByTKU)) : {};
+  state.historyCache[newDate] = state.dataByTKU;
+  state.activeYL = null;
+  refreshAll();
+}
+
+/* ==================================================================
+   THEME
+================================================================== */
+function applyTheme(){
+  const s = state.settings.theme;
+  let theme = s;
+  if(s === 'auto') theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  const i = $('btnTheme').querySelector('i');
+  i.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{ if(state.settings.theme==='auto') applyTheme(); });
+function saveSettings(){
+  try{
+    localStorage.setItem('yjual_v5_settings', JSON.stringify(state.settings));
+    localStorage.setItem('yjual_v5_gas', state.gasUrl || '');
+    localStorage.setItem('yjual_v5_fb', state.fbUrl || '');
+  }catch(_){}
+}
+function loadSettings(){
+  try{
+    const s = localStorage.getItem('yjual_v5_settings');
+    if(s) Object.assign(state.settings, JSON.parse(s));
+    state.gasUrl = localStorage.getItem('yjual_v5_gas') || '';
+    state.fbUrl = localStorage.getItem('yjual_v5_fb') || '';
+  }catch(_){}
+}
+
+/* ==================================================================
+   RENDER: BANNER
+================================================================== */
+function renderBanner(){
+  const stats = getTKUStats(state.activeTKU);
+  $('bsBotol').textContent = fmtNum(stats.total);
+  $('bsYL').textContent = `${stats.filled}/${stats.count}`;
+  $('bsRp').textContent = fmtRp(stats.rp);
+  const pct = stats.target > 0 ? Math.min(100, (stats.total/stats.target)*100) : 0;
+  $('bsProgress').style.width = pct + '%';
+  $('bannerSub').textContent = `${TKU_DATA[state.activeTKU].center} · ${relativeDay(state.currentDate)}`;
+}
+
+/* ==================================================================
+   RENDER: MAIN ROUTER
+================================================================== */
+function renderMain(){
+  const main = $('main');
+  const tab = state.activeTab;
+  if(tab === 'input')     main.innerHTML = inputTabHTML();
+  else if(tab === 'stats') main.innerHTML = statsTabHTML();
+  else if(tab === 'rank')  main.innerHTML = rankTabHTML();
+  else if(tab === 'set')   main.innerHTML = setTabHTML();
+  main.style.animation = 'none'; void main.offsetWidth; main.style.animation = '';
+  if(tab === 'input') postRenderInput();
+}
+
+/* ==================================================================
+   TAB: INPUT
+================================================================== */
+function inputTabHTML(){
+  return `
+    <div class="form-card">
+      <div class="dd" id="ddTKU">
+        <div class="field-label">
+          <i class="fa-solid fa-store"></i> Pilih TKU
+          <span class="count" id="tkuCountLbl">—</span>
+        </div>
+        <button class="dd-trigger" type="button" data-dd-trigger="tku">
+          <span class="dd-trigger-text placeholder" id="tkuTriggerText">— Pilih TKU —</span>
+          <i class="fa-solid fa-chevron-down dd-arrow"></i>
+        </button>
+        <div class="dd-menu" id="ddMenuTKU"></div>
+      </div>
+
+      <div class="dd" id="ddYL">
+        <div class="field-label">
+          <i class="fa-solid fa-user"></i> Pilih Nama YL
+          <span class="count" id="ylCountLbl">—</span>
+        </div>
+        <button class="dd-trigger" type="button" data-dd-trigger="yl">
+          <span class="dd-trigger-text placeholder" id="ylTriggerText">— Pilih Nama YL —</span>
+          <i class="fa-solid fa-chevron-down dd-arrow"></i>
+        </button>
+        <div class="dd-menu" id="ddMenuYL"></div>
+      </div>
+    </div>
+
+    <div class="date-nav" style="display:flex; align-items:center; justify-content:center; gap:10px; margin:0; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:8px 10px; box-shadow:0 6px 16px -10px rgba(15,23,42,.14);">
+      <button class="date-nav-btn" id="btnPrevDay" style="width:30px; height:30px; border-radius:9px; background:var(--surface-2); color:var(--text-mute); display:flex; align-items:center; justify-content:center; font-size:11px;"><i class="fa-solid fa-chevron-left"></i></button>
+      <div style="flex:1; text-align:center;">
+        <div class="date-nav-main" id="dateMain" style="font-family:'Poppins',sans-serif; font-weight:700; font-size:12.5px; display:flex; align-items:center; justify-content:center; gap:6px;">—</div>
+        <div class="date-nav-sub" id="dateSub" style="font-size:10px; font-weight:500; color:var(--text-dim); margin-top:1px;">—</div>
+      </div>
+      <button class="date-nav-btn" id="btnNextDay" style="width:30px; height:30px; border-radius:9px; background:var(--surface-2); color:var(--text-mute); display:flex; align-items:center; justify-content:center; font-size:11px;"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+
+    <div class="summary-strip">
+      <div class="summary-cell">
+        <div class="summary-cell-lbl">Pending</div>
+        <div class="summary-cell-val warn num" id="scPending">0</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-cell-lbl">Terisi</div>
+        <div class="summary-cell-val good num" id="scFilled">0</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-cell-lbl">Target</div>
+        <div class="summary-cell-val num" id="scTarget">0</div>
+      </div>
+    </div>
+
+    <div class="section" id="secPending">
+      <div class="section-head" data-toggle="pending">
+        <div class="section-head-left">
+          <div class="section-icon pending"><i class="fa-solid fa-clock"></i></div>
+          <div>
+            <div class="section-title">Belum Input</div>
+            <div class="section-sub" id="pendingSub">—</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="section-badge pending num" id="pendingBadge">0</span>
+          <i class="fa-solid fa-chevron-down chevron"></i>
+        </div>
+      </div>
+      <div class="section-body"><div id="pendingList"></div></div>
+    </div>
+
+    <div class="section collapsed" id="secDone">
+      <div class="section-head" data-toggle="done">
+        <div class="section-head-left">
+          <div class="section-icon done"><i class="fa-solid fa-check"></i></div>
+          <div>
+            <div class="section-title">Sudah Input</div>
+            <div class="section-sub" id="doneSub">—</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="section-badge done num" id="doneBadge">0</span>
+          <i class="fa-solid fa-chevron-down chevron"></i>
+        </div>
+      </div>
+      <div class="section-body"><div id="doneList"></div></div>
+    </div>
+
+    <div class="bottom-actions">
+      <button class="btn-wa" data-action="share-wa">
+        <i class="fa-brands fa-whatsapp"></i>
+        <span>WhatsApp</span>
+      </button>
+      <button class="btn-submit" id="btnSubmit" data-action="submit-all">
+        <i class="fa-solid fa-paper-plane"></i>
+        <span>Submit</span>
+      </button>
+    </div>
+  `;
+}
+
+function postRenderInput(){
+  renderDateNav();
+  renderTKUDropdown();
+  renderYLDropdown();
+  renderSummaryStrip();
+  renderLists();
+}
+
+/* ==================================================================
+   DROPDOWN RENDERS
+================================================================== */
+function renderTKUDropdown(){
+  const menu = $('ddMenuTKU');
+  if(!menu) return;
+  $('tkuCountLbl').textContent = `${TKU_ORDER.length} Center`;
+  menu.innerHTML = TKU_ORDER.map(k=>{
+    const tku = TKU_DATA[k];
+    const stats = getTKUStats(k);
+    const selected = k === state.activeTKU;
+    const pendingTxt = stats.pending > 0 ? `${stats.pending} pending` : 'Selesai ✓';
+    return `
+      <button class="dd-item ${selected?'selected':''}" type="button" data-dd-item="tku" data-value="${k}">
+        <span class="dd-item-code">${k}</span>
+        <span class="dd-item-main">
+          <span class="dd-item-name">${tku.center}</span>
+          <span class="dd-item-meta">${stats.filled}/${stats.count} YL · ${pendingTxt}</span>
+        </span>
+        <i class="fa-solid fa-check dd-check"></i>
+      </button>
+    `;
+  }).join('');
+  const tku = TKU_DATA[state.activeTKU];
+  $('tkuTriggerText').textContent = tku.center;
+  $('tkuTriggerText').classList.remove('placeholder');
+}
+
+function renderYLDropdown(){
+  const menu = $('ddMenuYL');
+  if(!menu) return;
+  const tku = TKU_DATA[state.activeTKU];
+  const pending = tku.yl.filter(y => !isFilled(state.activeTKU, y)).sort();
+  const done = tku.yl.filter(y => isFilled(state.activeTKU, y))
+    .sort((a,b)=>getTotal(state.activeTKU,b)-getTotal(state.activeTKU,a));
+  $('ylCountLbl').textContent = `${done.length}/${tku.yl.length} terisi`;
+  const q = state.ddSearch.yl.toLowerCase();
+  const fp = q ? pending.filter(y=>y.toLowerCase().includes(q)) : pending;
+  const fd = q ? done.filter(y=>y.toLowerCase().includes(q)) : done;
+  let html = `
+    <div class="dd-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Cari nama YL..." data-dd-search="yl" value="${state.ddSearch.yl.replace(/"/g,'&quot;')}">
+    </div>
+  `;
+  if(fp.length === 0 && fd.length === 0){
+    html += `<div class="dd-empty"><i class="fa-solid fa-inbox"></i>${q ? 'Tidak ditemukan' : 'Semua YL sudah diinput ✓'}</div>`;
+  } else {
+    if(fp.length > 0){
+      html += `<div class="dd-group-label">Belum Input · ${fp.length}</div>`;
+      html += fp.map(y=>ddYLItem(y, false)).join('');
+    }
+    if(fd.length > 0){
+      html += `<div class="dd-group-label">Sudah Input · ${fd.length}</div>`;
+      html += fd.map(y=>ddYLItem(y, true)).join('');
+    }
+  }
+  menu.innerHTML = html;
+  if(state.ddSearch.yl){
+    const inp = menu.querySelector('[data-dd-search="yl"]');
+    if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  }
+}
+function ddYLItem(ylName, filled){
+  const total = getTotal(state.activeTKU, ylName);
+  const rp = getSetoran(state.activeTKU, ylName);
+  const selected = state.activeYL === ylName;
+  const meta = filled ? `${fmtNum(total)} btl · ${fmtRp(rp)}` : 'Belum ada data';
+  return `
+    <button class="dd-item ${selected?'selected':''}" type="button" data-dd-item="yl" data-value="${encodeURIComponent(ylName)}">
+      <span class="dd-item-main">
+        <span class="dd-item-name">${ylName}</span>
+        <span class="dd-item-meta">${meta}</span>
+      </span>
+      <i class="fa-solid fa-check dd-check"></i>
+    </button>
+  `;
+}
+function openDD(id){ closeAllDD(id); $(id).classList.add('open'); haptic(6); }
+function closeAllDD(except){
+  document.querySelectorAll('.dd.open').forEach(dd=>{
+    if(except && dd.id === except) return;
+    dd.classList.remove('open');
+  });
+}
+function closeDD(id){ $(id).classList.remove('open'); }
+
+/* ==================================================================
+   RENDER: DATE NAV + SUMMARY + LISTS
+================================================================== */
+function renderDateNav(){
+  const dk = state.currentDate;
+  const el = $('dateMain');
+  if(!el) return;
+  const badge = isToday(dk) ? '<span style="padding:2px 6px; border-radius:5px; background:var(--brand-soft); color:var(--brand); font-size:8.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;">Hari ini</span>' : '';
+  el.innerHTML = fmtDateShort(dk) + badge;
+  if(isToday(dk)) el.style.color = 'var(--brand)';
+  else el.style.color = 'var(--text)';
+  $('dateSub').textContent = relativeDay(dk);
+  $('btnNextDay').disabled = isToday(dk);
+  $('btnNextDay').style.opacity = isToday(dk) ? '.32' : '1';
+}
+function renderSummaryStrip(){
+  const s = getTKUStats(state.activeTKU);
+  if(!$('scPending')) return;
+  $('scPending').textContent = s.pending;
+  $('scFilled').textContent = s.filled;
+  $('scTarget').textContent = fmtNum(s.target);
+}
+function renderLists(){
+  const tku = TKU_DATA[state.activeTKU];
+  const pending = [], done = [];
+  tku.yl.forEach(yl=>{
+    if(isFilled(state.activeTKU, yl)) done.push(yl);
+    else pending.push(yl);
+  });
+  pending.sort();
+  done.sort((a,b)=>getTotal(state.activeTKU,b)-getTotal(state.activeTKU,a));
+  if(!$('pendingBadge')) return;
+  $('pendingBadge').textContent = pending.length;
+  $('doneBadge').textContent = done.length;
+  $('pendingSub').textContent = pending.length===0 ? 'Semua YL sudah diinput ✓' : `${pending.length} YL menunggu`;
+  $('doneSub').textContent = done.length===0 ? 'Belum ada yang diinput' : `${done.length} YL sudah diinput`;
+  $('pendingList').innerHTML = pending.length === 0
+    ? `<div class="section-empty"><i class="fa-solid fa-circle-check"></i>Semua YL sudah diinput!</div>`
+    : pending.map(y => ylRowHTML(y, false)).join('');
+  $('doneList').innerHTML = done.length === 0
+    ? `<div class="section-empty"><i class="fa-solid fa-inbox"></i>Belum ada yang diinput</div>`
+    : done.map(y => ylRowHTML(y, true)).join('');
+}
+function ylRowHTML(ylName, filled){
+  const total = getTotal(state.activeTKU, ylName);
+  const setoran = getSetoran(state.activeTKU, ylName);
+  return `
+    <div class="yl-row ${filled?'filled':''}" data-yl="${encodeURIComponent(ylName)}">
+      <div class="yl-avatar" style="background:${avatarBg(ylName)}">${getInitials(ylName)}</div>
+      <div class="yl-info">
+        <div class="yl-name">${ylName}</div>
+        <div class="yl-meta">
+          <span class="yl-chip ${filled?'done':'empty'}">${filled?'✓ Sudah':'Belum'}</span>
+          ${filled ? `<span class="yl-rp num">${fmtRp(setoran)}</span>` : ''}
+        </div>
+      </div>
+      <div>
+        <div class="yl-total ${filled?'filled':''} num">${filled ? fmtNum(total) : '—'}</div>
+        <div class="yl-total-lbl">${filled ? 'botol' : ''}</div>
+      </div>
+      <i class="fa-solid fa-chevron-right yl-arrow"></i>
+    </div>
+  `;
+}
+
+/* ==================================================================
+   TAB: ANALISA
+================================================================== */
+function statsTabHTML(){
+  const tku = TKU_DATA[state.activeTKU];
+  const stats = getTKUStats(state.activeTKU);
+  const pct = Math.min(100, stats.target>0 ? (stats.total/stats.target)*100 : 0);
+
+  const now = new Date();
+  const startHour = 8;
+  const hoursElapsed = Math.max(0.1, (now.getHours() + now.getMinutes()/60) - startHour);
+  const ratePerHr = stats.total / hoursElapsed;
+  const remain = Math.max(0, stats.target - stats.total);
+  const hoursToFinish = ratePerHr > 0 ? remain / ratePerHr : Infinity;
+  const finishTime = isFinite(hoursToFinish) && hoursToFinish < 24
+    ? new Date(now.getTime() + hoursToFinish*3600*1000) : null;
+  const finishStr = finishTime
+    ? `${String(finishTime.getHours()).padStart(2,'0')}:${String(finishTime.getMinutes()).padStart(2,'0')}`
+    : '—';
+  const projEOD = Math.round(ratePerHr * 12);
+  const projPct = stats.target>0 ? Math.round((projEOD/stats.target)*100) : 0;
+
+  const mixArr = [
+    { name:'OM05', value:stats.mix.om, color:'#F97316' },
+    { name:'OS05', value:stats.mix.os, color:'#EC4899' },
+    { name:'YO05', value:stats.mix.yo, color:'#EF4444' },
+    { name:'YT05', value:stats.mix.yt, color:'#3B82F6' }
+  ];
+
+  const days = [];
+  for(let i=6;i>=0;i--){
+    const dk = dateKeyOffset(state.currentDate, -i);
+    const d = state.historyCache[dk];
+    const t = d ? getTKUStats(state.activeTKU, d).total : 0;
+    days.push({ label: shortDayLabel(dk), value: t, isToday: i===0 });
+  }
+
+  const dNow = parseDateKey(state.currentDate);
+  const y = dNow.getFullYear(), m = dNow.getMonth()+1;
+  const daysInMonth = monthDayCount(y, m);
+  const heatDays = [];
+  for(let i=1;i<=daysInMonth;i++){
+    heatDays.push(`${y}-${String(m).padStart(2,'0')}-${String(i).padStart(2,'0')}`);
+  }
+
+  const yest = state.historyCache[dateKeyOffset(state.currentDate, -1)];
+  const yestTotal = yest ? getTKUStats(state.activeTKU, yest).total : null;
+
+  const insights = buildInsights(stats, yestTotal, pct, now.getHours());
+
+  return `
+    <div class="dash-card">
+      <div class="dash-title"><i class="fa-solid fa-gauge-high"></i> Run-Rate · ${state.activeTKU}</div>
+      <div class="rr-grid">
+        <div class="rr-item">
+          <div class="rr-lbl">Progress</div>
+          <div class="rr-val ${pct>=100?'good':pct>=60?'warn':'bad'}">${Math.round(pct)}%</div>
+          <div class="rr-sub">${fmtNum(stats.total)} / ${fmtNum(stats.target)}</div>
+        </div>
+        <div class="rr-item">
+          <div class="rr-lbl">Rate /jam</div>
+          <div class="rr-val">${fmtNum(ratePerHr)}</div>
+          <div class="rr-sub">sejak 08:00</div>
+        </div>
+        <div class="rr-item">
+          <div class="rr-lbl">Estimasi Selesai</div>
+          <div class="rr-val">${finishStr}</div>
+          <div class="rr-sub">${remain>0?'jika pace stabil':'✓ tercapai'}</div>
+        </div>
+        <div class="rr-item">
+          <div class="rr-lbl">Proyeksi EOD</div>
+          <div class="rr-val ${projPct>=100?'good':'warn'}">${fmtNum(projEOD)}</div>
+          <div class="rr-sub">${projPct}% dari target</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-title"><i class="fa-solid fa-chart-pie"></i> Mix Produk Hari Ini</div>
+      <div class="donut-wrap">
+        ${renderDonut(mixArr)}
+        <div class="donut-legend">
+          ${mixArr.map(x=>`
+            <div class="legend-item">
+              <div class="legend-dot" style="background:${x.color}"></div>
+              <div class="legend-name">${x.name}</div>
+              <div class="legend-val num">${fmtNum(x.value)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-title"><i class="fa-solid fa-chart-column"></i> Trend 7 Hari · ${state.activeTKU}</div>
+      ${renderBars(days)}
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-title"><i class="fa-solid fa-fire"></i> Heatmap Bulan Ini · Semua TKU</div>
+      ${renderHeatmap(heatDays)}
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-title"><i class="fa-solid fa-lightbulb"></i> Insight & Saran</div>
+      ${insights.length===0?'<div style="font-size:11.5px; color:var(--text-dim); font-weight:600;">Belum cukup data untuk insight.</div>':insights.map(ins=>`
+        <div class="insight-row">
+          <div class="insight-ico ${ins.type}"><i class="fa-solid ${ins.icon}"></i></div>
+          <div class="insight-txt">${ins.text}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function buildInsights(stats, yestTotal, pct, hour){
+  const insights = [];
+  if(yestTotal !== null){
+    const delta = stats.total - yestTotal;
+    const pctDelta = yestTotal>0 ? Math.round((delta/yestTotal)*100) : 0;
+    if(delta > 0){
+      insights.push({ type:'up', icon:'fa-arrow-trend-up', text:`<b>Naik ${pctDelta}%</b> dari kemarin (${fmtNum(yestTotal)} → ${fmtNum(stats.total)} btl). Pertahankan!` });
+    } else if(delta < 0){
+      insights.push({ type:'warn', icon:'fa-arrow-trend-down', text:`<b>Turun ${Math.abs(pctDelta)}%</b> dari kemarin. Cek YL yang belum input.` });
+    }
+  }
+  if(stats.pending > 0){
+    insights.push({ type:'warn', icon:'fa-user-clock', text:`<b>${stats.pending} YL</b> belum diinput. Dorong sebelum jam 15:00.` });
+  } else {
+    insights.push({ type:'up', icon:'fa-circle-check', text:`<b>Semua YL sudah input</b> — data siap di-submit ke cloud.` });
+  }
+  if(pct >= 100){
+    insights.push({ type:'up', icon:'fa-trophy', text:`🎉 <b>Target ${state.activeTKU} tercapai!</b> Total ${fmtNum(stats.total)} dari ${fmtNum(stats.target)} btl.` });
+  } else if(pct >= 80){
+    insights.push({ type:'info', icon:'fa-bolt', text:`Tinggal <b>${fmtNum(stats.target-stats.total)} btl</b> lagi. Hampir sampai!` });
+  } else if(pct < 40 && hour >= 14){
+    insights.push({ type:'warn', icon:'fa-triangle-exclamation', text:`Progress baru <b>${Math.round(pct)}%</b> padahal sudah jam ${hour}. Perlu dorongan.` });
+  }
+  const total = stats.mix.om+stats.mix.os+stats.mix.yo+stats.mix.yt;
+  if(total > 0){
+    const entries = [['om','OM05',stats.mix.om],['os','OS05',stats.mix.os],['yo','YO05',stats.mix.yo],['yt','YT05',stats.mix.yt]];
+    entries.sort((a,b)=>b[2]-a[2]);
+    const top = entries[0];
+    const pctTop = Math.round((top[2]/total)*100);
+    insights.push({ type:'info', icon:'fa-star', text:`Varian terlaris: <b>${top[1]}</b> (${pctTop}% dari total).` });
+  }
+  return insights;
+}
+
+function renderDonut(segments){
+  const total = segments.reduce((s,x)=>s+x.value,0);
+  const size=120, r=44, cx=60, cy=60, sw=20;
+  const circ = 2*Math.PI*r;
+  if(total === 0){
+    return `<svg viewBox="0 0 ${size} ${size}" class="donut-svg">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="${sw}"/>
+      <text x="${cx}" y="${cy+4}" text-anchor="middle" class="donut-label">Belum ada</text>
+    </svg>`;
+  }
+  let cum = 0;
+  const arcs = segments.map(s=>{
+    const dash = (s.value/total)*circ;
+    const el = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${sw}" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-cum}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    cum += dash;
+    return el;
+  }).join('');
+  return `<svg viewBox="0 0 ${size} ${size}" class="donut-svg">
+    ${arcs}
+    <text x="${cx}" y="${cy-1}" text-anchor="middle" class="donut-total">${fmtNum(total)}</text>
+    <text x="${cx}" y="${cy+13}" text-anchor="middle" class="donut-label">BOTOL</text>
+  </svg>`;
+}
+
+function renderBars(days){
+  const max = Math.max(...days.map(d=>d.value), 1);
+  return `
+    <div class="bars-chart">
+      ${days.map(d=>{
+        const h = d.value>0 ? Math.max(4, (d.value/max)*100) : 2;
+        return `<div class="bar-col">
+          <div class="bar-val" style="${d.value===0?'opacity:.3;':''}">${d.value>0?fmtNum(d.value):''}</div>
+          <div class="bar-fill ${d.isToday?'today':''}" style="height:${h}%"></div>
+          <div class="bar-label" style="${d.isToday?'color:var(--brand);':''}">${d.label}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderHeatmap(heatDays){
+  const headerCells = heatDays.map(dk=>`<div class="heat-hdr">${dayNumber(dk)}</div>`).join('');
+  const rows = TKU_ORDER.map(k=>{
+    const cells = heatDays.map(dk=>{
+      const d = state.historyCache[dk];
+      if(!d){ return `<div class="heat-cell" title="${dk} ${k}"></div>`; }
+      const s = getTKUStats(k, d);
+      const pct = s.target>0 ? s.total/s.target : 0;
+      let bg = 'var(--surface-2)';
+      if(pct > 0) bg = `rgba(16,185,129,${Math.min(1, 0.15 + pct*0.85)})`;
+      if(pct >= 1) bg = 'linear-gradient(135deg, #34D399, #059669)';
+      return `<div class="heat-cell" style="background:${bg}" title="${dk} · ${k}: ${s.total}/${s.target}"></div>`;
+    }).join('');
+    return `<div class="heat-label">${k}</div>${cells}`;
+  }).join('');
+  return `<div class="heat-grid" style="grid-template-columns: 30px repeat(${heatDays.length}, minmax(0,1fr));">
+    <div></div>${headerCells}
+    ${rows}
+  </div>`;
+}
+
+/* ==================================================================
+   TAB: RANK
+================================================================== */
+function rankTabHTML(){
+  const isYL = state.rankType === 'yl';
+  return `
+    <div class="dash-card">
+      <div class="dash-title"><i class="fa-solid fa-trophy"></i> Leaderboard · ${relativeDay(state.currentDate)}</div>
+      <div class="rank-toggle">
+        <button class="${isYL?'active':''}" data-rank="yl">Per YL</button>
+        <button class="${!isYL?'active':''}" data-rank="tku">Per TKU</button>
+      </div>
+      ${isYL ? renderYLRanking() : renderTKURanking()}
+    </div>
+  `;
+}
+function renderYLRanking(){
+  const rows = [];
+  TKU_ORDER.forEach(k=>{
+    TKU_DATA[k].yl.forEach(yl=>{
+      const total = getTotal(k, yl);
+      if(total > 0) rows.push({ name:yl, tku:k, total, rp:getSetoran(k, yl) });
+    });
+  });
+  rows.sort((a,b)=>b.total - a.total);
+  if(rows.length === 0){
+    return `<div style="text-align:center; padding:20px; color:var(--text-dim); font-size:11.5px; font-weight:600;">Belum ada data untuk tanggal ini</div>`;
+  }
+  const maxTotal = rows[0].total;
+  return rows.slice(0, 20).map((r,i)=>{
+    const medal = i===0?'g1':i===1?'g2':i===2?'g3':'gn';
+    const pctOfMax = Math.round((r.total/maxTotal)*100);
+    return `
+      <div class="rank-row">
+        <div class="rank-medal ${medal}">${i+1}</div>
+        <div class="rank-info">
+          <div class="rank-name">${r.name}</div>
+          <div class="rank-sub">${r.tku} · ${fmtRp(r.rp)} · ${pctOfMax}%</div>
+        </div>
+        <div>
+          <div class="rank-val num">${fmtNum(r.total)}</div>
+          <div class="rank-val-lbl">botol</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+function renderTKURanking(){
+  const rows = TKU_ORDER.map(k=>{
+    const s = getTKUStats(k);
+    return { key:k, center:TKU_DATA[k].center, total:s.total, rp:s.rp, target:s.target, filled:s.filled, count:s.count };
+  }).sort((a,b)=>b.total - a.total);
+  const maxTotal = Math.max(...rows.map(r=>r.total), 1);
+  return rows.map((r,i)=>{
+    const medal = i===0?'g1':i===1?'g2':i===2?'g3':'gn';
+    const pct = Math.round((r.total/maxTotal)*100);
+    return `
+      <div class="rank-row">
+        <div class="rank-medal ${medal}">${i+1}</div>
+        <div class="rank-info">
+          <div class="rank-name">${r.key} · ${r.center}</div>
+          <div class="rank-sub">${r.filled}/${r.count} YL · ${fmtRp(r.rp)} · ${pct}% dari top</div>
+        </div>
+        <div>
+          <div class="rank-val num">${fmtNum(r.total)}</div>
+          <div class="rank-val-lbl">botol</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ==================================================================
+   TAB: SET
+================================================================== */
+function setTabHTML(){
+  const s = state.settings;
+  const grand = TKU_ORDER.reduce((acc,k)=>{
+    const st = getTKUStats(k);
+    acc.total += st.total; acc.rp += st.rp;
+    return acc;
+  }, { total:0, rp:0 });
+  const histCount = Object.keys(state.historyCache).length;
+  return `
+    <div class="set-group">
+      <div class="set-row">
+        <div><div class="set-lbl">Tema</div><div class="set-sub">Light, Dark, atau Auto</div></div>
+        <div class="seg" data-seg="theme">
+          <button class="${s.theme==='light'?'active':''}" data-seg-val="light">Light</button>
+          <button class="${s.theme==='auto'?'active':''}" data-seg-val="auto">Auto</button>
+          <button class="${s.theme==='dark'?'active':''}" data-seg-val="dark">Dark</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="set-group" style="margin-top:12px;">
+      <div class="set-row">
+        <div><div class="set-lbl">Data Hari Ini</div><div class="set-sub">${fmtNum(grand.total)} botol · ${fmtRp(grand.rp)}</div></div>
+        <button class="set-btn danger" data-action="reset-today">Reset</button>
+      </div>
+      <div class="set-row">
+        <div><div class="set-lbl">Riwayat Tersimpan</div><div class="set-sub">${histCount} hari di IndexedDB</div></div>
+        <button class="set-btn" data-action="open-output">Export</button>
+      </div>
+      <div class="set-row">
+        <div><div class="set-lbl">Isi Ulang Kemarin</div><div class="set-sub">Salin dari ${dateKeyOffset(state.currentDate, -1)}</div></div>
+        <button class="set-btn" data-action="copy-yesterday">Salin</button>
+      </div>
+    </div>
+
+    <div class="set-group" style="margin-top:12px;">
+      <div class="set-row">
+        <div><div class="set-lbl">Koneksi Cloud</div><div class="set-sub">${state.gasUrl ? '✓ Sheets' : '— Sheets'} · ${state.fbUrl ? '✓ Firebase' : '— Firebase'}</div></div>
+        <button class="set-btn primary" data-action="open-sync">Atur</button>
+      </div>
+    </div>
+
+    <div class="set-group" style="margin-top:12px;">
+      <div class="set-row">
+        <div><div class="set-lbl">Y-Jual v5.1</div><div class="set-sub">Fixed input + slim UX</div></div>
+        <button class="set-btn" data-action="about">Info</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ==================================================================
+   SHEET MANAGEMENT
+================================================================== */
+function openSheet(id){
+  $('overlay').classList.add('open');
+  $(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAllSheets(){
+  ['inputSheet','outputSheet','syncSheet'].forEach(id=>$(id).classList.remove('open'));
+  $('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ==================================================================
+   INPUT SHEET — FIXED (no auto-focus)
+================================================================== */
+function openInputSheet(ylName){
+  state.activeYL = ylName;
+  const tku = TKU_DATA[state.activeTKU];
+  const data = getYLData(state.activeTKU, ylName);
+  $('sAvatar').textContent = getInitials(ylName);
+  $('sAvatar').style.background = avatarBg(ylName);
+  $('sName').textContent = ylName;
+  $('sMeta').innerHTML = `${tku.center} · ${state.activeTKU} · ${relativeDay(state.currentDate)}`;
+  ['om','os','yo','yt'].forEach(k=>{
+    const el = $('input-'+k);
+    if(el) el.value = data[k] || '';
+  });
+  updateInputTotal();
+  closeAllDD();
+  openSheet('inputSheet');
+}
+
+function updateInputTotal(){
+  const vals = { om:0, os:0, yo:0, yt:0 };
+  ['om','os','yo','yt'].forEach(k=>{
+    const inp = $('input-'+k);
+    if(inp) vals[k] = Math.max(0, parseInt(inp.value) || 0);
+    const card = document.querySelector(`.var-card[data-key="${k}"]`);
+    if(card) card.classList.toggle('has-val', vals[k] > 0);
+    const sub = $('sub-'+k);
+    if(sub) sub.textContent = fmtRp(vals[k] * HARGA[k]);
+  });
+  const total = vals.om + vals.os + vals.yo + vals.yt;
+  const rp = vals.om*HARGA.om + vals.os*HARGA.os + vals.yo*HARGA.yo + vals.yt*HARGA.yt;
+  const sTotal = $('sTotal');
+  const sRp = $('sRp');
+  const btn = $('btnSaveInput');
+  if(sTotal) sTotal.textContent = fmtNum(total);
+  if(sRp) sRp.textContent = fmtRp(rp);
+  if(btn) btn.classList.toggle('zero', total === 0);
+}
+
+function clearInput(){
+  ['om','os','yo','yt'].forEach(k=>{
+    const el = $('input-'+k);
+    if(el) el.value = '';
+  });
+  updateInputTotal();
+  haptic(16);
+  showToast('Direset');
+}
+
+async function saveInput(){
+  if(!state.activeYL) return;
+  const data = {
+    om: parseInt($('input-om').value) || 0,
+    os: parseInt($('input-os').value) || 0,
+    yo: parseInt($('input-yo').value) || 0,
+    yt: parseInt($('input-yt').value) || 0
+  };
+  const wasFilled = isFilled(state.activeTKU, state.activeYL);
+  setYLData(state.activeTKU, state.activeYL, data);
+  await persistCurrentDate();
+  const total = data.om+data.os+data.yo+data.yt;
+  const rp = hitungSetoran(data);
+  haptic(25);
+  showToast(`✓ ${state.activeYL.split(' ')[0]} · ${fmtNum(total)} btl`);
+  closeAllSheets();
+  refreshAll();
+  if(!wasFilled && total > 0){
+    setTimeout(()=>{
+      state.sectionOpen.done = true;
+      const el = $('secDone');
+      if(el) el.classList.remove('collapsed');
+    }, 300);
+  }
+  checkMilestone();
+}
+
+/* ==================================================================
+   TOAST + CONFETTI
+================================================================== */
+let toastTimer = null;
+function showToast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+function fireConfetti(){
+  const canvas = $('confetti');
+  canvas.classList.add('show');
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  canvas.width = innerWidth*dpr; canvas.height = innerHeight*dpr;
+  canvas.style.width = innerWidth+'px'; canvas.style.height = innerHeight+'px';
+  const colors = ['#E11D48','#F472B6','#FACC15','#10B981','#A78BFA'];
+  const particles = [];
+  const cx = canvas.width/2, cy = canvas.height*0.3;
+  for(let i=0;i<120;i++){
+    const a = Math.random()*Math.PI*2;
+    const sp = (Math.random()*8+6)*dpr;
+    particles.push({
+      x: cx+(Math.random()-.5)*80*dpr,
+      y: cy+(Math.random()-.5)*30*dpr,
+      vx: Math.cos(a)*sp, vy: Math.sin(a)*sp-5*dpr,
+      size:(Math.random()*7+4)*dpr,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*Math.PI*2, rs:(Math.random()-.5)*.3,
+      life:1, shape: Math.random()>.5?'rect':'circle'
+    });
+  }
+  const start = performance.now();
+  function draw(t){
+    const el = t-start;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive = 0;
+    for(const p of particles){
+      p.x+=p.vx; p.y+=p.vy; p.vy+=.35*dpr; p.vx*=.99; p.rot+=p.rs; p.life-=.008;
+      if(p.life<=0) continue;
+      alive++;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      if(p.shape==='rect') ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+      else { ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
+      ctx.restore();
+    }
+    if(alive>0 && el<4000) requestAnimationFrame(draw);
+    else canvas.classList.remove('show');
+  }
+  requestAnimationFrame(draw);
+}
+function checkMilestone(){
+  const s = getTKUStats(state.activeTKU);
+  const key = state.activeTKU + '_' + state.currentDate;
+  if(s.total >= s.target && !state._milestoneFired[key]){
+    state._milestoneFired[key] = true;
+    setTimeout(()=>{ fireConfetti(); showToast(`🎉 Target ${state.activeTKU} tercapai!`); }, 300);
+  }
+}
+
+/* ==================================================================
+   REFRESH
+================================================================== */
+function refreshAll(){
+  applyTheme();
+  renderBanner();
+  renderMain();
+  checkMilestone();
+}
+
+/* ==================================================================
+   WHATSAPP + SUBMIT
+================================================================== */
+function buildWAText(){
+  const tku = TKU_DATA[state.activeTKU];
+  const data = state.dataByTKU[state.activeTKU] || {};
+  let text = `*LAPORAN PENJUALAN HARIAN*\n`;
+  text += `Tanggal: ${fmtDateLong(state.currentDate)}\n`;
+  text += `Area: ${tku.center} (${state.activeTKU})\n`;
+  text += `━━━━━━━━━━━━━━━━━━\n\n`;
+  let gt=0, gs=0;
+  tku.yl.forEach((yl, i)=>{
+    const d = data[yl];
+    if(!d) return;
+    const t = (d.om||0)+(d.os||0)+(d.yo||0)+(d.yt||0);
+    if(t===0) return;
+    gt += t; gs += hitungSetoran(d);
+    text += `${i+1}. ${yl}\n`;
+    text += `   OM:${d.om||0} OS:${d.os||0} YO:${d.yo||0} YT:${d.yt||0}\n`;
+    text += `   Total: ${t} btl · ${fmtRp(hitungSetoran(d))}\n\n`;
+  });
+  text += `━━━━━━━━━━━━━━━━━━\n`;
+  text += `*TOTAL ${state.activeTKU}:* ${fmtNum(gt)} btl\n`;
+  text += `Target: ${fmtNum(tku.target)} btl (${Math.round(gt/tku.target*100)}%)\n`;
+  text += `*Setoran: ${fmtRp(gs)}*`;
+  return text;
+}
+function shareWA(){
+  const text = buildWAText();
+  const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+  haptic(15);
+}
+function buildPayload(){
+  const tku = TKU_DATA[state.activeTKU];
+  const data = state.dataByTKU[state.activeTKU] || {};
+  const rows = [];
+  tku.yl.forEach(yl=>{
+    const d = data[yl];
+    if(!d) return;
+    const total = (d.om||0)+(d.os||0)+(d.yo||0)+(d.yt||0);
+    if(total === 0) return;
+    rows.push({
+      date: state.currentDate, tku: state.activeTKU, center: tku.center,
+      yl, om: d.om||0, os: d.os||0, yo: d.yo||0, yt: d.yt||0,
+      total, rp: hitungSetoran(d)
+    });
+  });
+  return { date: state.currentDate, tku: state.activeTKU, center: tku.center, rows, timestamp: Date.now() };
+}
+async function submitAll(){
+  const payload = buildPayload();
+  if(payload.rows.length === 0){ showToast('Tidak ada data'); return; }
+  if(!state.gasUrl && !state.fbUrl){
+    $('gasUrl').value = state.gasUrl;
+    $('fbUrl').value = state.fbUrl;
+    openSheet('syncSheet');
+    showToast('Isi endpoint cloud terlebih dahulu');
+    return;
+  }
+  const btn = $('btnSubmit');
+  if(btn){ btn.classList.add('loading'); btn.querySelector('i').className = 'fa-solid fa-spinner'; }
+  const results = { gas:'skipped', fb:'skipped' };
+  if(state.gasUrl){
+    try{
+      await fetch(state.gasUrl, {
+        method:'POST', mode:'no-cors',
+        headers:{ 'Content-Type':'text/plain' },
+        body: JSON.stringify(payload)
+      });
+      results.gas = 'ok';
+    }catch(e){ results.gas = 'fail'; }
+  }
+  if(state.fbUrl){
+    try{
+      const base = state.fbUrl.replace(/\/$/,'');
+      const url = `${base}/penjualan/${payload.date}/${payload.tku}.json`;
+      await fetch(url, {
+        method:'PUT',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+      results.fb = 'ok';
+    }catch(e){ results.fb = 'fail'; }
+  }
+  if(btn){ btn.classList.remove('loading'); btn.querySelector('i').className = 'fa-solid fa-paper-plane'; }
+  const parts = [];
+  if(results.gas === 'ok') parts.push('Sheets ✓');
+  else if(results.gas === 'fail') parts.push('Sheets ✗');
+  if(results.fb === 'ok') parts.push('FB ✓');
+  else if(results.fb === 'fail') parts.push('FB ✗');
+  if(results.gas === 'ok' || results.fb === 'ok'){
+    showToast(`Terkirim · ${parts.join(' · ')}`);
+    haptic(30);
+  } else {
+    showToast(`Gagal · ${parts.join(' · ')}`);
+  }
+}
+
+/* ==================================================================
+   REPORT IMAGE
+================================================================== */
+function buildReportData(){
+  const tku = TKU_DATA[state.activeTKU];
+  const rows = [];
+  const totals = { om:0, os:0, yo:0, yt:0, total:0, rp:0 };
+  tku.yl.forEach(yl=>{
+    const d = getYLData(state.activeTKU, yl);
+    const total = (d.om||0)+(d.os||0)+(d.yo||0)+(d.yt||0);
+    if(total === 0) return;
+    rows.push({ yl, om:d.om||0, os:d.os||0, yo:d.yo||0, yt:d.yt||0, total, rp: hitungSetoran(d) });
+    totals.om += d.om||0; totals.os += d.os||0;
+    totals.yo += d.yo||0; totals.yt += d.yt||0;
+    totals.total += total; totals.rp += hitungSetoran(d);
+  });
+  return { tku, rows, totals };
+}
+function generateReportImage(){
+  const { tku, rows, totals } = buildReportData();
+  const W = 1080, pad = 32;
+  const headerH = 210;
+  const colH = 60, rowH = 54;
+  const totalH = colH + Math.max(rows.length,1)*rowH + 80;
+  const H = headerH + totalH + 60;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,W,H);
+  const grd = ctx.createLinearGradient(0,0,W,headerH);
+  grd.addColorStop(0,'#E11D48'); grd.addColorStop(.6,'#BE123C'); grd.addColorStop(1,'#9F1239');
+  ctx.fillStyle = grd; ctx.fillRect(0,0,W,headerH);
+  ctx.save(); ctx.globalAlpha=.1; ctx.fillStyle='#FFF';
+  ctx.beginPath(); ctx.arc(W-60,40,140,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(40,headerH-20,100,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.textBaseline='middle'; ctx.textAlign='left'; ctx.fillStyle='#FFF';
+  ctx.font='700 40px Poppins, sans-serif';
+  ctx.fillText('LAPORAN HARIAN', pad, 66);
+  ctx.font='700 32px Poppins, sans-serif';
+  ctx.fillText(`${tku.center} · ${state.activeTKU}`, pad, 112);
+  ctx.font='500 16px "Plus Jakarta Sans", sans-serif';
+  ctx.globalAlpha=.88;
+  ctx.fillText(`${fmtDateLong(state.currentDate)} · ${relativeDay(state.currentDate)}`, pad, 152);
+  ctx.globalAlpha=1;
+  ctx.textAlign='right';
+  let sy = 66;
+  [
+    { l:'BOTOL', v:fmtNum(totals.total) },
+    { l:'YL TERISI', v:`${rows.length}/${tku.yl.length}` },
+    { l:'SETORAN', v:fmtRp(totals.rp) }
+  ].forEach(s=>{
+    ctx.font='700 22px Poppins, sans-serif';
+    ctx.fillStyle='#FFF'; ctx.fillText(s.v, W-pad, sy);
+    ctx.font='600 10px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.75)';
+    ctx.fillText(s.l, W-pad, sy+20);
+    sy += 46;
+  });
+  const cols = [
+    { key:'no',   w:60,  label:'No',      align:'center' },
+    { key:'yl',   w:290, label:'Nama YL', align:'left'   },
+    { key:'om',   w:88,  label:'OM05',    align:'center' },
+    { key:'os',   w:88,  label:'OS05',    align:'center' },
+    { key:'yo',   w:88,  label:'YO05',    align:'center' },
+    { key:'yt',   w:88,  label:'YT05',    align:'center' },
+    { key:'total',w:100, label:'Botol',   align:'center' },
+    { key:'rp',   w:190, label:'Setoran', align:'right'  }
+  ];
+  const tw = cols.reduce((a,c)=>a+c.w,0);
+  const tx = (W-tw)/2;
+  const ty = headerH;
+  ctx.fillStyle='#0B1220'; ctx.fillRect(tx, ty, tw, colH);
+  let cx = tx;
+  ctx.fillStyle='#FFF';
+  cols.forEach(c=>{
+    ctx.textAlign = c.align==='left'?'left':c.align==='right'?'right':'center';
+    ctx.font='700 14px Poppins, sans-serif';
+    const px = c.align==='left'?cx+16:c.align==='right'?cx+c.w-16:cx+c.w/2;
+    ctx.fillText(c.label, px, ty + colH/2);
+    cx += c.w;
+  });
+  const startY = ty + colH;
+  if(rows.length === 0){
+    ctx.fillStyle='#F8FAFC'; ctx.fillRect(tx, startY, tw, rowH);
+    ctx.fillStyle='#94A3B8'; ctx.textAlign='center';
+    ctx.font='600 15px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('Belum ada data', tx + tw/2, startY + rowH/2);
+  } else {
+    rows.forEach((r, i)=>{
+      const ry = startY + i*rowH;
+      if(i%2 === 1){ ctx.fillStyle='#F8FAFC'; ctx.fillRect(tx, ry, tw, rowH); }
+      ctx.strokeStyle='#E7E9EE'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(tx, ry+rowH); ctx.lineTo(tx+tw, ry+rowH); ctx.stroke();
+      let cxx = tx;
+      cols.forEach(c=>{
+        ctx.textAlign = c.align==='left'?'left':c.align==='right'?'right':'center';
+        const px = c.align==='left'?cxx+16:c.align==='right'?cxx+c.w-16:cxx+c.w/2;
+        let txt='', color='#0B1220';
+        if(c.key==='no'){ txt=String(i+1); color='#94A3B8'; ctx.font='700 14px "Plus Jakarta Sans", sans-serif'; }
+        else if(c.key==='yl'){ txt=r.yl; ctx.font='700 14px "Plus Jakarta Sans", sans-serif'; }
+        else if(c.key==='om'){ txt=String(r.om); color=r.om>0?'#F97316':'#CBD5E1'; ctx.font='700 15px Poppins, sans-serif'; }
+        else if(c.key==='os'){ txt=String(r.os); color=r.os>0?'#EC4899':'#CBD5E1'; ctx.font='700 15px Poppins, sans-serif'; }
+        else if(c.key==='yo'){ txt=String(r.yo); color=r.yo>0?'#EF4444':'#CBD5E1'; ctx.font='700 15px Poppins, sans-serif'; }
+        else if(c.key==='yt'){ txt=String(r.yt); color=r.yt>0?'#3B82F6':'#CBD5E1'; ctx.font='700 15px Poppins, sans-serif'; }
+        else if(c.key==='total'){ txt=String(r.total); color='#059669'; ctx.font='700 15px Poppins, sans-serif'; }
+        else if(c.key==='rp'){ txt=fmtRp(r.rp); color='#059669'; ctx.font='700 13px "Plus Jakarta Sans", sans-serif'; }
+        ctx.fillStyle=color;
+        ctx.fillText(txt, px, ry + rowH/2);
+        cxx += c.w;
+      });
+    });
+  }
+  const totalY = startY + Math.max(rows.length,1)*rowH;
+  ctx.fillStyle='#FEF2F2'; ctx.fillRect(tx, totalY, tw, 62);
+  ctx.fillStyle='#E11D48'; ctx.fillRect(tx, totalY, tw, 3);
+  ctx.fillStyle='#9F1239'; ctx.fillRect(tx, totalY+59, tw, 3);
+  let txx = tx;
+  cols.forEach(c=>{
+    ctx.textAlign = c.align==='left'?'left':c.align==='right'?'right':'center';
+    const px = c.align==='left'?txx+16:c.align==='right'?txx+c.w-16:txx+c.w/2;
+    let txt='';
+    if(c.key==='yl') txt='TOTAL';
+    if(c.key==='om') txt=String(totals.om);
+    if(c.key==='os') txt=String(totals.os);
+    if(c.key==='yo') txt=String(totals.yo);
+    if(c.key==='yt') txt=String(totals.yt);
+    if(c.key==='total') txt=String(totals.total);
+    if(c.key==='rp') txt=fmtRp(totals.rp);
+    if(txt){
+      ctx.font = c.key==='yl' ? '700 14px Poppins, sans-serif' : '700 15px Poppins, sans-serif';
+      ctx.fillStyle='#9F1239';
+      ctx.fillText(txt, px, totalY+31);
+    }
+    txx += c.w;
+  });
+  ctx.textAlign='center';
+  ctx.font='500 11px "Plus Jakarta Sans", sans-serif';
+  ctx.fillStyle='#94A3B8';
+  ctx.fillText(`Y-Jual · ${new Date().toLocaleString('id-ID')}`, W/2, totalY + 62 + 28);
+  return canvas;
+}
+async function openOutputSheet(){
+  openSheet('outputSheet');
+  const p = $('imgPreview');
+  p.innerHTML = '<span style="color:var(--text-dim); font-size:11.5px; font-weight:600;"><i class="fa-solid fa-spinner fa-spin"></i> Membuat gambar...</span>';
+  setTimeout(async ()=>{
+    try{
+      const canvas = generateReportImage();
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/png', 0.95));
+      state._lastImageBlob = blob;
+      const url = URL.createObjectURL(blob);
+      p.innerHTML = `<img src="${url}" alt="Laporan">`;
+    }catch(e){
+      p.innerHTML = '<span style="color:var(--brand); font-size:11.5px; font-weight:700;">Gagal membuat gambar</span>';
+    }
+  }, 60);
+}
+async function ensureBlob(){
+  if(state._lastImageBlob) return state._lastImageBlob;
+  state._lastImageBlob = await new Promise(r => generateReportImage().toBlob(r, 'image/png', 0.95));
+  return state._lastImageBlob;
+}
+async function downloadImage(){
+  const blob = await ensureBlob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `yjual_${state.activeTKU}_${state.currentDate}.png`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  showToast('✓ Gambar didownload');
+}
+async function shareImage(){
+  const blob = await ensureBlob();
+  const file = new File([blob], `yjual_${state.activeTKU}_${state.currentDate}.png`, { type:'image/png' });
+  if(navigator.canShare && navigator.canShare({ files:[file] })){
+    try{
+      await navigator.share({ files:[file], title:`Laporan ${state.activeTKU}` });
+    }catch(_){}
+  } else {
+    showToast('Share file tidak didukung. Gunakan Download.');
+  }
+}
+async function copyImage(){
+  const blob = await ensureBlob();
+  try{
+    if(navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      showToast('✓ Gambar tersalin');
+    } else showToast('Clipboard tidak didukung');
+  }catch(e){ showToast('Gagal menyalin'); }
+}
+
+/* ==================================================================
+   GAS CODE
+================================================================== */
+const GAS_CODE = `const SHEET_ID = '1S3DulFcADmlQyERD0fqoluQiqijGZ2c-CFmqdKnYaho';
+const SHEET_NAME = 'Data';
+
+function doPost(e){
+  try{
+    const payload = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if(!sheet){
+      sheet = ss.insertSheet(SHEET_NAME);
+      sheet.appendRow(['Tanggal','TKU','Center','Nama YL','OM05','OS05','YO05','YT05','Total','Setoran','Timestamp']);
+      sheet.getRange(1,1,1,11).setFontWeight('bold').setBackground('#E11D48').setFontColor('#FFF');
+      sheet.setFrozenRows(1);
+    }
+    const ts = new Date();
+    const rows = payload.rows.map(r => [
+      payload.date, payload.tku, r.center, r.yl,
+      r.om, r.os, r.yo, r.yt, r.total, r.rp, ts
+    ]);
+    if(rows.length > 0){
+      const ex = sheet.getDataRange().getValues();
+      for(let i=ex.length-1;i>=1;i--){
+        if(ex[i][0]===payload.date && ex[i][1]===payload.tku) sheet.deleteRow(i+1);
+      }
+      sheet.getRange(sheet.getLastRow()+1,1,rows.length,11).setValues(rows);
+    }
+    return ContentService.createTextOutput(JSON.stringify({ok:true,count:rows.length}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }catch(err){
+    return ContentService.createTextOutput(JSON.stringify({ok:false,error:String(err)}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+/* ==================================================================
+   EVENT DELEGATION
+================================================================== */
+document.addEventListener('click', async e => {
+  const t = e.target;
+
+  // Tab bar
+  const tab = t.closest('[data-tab]');
+  if(tab){
+    haptic(8);
+    state.activeTab = tab.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab === state.activeTab));
+    renderMain();
+    return;
+  }
+
+  // Sheet close
+  if(t.closest('[data-close]')){ closeAllSheets(); return; }
+  if(t.id === 'overlay'){ closeAllSheets(); closeAllDD(); return; }
+
+  // DD trigger
+  const trig = t.closest('[data-dd-trigger]');
+  if(trig){
+    const which = trig.dataset.ddTrigger;
+    const id = which === 'tku' ? 'ddTKU' : 'ddYL';
+    if($(id).classList.contains('open')) closeDD(id);
+    else openDD(id);
+    return;
+  }
+
+  // DD item
+  const item = t.closest('[data-dd-item]');
+  if(item){
+    const kind = item.dataset.ddItem;
+    const value = item.dataset.value;
+    if(kind === 'tku'){
+      state.activeTKU = value;
+      state.activeYL = null;
+      state.ddSearch.yl = '';
+      closeAllDD();
+      haptic(10);
+      renderBanner();
+      renderTKUDropdown();
+      renderYLDropdown();
+      renderSummaryStrip();
+      renderLists();
+      checkMilestone();
+    } else if(kind === 'yl'){
+      const yl = decodeURIComponent(value);
+      closeAllDD();
+      haptic(10);
+      openInputSheet(yl);
+    }
+    return;
+  }
+
+  // YL row
+  const row = t.closest('.yl-row');
+  if(row){
+    haptic(10);
+    openInputSheet(decodeURIComponent(row.dataset.yl));
+    return;
+  }
+
+  // Toggle section
+  const tog = t.closest('[data-toggle]');
+  if(tog){
+    haptic(6);
+    const w = tog.dataset.toggle;
+    state.sectionOpen[w] = !state.sectionOpen[w];
+    const el = w === 'pending' ? $('secPending') : $('secDone');
+    if(el) el.classList.toggle('collapsed', !state.sectionOpen[w]);
+    return;
+  }
+
+  // Rank toggle
+  const rankBtn = t.closest('[data-rank]');
+  if(rankBtn){
+    haptic(8);
+    state.rankType = rankBtn.dataset.rank;
+    renderMain();
+    return;
+  }
+
+  // Segmented control
+  const seg = t.closest('[data-seg]');
+  if(seg){
+    const group = seg.dataset.seg;
+    const valBtn = t.closest('[data-seg-val]');
+    if(!valBtn) return;
+    const val = valBtn.dataset.segVal;
+    haptic(8);
+    if(group === 'theme'){ state.settings.theme = val; applyTheme(); }
+    saveSettings();
+    renderMain();
+    return;
+  }
+
+  // Action
+  const action = t.closest('[data-action]')?.dataset.action;
+  if(!action) return;
+  haptic(12);
+
+  switch(action){
+    case 'save-input': saveInput(); break;
+    case 'clear-input': clearInput(); break;
+    case 'share-wa': shareWA(); break;
+    case 'submit-all': submitAll(); break;
+    case 'open-output': openOutputSheet(); break;
+    case 'regenerate-img': openOutputSheet(); break;
+    case 'download-img': downloadImage(); break;
+    case 'share-img': shareImage(); break;
+    case 'copy-img': copyImage(); break;
+    case 'open-sync':
+      $('gasUrl').value = state.gasUrl;
+      $('fbUrl').value = state.fbUrl;
+      openSheet('syncSheet');
+      break;
+    case 'save-endpoints':
+      state.gasUrl = $('gasUrl').value.trim();
+      state.fbUrl = $('fbUrl').value.trim().replace(/\/$/,'');
+      saveSettings();
+      showToast('✓ Endpoint disimpan');
+      if(state.activeTab === 'set') renderMain();
+      break;
+    case 'show-gas-code': {
+      const w = window.open('', '_blank');
+      if(w){
+        w.document.write('<pre style="padding:20px;font-size:12px;line-height:1.6;background:#0B1220;color:#E2E8F0;white-space:pre-wrap;word-break:break-all;font-family:ui-monospace,Menlo,monospace;">' + GAS_CODE.replace(/[<>&]/g, m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m])) + '</pre>');
+        w.document.title = 'Y-Jual · GAS Code';
+      }
+      break;
+    }
+    case 'reset-today': {
+      if(!confirm('Reset semua data hari ini?')) return;
+      state.dataByTKU = {};
+      await persistCurrentDate();
+      renderBanner();
+      renderMain();
+      showToast('✓ Data hari ini direset');
+      break;
+    }
+    case 'copy-yesterday': {
+      const yk = dateKeyOffset(state.currentDate, -1);
+      const yd = state.historyCache[yk];
+      if(!yd){ showToast('Tidak ada data kemarin'); return; }
+      if(!confirm(`Salin data ${yk} ke ${state.currentDate}?`)) return;
+      state.dataByTKU = JSON.parse(JSON.stringify(yd));
+      await persistCurrentDate();
+      renderBanner();
+      renderMain();
+      showToast('✓ Disalin dari kemarin');
+      break;
+    }
+    case 'about': showToast('Y-Jual v5.1 · Slim & Clean ✨'); break;
+  }
+});
+
+// Date nav (delegated)
+document.addEventListener('click', async e => {
+  if(e.target.closest('#btnPrevDay')){
+    haptic(10);
+    await switchDate(dateKeyOffset(state.currentDate, -1));
+  }
+  if(e.target.closest('#btnNextDay')){
+    if(isToday(state.currentDate)) return;
+    haptic(10);
+    await switchDate(dateKeyOffset(state.currentDate, 1));
+  }
+});
+
+// Input handler — sanitize + update
+document.addEventListener('input', e => {
+  const s = e.target.closest('[data-dd-search]');
+  if(s){
+    state.ddSearch[s.dataset.ddSearch] = e.target.value;
+    if(s.dataset.ddSearch === 'yl') renderYLDropdown();
+    return;
+  }
+
+  if(e.target.classList.contains('var-input')){
+    const raw = e.target.value;
+    const clean = raw.replace(/[^0-9]/g, '').slice(0, 5);
+    if(clean !== raw){
+      const pos = Math.max(0, (e.target.selectionStart || 0) - (raw.length - clean.length));
+      e.target.value = clean;
+      try{ e.target.setSelectionRange(pos, pos); }catch(_){}
+    }
+    updateInputTotal();
+  }
+});
+
+// Close DD outside
+document.addEventListener('mousedown', e => {
+  if(!e.target.closest('.dd') && !e.target.closest('[data-dd-item]')) closeAllDD();
+});
+document.addEventListener('touchstart', e => {
+  if(!e.target.closest('.dd') && !e.target.closest('[data-dd-item]')) closeAllDD();
+}, { passive:true });
+
+// Esc
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    if(document.querySelector('.dd.open')) closeAllDD();
+    else closeAllSheets();
+  }
+});
+
+// Theme + refresh
+$('btnTheme').addEventListener('click', ()=>{
+  haptic(10);
+  const cur = document.documentElement.getAttribute('data-theme');
+  state.settings.theme = cur === 'dark' ? 'light' : 'dark';
+  applyTheme();
+  saveSettings();
+  if(state.activeTab === 'set') renderMain();
+});
+$('btnRefresh').addEventListener('click', ()=>{ haptic(10); refreshAll(); showToast('Data dimuat ulang'); });
+
+/* ==================================================================
+   INIT
+================================================================== */
+async function init(){
+  loadSettings();
+  applyTheme();
+  const records = await idbGetAll();
+  records.forEach(r=>{ state.historyCache[r.date] = r.dataByTKU; });
+  const today = dateKey(new Date());
+  state.currentDate = today;
+  const rec = await idbGet(today);
+  state.dataByTKU = rec ? JSON.parse(JSON.stringify(rec.dataByTKU)) : {};
+  refreshAll();
+}
+
+init();
+</script>
+</body>
+</html>
