@@ -25,6 +25,7 @@ const Icons = {
 const homeMenu = [
     { id: 'yakult-dashboard', label: 'Yakult Dashboard', img: '/assets/menu/yakult-dashboard.png' },    { id: 'penjualan',   label: 'Penjualan',   img: '/assets/menu/penjualan.png' },
     { id: 'inputpjl',    label: 'Input PJL',   img: '/assets/menu/inputpjl.png' },
+    { id: 'apk-tukar-botol', label: 'Tukar Botol', img: '/assets/menu/pointplg.png' },
     { id: 'yakult-lady', label: 'Yakult Lady', img: '/assets/menu/yakult-lady.png' },
     { id: 'kompensasi',  label: 'Kompensasi',  img: '/assets/menu/kompensasi.png' },
     { id: 'seragam',     label: 'Seragam',     img: '/assets/menu/seragam.png' },
@@ -41,7 +42,6 @@ const reportMenu = [
     { id: 'lap-mingguan-staf', label: 'Lap. Mingguan Staf', icon: 'chart',  grad: 'from-indigo-500 to-indigo-600' },
     { id: 'lap-mingguan-ceko', label: 'Lap. Mingguan Ceko', icon: 'chart',  grad: 'from-violet-500 to-violet-600' },
     { id: 'lap-join-ceko',     label: 'Lap. Join Ceko',     icon: 'doc',    grad: 'from-fuchsia-500 to-fuchsia-600' },
-    { id: 'apk-tukar-botol',   label: 'Tukar Botol',        icon: 'bottle', grad: 'from-teal-500 to-teal-600' },
     { id: 'informasi',         label: 'Informasi',          icon: 'info',   grad: 'from-sky-500 to-sky-600' },
     { id: 'report',            label: 'Report',             icon: 'doc',    grad: 'from-slate-500 to-slate-600' },
 ];

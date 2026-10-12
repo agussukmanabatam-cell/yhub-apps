@@ -233,7 +233,7 @@
         @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
 
         /* ============================================================
-           PODIUM TOP 3 — LAYOUT BARU YANG MEGAH
+           PODIUM TOP 3
            ============================================================ */
         .podium-wrapper {
             position: relative;
@@ -262,7 +262,6 @@
         .podium-card:hover { transform: translateY(-4px); }
         .podium-card:active { transform: scale(.97); }
 
-        /* Peringkat 1 — Tengah, paling tinggi */
         .podium-1 {
             background: linear-gradient(160deg, #fef3c7 0%, #fde68a 55%, #fbbf24 100%);
             border-color: #f59e0b;
@@ -288,7 +287,6 @@
             }
         }
 
-        /* Peringkat 2 — Kiri */
         .podium-2 {
             background: linear-gradient(160deg, #f8fafc 0%, #e2e8f0 100%);
             border-color: #94a3b8;
@@ -298,7 +296,6 @@
             padding-top: 26px;
         }
 
-        /* Peringkat 3 — Kanan */
         .podium-3 {
             background: linear-gradient(160deg, #fed7aa 0%, #fdba74 100%);
             border-color: #ea580c;
@@ -308,7 +305,6 @@
             padding-top: 26px;
         }
 
-        /* Crown untuk juara 1 */
         .podium-1 .crown {
             position: absolute;
             top: -22px;
@@ -324,7 +320,6 @@
             50% { transform: translateX(-50%) translateY(-4px) rotate(6deg); }
         }
 
-        /* Avatar medal */
         .podium-avatar {
             width: 52px;
             height: 52px;
@@ -354,7 +349,6 @@
             background: linear-gradient(135deg, #ea580c, #c2410c);
         }
 
-        /* Badge rank di atas avatar */
         .podium-rank-badge {
             position: absolute;
             top: -6px;
@@ -376,7 +370,6 @@
         .podium-2 .podium-rank-badge { color: #64748b; }
         .podium-3 .podium-rank-badge { color: #c2410c; }
 
-        /* Nama YL */
         .podium-name {
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 12px;
@@ -395,7 +388,6 @@
         }
         .podium-1 .podium-name { font-size: 14px; color: #78350f; }
 
-        /* Point value */
         .podium-point {
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 18px;
@@ -420,7 +412,6 @@
             margin-top: 1px;
         }
 
-        /* Info tambahan (pelanggan) */
         .podium-info {
             font-size: 9px;
             font-weight: 700;
@@ -437,7 +428,6 @@
             color: #78350f;
         }
 
-        /* Base/pedestal di bawah podium */
         .podium-base {
             position: relative;
             height: 18px;
@@ -447,7 +437,6 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,.05);
         }
 
-        /* Sparkle background untuk juara 1 */
         .podium-1::before,
         .podium-1::after {
             content: '✨';
@@ -577,7 +566,6 @@
             margin-top: 2px;
         }
 
-        /* Progress bar relatif ke #1 */
         .leader-progress {
             height: 4px;
             border-radius: 999px;
@@ -596,7 +584,6 @@
             background: rgba(219,39,119,.2);
         }
 
-        /* Achievement badge */
         .achievement-badge {
             display: inline-flex;
             align-items: center;
@@ -612,7 +599,6 @@
         .achievement-top-customer { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
         .achievement-top-efficiency { background: linear-gradient(135deg, #10b981, #059669); color: white; }
 
-        /* Highlight "YOU" */
         .leader-row.is-me {
             border-color: #db2777;
             background: linear-gradient(135deg, #fff1f2 0%, #fce7f3 100%);
@@ -724,21 +710,113 @@
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 -mt-2 sm:mt-4 w-full pb-6">
 
-        <!-- TAB SWITCHER -->
+        <!-- TAB SWITCHER — Leaderboard dipindah ke depan -->
         <div class="tab-switcher ripple-effect-btn mb-3" id="tabSwitcher">
             <div class="tab-indicator" id="tabIndicator"></div>
-            <button id="tabBtnPelanggan" onclick="switchTab('pelanggan', this)" class="tab-btn active" data-tab="pelanggan">
-                <i class="fa-solid fa-users"></i>
-                <span>Pelanggan</span>
-            </button>
-            <button id="tabBtnLeaderboard" onclick="switchTab('leaderboard', this)" class="tab-btn" data-tab="leaderboard">
+            <button id="tabBtnLeaderboard" onclick="switchTab('leaderboard', this)" class="tab-btn active" data-tab="leaderboard">
                 <i class="fa-solid fa-trophy"></i>
                 <span>Leaderboard YL</span>
             </button>
+            <button id="tabBtnPelanggan" onclick="switchTab('pelanggan', this)" class="tab-btn" data-tab="pelanggan">
+                <i class="fa-solid fa-users"></i>
+                <span>Pelanggan</span>
+            </button>
         </div>
 
-        <!-- ============ TAB: PELANGGAN ============ -->
-        <div id="tabContentPelanggan" class="tab-panel active">
+        <!-- ============ TAB: LEADERBOARD (SEKARANG DI DEPAN) ============ -->
+        <div id="tabContentLeaderboard" class="tab-panel active">
+
+            <!-- ===== HEADER STATS ===== -->
+            <div class="bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 rounded-3xl p-4 sm:p-5 shadow-sm border-2 border-amber-200/60 mb-4 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-300/30 to-transparent rounded-full -mr-12 -mt-12 pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-300/30 to-transparent rounded-full -ml-8 -mb-8 pointer-events-none"></div>
+
+                <div class="relative">
+                    <div class="flex items-start justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-amber-400 via-amber-500 to-orange-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-300/50 flex-shrink-0">
+                                <i class="fa-solid fa-trophy text-xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-base sm:text-lg font-black text-amber-950 font-poppins tracking-tight">Leaderboard YL</h2>
+                                <p class="text-[10px] sm:text-[11px] text-amber-700 font-semibold mt-0.5">Ranking Point (60%) + Pelanggan (40%)</p>
+                            </div>
+                        </div>
+                        <button onclick="shareLeaderboard()" class="px-3 py-2 bg-white text-amber-700 hover:bg-amber-100 border-2 border-amber-300 rounded-xl font-bold text-[11px] shadow-sm flex items-center gap-1.5 flex-shrink-0 btn-tactile">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                            <span class="hidden sm:inline">Bagikan</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-2.5 border border-amber-200 text-center shadow-sm">
+                            <div class="flex items-center justify-center gap-1 mb-1">
+                                <i class="fa-solid fa-users text-[10px] text-amber-600"></i>
+                                <p class="text-[9px] text-amber-700 font-bold uppercase tracking-wide">Total YL</p>
+                            </div>
+                            <p id="statLeaderTotalYL" class="text-xl font-black text-amber-900 tabular-nums">0</p>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-2.5 border border-amber-200 text-center shadow-sm">
+                            <div class="flex items-center justify-center gap-1 mb-1">
+                                <i class="fa-solid fa-coins text-[10px] text-pink-500"></i>
+                                <p class="text-[9px] text-amber-700 font-bold uppercase tracking-wide">Point</p>
+                            </div>
+                            <p id="statLeaderTotalPoint" class="text-xl font-black text-brand-600 tabular-nums">0</p>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-2.5 border border-amber-200 text-center shadow-sm">
+                            <div class="flex items-center justify-center gap-1 mb-1">
+                                <i class="fa-solid fa-crown text-[10px] text-amber-600"></i>
+                                <p class="text-[9px] text-amber-700 font-bold uppercase tracking-wide">Top YL</p>
+                            </div>
+                            <p id="statLeaderTopName" class="text-[11px] font-black text-amber-900 truncate leading-tight">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PODIUM TOP 3 ===== -->
+            <div id="podiumContainer" class="podium-wrapper mb-4 hidden">
+                <div class="podium-grid" id="podiumGrid"></div>
+                <div class="podium-base"></div>
+            </div>
+
+            <!-- ===== LIST RANKING 4+ ===== -->
+            <div id="leaderboardList" class="space-y-2.5"></div>
+
+            <!-- Skeleton -->
+            <div id="leaderboardSkeleton" class="space-y-2.5">
+                <div class="bg-white rounded-2xl p-4 border border-slate-200">
+                    <div class="flex gap-3">
+                        <div class="skeleton w-12 h-12 rounded-2xl"></div>
+                        <div class="flex-1">
+                            <div class="skeleton h-4 w-40 mb-2"></div>
+                            <div class="skeleton h-3 w-24"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 border border-slate-200">
+                    <div class="flex gap-3">
+                        <div class="skeleton w-12 h-12 rounded-2xl"></div>
+                        <div class="flex-1">
+                            <div class="skeleton h-4 w-40 mb-2"></div>
+                            <div class="skeleton h-3 w-24"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty -->
+            <div id="leaderboardEmpty" class="hidden py-12 text-center bg-white rounded-2xl border border-slate-200/80">
+                <div class="w-16 h-16 bg-gradient-to-br from-amber-100 to-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h4 class="text-sm font-bold text-slate-700">Belum Ada Data YL</h4>
+                <p class="text-[11px] text-slate-400 max-w-xs mx-auto mt-1">Sync data dari Google Sheets untuk melihat leaderboard.</p>
+            </div>
+        </div>
+
+        <!-- ============ TAB: PELANGGAN (SEKARANG DI BELAKANG) ============ -->
+        <div id="tabContentPelanggan" class="tab-panel">
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-3">
                 <div class="stat-card">
@@ -863,102 +941,6 @@
                     <h4 class="text-xs font-bold text-slate-700">Data Tidak Ditemukan</h4>
                     <p class="text-[10px] text-slate-400 max-w-xs mx-auto mt-0.5">Coba sesuaikan kata kunci pencarian atau ubah filter Center & YL Anda.</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- ============ TAB: LEADERBOARD (REDESIGN) ============ -->
-        <div id="tabContentLeaderboard" class="tab-panel">
-
-            <!-- ===== HEADER STATS ===== -->
-            <div class="bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 rounded-3xl p-4 sm:p-5 shadow-sm border-2 border-amber-200/60 mb-4 relative overflow-hidden">
-                <!-- Dekorasi background -->
-                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-300/30 to-transparent rounded-full -mr-12 -mt-12 pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-300/30 to-transparent rounded-full -ml-8 -mb-8 pointer-events-none"></div>
-
-                <div class="relative">
-                    <div class="flex items-start justify-between gap-3 mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-amber-400 via-amber-500 to-orange-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-300/50 flex-shrink-0">
-                                <i class="fa-solid fa-trophy text-xl"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-base sm:text-lg font-black text-amber-950 font-poppins tracking-tight">Leaderboard YL</h2>
-                                <p class="text-[10px] sm:text-[11px] text-amber-700 font-semibold mt-0.5">Ranking Point (60%) + Pelanggan (40%)</p>
-                            </div>
-                        </div>
-                        <button onclick="shareLeaderboard()" class="px-3 py-2 bg-white text-amber-700 hover:bg-amber-100 border-2 border-amber-300 rounded-xl font-bold text-[11px] shadow-sm flex items-center gap-1.5 flex-shrink-0 btn-tactile">
-                            <i class="fa-brands fa-whatsapp text-sm"></i>
-                            <span class="hidden sm:inline">Bagikan</span>
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-2.5 border border-amber-200 text-center shadow-sm">
-                            <div class="flex items-center justify-center gap-1 mb-1">
-                                <i class="fa-solid fa-users text-[10px] text-amber-600"></i>
-                                <p class="text-[9px] text-amber-700 font-bold uppercase tracking-wide">Total YL</p>
-                            </div>
-                            <p id="statLeaderTotalYL" class="text-xl font-black text-amber-900 tabular-nums">0</p>
-                        </div>
-                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-2.5 border border-amber-200 text-center shadow-sm">
-                            <div class="flex items-center justify-center gap-1 mb-1">
-                                <i class="fa-solid fa-coins text-[10px] text-pink-500"></i>
-                                <p class="text-[9px] text-amber-700 font-bold uppercase tracking-wide">Point</p>
-                            </div>
-                            <p id="statLeaderTotalPoint" class="text-xl font-black text-brand-600 tabular-nums">0</p>
-                        </div>
-                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-2.5 border border-amber-200 text-center shadow-sm">
-                            <div class="flex items-center justify-center gap-1 mb-1">
-                                <i class="fa-solid fa-crown text-[10px] text-amber-600"></i>
-                                <p class="text-[9px] text-amber-700 font-bold uppercase tracking-wide">Top YL</p>
-                            </div>
-                            <p id="statLeaderTopName" class="text-[11px] font-black text-amber-900 truncate leading-tight">-</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===== PODIUM TOP 3 ===== -->
-            <div id="podiumContainer" class="podium-wrapper mb-4 hidden">
-                <div class="podium-grid" id="podiumGrid">
-                    <!-- Diisi JS -->
-                </div>
-                <div class="podium-base"></div>
-            </div>
-
-            <!-- ===== LIST RANKING 4+ ===== -->
-            <div id="leaderboardList" class="space-y-2.5">
-            </div>
-
-            <!-- Skeleton -->
-            <div id="leaderboardSkeleton" class="space-y-2.5">
-                <div class="bg-white rounded-2xl p-4 border border-slate-200">
-                    <div class="flex gap-3">
-                        <div class="skeleton w-12 h-12 rounded-2xl"></div>
-                        <div class="flex-1">
-                            <div class="skeleton h-4 w-40 mb-2"></div>
-                            <div class="skeleton h-3 w-24"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl p-4 border border-slate-200">
-                    <div class="flex gap-3">
-                        <div class="skeleton w-12 h-12 rounded-2xl"></div>
-                        <div class="flex-1">
-                            <div class="skeleton h-4 w-40 mb-2"></div>
-                            <div class="skeleton h-3 w-24"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty -->
-            <div id="leaderboardEmpty" class="hidden py-12 text-center bg-white rounded-2xl border border-slate-200/80">
-                <div class="w-16 h-16 bg-gradient-to-br from-amber-100 to-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
-                    <i class="fa-solid fa-trophy"></i>
-                </div>
-                <h4 class="text-sm font-bold text-slate-700">Belum Ada Data YL</h4>
-                <p class="text-[11px] text-slate-400 max-w-xs mx-auto mt-1">Sync data dari Google Sheets untuk melihat leaderboard.</p>
             </div>
         </div>
 
@@ -1262,7 +1244,7 @@
         let activeCustomerDetailItem = null;
         let selectedRewardItem = null;
         let activeRewardTabFilter = 'eligible';
-        let activeTab = 'pelanggan';
+        let activeTab = 'leaderboard'; // ✅ Default tab = leaderboard
         let deferredInstallPrompt = null;
 
         let selectedCenterValue = '';
@@ -1597,18 +1579,19 @@
             activeTab = tab;
             if (btnEl) createRipple(btnEl);
 
+            // ✅ Indicator: leaderboard = default (kiri), pelanggan = kanan
             const indicator = document.getElementById('tabIndicator');
-            if (tab === 'leaderboard') indicator.classList.add('right');
+            if (tab === 'pelanggan') indicator.classList.add('right');
             else indicator.classList.remove('right');
 
             const btnPelanggan = document.getElementById('tabBtnPelanggan');
             const btnLeaderboard = document.getElementById('tabBtnLeaderboard');
-            if (tab === 'pelanggan') {
-                btnPelanggan.classList.add('active');
-                btnLeaderboard.classList.remove('active');
-            } else {
+            if (tab === 'leaderboard') {
                 btnLeaderboard.classList.add('active');
                 btnPelanggan.classList.remove('active');
+            } else {
+                btnPelanggan.classList.add('active');
+                btnLeaderboard.classList.remove('active');
             }
 
             const panelPelanggan = document.getElementById('tabContentPelanggan');
@@ -1618,10 +1601,10 @@
 
             const newPanel = tab === 'pelanggan' ? panelPelanggan : panelLeaderboard;
             if (tab === 'pelanggan') {
-                newPanel.classList.add('slide-right');
+                newPanel.classList.add('slide-left');
                 renderTable();
             } else {
-                newPanel.classList.add('slide-left');
+                newPanel.classList.add('slide-right');
                 renderLeaderboard();
             }
             void newPanel.offsetWidth;
@@ -1882,7 +1865,7 @@
         }
 
         // ============================================================
-        // LEADERBOARD RENDER — VERSI BARU DENGAN PODIUM
+        // LEADERBOARD RENDER
         // ============================================================
         function renderLeaderboard() {
             const listEl = document.getElementById('leaderboardList');
@@ -1891,7 +1874,6 @@
             const podiumContainer = document.getElementById('podiumContainer');
             const podiumGrid = document.getElementById('podiumGrid');
 
-            // Skeleton saat data belum siap
             if (leaderboardData.length === 0 && aggregatedCustomers.length === 0) {
                 skeleton.style.display = 'block';
                 listEl.innerHTML = '';
@@ -1902,7 +1884,6 @@
                 skeleton.style.display = 'none';
             }
 
-            // Update header stats
             const totalYL = leaderboardData.length;
             const totalPoint = leaderboardData.reduce((s, l) => s + l.totalPoint, 0);
             const topName = leaderboardData.length > 0 ? leaderboardData[0].yl : '-';
@@ -1918,39 +1899,32 @@
             }
             empty.classList.add('hidden');
 
-            // ====== PODIUM TOP 3 ======
             if (leaderboardData.length >= 3) {
                 podiumContainer.classList.remove('hidden');
                 renderPodium(leaderboardData.slice(0, 3), podiumGrid);
-                // List mulai dari rank 4
                 renderLeaderList(leaderboardData.slice(3), listEl, 4);
             } else if (leaderboardData.length > 0) {
-                // Kurang dari 3 YL — gak pakai podium, langsung list
                 podiumContainer.classList.add('hidden');
                 renderLeaderList(leaderboardData, listEl, 1);
             }
         }
 
-        // ====== Render Podium ======
         function renderPodium(top3, container) {
             const [first, second, third] = top3;
             const medalEmoji = ['🥇', '🥈', '🥉'];
 
-            // Urutan visual: [2] [1] [3]
             container.innerHTML = `
                 ${buildPodiumCard(second, 2, medalEmoji[1])}
                 ${buildPodiumCard(first, 1, medalEmoji[0])}
                 ${buildPodiumCard(third, 3, medalEmoji[2])}
             `;
 
-            // Efek tambahan: click to see details? (opsional)
             container.querySelectorAll('.podium-card').forEach((card, idx) => {
-                const orderIdx = [2, 1, 3][idx] - 1; // 2 → index 1, 1 → index 0, 3 → index 2
+                const orderIdx = [2, 1, 3][idx] - 1;
                 const data = top3[orderIdx];
                 if (data) {
                     card.style.cursor = 'pointer';
                     card.addEventListener('click', () => {
-                        // Bisa tambahkan detail YL di sini
                         showToast(`${data.yl} — ${fmtNum(data.totalPoint)} Point`);
                     });
                 }
@@ -1985,7 +1959,6 @@
             `;
         }
 
-        // ====== Render List Rank 4+ ======
         function renderLeaderList(data, container, startRank) {
             if (data.length === 0) {
                 container.innerHTML = '';
@@ -1993,7 +1966,7 @@
             }
 
             const maxScore = leaderboardData[0]?.score || 1;
-            const currentYLFilter = selectedYLValue; // untuk highlight "YOU"
+            const currentYLFilter = selectedYLValue;
 
             let html = '';
             data.forEach((l, i) => {
@@ -2065,7 +2038,7 @@
             if (leaderboardData.length > 10) {
                 text += `_...dan ${leaderboardData.length - 10} YL lainnya_\n\n`;
             }
-            text += `━━━━━━━━━━━━━━━━━\n`;
+            text += `━━━━━━━━━━━━━━━\n`;
             text += `_ayo semangat kumpulkan point!_ 💪`;
 
             const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
