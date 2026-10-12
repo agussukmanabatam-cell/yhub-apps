@@ -497,12 +497,15 @@ body {
    ============================================================ */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
 }
 .card-grid.list-view {
   grid-template-columns: 1fr;
   gap: 10px;
+}
+@media (min-width: 1024px) {
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }
 
 /* ============================================================
@@ -1366,7 +1369,7 @@ body.dark .pdf-fallback p { color: #94a3b8; }
       <div class="stat-label">Di Kategori</div>
     </div>
     <div class="stat-box">
-      <div class="stat-value" id="statSlots">0/6</div>
+      <div class="stat-value" id="statSlots">0/10</div>
       <div class="stat-label">Slot Terisi</div>
     </div>
   </div>
@@ -1576,8 +1579,11 @@ const firebaseConfig = {
 
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'informasi-bdl-app';
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzl8jq2GA6KA7TyVXTvj281QbNU6ojhcZ2jGXGzOS6Ly6c6e2J0gihTyfg2IbKH8mbS/exec";
-const ADMIN_PASSWORD = "Yakult27";
-const TOTAL_SLOTS = 6;
+const ADMIN_PASSWORD = "Yakult2027";
+
+/* ==== 10 SLOT PER KATEGORI ==== */
+const TOTAL_SLOTS = 10;
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const LOCAL_KEY = 'bdl_slots_offline_v6';
 const LS_DARK = 'bdl_dark';
@@ -1587,10 +1593,22 @@ const LS_SLOT_LABELS = 'bdl_slot_labels';
 const SESSION_MINUTES = 30;
 
 const SLOT_LABELS_DEFAULT = {
-  memo: ['Memo Utama', 'Memo Terbaru', 'Arsip Memo', 'Referensi', 'Dokumen Pendukung', 'Lainnya'],
-  project: ['Project Aktif', 'Rencana Project', 'Laporan', 'Dokumentasi', 'Referensi', 'Arsip'],
-  news: ['News Terbaru', 'News Update', 'Buletin', 'Pengumuman', 'Press Release', 'Arsip News'],
-  kompetisi: ['Kompetisi Aktif', 'Klasemen', 'Aturan', 'Pengumuman', 'Dokumentasi', 'Arsip']
+  memo: [
+    'Memo Utama', 'Memo Terbaru', 'Arsip Memo', 'Referensi',
+    'Dokumen Pendukung', 'Lainnya', 'Slot 7', 'Slot 8', 'Slot 9', 'Slot 10'
+  ],
+  project: [
+    'Project Aktif', 'Rencana Project', 'Laporan', 'Dokumentasi',
+    'Referensi', 'Arsip', 'Slot 7', 'Slot 8', 'Slot 9', 'Slot 10'
+  ],
+  news: [
+    'News Terbaru', 'News Update', 'Buletin', 'Pengumuman',
+    'Press Release', 'Arsip News', 'Slot 7', 'Slot 8', 'Slot 9', 'Slot 10'
+  ],
+  kompetisi: [
+    'Kompetisi Aktif', 'Klasemen', 'Aturan', 'Pengumuman',
+    'Dokumentasi', 'Arsip', 'Slot 7', 'Slot 8', 'Slot 9', 'Slot 10'
+  ]
 };
 
 /* ============================================================
@@ -1891,7 +1909,7 @@ function buildFileCard(slot, item, idx) {
   if (state.bulkMode) card.classList.add('bulk-mode');
   const isSelected = state.selected.has(slot);
   if (isSelected) card.classList.add('selected');
-  card.style.animationDelay = (idx * 0.04) + 's';
+  card.style.animationDelay = (idx * 0.03) + 's';
   card.dataset.slot = slot;
 
   const badgeClass = isPdf ? 'pdf' : 'image';
@@ -1942,7 +1960,7 @@ function buildFileCard(slot, item, idx) {
 function buildEmptyCard(slot, idx) {
   const card = document.createElement('div');
   card.className = 'empty-card';
-  card.style.animationDelay = (idx * 0.04) + 's';
+  card.style.animationDelay = (idx * 0.03) + 's';
   card.onclick = () => requestUpload(slot);
   card.innerHTML = `
     <div class="empty-icon"><i class="ph ph-upload-simple"></i></div>
