@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="id" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#E43147">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Product Knowledge App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        yakult: {
+                            red: '#E43147', purple: '#7B61FF', green: '#38A169',
+                            blue: '#4299E1', darkblue: '#2B6CB0', orange: '#ED8936',
+                            pink: '#ED64A6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+        .dark body { background-color: #111827; }
+
+        #app-container {
+            width: 100%; max-width: 414px; height: 100vh; max-height: 896px;
+            background-color: #ffffff; position: relative; overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: background-color 0.3s ease;
+        }
+        .dark #app-container { background-color: #1f2937; box-shadow: none; }
+
+        @media (min-width: 768px) {
+            #app-container { max-width: 100%; height: 100vh; max-height: none; border-radius: 0; border: none; }
+        }
+
+        .scrollable-area {
+            overflow-y: auto; height: 100%; padding-bottom: 2rem; scroll-behavior: smooth;
+        }
+        .scrollable-area::-webkit-scrollbar { width: 6px; }
+        .scrollable-area::-webkit-scrollbar-track { background: transparent; }
+        .scrollable-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark .scrollable-area::-webkit-scrollbar-thumb { background: #4b5563; }
+
+        .accordion-content {
+            display: grid; grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .accordion-content.open { grid-template-rows: 1fr; }
+        .accordion-inner { overflow: hidden; }
+
+        .chevron { transition: transform 0.35s ease; }
+        .chevron.rotate { transform: rotate(180deg); }
+
+        .view-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+        .dark .view-layer { background: #1f2937; }
+        .view-hidden-right { transform: translateX(100%); }
+        .view-hidden-left { transform: translateX(-100%); }
+        .view-active { transform: translateX(0); }
+
+        .card-bg-icon {
+            position: absolute; bottom: -10px; right: -10px;
+            font-size: 5rem; color: rgba(255, 255, 255, 0.1);
+            transform: rotate(-15deg); animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes float {
+            0% { transform: rotate(-15deg) translateY(0); }
+            50% { transform: rotate(-15deg) translateY(-8px); }
+            100% { transform: rotate(-15deg) translateY(0); }
+        }
+
+        .flip-card { perspective: 1000px; width: 100%; height: 320px; }
+        .flip-card-inner {
+            position: relative; width: 100%; height: 100%; text-align: left;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .flip-card-front { background-color: white; }
+        .dark .flip-card-front { background-color: #374151; }
+        .flip-card-back { transform: rotateY(180deg); background-color: white; overflow-y: auto; }
+        .dark .flip-card-back { background-color: #374151; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; opacity: 0;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(228, 49, 71, 0.2);
+            border-color: #E43147;
+        }
+        .dark .search-input:focus { box-shadow: 0 0 0 3px rgba(228, 49, 71, 0.3); }
+
+        .bookmark-btn.active { color: #FBBF24; }
+        .bookmark-btn.active i { font-weight: 900; }
+
+        /* Refresh color button spin animation */
+        @keyframes spinOnce {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spin-once { animation: spinOnce 0.6s ease; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- HOME VIEW -->
+        <div id="view-home" class="view-layer view-active flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+            <header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-4 flex items-center justify-between sticky top-0 z-20 shadow-sm border-b border-gray-100 dark:border-gray-700">
+                <div class="flex items-center">
+                    <button aria-label="Menu" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <h1 class="text-xl font-bold ml-2">Product Knowledge</h1>
+                </div>
+                <div class="flex items-center gap-1">
+                    <!-- Refresh Colors Button -->
+                    <button id="refreshColorsBtn" aria-label="Acak ulang warna" title="Acak ulang warna card"
+                            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        <i class="fa-solid fa-palette text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" aria-label="Toggle dark mode"
+                            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        <i class="fa-solid fa-moon text-gray-600 dark:text-yellow-400"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="px-4 pt-4 pb-2 bg-gray-50 dark:bg-gray-900 z-10">
+                <div class="relative">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="searchInput" placeholder="Cari pertanyaan..."
+                           class="search-input w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none transition-all duration-200 text-sm">
+                </div>
+            </div>
+
+            <main class="scrollable-area p-4 bg-gray-50 dark:bg-gray-900">
+                <div id="cards-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <!-- Cards injected by JS -->
+                </div>
+                <div id="emptySearch" class="hidden text-center py-10 opacity-0 transition-opacity duration-300">
+                    <i class="fa-solid fa-magnifying-glass text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium">Pertanyaan tidak ditemukan</p>
+                    <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">Coba kata kunci lain ya kawan</p>
+                </div>
+            </main>
+        </div>
+
+        <!-- DETAIL VIEW -->
+        <div id="view-detail" class="view-layer view-hidden-right flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+            <header id="detail-header" class="text-white p-4 flex items-center sticky top-0 z-20 shadow-sm transition-colors duration-300">
+                <button onclick="goBack()" aria-label="Kembali"
+                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition">
+                    <i class="fa-solid fa-arrow-left text-xl"></i>
+                </button>
+                <h1 id="detail-header-title" class="text-lg font-semibold ml-2 truncate">Title</h1>
+            </header>
+
+            <main class="scrollable-area flex-1 relative">
+                <div id="detail-header-bg" class="absolute top-0 left-0 w-full h-40 z-0 transition-colors duration-300 rounded-b-[2.5rem]"></div>
+
+                <div class="relative z-10 px-4 pt-6">
+                    <div id="detail-hero" class="mb-6"></div>
+                    <div id="faq-list" class="flex flex-col gap-3 pb-8"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // DATA STRUKTUR APLIKASI
+        // (bgClass & headerColor TIDAK didefinisikan di sini lagi,
+        //  akan di-assign random via colorPalette di bawah)
+        // ============================================================
+        const appData = [
+            {
+                id: 'cat1',
+                title: '10 Pertanyaan ke-1',
+                tags: ['10 soal', 'Mudah'],
+                icon: 'fa-clipboard-question',
+                detail: {
+                    heroIcon: 'fa-circle-question',
+                    heroTitle: 'FAQ Seputar Yakult',
+                    heroSubtitle: 'Pertanyaan yang sering ditanyakan',
+                    useNumbers: true,
+                    faqs: [
+                        { q: 'Bolehkah orang yang menderita maag minum Yakult?', a: 'Boleh. Yakult aman diminum oleh orang sakit maag. Tetapi bila maag-nya parah disarankan konsultasi ke dokter.' },
+                        { q: 'Yakult boleh diminum mulai usia berapa?', a: 'Yakult sudah boleh diminum sejak usia bayi yang sudah mendapat makanan tambahan, yaitu kira-kira usia 6 bulanan, dengan pemberian secara bertahap (sedikit-sedikit).' },
+                        { q: 'Bolehkah penderita diabetes minum Yakult?', a: 'Boleh. Yakult boleh diminum oleh penderita diabetes. Gula yang terkandung dalam Yakult sebesar 10g. Tetapi bila diabetesnya parah, disarankan konsultasi ke dokter.' },
+                        { q: 'Berapa botol minum Yakult setiap harinya?', a: 'Minimal 1 botol secara rutin setiap hari untuk menjaga keseimbangan bakteri baik di dalam usus.' },
+                        { q: 'Apa beda Yakult dengan produk lain?', a: 'Yakult yang saya tahu:<br>1. Mengandung lebih dari 6,5 milyar bakteri L. casei Shirota strain yang mampu hidup sampai usus kita.<br>2. Terbukti aman &amp; bermanfaat memperbaiki sistem pencernaan.<br>3. Tanpa bahan pengawet dan pewarna.<br>4. Minuman Internasional yang sudah ada di 40 negara.' },
+                        { q: 'Bolehkah ibu hamil/menyusui minum Yakult?', a: 'Boleh. Yakult sangat dianjurkan diminum oleh ibu hamil, karena Yakult membantu menjaga keseimbangan bakteri baik yang sangat dibutuhkan.' },
+                        { q: 'Bolehkah orang diare minum Yakult?', a: 'Boleh. Saat diare, jumlah bakteri baik di dalam usus menurun sehingga keseimbangannya terganggu. Minum Yakult membantu memasukkan kembali bakteri baik L. casei Shirota strain ke dalam usus. Namun bila diarenya parah atau berkepanjangan, disarankan segera konsultasi ke dokter.' },
+                        { q: 'Adakah efek samping minum Yakult yang tidak dingin?', a: 'Tidak ada efek samping. Yakult boleh diminum dalam keadaan dingin maupun tidak dingin (suhu ruang). Bakteri LcS tetap aman dikonsumsi. Yang perlu dihindari adalah terkena sinar matahari langsung atau dipanaskan, karena dapat menurunkan jumlah bakteri hidup di dalamnya.' },
+                        { q: 'Berapa lama masa kedaluwarsa Yakult?', a: 'Masa kedaluwarsa Yakult tercantum pada tutup botol. Umumnya sekitar 40 hari sejak tanggal produksi, selama disimpan di lemari pendingin (suhu di bawah 10°C) dan tidak terkena sinar matahari langsung.' },
+                        { q: 'Kapan waktu yang tepat minum Yakult?', a: 'Tidak ada aturan khusus mengenai waktu minum Yakult. Yang terpenting adalah diminum secara rutin setiap hari, minimal 1 botol. Waktu favorit sebagian orang adalah pagi hari sebelum makan atau malam hari sebelum tidur, namun kapan pun tetap baik untuk tubuh.' }
+                    ]
+                }
+            },
+            {
+                id: 'cat2',
+                title: '10 Pertanyaan ke-2',
+                tags: ['10 soal', 'Lanjutan'],
+                icon: 'fa-box-archive',
+                detail: {
+                    heroIcon: 'fa-clipboard-list',
+                    heroTitle: 'FAQ Seputar Yakult',
+                    heroSubtitle: 'Kenali lebih dalam tentang Yakult',
+                    useNumbers: false,
+                    faqs: [
+                        { icon: 'fa-bottle-water', q: 'Apakah Yakult itu?', a: 'Yakult adalah minuman susu fermentasi yang baik untuk kesehatan. Satu botol Yakult berisi lebih dari 6,5 milyar bakteri L. casei Shirota strain yang hidup dan bermanfaat bagi kesehatan pencernaan.' },
+                        { icon: 'fa-heart-pulse', q: 'Mengapa usus itu penting?', a: 'Usus adalah tempat yang penting untuk menyerap gizi makanan yang kita perlukan untuk dapat terus hidup sehat. Selain itu, sebagian besar sel kekebalan tubuh juga berada di usus, sehingga kesehatan usus sangat mempengaruhi kesehatan tubuh secara keseluruhan.' },
+                        { icon: 'fa-hand-holding-heart', q: 'Apa manfaat Yakult?', a: '1. Membantu mencegah gangguan pencernaan.<br>2. Membantu meningkatkan jumlah bakteri berguna dalam usus.<br>3. Membantu menekan jumlah bakteri yang merugikan dalam usus.' },
+                        { icon: 'fa-microscope', q: 'Mengapa bakteri L. casei Shirota strain dapat mencapai usus kita dalam keadaan hidup?', a: 'Karena bakteri L. casei Shirota strain kuat dan tahan terhadap asam lambung dan cairan empedu, sehingga dapat melewati saluran pencernaan bagian atas dan tiba di usus dalam keadaan hidup.' },
+                        { icon: 'fa-calendar-check', q: 'Mengapa perlu minum Yakult setiap hari?', a: 'Jumlah bakteri baik di dalam usus terus berkurang setiap hari akibat pola makan yang kurang baik, stres, konsumsi obat-obatan, dan faktor usia. Karena itu, bakteri baik perlu dipasok setiap hari agar keseimbangan flora usus tetap terjaga. Minum Yakult minimal 1 botol setiap hari secara rutin adalah cara termudah.' },
+                        { icon: 'fa-pills', q: 'Apakah orang yang sedang minum obat juga boleh minum Yakult?', a: 'Pada dasarnya boleh. Namun sebaiknya beri jeda sekitar 1-2 jam antara minum obat dan minum Yakult. Untuk kondisi tertentu seperti sedang mengonsumsi antibiotik atau obat penyakit berat, sebaiknya konsultasikan terlebih dahulu ke dokter.' },
+                        { icon: 'fa-user', q: 'Apakah orang dewasa perlu minum Yakult?', a: 'Perlu. Orang dewasa juga mengalami penurunan jumlah bakteri baik di usus akibat kesibukan, pola makan tidak teratur, stres, dan penuaan. Minum Yakult setiap hari membantu menjaga keseimbangan bakteri baik sehingga pencernaan dan daya tahan tubuh tetap terjaga.' },
+                        { icon: 'fa-lemon', q: 'Mengapa Yakult rasanya asam?', a: 'Rasa asam Yakult berasal dari proses fermentasi. Bakteri L. casei Shirota strain mengubah gula menjadi asam laktat. Asam laktat inilah yang menciptakan rasa asam segar yang khas sekaligus berperan menekan pertumbuhan bakteri merugikan di dalam usus.' },
+                        { icon: 'fa-wine-bottle', q: 'Mengapa botol Yakult kecil?', a: 'Botol Yakult berukuran 65 ml dirancang sebagai satu porsi sekali minum, sehingga isinya dapat langsung habis dan tidak terkontaminasi. Ukuran ini juga sudah cukup untuk memasukkan lebih dari 6,5 milyar bakteri baik ke dalam tubuh, mudah digenggam anak-anak maupun dewasa, serta efisien dalam pengemasan dan distribusi.' },
+                        { icon: 'fa-clock', q: 'Mengapa masa kedaluwarsa Yakult itu singkat?', a: 'Karena Yakult tidak menggunakan bahan pengawet dan berisi bakteri hidup yang masih aktif. Masa kedaluwarsa sekitar 40 hari sejak tanggal produksi dan harus disimpan di lemari pendingin agar bakteri LcS tetap hidup dan bermanfaat saat diminum.' }
+                    ]
+                }
+            },
+            {
+                id: 'cat3',
+                title: 'Cintai Ususmu',
+                tags: ['Edukasi', 'Kesehatan'],
+                icon: 'fa-heart-circle-check',
+                detail: {
+                    heroIcon: 'fa-heart-pulse',
+                    heroTitle: 'Cintai Ususmu',
+                    heroSubtitle: 'Kesehatan berawal dari usus yang sehat',
+                    useNumbers: true,
+                    faqs: [
+                        { q: 'Apa maksud "Cintai Ususmu"?', a: 'Cintai ususmu adalah pesan baru dari Yakult yang berhubungan dengan kesehatan kita. Kesehatan kita berawal dari usus yang menyerap gizi yang diperlukan oleh tubuh.' },
+                        { q: 'Mengapa kita harus mencintai usus?', a: 'Karena usus adalah organ yang sangat penting di dalam tubuh manusia. Usus menyerap gizi yang diperlukan, kemudian merubahnya menjadi energi. Bila usus tidak sehat, penyerapan gizi terganggu sehingga tubuh mudah lemas dan sakit.' },
+                        { q: 'Bagaimana caranya mencintai usus kita?', a: 'Dengan merawatnya setiap hari, misalkan makan &amp; olahraga secara teratur, istirahat yang cukup, banyak minum air putih, serta minum Yakult setiap hari untuk menjaga keseimbangan bakteri baik di dalam usus.' },
+                        { q: 'Apa bukti dengan minum Yakult setiap hari, usus menjadi sehat?', a: 'Bakteri L. casei Shirota strain terbukti secara ilmiah mampu bertahan hidup melewati asam lambung dan cairan empedu, lalu mencapai usus dalam keadaan hidup. Di dalam usus, bakteri ini membantu meningkatkan jumlah bakteri berguna dan menekan bakteri merugikan. Manfaat ini didukung oleh berbagai penelitian ilmiah.' },
+                        { q: 'Berapa lama saya minum Yakult agar usus menjadi sehat?', a: 'Yakult sebaiknya diminum setiap hari secara rutin, bukan hanya ketika merasa sakit. Karena bakteri baik di usus berkurang setiap hari, dianjurkan minum minimal 1 botol setiap hari secara berkelanjutan agar keseimbangan bakteri baik di usus tetap terjaga.' }
+                    ]
+                }
+            },
+            {
+                id: 'cat4',
+                title: '10 Pertanyaan Tambahan',
+                tags: ['Bonus', 'Senin'],
+                icon: 'fa-plus-square',
+                detail: {
+                    heroIcon: 'fa-lightbulb',
+                    heroTitle: 'Fakta Menarik Yakult',
+                    heroSubtitle: 'Hal-hal yang perlu kamu tahu tentang Yakult',
+                    useNumbers: true,
+                    faqs: [
+                        { q: 'Siapa penemu bakteri Yakult?', a: 'Penemu bakteri Yakult adalah Dr. Minoru Shirota, seorang ilmuwan berkebangsaan Jepang. Beliau berhasil mengkulturkan bakteri asam laktat yang kuat dan tahan terhadap asam lambung, yang kemudian diberi nama L. casei Shirota strain.' },
+                        { q: 'Sejak kapan Yakult dipasarkan?', a: '- Di Jepang: tahun 1935<br>- Di Indonesia: tahun 1991' },
+                        { q: 'Di mana letak/lokasi pabrik PT Yakult Indonesia Persada?', a: '- Lokasi Pertama: di Sukabumi, Jawa Barat<br>- Lokasi Kedua: di Mojokerto, Jawa Timur' },
+                        { q: 'Bagaimana warna Yakult terbentuk?', a: 'Warna Yakult terbentuk dari proses produksi, pada tahap pemanasan susu bubuk skim dan dekstrosa. Reaksi pemanasan inilah yang menghasilkan warna khas Yakult. Yakult tidak menggunakan bahan pewarna tambahan.' },
+                        { q: 'Apa arti fermentasi?', a: 'Fermentasi adalah proses penguraian gula menjadi asam atau alkohol dengan bantuan mikroorganisme seperti bakteri dan ragi. Pada Yakult, bakteri L. casei Shirota strain memfermentasi gula menjadi asam laktat, sehingga terbentuk rasa asam yang khas dan bermanfaat bagi usus.' },
+                        { q: 'Kenapa bentuk botol Yakult unik?', a: 'Bentuk botol Yakult yang menyerupai jam pasir dirancang agar mudah digenggam oleh siapa saja, termasuk anak-anak dan orang dewasa, mudah dibuka, serta efisien dalam penataan dan distribusi. Botolnya juga dapat didaur ulang.' },
+                        { q: 'Berapa berat (kg) bakteri di tubuh manusia?', a: 'Diperkirakan terdapat sekitar 100 triliun sel bakteri yang hidup di dalam tubuh manusia dengan berat kurang lebih 1-2 kg. Sebagian besar bakteri tersebut berada di dalam usus besar.' },
+                        { q: 'Berapa panjang usus manusia?', a: 'Usus halus manusia memiliki panjang sekitar 6-7 meter, sedangkan usus besar sekitar 1,5 meter. Jadi total panjang usus manusia kurang lebih 8-9 meter.' },
+                        { q: 'Di mana Yakult bekerja di tubuh manusia?', a: 'Yakult bekerja di dalam usus, yaitu di usus halus dan usus besar. Di sanalah bakteri L. casei Shirota strain membantu menjaga keseimbangan bakteri baik sehingga penyerapan gizi berjalan lebih optimal.' },
+                        { q: 'Apa yang dimaksud Probiotik?', a: 'Probiotik adalah bakteri baik yang hidup. Apabila dikonsumsi dalam jumlah yang cukup, probiotik terbukti dapat memberikan manfaat kesehatan bagi tubuh.' }
+                    ]
+                }
+            },
+            {
+                id: 'cat5',
+                title: 'Info Yakult Light',
+                tags: ['Rendah gula'],
+                icon: 'fa-sun',
+                detail: {
+                    heroIcon: 'fa-bottle-water',
+                    heroTitle: 'Tanya Jawab Yakult Light',
+                    heroSubtitle: '7 pertanyaan seputar Yakult Light',
+                    useNumbers: true,
+                    faqs: [
+                        { q: 'Mengapa Yakult Light lebih sedikit gula daripada Yakult Original tetapi lebih mahal?', a: 'Sesuai target produk rendah kalori namun tetap memberikan rasa manis yang mirip dengan Yakult Original, sehingga terdapat beberapa penambahan bahan baku.' },
+                        { q: 'Mengapa ada penambahan Vitamin D dan E? Lalu, apa manfaat dari Vitamin D dan E?', a: 'Vitamin D &amp; E adalah bagian vitamin yang dibutuhkan oleh tubuh. Vitamin D bermanfaat untuk kesehatan tulang dan gigi serta membantu penyerapan kalsium. Vitamin E bermanfaat untuk kesehatan kulit dan sebagai antioksidan yang membantu menjaga daya tahan tubuh.' },
+                        { q: 'Berapa banyak kandungan gula dalam Yakult Original dan Yakult Light?', a: 'Yakult Original mengandung sekitar 10 gram gula, sedangkan Yakult Light sekitar 3 gram. Keduanya aman dikonsumsi sesuai anjuran.' },
+                        { q: 'Bolehkah penderita diabetes minum Yakult Light?', a: 'Boleh, karena kandungan gulanya jauh lebih sedikit dibandingkan Yakult Original. Namun bila kondisi diabetesnya parah, disarankan untuk berkonsultasi terlebih dahulu ke dokter.' },
+                        { q: 'Bolehkah anak-anak juga minum Yakult Light?', a: 'Boleh. Yakult Light aman dikonsumsi anak-anak. Untuk bayi, Yakult sudah boleh diberikan sejak usia sekitar 6 bulan (setelah mendapat makanan tambahan) dengan pemberian secara bertahap dan sedikit-sedikit.' },
+                        { q: 'Apakah penderita maag boleh minum Yakult Light?', a: 'Boleh. Yakult Light aman diminum oleh penderita maag. Namun bila maagnya parah, disarankan untuk konsultasi ke dokter terlebih dahulu.' },
+                        { q: 'Apakah boleh minum Yakult Light lebih dari 1 botol per hari?', a: 'Boleh. Anjuran minimal adalah 1 botol setiap hari, dan boleh lebih dari itu. Namun sebaiknya dikonsumsi sesuai kebutuhan dan tidak berlebihan.' }
+                    ]
+                }
+            },
+            {
+                id: 'cat6',
+                title: 'Yakult Rasa Mangga',
+                tags: ['Baru'],
+                icon: 'fa-lemon',
+                detail: {
+                    heroIcon: 'fa-apple-whole',
+                    heroTitle: 'Segar & Bernutrisi',
+                    heroSubtitle: 'Dengan Vitamin D & Bakteri LcS',
+                    useNumbers: true,
+                    faqs: [
+                        { q: 'Mengapa pilihannya menggunakan Rasa Mangga?', a: 'Karena buah mangga menjadi salah satu buah yang familiar dan banyak disukai masyarakat Indonesia. Selain mudah ditemukan, rasa mangga yang manis dan segar juga disukai oleh berbagai kalangan usia.' },
+                        { q: 'Yakult rasa Mangga menggunakan rasa dari Mangga murni atau buatan?', a: 'Yakult rasa Mangga menggunakan perisa identik alami dari buah mangga yang aman dikonsumsi, sehingga memberikan rasa mangga yang khas dan menyegarkan.' },
+                        { q: 'Apa beda Yakult rasa Mangga dengan Yakult Original dan Light?', a: 'Yakult rasa Mangga sama dengan Yakult Original, tetapi ada penambahan Vitamin D dan rasa Mangga. Sedangkan Yakult Light memiliki kandungan gula yang lebih sedikit, yaitu sekitar 3 gram.' },
+                        { q: 'Bolehkah Ibu Hamil atau Menyusui minum Yakult?', a: 'Boleh. Yakult bahkan sangat dianjurkan untuk ibu hamil dan menyusui, karena membantu menjaga keseimbangan bakteri baik di dalam usus yang sangat dibutuhkan pada masa kehamilan dan menyusui.' }
+                    ]
+                }
+            },
+            {
+                id: 'cat7',
+                title: 'QnA Yakult Stroberi',
+                tags: ['Baru', 'Flip Card'],
+                icon: 'fa-seedling',
+                isFlipCard: true,
+                detail: {
+                    heroIcon: 'fa-leaf',
+                    heroTitle: 'Kenalan Sama Rasa Stroberi',
+                    heroSubtitle: 'Tap kartu untuk lihat jawaban lengkapnya',
+                    tags: ['1 Topik', 'Yakult Stroberi'],
+                    useNumbers: true,
+                    faqs: [
+                        {
+                            q: 'Kenapa Yakult rasa Stroberi?',
+                            a: '<div class="text-[#D53F8C] font-bold mb-4 border-b border-gray-100 dark:border-gray-600 pb-3 flex justify-between items-center"><span class="flex items-center gap-2"><i class="fa-solid fa-book-open"></i> Panduan Jawaban</span> <i class="fa-solid fa-rotate-right text-gray-400"></i></div><p class="mb-3 text-gray-700 dark:text-gray-300">Terima kasih Bapak/Ibu sudah rutin mengonsumsi Yakult.</p><p class="mb-2 text-gray-700 dark:text-gray-300">Varian Rasa Stroberi dihadirkan karena:</p><ol class="list-decimal pl-4 space-y-2 text-gray-700 dark:text-gray-300"><li>Berdasarkan hasil survei, terdapat permintaan yang tinggi dari pelanggan terhadap varian rasa stroberi.</li><li>Stroberi merupakan rasa buah yang disukai oleh semua usia.</li></ol>'
+                        }
+                    ]
+                }
+            },
+            {
+                id: 'cat8',
+                title: 'Hafalan Probiotik',
+                tags: ['Flashcard', '6 soal'],
+                icon: 'fa-brain',
+                detail: {
+                    heroIcon: 'fa-shield-virus',
+                    heroTitle: 'Sahabat Probiotikmu',
+                    heroSubtitle: 'Kenali si baik yang bekerja untuk pencernaanmu',
+                    tags: ['6 Topik', 'Probiotik & Yakult'],
+                    useNumbers: false,
+                    faqs: [
+                        { icon: 'fa-circle-question', q: 'Apa yang dimaksud dengan Probiotik?', a: 'Probiotik merupakan bakteri baik yang hidup. Apabila dikonsumsi dalam jumlah yang cukup terbukti dapat memberi manfaat kesehatan.' },
+                        { icon: 'fa-trash-can', q: 'Kenapa Yakult merupakan minuman Probiotik?', a: 'Karena bakteri baik LcS yang hidup terbukti aman untuk dikonsumsi dan memberikan manfaat kesehatan.' },
+                        { icon: 'fa-flask', q: 'Apakah semua bakteri baik merupakan Probiotik?', a: 'Tidak, bakteri disebut sebagai Probiotik jika terbukti secara ilmiah aman dan memberikan manfaat bagi kesehatan.' },
+                        { icon: 'fa-hand-holding-heart', q: 'Apa manfaat utama Probiotik bagi tubuh?', a: 'Manfaat utama Probiotik adalah membantu menjaga keseimbangan bakteri baik di dalam usus, membantu mencegah gangguan pencernaan, membantu penyerapan gizi makanan, serta membantu menjaga daya tahan tubuh.' },
+                        { icon: 'fa-shield-heart', q: 'Apakah ada efek samping dari konsumsi Probiotik setiap hari?', a: 'Tidak ada. Probiotik seperti L. casei Shirota strain aman dikonsumsi setiap hari, tidak menimbulkan efek samping, dan tidak menimbulkan ketergantungan.' },
+                        { icon: 'fa-circle-check', q: 'Mengapa kita perlu mengonsumsi Probiotik?', a: 'Karena jumlah bakteri baik di dalam usus terus berkurang setiap hari akibat pola makan yang kurang baik, stres, konsumsi obat-obatan, dan faktor usia. Dengan mengonsumsi Probiotik setiap hari, keseimbangan bakteri baik di usus tetap terjaga sehingga tubuh tetap sehat.' }
+                    ]
+                }
+            }
+        ];
+
+        // ============================================================
+        // COLOR PALETTE (OPSI B)
+        // ============================================================
+        const colorPalette = [
+            { bg: 'bg-gradient-to-br from-[#E43147] to-[#B91C2E]', header: 'bg-[#E43147]' }, // Merah
+            { bg: 'bg-gradient-to-br from-[#7B61FF] to-[#5A45CE]', header: 'bg-[#7B61FF]' }, // Ungu
+            { bg: 'bg-gradient-to-br from-[#38A169] to-[#276749]', header: 'bg-[#38A169]' }, // Hijau
+            { bg: 'bg-gradient-to-br from-[#4299E1] to-[#2B6CB0]', header: 'bg-[#3182CE]' }, // Biru
+            { bg: 'bg-gradient-to-br from-[#ED8936] to-[#C05621]', header: 'bg-[#DD6B20]' }, // Orange
+            { bg: 'bg-gradient-to-br from-[#ED64A6] to-[#B83280]', header: 'bg-[#D53F8C]' }, // Pink
+            { bg: 'bg-gradient-to-br from-[#ECC94B] to-[#D69E2E]', header: 'bg-[#D69E2E]' }, // Kuning
+            { bg: 'bg-gradient-to-br from-[#9F7AEA] to-[#6B46C1]', header: 'bg-[#805AD5]' }, // Violet
+            { bg: 'bg-gradient-to-br from-[#48BB78] to-[#2F855A]', header: 'bg-[#38A169]' }, // Hijau muda
+            { bg: 'bg-gradient-to-br from-[#F56565] to-[#C53030]', header: 'bg-[#E53E3E]' }, // Merah muda
+            { bg: 'bg-gradient-to-br from-[#00B5D8] to-[#0987A0]', header: 'bg-[#00A3C4]' }, // Cyan
+            { bg: 'bg-gradient-to-br from-[#667EEA] to-[#4C51BF]', header: 'bg-[#5A67D8]' }, // Indigo
+        ];
+
+        // ============================================================
+        // COLOR ASSIGNMENT LOGIC
+        // ============================================================
+        const COLOR_STORAGE_KEY = 'yakult_color_assignments_v1';
+
+        // Shuffle array (Fisher-Yates)
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // Assign warna random ke tiap kategori (acak sekali, simpan di localStorage)
+        function assignColors(forceReshuffle = false) {
+            let assignments = JSON.parse(localStorage.getItem(COLOR_STORAGE_KEY) || 'null');
+
+            if (!assignments || forceReshuffle) {
+                // Buat urutan warna yang di-shuffle, lalu map ke tiap kategori
+                const shuffledIndices = shuffleArray(colorPalette.map((_, i) => i));
+                assignments = {};
+                appData.forEach((cat, idx) => {
+                    assignments[cat.id] = shuffledIndices[idx % shuffledIndices.length];
+                });
+                localStorage.setItem(COLOR_STORAGE_KEY, JSON.stringify(assignments));
+            }
+
+            // Terapkan ke appData
+            appData.forEach(cat => {
+                const colorIdx = assignments[cat.id] ?? 0;
+                cat.bgClass = colorPalette[colorIdx].bg;
+                cat.headerColor = colorPalette[colorIdx].header;
+            });
+        }
+
+        // Ambil objek warna untuk 1 kategori
+        function getColorForCategory(catId) {
+            const cat = appData.find(c => c.id === catId);
+            return cat ? { bg: cat.bgClass, header: cat.headerColor } : colorPalette[0];
+        }
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        let currentOpenAccordionIndex = null;
+        let bookmarks = JSON.parse(localStorage.getItem('yakult_bookmarks')) || [];
+        let lastQuery = ''; // fix bug: simpan query search terakhir
+
+        // DOM Elements
+        const cardsGrid = document.getElementById('cards-grid');
+        const viewHome = document.getElementById('view-home');
+        const viewDetail = document.getElementById('view-detail');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const refreshColorsBtn = document.getElementById('refreshColorsBtn');
+        const searchInput = document.getElementById('searchInput');
+        const emptySearch = document.getElementById('emptySearch');
+
+        const detailHeader = document.getElementById('detail-header');
+        const detailHeaderTitle = document.getElementById('detail-header-title');
+        const detailHeaderBg = document.getElementById('detail-header-bg');
+        const detailHero = document.getElementById('detail-hero');
+        const faqList = document.getElementById('faq-list');
+
+        // ============================================================
+        // DARK MODE
+        // ============================================================
+        function initDarkMode() {
+            if (localStorage.getItem('theme') === 'dark' ||
+                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                darkModeToggle.innerHTML = '<i class="fa-solid fa-sun text-yellow-400"></i>';
+            } else {
+                document.documentElement.classList.remove('dark');
+                darkModeToggle.innerHTML = '<i class="fa-solid fa-moon text-gray-600"></i>';
+            }
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                darkModeToggle.innerHTML = '<i class="fa-solid fa-sun text-yellow-400"></i>';
+            } else {
+                localStorage.setItem('theme', 'light');
+                darkModeToggle.innerHTML = '<i class="fa-solid fa-moon text-gray-600"></i>';
+            }
+        });
+
+        // ============================================================
+        // REFRESH COLORS BUTTON
+        // ============================================================
+        refreshColorsBtn.addEventListener('click', () => {
+            assignColors(true); // force reshuffle
+            // Animasi spin
+            const icon = refreshColorsBtn.querySelector('i');
+            icon.classList.add('spin-once');
+            setTimeout(() => icon.classList.remove('spin-once'), 600);
+            // Re-render home dengan query terakhir
+            renderHome(filterByQuery(lastQuery));
+        });
+
+        // ============================================================
+        // FILTER HELPER
+        // ============================================================
+        function filterByQuery(query) {
+            const q = (query || '').toLowerCase().trim();
+            if (!q) return appData;
+            return appData.filter(cat =>
+                cat.title.toLowerCase().includes(q) ||
+                cat.tags.some(tag => tag.toLowerCase().includes(q)) ||
+                cat.detail.faqs.some(faq => faq.q.toLowerCase().includes(q))
+            );
+        }
+
+        // ============================================================
+        // RENDER HOME
+        // ============================================================
+        function renderHome(dataToRender = appData) {
+            cardsGrid.innerHTML = '';
+
+            if (dataToRender.length === 0) {
+                emptySearch.classList.remove('hidden');
+                setTimeout(() => emptySearch.classList.remove('opacity-0'), 10);
+                return;
+            } else {
+                emptySearch.classList.add('opacity-0');
+                setTimeout(() => emptySearch.classList.add('hidden'), 300);
+            }
+
+            dataToRender.forEach((cat, index) => {
+                const tagsHTML = cat.tags.map(tag =>
+                    `<span class="bg-white/20 text-white text-[10px] px-2 py-1 rounded-full font-medium backdrop-blur-sm shadow-sm">${tag}</span>`
+                ).join('');
+
+                const hasBookmark = bookmarks.some(b => b.catId === cat.id);
+                const bookmarkBadge = hasBookmark ?
+                    `<div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 rounded-full w-6 h-6 flex items-center justify-center shadow-md z-20"><i class="fa-solid fa-star text-[10px]"></i></div>` : '';
+
+                const cardHTML = `
+                    <div onclick="openDetail('${cat.id}')"
+                         class="${cat.bgClass} card-responsive-height rounded-2xl p-4 relative overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 active:scale-95 group card-hover animate-fade-in-up"
+                         style="animation-delay: ${index * 50}ms;">
+                        ${bookmarkBadge}
+                        <h2 class="text-white font-bold text-sm sm:text-base leading-tight mb-2 relative z-10 pr-6">${cat.title}</h2>
+                        <div class="flex flex-wrap gap-1 relative z-10">
+                            ${tagsHTML}
+                        </div>
+                        <i class="fa-solid ${cat.icon} card-bg-icon"></i>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                `;
+                cardsGrid.innerHTML += cardHTML;
+            });
+        }
+
+        // ============================================================
+        // SEARCH
+        // ============================================================
+        searchInput.addEventListener('input', (e) => {
+            lastQuery = e.target.value;
+            renderHome(filterByQuery(lastQuery));
+        });
+
+        // ============================================================
+        // OPEN DETAIL
+        // ============================================================
+        function openDetail(categoryId) {
+            const data = appData.find(c => c.id === categoryId);
+            if (!data) return;
+
+            currentOpenAccordionIndex = null;
+
+            // Ambil warna yang sudah di-assign ke kategori ini
+            const color = getColorForCategory(categoryId);
+
+            // Setup Header & Background pakai warna dari card yang diklik
+            detailHeader.className = `text-white p-4 flex items-center sticky top-0 z-20 shadow-sm transition-colors duration-300 ${color.header}`;
+            detailHeaderBg.className = `absolute top-0 left-0 w-full h-40 z-0 transition-colors duration-300 rounded-b-[2.5rem] ${color.header}`;
+            detailHeaderTitle.innerText = data.title;
+
+            // Hero Section
+            let heroTags = '';
+            if (data.tags.length > 0) {
+                heroTags = data.tags.map(tag =>
+                    `<span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-medium backdrop-blur-sm flex items-center gap-1 border border-white/10">
+                        <i class="fa-solid fa-tag text-[10px]"></i> ${tag}
+                    </span>`
+                ).join('');
+            }
+
+            detailHero.innerHTML = `
+                <div class="flex items-start mb-2">
+                    <div class="bg-white/20 p-2.5 rounded-xl text-white mr-3 backdrop-blur-sm shadow-sm">
+                         <i class="fa-solid ${data.detail.heroIcon} text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-bold text-xl drop-shadow-md">${data.detail.heroTitle}</h2>
+                        <p class="text-white/90 text-sm drop-shadow-md">${data.detail.heroSubtitle}</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-4">
+                    ${heroTags}
+                </div>
+            `;
+
+            // FAQ List
+            faqList.innerHTML = '';
+
+            if (data.isFlipCard) {
+                data.detail.faqs.forEach((faq, index) => {
+                    const itemHTML = `
+                        <div class="flip-card cursor-pointer group mt-2" onclick="this.classList.toggle('flipped')">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-gradient-to-br from-[#ED64A6] to-[#D53F8C] p-6 flex flex-col justify-center items-center text-center text-white">
+                                    <div class="w-16 h-16 rounded-full bg-white text-[#D53F8C] font-bold text-3xl flex items-center justify-center mb-6 shadow-md">${index + 1}</div>
+                                    <h3 class="font-bold text-xl leading-snug px-4">${faq.q}</h3>
+                                    <div class="absolute bottom-6 right-6 text-white text-sm flex items-center gap-2 opacity-80">
+                                        <i class="fa-solid fa-hand-pointer"></i> tap
+                                    </div>
+                                </div>
+                                <div class="flip-card-back bg-white dark:bg-gray-700 p-6 flex flex-col border border-pink-100 dark:border-gray-600 rounded-2xl">
+                                    <div class="text-sm leading-relaxed h-full flex flex-col text-gray-700 dark:text-gray-200">
+                                        ${faq.a}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    faqList.innerHTML += itemHTML;
+                });
+            } else {
+                data.detail.faqs.forEach((faq, index) => {
+                    let leftBadge = '';
+                    if (data.detail.useNumbers) {
+                        leftBadge = `<div class="${color.header} w-8 h-8 rounded-lg text-white flex items-center justify-center text-sm font-bold shrink-0 shadow-sm">${index + 1}</div>`;
+                    } else {
+                        leftBadge = `<div class="${color.header} w-8 h-8 rounded-lg text-white flex items-center justify-center text-sm shrink-0 shadow-sm"><i class="fa-solid ${faq.icon || 'fa-circle-question'}"></i></div>`;
+                    }
+
+                    const isBookmarked = bookmarks.some(b => b.catId === categoryId && b.index === index);
+                    const bookmarkIcon = isBookmarked ? 'fa-solid fa-bookmark text-yellow-500' : 'fa-regular fa-bookmark text-gray-300 dark:text-gray-500';
+
+                    const itemHTML = `
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow duration-200">
+                            <div class="w-full flex items-start gap-3 p-4">
+                                ${leftBadge}
+                                <div class="flex-1 cursor-pointer" onclick="toggleAccordion(${index})">
+                                    <span class="font-semibold text-gray-800 dark:text-gray-100 text-sm leading-snug pr-1 block mb-1">${faq.q}</span>
+                                    <span class="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium">Pertanyaan ${index + 1}</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-2 shrink-0">
+                                    <button onclick="toggleBookmark('${categoryId}', ${index}, this)" class="bookmark-btn w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition ${isBookmarked ? 'active' : ''}">
+                                        <i class="${bookmarkIcon} text-sm"></i>
+                                    </button>
+                                    <button onclick="toggleAccordion(${index})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                        <i id="chevron-${index}" class="fa-solid fa-chevron-down text-gray-400 dark:text-gray-500 text-xs chevron"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="content-${index}" class="accordion-content">
+                                <div class="accordion-inner">
+                                    <div class="px-4 pb-4">
+                                        <div class="border-t border-gray-100 dark:border-gray-700 pt-3 text-sm text-gray-600 dark:text-gray-300 leading-relaxed pl-[2.75rem]">
+                                            ${faq.a}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    faqList.innerHTML += itemHTML;
+                });
+            }
+
+            viewHome.classList.remove('view-active');
+            viewHome.classList.add('view-hidden-left');
+            viewDetail.classList.remove('view-hidden-right');
+            viewDetail.classList.add('view-active');
+
+            document.querySelector('#view-detail .scrollable-area').scrollTop = 0;
+        }
+
+        // ============================================================
+        // BOOKMARK
+        // ============================================================
+        function toggleBookmark(catId, index, btnElement) {
+            const existingIndex = bookmarks.findIndex(b => b.catId === catId && b.index === index);
+
+            if (existingIndex > -1) {
+                bookmarks.splice(existingIndex, 1);
+                btnElement.classList.remove('active');
+                btnElement.innerHTML = '<i class="fa-regular fa-bookmark text-gray-300 dark:text-gray-500 text-sm"></i>';
+            } else {
+                bookmarks.push({ catId, index });
+                btnElement.classList.add('active');
+                btnElement.innerHTML = '<i class="fa-solid fa-bookmark text-yellow-500 text-sm"></i>';
+            }
+
+            localStorage.setItem('yakult_bookmarks', JSON.stringify(bookmarks));
+        }
+
+        // ============================================================
+        // GO BACK
+        // ============================================================
+        function goBack() {
+            viewDetail.classList.remove('view-active');
+            viewDetail.classList.add('view-hidden-right');
+            viewHome.classList.remove('view-hidden-left');
+            viewHome.classList.add('view-active');
+
+            // Re-render home untuk update bookmark badge,
+            // tapi tetap hormati query search terakhir
+            renderHome(filterByQuery(lastQuery));
+        }
+
+        // ============================================================
+        // ACCORDION
+        // ============================================================
+        function toggleAccordion(index) {
+            const content = document.getElementById(`content-${index}`);
+            const chevron = document.getElementById(`chevron-${index}`);
+            if (!content || !chevron) return;
+
+            if (currentOpenAccordionIndex === index) {
+                content.classList.remove('open');
+                chevron.classList.remove('rotate');
+                currentOpenAccordionIndex = null;
+                return;
+            }
+
+            if (currentOpenAccordionIndex !== null) {
+                const prevContent = document.getElementById(`content-${currentOpenAccordionIndex}`);
+                const prevChevron = document.getElementById(`chevron-${currentOpenAccordionIndex}`);
+                if (prevContent) prevContent.classList.remove('open');
+                if (prevChevron) prevChevron.classList.remove('rotate');
+            }
+
+            content.classList.add('open');
+            chevron.classList.add('rotate');
+            currentOpenAccordionIndex = index;
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initDarkMode();
+            assignColors();       // assign warna random (sekali, disimpan)
+            renderHome();
+        });
+
+    </script>
+</body>
+</html>
