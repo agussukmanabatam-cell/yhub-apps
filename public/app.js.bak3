@@ -43,6 +43,7 @@ const reportMenu = [
     { id: 'lap-mingguan-ceko', label: 'Lap. Mingguan Ceko', icon: 'chart',  grad: 'from-violet-500 to-violet-600' },
     { id: 'lap-join-ceko',     label: 'Lap. Join Ceko',     icon: 'doc',    grad: 'from-fuchsia-500 to-fuchsia-600' },
     { id: 'informasi',         label: 'Informasi',          icon: 'info',   grad: 'from-sky-500 to-sky-600' },
+    { id: 'produk-khowledge',  label: 'Produk Knowledge',   icon: 'doc',    grad: 'from-emerald-500 to-emerald-600' },
     { id: 'report',            label: 'Report',             icon: 'doc',    grad: 'from-slate-500 to-slate-600' },
 ];
 
@@ -219,6 +220,7 @@ const APP_PATHS = {
     'lap-join-ceko':     '/apps/laporan-join-ceko.html',
     'apk-tukar-botol':   '/apps/pointplg.html',
     'informasi':         '/apps/Informasibdl.html',
+    'produk-khowledge':  '/apps/produk-khowledge.html',
     'report':            '/apps/report.html',
     'inputpjl':          '/apps/inputpjl.html',
 };
