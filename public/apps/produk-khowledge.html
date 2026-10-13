@@ -125,12 +125,93 @@
         .bookmark-btn.active { color: #FBBF24; }
         .bookmark-btn.active i { font-weight: 900; }
 
-        /* Refresh color button spin animation */
         @keyframes spinOnce {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
         .spin-once { animation: spinOnce 0.6s ease; }
+
+        /* ===== QUIZ STYLES ===== */
+        .quiz-option {
+            transition: all 0.2s ease;
+        }
+        .quiz-option:hover:not(.disabled) {
+            transform: translateX(4px);
+        }
+        .quiz-option.selected {
+            border-color: #7B61FF;
+            background-color: rgba(123, 97, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(123, 97, 255, 0.15);
+        }
+        .dark .quiz-option.selected {
+            background-color: rgba(123, 97, 255, 0.15);
+        }
+        .quiz-option.correct {
+            border-color: #38A169;
+            background-color: rgba(56, 161, 105, 0.1);
+        }
+        .dark .quiz-option.correct {
+            background-color: rgba(56, 161, 105, 0.2);
+        }
+        .quiz-option.wrong {
+            border-color: #E43147;
+            background-color: rgba(228, 49, 71, 0.1);
+        }
+        .dark .quiz-option.wrong {
+            background-color: rgba(228, 49, 71, 0.2);
+        }
+        .quiz-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+
+        .option-badge {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            font-weight: 700; font-size: 14px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .dark .progress-bar { background: #374151; }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7B61FF, #ED64A6);
+            border-radius: 999px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes scoreReveal {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .score-reveal { animation: scoreReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti-piece {
+            position: fixed;
+            width: 10px; height: 10px;
+            animation: confettiFall 2.5s ease-in forwards;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* Quiz start screen icon pulse */
+        @keyframes quizPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        .quiz-pulse { animation: quizPulse 2s ease-in-out infinite; }
     </style>
 </head>
 <body>
@@ -146,12 +227,10 @@
                     <h1 class="text-xl font-bold ml-2">Product Knowledge</h1>
                 </div>
                 <div class="flex items-center gap-1">
-                    <!-- Refresh Colors Button -->
-                    <button id="refreshColorsBtn" aria-label="Acak ulang warna" title="Acak ulang warna card"
+                    <button id="refreshColorsBtn" aria-label="Acak ulang warna"
                             class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                         <i class="fa-solid fa-palette text-gray-600 dark:text-gray-300"></i>
                     </button>
-                    <!-- Dark Mode Toggle -->
                     <button id="darkModeToggle" aria-label="Toggle dark mode"
                             class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                         <i class="fa-solid fa-moon text-gray-600 dark:text-yellow-400"></i>
@@ -198,13 +277,188 @@
                 </div>
             </main>
         </div>
+
+        <!-- ============================================================ -->
+        <!-- QUIZ START VIEW -->
+        <!-- ============================================================ -->
+        <div id="view-quiz-start" class="view-layer view-hidden-right flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+            <header class="bg-[#7B61FF] text-white p-4 flex items-center sticky top-0 z-20 shadow-sm">
+                <button onclick="closeQuiz()" aria-label="Tutup"
+                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition">
+                    <i class="fa-solid fa-arrow-left text-xl"></i>
+                </button>
+                <h1 class="text-lg font-semibold ml-2">Kuis Probiotik "ini hanya latihan" bukan soal sebenarnya</h1>
+            </header>
+
+            <main class="scrollable-area flex-1 px-4 pt-6 pb-8">
+                <div class="text-center mb-6">
+                    <div class="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-[#7B61FF] to-[#5A45CE] flex items-center justify-center shadow-lg mb-4 quiz-pulse">
+                        <i class="fa-solid fa-brain text-white text-4xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Uji Kompetensi Probiotik</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Tingkat: <span class="font-bold text-[#E43147]">Expert</span></p>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 mb-4">
+                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-[#7B61FF]"></i> Informasi Kuis
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center"><i class="fa-solid fa-list-ol"></i></div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-white">25 Soal Pilihan Ganda</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Opsi A sampai E</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-500 flex items-center justify-center"><i class="fa-solid fa-trophy"></i></div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-white">Skor Maksimal 100</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">4 poin per jawaban benar</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-white">Level Expert</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Sertifikasi Advisor Probiotik</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/50 rounded-2xl p-4 mb-6">
+                    <div class="flex items-start gap-2">
+                        <i class="fa-solid fa-lightbulb text-yellow-500 mt-0.5"></i>
+                        <div>
+                            <p class="text-xs font-bold text-yellow-700 dark:text-yellow-400 mb-1">TIPS</p>
+                            <p class="text-xs text-yellow-800 dark:text-yellow-200 leading-relaxed">Jawab dengan teliti. Setelah memilih jawaban, kamu akan langsung melihat kunci & penjelasannya. Skor akhir muncul di halaman hasil.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="startQuiz()"
+                        class="w-full py-4 rounded-xl bg-gradient-to-r from-[#7B61FF] to-[#5A45CE] text-white font-bold text-base shadow-lg hover:shadow-xl active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play"></i> Mulai Kuis Sekarang
+                </button>
+            </main>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- QUIZ QUESTION VIEW -->
+        <!-- ============================================================ -->
+        <div id="view-quiz" class="view-layer view-hidden-right flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+            <header class="bg-[#7B61FF] text-white p-4 flex items-center sticky top-0 z-20 shadow-sm">
+                <button onclick="closeQuiz()" aria-label="Tutup kuis"
+                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                <h1 class="text-lg font-semibold ml-2">Kuis Probiotik</h1>
+                <div class="ml-auto text-sm font-medium bg-white/20 px-3 py-1 rounded-full">
+                    <span id="quiz-counter">1/25</span>
+                </div>
+            </header>
+
+            <div class="px-4 pt-3 pb-1 bg-gray-50 dark:bg-gray-900">
+                <div class="progress-bar">
+                    <div id="quiz-progress" class="progress-fill" style="width: 4%"></div>
+                </div>
+            </div>
+
+            <main class="scrollable-area flex-1 px-4 pt-4 pb-24">
+                <div id="quiz-question-container" class="animate-fade-in-up">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 mb-4">
+                        <div class="flex items-start gap-3 mb-3">
+                            <div class="bg-[#7B61FF] w-8 h-8 rounded-lg text-white flex items-center justify-center text-sm font-bold shrink-0">
+                                <span id="quiz-number">1</span>
+                            </div>
+                            <span class="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium mt-2">Soal Pilihan Ganda</span>
+                        </div>
+                        <p id="quiz-question" class="text-gray-800 dark:text-gray-100 font-semibold text-base leading-relaxed"></p>
+                    </div>
+
+                    <div id="quiz-options" class="flex flex-col gap-3"></div>
+
+                    <div id="quiz-explanation" class="hidden mt-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50">
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-info text-blue-500 mt-0.5"></i>
+                            <div>
+                                <p class="text-xs font-bold text-blue-700 dark:text-blue-300 mb-1">KUNCI JAWABAN</p>
+                                <p id="quiz-explanation-text" class="text-sm text-blue-800 dark:text-blue-200 leading-relaxed"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <div class="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 shadow-lg">
+                <button id="quiz-next-btn" onclick="nextQuestion()" disabled
+                        class="w-full py-3.5 rounded-xl bg-[#7B61FF] text-white font-semibold text-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#5A45CE] active:scale-95 flex items-center justify-center gap-2">
+                    <span id="quiz-next-text">Lanjut</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- QUIZ RESULT VIEW -->
+        <!-- ============================================================ -->
+        <div id="view-quiz-result" class="view-layer view-hidden-right flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+            <header class="bg-[#7B61FF] text-white p-4 flex items-center sticky top-0 z-20 shadow-sm">
+                <button onclick="closeQuiz()" aria-label="Tutup"
+                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                <h1 class="text-lg font-semibold ml-2">Hasil Kuis</h1>
+            </header>
+
+            <main class="scrollable-area flex-1 px-4 pt-6 pb-8">
+                <div id="result-score-card" class="score-reveal bg-gradient-to-br from-[#7B61FF] to-[#5A45CE] rounded-3xl p-6 text-white text-center shadow-lg mb-6 relative overflow-hidden">
+                    <i class="fa-solid fa-trophy absolute -right-4 -bottom-4 text-8xl text-white/10"></i>
+                    <p class="text-sm font-medium opacity-90 mb-2">Skor Kamu</p>
+                    <div class="text-6xl font-bold mb-1">
+                        <span id="result-score">0</span><span class="text-3xl opacity-70">/100</span>
+                    </div>
+                    <p id="result-grade" class="text-lg font-semibold mt-2"></p>
+                    <p id="result-message" class="text-sm opacity-90 mt-1"></p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 text-center border border-gray-100 dark:border-gray-700">
+                        <i class="fa-solid fa-circle-check text-[#38A169] text-2xl mb-2"></i>
+                        <p id="result-correct" class="text-2xl font-bold text-gray-800 dark:text-white">0</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Benar</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 text-center border border-gray-100 dark:border-gray-700">
+                        <i class="fa-solid fa-circle-xmark text-[#E43147] text-2xl mb-2"></i>
+                        <p id="result-wrong" class="text-2xl font-bold text-gray-800 dark:text-white">0</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Salah</p>
+                    </div>
+                </div>
+
+                <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-[#7B61FF]"></i> Review Jawaban
+                </h3>
+                <div id="result-review" class="flex flex-col gap-3 mb-6"></div>
+
+                <div class="flex flex-col gap-3">
+                    <button onclick="restartQuiz()"
+                            class="w-full py-3.5 rounded-xl bg-[#7B61FF] text-white font-semibold text-sm hover:bg-[#5A45CE] active:scale-95 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Ulangi Kuis
+                    </button>
+                    <button onclick="closeQuiz()"
+                            class="w-full py-3.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold text-sm hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-house"></i> Kembali ke Home
+                    </button>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script>
         // ============================================================
-        // DATA STRUKTUR APLIKASI
-        // (bgClass & headerColor TIDAK didefinisikan di sini lagi,
-        //  akan di-assign random via colorPalette di bawah)
+        // DATA FAQ (SAMA SEPERTI SEBELUMNYA)
         // ============================================================
         const appData = [
             {
@@ -381,29 +635,331 @@
         ];
 
         // ============================================================
-        // COLOR PALETTE (OPSI B)
+        // DATA KUIS — 25 SOAL EXPERT PROBIOTIK
         // ============================================================
-        const colorPalette = [
-            { bg: 'bg-gradient-to-br from-[#E43147] to-[#B91C2E]', header: 'bg-[#E43147]' }, // Merah
-            { bg: 'bg-gradient-to-br from-[#7B61FF] to-[#5A45CE]', header: 'bg-[#7B61FF]' }, // Ungu
-            { bg: 'bg-gradient-to-br from-[#38A169] to-[#276749]', header: 'bg-[#38A169]' }, // Hijau
-            { bg: 'bg-gradient-to-br from-[#4299E1] to-[#2B6CB0]', header: 'bg-[#3182CE]' }, // Biru
-            { bg: 'bg-gradient-to-br from-[#ED8936] to-[#C05621]', header: 'bg-[#DD6B20]' }, // Orange
-            { bg: 'bg-gradient-to-br from-[#ED64A6] to-[#B83280]', header: 'bg-[#D53F8C]' }, // Pink
-            { bg: 'bg-gradient-to-br from-[#ECC94B] to-[#D69E2E]', header: 'bg-[#D69E2E]' }, // Kuning
-            { bg: 'bg-gradient-to-br from-[#9F7AEA] to-[#6B46C1]', header: 'bg-[#805AD5]' }, // Violet
-            { bg: 'bg-gradient-to-br from-[#48BB78] to-[#2F855A]', header: 'bg-[#38A169]' }, // Hijau muda
-            { bg: 'bg-gradient-to-br from-[#F56565] to-[#C53030]', header: 'bg-[#E53E3E]' }, // Merah muda
-            { bg: 'bg-gradient-to-br from-[#00B5D8] to-[#0987A0]', header: 'bg-[#00A3C4]' }, // Cyan
-            { bg: 'bg-gradient-to-br from-[#667EEA] to-[#4C51BF]', header: 'bg-[#5A67D8]' }, // Indigo
+        const quizData = [
+            {
+                question: 'Mengenai viabilitas Lactobacillus casei Shirota strain (LcS) pada sistem pencernaan manusia, pernyataan mana yang paling akurat secara fisiologis?',
+                options: [
+                    'LcS harus menempel secara permanen di mukosa usus halus untuk memberikan efek probiotik jangka panjang yang berkelanjutan.',
+                    'LcS mampu bertahan hidup terhadap asam lambung dan cairan empedu, serta memberikan manfaat sementara selama perjalanannya di saluran pencernaan tanpa harus berkolonisasi permanen.',
+                    'LcS melakukan kolonisasi permanen di usus besar setelah bersaing secara ketat dengan flora patogen endogen melalui sekresi bakteriosin spesifik.',
+                    'LcS mengalami lisis total di dalam lambung dan hanya komponen dinding selnya (peptidoglikan) yang diserap untuk menstimulasi sistem imun sistemik.',
+                    'LcS berkolonisasi di lambung untuk menekan populasi Helicobacter pylori secara langsung melalui kompetisi ruang dan nutrien.'
+                ],
+                correctIndex: 1,
+                explanation: 'LcS tidak berkolonisasi permanen, tetapi mampu melewati asam lambung & empedu dalam keadaan hidup, lalu memberikan manfaat selama transit di saluran cerna.'
+            },
+            {
+                question: 'Perbedaan paling mendasar antara mekanisme kerja prebiotik (seperti inulin atau laktulosa) dengan probiotik (seperti LcS) adalah:',
+                options: [
+                    'Prebiotik adalah organisme hidup yang mendiami lumen usus, sedangkan probiotik adalah substrat nutrisi yang tidak dapat dicerna oleh enzim penjamu.',
+                    'Probiotik meningkatkan keasaman usus melalui produksi asam laktat, sementara prebiotik bekerja secara langsung sebagai antibodi humoral di mukosa usus.',
+                    'Prebiotik berfungsi sebagai substrat selektif yang menstimulasi pertumbuhan atau aktivitas bakteri baik endogen maupun eksogen, sedangkan probiotik adalah mikroorganisme hidup yang memberikan efek menguntungkan bagi host.',
+                    'Probiotik hanya aktif pada saluran pencernaan bagian atas, sedangkan prebiotik hanya dimetabolisme oleh mikroflora di sekum dan kolon distal.',
+                    'Prebiotik langsung berikatan dengan reseptor enterosit untuk mencegah adesi toksin, sedangkan probiotik berfungsi sebagai buffer pH lambung.'
+                ],
+                correctIndex: 2,
+                explanation: 'Prebiotik = substrat selektif (bukan organisme). Probiotik = mikroorganisme hidup yang menguntungkan host.'
+            },
+            {
+                question: 'Apa konsekuensi fisiologis yang paling krusial jika produk fermentasi susu probiotik disimpan pada suhu di atas 15°C hingga 25°C dalam jangka waktu tertentu?',
+                options: [
+                    'Peningkatan kecepatan fermentasi mengakibatkan penurunan pH drastis di bawah ambang batas hidup LcS, menyebabkan kematian sel bakteri (acid-induced cell death) dan hilangnya manfaat probiotik.',
+                    'Terjadi kristalisasi laktosa yang merusak membran sel bakteri secara mekanis tanpa mempengaruhi populasi total sel hidup.',
+                    'Penurunan aktivitas metabolik bakteri secara total karena memasuki fase Dormansi termal untuk melindungi DNA dari kerusakan panas.',
+                    'Peningkatan produksi vitamin B kompleks secara eksponensial yang justru membuat produk menjadi toksik bagi saluran pencernaan sensitif.',
+                    'Perubahan struktur dinding sel LcS dari gram-positif menjadi gram-negatif akibat denaturasi protein permukaan.'
+                ],
+                correctIndex: 0,
+                explanation: 'Suhu tinggi memicu fermentasi lanjut → pH turun drastis → sel bakteri mati (acid-induced cell death) → manfaat probiotik hilang.'
+            },
+            {
+                question: 'Dalam konteks pencegahan infeksi saluran pernapasan akut (ISPA) pada anak-anak berdasarkan studi klinis, jalur utama apa yang dimodulasi oleh konsumsi LcS secara rutin?',
+                options: [
+                    'Peningkatan sekresi asam lambung untuk membunuh patogen airborne yang tertelan secara tidak sengaja.',
+                    'Modulasi sistem imun mukosa melalui peningkatan produksi Sekretori IgA (sIgA) serta stimulasi aktivitas sel Natural Killer (NK) dan fagositosis makrofag.',
+                    'Penurunan permeabilitas kapiler paru melalui inhibisi langsung terhadap prostaglandin pro-inflamasi di aliran darah perifer.',
+                    'Peningkatan produksi mukus di saluran napas atas untuk menjebak partikel debu dan virus secara mekanis.',
+                    'Penekanan total populasi mikrobiota rongga mulut sehingga patogen saluran napas kehilangan media kultur.'
+                ],
+                correctIndex: 1,
+                explanation: 'LcS memodulasi imun mukosa: meningkatkan sIgA, mengaktifkan NK cell, dan memacu fagositosis makrofag — efektif cegah ISPA.'
+            },
+            {
+                question: 'Manakah dari pernyataan berikut yang paling tepat menggambarkan fenomena dysbiosis pada mikrobiota usus manusia?',
+                options: [
+                    'Kondisi di mana jumlah total bakteri di dalam usus melebihi kapasitas volume anatomis kolon manusia.',
+                    'Keadaan ketidakseimbangan komposisi mikrobiota usus, ditandai dengan penurunan keanekaragaman bakteri baik dan peningkatan populasi bakteri patogen atau proteolitik yang merugikan.',
+                    'Dominasi mutlak satu spesies bakteri menguntungkan (seperti Bifidobacterium) yang menekan fungsi fisiologis enzim pencernaan inang.',
+                    'Kegagalan usus dalam memproduksi enzim laktase yang menyebabkan intoleransi laktosa sekunder setelah dewasa.',
+                    'Penurunan sekresi empedu oleh hati akibat tidak adanya rangsangan dari bakteri anaerob fakultatif.'
+                ],
+                correctIndex: 1,
+                explanation: 'Dysbiosis = ketidakseimbangan mikrobiota: keanekaragaman baik turun, populasi patogen/proteolitik meningkat.'
+            },
+            {
+                question: 'Apa mekanisme biokimia utama yang dilakukan oleh Lactobacillus casei Shirota strain dalam menghambat pertumbuhan bakteri patogen di dalam usus?',
+                options: [
+                    'Menghasilkan antibiotik berspektrum luas seperti tetrasiklin dan amoksisilin secara fermentatif di dalam lumen usus.',
+                    'Memproduksi asam laktat dan asam organik lain yang menurunkan pH lingkungan usus, serta memproduksi senyawa antimikroba (bakteriosin) dan berkompetisi secara ketat dalam memperebutkan nutrien serta tempat melekat (site competition).',
+                    'Mengikat ion logam berat di dalam usus sehingga bakteri patogen kekurangan nutrisi esensial untuk replikasi DNA.',
+                    'Menginduksi apoptosis sel epitel usus yang telah terinfeksi oleh patogen intraseluler secara selektif.',
+                    'Mengubah struktur kimia reseptor mukosa usus secara permanen agar toksin patogen tidak dapat berikatan.'
+                ],
+                correctIndex: 1,
+                explanation: 'Mekanisme utama: produksi asam laktat & organik (turunkan pH), bakteriosin, dan site competition (rebut nutrien + tempat melekat).'
+            },
+            {
+                question: 'Mengapa pencampuran minuman probiotik hidup (seperti Yakult) dengan air atau minuman bersuhu panas (>60°C) sangat tidak dianjurkan?',
+                options: [
+                    'Suhu tinggi menyebabkan koagulasi protein susu yang kemudian mengikat seluruh vitamin dalam produk sehingga tidak dapat diserap tubuh.',
+                    'Panas ekstrim menyebabkan denaturasi protein seluler, inaktivasi enzim internal esensial, dan kerusakan integritas membran sel bakteri hidup, berakibat pada kematian sel (inviabilitas).',
+                    'Suhu panas memicu reaksi Maillard antara laktosa dan asam amino yang menghasilkan senyawa mutagenik berbahaya bagi mukosa lambung.',
+                    'Pemanasan akan mengubah karakteristik rasa menjadi sangat pahit karena oksidasi lemak rantai pendek.',
+                    'Suhu tinggi mengaktifkan spora dorman patogen lain yang mungkin terkontaminasi dalam air panas tersebut.'
+                ],
+                correctIndex: 1,
+                explanation: 'Panas >60°C mendenaturasi protein seluler, menginaktivasi enzim, dan merusak membran → sel bakteri mati → probiotik tidak bermanfaat.'
+            },
+            {
+                question: 'Apa hubungan fungsional yang paling erat antara kesehatan usus (gut health) dengan optimalisasi sistem imun sistemik?',
+                options: [
+                    'Usus hanya berfungsi sebagai jalur ekskresi sisa metabolisme tanpa interaksi langsung dengan kelenjar getah bening atau sistem limfatik.',
+                    'Sekitar 70% sel imun tubuh terletak di saluran pencernaan (GALT - Gut-Associated Lymphoid Tissue), di mana mikrobiota usus yang sehat bertindak sebagai educator utama dalam membedakan antigen asing berbahaya dan non-berbahaya.',
+                    'Sistem imun sepenuhnya dikendalikan oleh sumsum tulang belakang dan tidak dipengaruhi oleh kondisi mikrobioma di saluran pencernaan.',
+                    'Kesehatan usus hanya mempengaruhi proses pencernaan mekanis, sementara imunitas diatur secara independen oleh kelenjar tiroid.',
+                    'Sel-sel imun di usus memproduksi enzim pencernaan tambahan untuk membantu kerja pankreas dan empedu.'
+                ],
+                correctIndex: 1,
+                explanation: '±70% sel imun ada di GALT. Mikrobiota sehat "mendidik" sistem imun membedakan antigen berbahaya vs aman.'
+            },
+            {
+                question: 'Manakah di bawah ini yang merupakan definisi klinis yang tepat mengenai konsep Multiple Effect dalam pemeliharaan kesehatan saluran pencernaan?',
+                options: [
+                    'Efek sinergis dari konsumsi kombinasi berbagai jenis obat pencahar kimiawi dan antibiotik spektrum luas secara bersamaan.',
+                    'Manfaat komprehensif di mana perbaikan kondisi mikrobiota usus dan penyerapan gizi yang optimal oleh usus yang sehat akan berdampak positif secara sistemik pada peningkatan daya tahan tubuh dan kebugaran organ tubuh lainnya.',
+                    'Kemampuan satu jenis obat untuk menyembuhkan berbagai macam penyakit infeksi akut maupun kronis dalam waktu singkat.',
+                    'Proses penyerapan gizi ganda yang terjadi di dalam lambung sebelum makanan mencapai usus halus.',
+                    'Kombinasi antara konsumsi makanan berserat tinggi dan vitamin sintetis dosis tinggi untuk mencegah konstipasi.'
+                ],
+                correctIndex: 1,
+                explanation: 'Multiple Effect = efek domino: usus sehat → penyerapan gizi optimal → imun & organ lain ikut sehat.'
+            },
+            {
+                question: 'Mengapa suhu penyimpanan pada kisaran 0°C hingga 10°C mutlak diperlukan selama rantai pasok (cold chain) produk yang mengandung bakteri probiotik hidup?',
+                options: [
+                    'Untuk membekukan seluruh cairan produk agar mudah didistribusikan dalam bentuk es krim padat.',
+                    'Untuk menjaga laju metabolisme bakteri berada pada titik minimal yang aman, mencegah pertumbuhan berlebih atau kematian dini akibat autolisis, sehingga jumlah sel hidup (viability) tetap terjaga sesuai standar mutu.',
+                    'Untuk mengaktifkan proses sporulasi bakteri sehingga tahan terhadap guncangan fisik selama pengiriman jarak jauh.',
+                    'Mendinginkan produk bertujuan agar rasanya lebih segar saat dikonsumsi tanpa ada hubungannya dengan kelangsungan hidup bakteri.',
+                    'Suhu dingin berfungsi sebagai katalisator untuk mengubah laktosa menjadi asam amino esensial secara instan.'
+                ],
+                correctIndex: 1,
+                explanation: 'Cold chain (0–10°C) menjaga metabolisme bakteri di titik minimal → viabilitas terjaga → manfaat probiotik tetap utuh.'
+            },
+            {
+                question: 'Perubahan patologis apa yang paling sering diamati pada mukosa usus penderita konstipasi kronis yang dapat diperbaiki melalui konsumsi probiotik dan peningkatan serat?',
+                options: [
+                    'Peningkatan ketebalan lapisan otot polos lambung akibat kontraksi berlebih saat membuang air besar.',
+                    'Penurunan motilitas usus besar, perlambatan waktu transit feses yang memicu penyerapan kembali toksin/air secara berlebih, serta ketidakseimbangan populasi mikrobiota lokal.',
+                    'Terjadinya ulserasi parah pada seluruh permukaan vili usus halus akibat infeksi jamur sistemik.',
+                    'Hipertrofi kelenjar empedu yang menyebabkan produksi cairan pencernaan menjadi berlebih dan asam.',
+                    'Penghentian total sekresi lendir oleh sel goblet di seluruh bagian usus kecil.'
+                ],
+                correctIndex: 1,
+                explanation: 'Konstipasi kronis = motilitas turun + transit lambat + reabsorpsi toksin/air + mikrobiota tidak seimbang.'
+            },
+            {
+                question: 'Apa peran spesifik dari Gut-Associated Lymphoid Tissue (GALT) dalam sistem pertahanan tubuh manusia?',
+                options: [
+                    'Mengatur suhu tubuh perifer agar tetap stabil saat terjadi infeksi bakteri di saluran pencernaan.',
+                    'Berfungsi sebagai organ pencernaan sekunder untuk memecah molekul protein kompleks menjadi asam amino bebas.',
+                    'Bertindak sebagai benteng imunologis terbesar di tubuh yang mendeteksi patogen, memproduksi antibodi (terutama sIgA), dan mengatur toleransi terhadap antigen makanan yang tidak berbahaya.',
+                    'Menghasilkan hormon pencernaan yang merangsang pengeluaran insulin dari pankreas.',
+                    'Menyimpan cadangan energi darurat dalam bentuk jaringan lemak viseral di sekitar usus.'
+                ],
+                correctIndex: 2,
+                explanation: 'GALT = benteng imun terbesar tubuh: deteksi patogen, produksi sIgA, atur toleransi antigen makanan.'
+            },
+            {
+                question: 'Bagaimana pengaruh konsumsi produk probiotik terhadap pH lumen usus besar (colon) secara umum?',
+                options: [
+                    'Meningkatkan pH usus menjadi sangat basa (>8.5) untuk menonaktifkan enzim pencernaan sisa.',
+                    'Menurunkan pH usus (menjadi lebih asam) melalui produksi asam lemak rantai pendek (SCFA) dan asam laktat hasil fermentasi karbohidrat, yang secara efektif menekan pertumbuhan bakteri patogen yang sensitif terhadap asam.',
+                    'Membuat pH usus menjadi netral secara permanen (pH 7.0) tanpa terpengaruh oleh jenis makanan yang dikonsumsi.',
+                    'Menyebabkan fluktuasi pH yang ekstrem setiap jam untuk melatih ketahanan dinding usus besar.',
+                    'Meningkatkan produksi empedu basa untuk menetralkan racun dari makanan.'
+                ],
+                correctIndex: 1,
+                explanation: 'Probiotik fermentasi karbohidrat → SCFA + asam laktat → pH turun (lebih asam) → patogen sensitif asam tertekan.'
+            },
+            {
+                question: 'Manakah pernyataan yang paling akurat mengenai kemampuan bertahan hidup Lactobacillus casei Shirota strain terhadap cairan lambung manusia?',
+                options: [
+                    'LcS langsung mati 100% begitu bersentuhan dengan asam klorida (HCl) di dalam lambung pada menit pertama.',
+                    'LcS memiliki resistensi alami yang tinggi terhadap keasaman lambung dan garam empedu, memungkinkannya untuk melewati lambung dan saluran pencernaan atas dalam keadaan hidup dan fungsional.',
+                    'LcS memerlukan bantuan obat antasida penurun asam lambung agar dapat bertahan hidup di dalam pencernaan manusia.',
+                    'LcS hanya dapat bertahan jika lambung berada dalam kondisi kosong total tanpa adanya makanan lain.',
+                    'LcS mengalami enkapsulasi buatan di dalam lambung sebelum melanjutkan perjalanan ke usus.'
+                ],
+                correctIndex: 1,
+                explanation: 'LcS resisten alami terhadap asam lambung & garam empedu → bisa lewat dalam keadaan hidup dan fungsional.'
+            },
+            {
+                question: 'Apa dampak tidak langsung dari fungsi penyerapan gizi usus yang optimal terhadap kinerja organ tubuh lain seperti otak dan jantung?',
+                options: [
+                    'Organ-organ tersebut tidak membutuhkan nutrisi dari usus karena memiliki suplai darah terisolasi.',
+                    'Pasokan nutrisi makro dan mikro (vitamin, mineral, asam amino esensial) yang terpenuhi dengan baik memastikan metabolisme seluler di jantung dan sistem saraf pusat berjalan pada kapasitas optimal dan efisien.',
+                    'Usus yang sehat akan mengirimkan sinyal elektrik langsung ke jantung untuk mengatur ritme detak jantung secara manual.',
+                    'Penyerapan gizi yang optimal mencegah kerja hati, sehingga jantung dan otak harus mengambil alih fungsi detoksifikasi darah.',
+                    'Tidak ada hubungan fungsional antara penyerapan gizi usus dengan kinerja organ vital di luar sistem pencernaan.'
+                ],
+                correctIndex: 1,
+                explanation: 'Usus serap gizi → pasokan makro/mikro nutrisi ke seluruh tubuh lancar → metabolisme sel jantung & SSP optimal.'
+            },
+            {
+                question: 'Manakah dari pilihan berikut yang merupakan indikator utama bahwa suatu mikroorganisme dapat dikategorikan sebagai probiotik sejati menurut kriteria ilmiah?',
+                options: [
+                    'Mampu hidup di dalam tanah dan tahan terhadap suhu pembakaran di atas 100°C.',
+                    'Diisolasi dari produk sintetik laboratorium kimia tanpa melalui uji klinis pada hewan atau manusia.',
+                    'Merupakan kultur mikroorganisme hidup, aman dikonsumsi (GRAS), tahan terhadap asam lambung dan empedu, mampu mencapai usus dalam keadaan hidup, dan memberikan manfaat kesehatan yang teruji secara ilmiah bagi inang.',
+                    'Bersifat patogen oportunistik yang dapat dimodifikasi menjadi antibiotik spektrum luas di dalam tubuh.',
+                    'Memiliki kemampuan untuk bermutasi secara cepat menyesuaikan diri dengan jenis antibiotik apapun.'
+                ],
+                correctIndex: 2,
+                explanation: 'Kriteria probiotik sejati: kultur hidup, GRAS, tahan asam & empedu, sampai usus hidup, manfaat teruji ilmiah.'
+            },
+            {
+                question: 'Apa peran utama dari asam lemak rantai pendek (Short-Chain Fatty Acids / SCFA) yang dihasilkan oleh bakteri baik di dalam usus?',
+                options: [
+                    'Sebagai sumber energi utama bagi sel-sel epitel usus (kolonosit), membantu menjaga integritas mukosa usus, serta mengatur peradangan lokal dan sistemik.',
+                    'Sebagai racun alami untuk membunuh seluruh sel di dalam usus besar guna memperbarui jaringan secara cepat.',
+                    'Mengubah lemak jenuh menjadi kolesterol baik di dalam aliran darah perifer secara instan.',
+                    'Membentuk lapisan lilin pelindung pada dinding lambung agar terhindar dari luka tukak lambung.',
+                    'Sebagai katalisator utama dalam pembentukan batu empedu di kantung empedu.'
+                ],
+                correctIndex: 0,
+                explanation: 'SCFA = sumber energi kolonosit, jaga integritas mukosa, dan atur peradangan lokal & sistemik.'
+            },
+            {
+                question: 'Dalam studi klinis di Vietnam terkait konsumsi LcS pada anak-anak, temuan signifikan apa yang dicatat selain pencegahan konstipasi dan infeksi saluran pernapasan?',
+                options: [
+                    'Peningkatan tinggi badan secara instan sebesar 5 sentimeter dalam waktu satu bulan.',
+                    'Perbaikan status gizi secara umum yang tercermin dari tren peningkatan berat badan dan peningkatan daya tahan tubuh terhadap infeksi umum.',
+                    'Perubahan warna gigi anak menjadi lebih putih dan kuat secara permanen.',
+                    'Penurunan drastis kebutuhan tidur harian anak dari 8 jam menjadi 3 jam.',
+                    'Peningkatan kemampuan kognitif matematika secara spesifik tanpa melalui proses belajar.'
+                ],
+                correctIndex: 1,
+                explanation: 'Studi Vietnam: LcS memperbaiki status gizi (tren BB naik) & daya tahan tubuh terhadap infeksi umum.'
+            },
+            {
+                question: 'Mengapa konsumsi produk probiotik dengan variasi suhu dingin (seperti dicampur es batu) umumnya tidak merusak manfaat probiotik, asalkan bukan suhu panas?',
+                options: [
+                    'Suhu dingin justru memicu multiplikasi bakteri probiotik menjadi dua kali lipat dalam hitungan detik.',
+                    'Suhu dingin (di bawah suhu kamar hingga titik beku air es) menghentikan sementara aktivitas metabolik sel tanpa merusak struktur organel vital atau mendenaturasi protein enzim di dalamnya, sehingga bakteri tetap hidup dan aktif kembali saat mencapai suhu optimal tubuh.',
+                    'Es batu mengandung zat kimia khusus yang melapisi bakteri agar kebal terhadap asam lambung.',
+                    'Suhu dingin membersihkan saluran pencernaan dari lendir sehingga bakteri lebih cepat menempel.',
+                    'Tidak ada alasan ilmiah, hal tersebut hanya masalah preferensi rasa tanpa pengaruh pada viabilitas sel.'
+                ],
+                correctIndex: 1,
+                explanation: 'Dingin = metabolisme sel terhenti sementara (tidak mati), protein tidak terdenaturasi → bakteri hidup & aktif lagi di suhu tubuh.'
+            },
+            {
+                question: 'Apa yang dimaksud dengan konsep Barrier Function (Fungsi Penghalang) pada mukosa usus sehat?',
+                options: [
+                    'Kemampuan usus untuk menolak seluruh zat makanan cair dan hanya menyerap makanan padat.',
+                    'Mekanisme selektif mukosa usus yang memungkinkan penyerapan nutrien dan air secara efisien sambil mencegah masuknya patogen berbahaya, toksin, dan antigen asing ke dalam sirkulasi darah sistemik melalui ikatan erat antar-sel (tight junctions).',
+                    'Proses penutupan total saluran pencernaan saat seseorang sedang tidur malam hari.',
+                    'Pertahanan mekanis luar berupa otot perut yang melindungi organ pencernaan dari benturan fisik.',
+                    'Kemampuan lambung mengeluarkan asam kuat untuk membakar semua benda asing yang masuk.'
+                ],
+                correctIndex: 1,
+                explanation: 'Barrier function: mukosa selektif — serap nutrisi & air, tapi blokir patogen/toksin/antigen via tight junctions.'
+            },
+            {
+                question: 'Apa perbedaan mekanisme antara konstipasi fungsional kronis dengan diare akut dalam kaitannya dengan gangguan keseimbangan mikrobiota?',
+                options: [
+                    'Konstipasi disebabkan oleh kelebihan bakteri baik, sedangkan diare disebabkan oleh ketiadaan total bakteri di usus.',
+                    'Konstipasi seringkali dikaitkan dengan waktu transit lambat yang memperkokoh dominasi bakteri proteolitik penghasil zat toksik, sedangkan diare akut umumnya ditandai oleh disrupsi cepat mikrobiota normal akibat invasi patogen enterik (virus/bakteri) yang merusak integritas epitel.',
+                    'Kedua kondisi tersebut memiliki penyebab mikrobiologis yang persis sama dan diobati dengan metode yang identik.',
+                    'Konstipasi terjadi di lambung, sedangkan diare akut terjadi secara eksklusif di pankreas.',
+                    'Tidak ada kaitan sama sekali antara mikrobiota usus dengan kedua gangguan pencernaan tersebut.'
+                ],
+                correctIndex: 1,
+                explanation: 'Konstipasi: transit lambat → bakteri proteolitik dominan. Diare akut: patogen enterik disrupsi mikrobiota + rusak epitel.'
+            },
+            {
+                question: 'Bagaimana pengaruh interaksi antara mikrobiota usus dan sistem saraf pusat yang dikenal sebagai poros usus-otak (gut-brain axis)?',
+                options: [
+                    'Otak mengendalikan seluruh aktivitas pembelahan bakteri usus melalui gelombang elektromagnetik kranial.',
+                    'Komunikasi dua arah melalui jalur saraf vagus, sistem imun, dan metabolit bakteri (seperti SCFA dan neurotransmiter) di mana kondisi mikrobiota usus dapat mempengaruhi fungsi kognitif, respons stres, dan suasana hati (mood).',
+                    'Usus mengirimkan perintah langsung ke otak untuk menentukan keputusan motorik tubuh sehari-hari.',
+                    'Poros usus-otak hanya aktif pada hewan mamalia besar dan tidak ditemukan pada sistem fisiologi manusia dewasa.',
+                    'Otak memproduksi seluruh bakteri yang ada di dalam usus besar melalui kelenjar hipofisis.'
+                ],
+                correctIndex: 1,
+                explanation: 'Gut-brain axis: komunikasi 2 arah via vagus, imun, & metabolit (SCFA, neurotransmiter) → pengaruhi kognitif, stres, mood.'
+            },
+            {
+                question: 'Mengapa penambahan prebiotik ke dalam produk yang mengandung probiotik (dikenal sebagai produk sinbiotik) memberikan nilai lebih dalam pemeliharaan kesehatan?',
+                options: [
+                    'Prebiotik berfungsi sebagai pengawet kimiawi agar produk tidak basi di luar ruangan.',
+                    'Sinbiotik menggabungkan bakteri hidup (probiotik) dengan pangan khusus yang tidak dapat dicerna inang (prebiotik) yang secara spesifik memacu pertumbuhan dan ketahanan hidup probiotik tersebut di dalam saluran pencernaan.',
+                    'Prebiotik akan membunuh bakteri kompetitor sebelum probiotik dimasukkan ke dalam tubuh.',
+                    'Kombinasi ini menghasilkan rasa manis buatan yang disukai oleh anak-anak tanpa efek samping kalori.',
+                    'Prebiotik mempercepat waktu transit produk melewati lambung dalam waktu kurang dari 5 detik.'
+                ],
+                correctIndex: 1,
+                explanation: 'Sinbiotik = probiotik (bakteri hidup) + prebiotik (substrat tidak tercerna) → prebiotik pacu pertumbuhan & ketahanan probiotik.'
+            },
+            {
+                question: 'Apa implikasi klinis dari penurunan keanekaragaman mikrobiota usus (alpha diversity) pada manusia modern?',
+                options: [
+                    'Tubuh menjadi lebih tahan terhadap segala jenis penyakit infeksi menular.',
+                    'Peningkatan risiko berbagai kondisi patologis, termasuk gangguan metabolik, inflamasi kronis, obesitas, dan penurunan respons imun optimal karena hilangnya fungsi sinergis berbagai spesies bakteri.',
+                    'Peningkatan kemampuan pencernaan protein hewani secara drastis tanpa batas.',
+                    'Penurunan berat badan yang ekstrim akibat percepatan metabolisme basal usus.',
+                    'Tidak ada implikasi klinis yang berarti bagi kesehatan manusia secara keseluruhan.'
+                ],
+                correctIndex: 1,
+                explanation: 'Alpha diversity turun → risiko gangguan metabolik, inflamasi kronis, obesitas, imun turun meningkat.'
+            },
+            {
+                question: 'Manakah pernyataan yang paling tepat untuk merangkum esensi pemeliharaan kesehatan pencernaan melalui pendekatan pencegahan (preventive health) berbasis probiotik?',
+                options: [
+                    'Mengonsumsi probiotik hanya saat jatuh sakit parah sebagai pengganti intervensi bedah darurat.',
+                    'Menjaga keseimbangan ekosistem mikroflora usus secara konsisten melalui pasokan probiotik hidup yang terjaga kualitas cold chain-nya, menghindari makanan perusak mukosa, dan memastikan suplai nutrisi prebiotik guna mengoptimalkan imunitas serta fungsi penyerapan tubuh secara jangka panjang.',
+                    'Mengandalkan antibiotik dosis tinggi setiap minggu untuk membersihkan usus dari segala jenis mikroorganisme.',
+                    'Melakukan sterilisasi total saluran pencernaan menggunakan cairan antiseptik khusus secara berkala.',
+                    'Mengabaikan kondisi usus selama asupan kalori harian tercukupi dengan baik.'
+                ],
+                correctIndex: 1,
+                explanation: 'Preventive health: jaga keseimbangan mikrobiota via probiotik hidup (cold chain), hindari perusak mukosa, suplai prebiotik → imun & penyerapan optimal jangka panjang.'
+            }
         ];
 
         // ============================================================
-        // COLOR ASSIGNMENT LOGIC
+        // COLOR PALETTE (OPSI B)
         // ============================================================
-        const COLOR_STORAGE_KEY = 'yakult_color_assignments_v1';
+        const colorPalette = [
+            { bg: 'bg-gradient-to-br from-[#E43147] to-[#B91C2E]', header: 'bg-[#E43147]' },
+            { bg: 'bg-gradient-to-br from-[#7B61FF] to-[#5A45CE]', header: 'bg-[#7B61FF]' },
+            { bg: 'bg-gradient-to-br from-[#38A169] to-[#276749]', header: 'bg-[#38A169]' },
+            { bg: 'bg-gradient-to-br from-[#4299E1] to-[#2B6CB0]', header: 'bg-[#3182CE]' },
+            { bg: 'bg-gradient-to-br from-[#ED8936] to-[#C05621]', header: 'bg-[#DD6B20]' },
+            { bg: 'bg-gradient-to-br from-[#ED64A6] to-[#B83280]', header: 'bg-[#D53F8C]' },
+            { bg: 'bg-gradient-to-br from-[#ECC94B] to-[#D69E2E]', header: 'bg-[#D69E2E]' },
+            { bg: 'bg-gradient-to-br from-[#9F7AEA] to-[#6B46C1]', header: 'bg-[#805AD5]' },
+            { bg: 'bg-gradient-to-br from-[#48BB78] to-[#2F855A]', header: 'bg-[#38A169]' },
+            { bg: 'bg-gradient-to-br from-[#F56565] to-[#C53030]', header: 'bg-[#E53E3E]' },
+            { bg: 'bg-gradient-to-br from-[#00B5D8] to-[#0987A0]', header: 'bg-[#00A3C4]' },
+            { bg: 'bg-gradient-to-br from-[#667EEA] to-[#4C51BF]', header: 'bg-[#5A67D8]' },
+        ];
 
-        // Shuffle array (Fisher-Yates)
+        const COLOR_STORAGE_KEY = 'yakult_color_assignments_v2';
+
         function shuffleArray(arr) {
             const a = [...arr];
             for (let i = a.length - 1; i > 0; i--) {
@@ -413,12 +969,9 @@
             return a;
         }
 
-        // Assign warna random ke tiap kategori (acak sekali, simpan di localStorage)
         function assignColors(forceReshuffle = false) {
             let assignments = JSON.parse(localStorage.getItem(COLOR_STORAGE_KEY) || 'null');
-
             if (!assignments || forceReshuffle) {
-                // Buat urutan warna yang di-shuffle, lalu map ke tiap kategori
                 const shuffledIndices = shuffleArray(colorPalette.map((_, i) => i));
                 assignments = {};
                 appData.forEach((cat, idx) => {
@@ -426,8 +979,6 @@
                 });
                 localStorage.setItem(COLOR_STORAGE_KEY, JSON.stringify(assignments));
             }
-
-            // Terapkan ke appData
             appData.forEach(cat => {
                 const colorIdx = assignments[cat.id] ?? 0;
                 cat.bgClass = colorPalette[colorIdx].bg;
@@ -435,7 +986,6 @@
             });
         }
 
-        // Ambil objek warna untuk 1 kategori
         function getColorForCategory(catId) {
             const cat = appData.find(c => c.id === catId);
             return cat ? { bg: cat.bgClass, header: cat.headerColor } : colorPalette[0];
@@ -446,12 +996,24 @@
         // ============================================================
         let currentOpenAccordionIndex = null;
         let bookmarks = JSON.parse(localStorage.getItem('yakult_bookmarks')) || [];
-        let lastQuery = ''; // fix bug: simpan query search terakhir
+        let lastQuery = '';
+
+        // Quiz state
+        let quizState = {
+            currentIndex: 0,
+            answers: [],       // { selectedIndex, isCorrect }
+            isAnswered: false, // soal saat ini sudah dijawab?
+            score: 0,
+            finished: false
+        };
 
         // DOM Elements
         const cardsGrid = document.getElementById('cards-grid');
         const viewHome = document.getElementById('view-home');
         const viewDetail = document.getElementById('view-detail');
+        const viewQuizStart = document.getElementById('view-quiz-start');
+        const viewQuiz = document.getElementById('view-quiz');
+        const viewQuizResult = document.getElementById('view-quiz-result');
         const darkModeToggle = document.getElementById('darkModeToggle');
         const refreshColorsBtn = document.getElementById('refreshColorsBtn');
         const searchInput = document.getElementById('searchInput');
@@ -489,15 +1051,13 @@
         });
 
         // ============================================================
-        // REFRESH COLORS BUTTON
+        // REFRESH COLORS
         // ============================================================
         refreshColorsBtn.addEventListener('click', () => {
-            assignColors(true); // force reshuffle
-            // Animasi spin
+            assignColors(true);
             const icon = refreshColorsBtn.querySelector('i');
             icon.classList.add('spin-once');
             setTimeout(() => icon.classList.remove('spin-once'), 600);
-            // Re-render home dengan query terakhir
             renderHome(filterByQuery(lastQuery));
         });
 
@@ -510,7 +1070,7 @@
             return appData.filter(cat =>
                 cat.title.toLowerCase().includes(q) ||
                 cat.tags.some(tag => tag.toLowerCase().includes(q)) ||
-                cat.detail.faqs.some(faq => faq.q.toLowerCase().includes(q))
+                (cat.detail && cat.detail.faqs && cat.detail.faqs.some(faq => faq.q.toLowerCase().includes(q)))
             );
         }
 
@@ -530,6 +1090,30 @@
             }
 
             dataToRender.forEach((cat, index) => {
+                // Kartu kuis punya penanganan berbeda
+                if (cat.isQuiz) {
+                    const quizCardHTML = `
+                        <div onclick="openQuizStart()"
+                             class="${cat.bgClass} rounded-2xl p-4 relative overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95 group animate-fade-in-up col-span-2 sm:col-span-1"
+                             style="animation-delay: ${index * 50}ms;">
+                            <div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 rounded-full px-2 py-0.5 flex items-center gap-1 shadow-md z-20">
+                                <i class="fa-solid fa-star text-[9px]"></i>
+                                <span class="text-[9px] font-bold">EXAM</span>
+                            </div>
+                            <i class="fa-solid fa-graduation-cap absolute -bottom-3 -right-3 text-7xl text-white/10 transform -rotate-12"></i>
+                            <h2 class="text-white font-bold text-sm sm:text-base leading-tight mb-2 relative z-10 pr-14">${cat.title}</h2>
+                            <div class="flex flex-wrap gap-1 relative z-10 mb-3">
+                                ${cat.tags.map(t => `<span class="bg-white/20 text-white text-[10px] px-2 py-1 rounded-full font-medium backdrop-blur-sm shadow-sm">${t}</span>`).join('')}
+                            </div>
+                            <div class="flex items-center gap-2 text-white text-xs font-semibold relative z-10">
+                                <i class="fa-solid fa-play"></i> Mulai Kuis
+                            </div>
+                        </div>
+                    `;
+                    cardsGrid.innerHTML += quizCardHTML;
+                    return;
+                }
+
                 const tagsHTML = cat.tags.map(tag =>
                     `<span class="bg-white/20 text-white text-[10px] px-2 py-1 rounded-full font-medium backdrop-blur-sm shadow-sm">${tag}</span>`
                 ).join('');
@@ -540,7 +1124,7 @@
 
                 const cardHTML = `
                     <div onclick="openDetail('${cat.id}')"
-                         class="${cat.bgClass} card-responsive-height rounded-2xl p-4 relative overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 active:scale-95 group card-hover animate-fade-in-up"
+                         class="${cat.bgClass} card-responsive-height rounded-2xl p-4 relative overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 active:scale-95 group animate-fade-in-up"
                          style="animation-delay: ${index * 50}ms;">
                         ${bookmarkBadge}
                         <h2 class="text-white font-bold text-sm sm:text-base leading-tight mb-2 relative z-10 pr-6">${cat.title}</h2>
@@ -568,19 +1152,16 @@
         // ============================================================
         function openDetail(categoryId) {
             const data = appData.find(c => c.id === categoryId);
-            if (!data) return;
+            if (!data || !data.detail) return;
 
             currentOpenAccordionIndex = null;
 
-            // Ambil warna yang sudah di-assign ke kategori ini
             const color = getColorForCategory(categoryId);
 
-            // Setup Header & Background pakai warna dari card yang diklik
             detailHeader.className = `text-white p-4 flex items-center sticky top-0 z-20 shadow-sm transition-colors duration-300 ${color.header}`;
             detailHeaderBg.className = `absolute top-0 left-0 w-full h-40 z-0 transition-colors duration-300 rounded-b-[2.5rem] ${color.header}`;
             detailHeaderTitle.innerText = data.title;
 
-            // Hero Section
             let heroTags = '';
             if (data.tags.length > 0) {
                 heroTags = data.tags.map(tag =>
@@ -605,7 +1186,6 @@
                 </div>
             `;
 
-            // FAQ List
             faqList.innerHTML = '';
 
             if (data.isFlipCard) {
@@ -709,9 +1289,6 @@
             viewDetail.classList.add('view-hidden-right');
             viewHome.classList.remove('view-hidden-left');
             viewHome.classList.add('view-active');
-
-            // Re-render home untuk update bookmark badge,
-            // tapi tetap hormati query search terakhir
             renderHome(filterByQuery(lastQuery));
         }
 
@@ -743,11 +1320,257 @@
         }
 
         // ============================================================
+        // ============== QUIZ LOGIC ==============
+        // ============================================================
+        const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E'];
+
+        function showView(target) {
+            [viewHome, viewDetail, viewQuizStart, viewQuiz, viewQuizResult].forEach(v => {
+                if (!v) return;
+                v.classList.remove('view-active');
+                v.classList.add('view-hidden-right');
+                v.classList.remove('view-hidden-left');
+            });
+            target.classList.remove('view-hidden-right');
+            target.classList.add('view-active');
+
+            // Scroll top
+            const scrollArea = target.querySelector('.scrollable-area');
+            if (scrollArea) scrollArea.scrollTop = 0;
+        }
+
+        function openQuizStart() {
+            showView(viewQuizStart);
+        }
+
+        function startQuiz() {
+            quizState = {
+                currentIndex: 0,
+                answers: new Array(quizData.length).fill(null),
+                isAnswered: false,
+                score: 0,
+                finished: false
+            };
+            showView(viewQuiz);
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = quizData[quizState.currentIndex];
+            const total = quizData.length;
+            const idx = quizState.currentIndex;
+
+            document.getElementById('quiz-counter').innerText = `${idx + 1}/${total}`;
+            document.getElementById('quiz-progress').style.width = `${((idx) / total) * 100}%`;
+            document.getElementById('quiz-number').innerText = idx + 1;
+            document.getElementById('quiz-question').innerText = q.question;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            const savedAnswer = quizState.answers[idx];
+
+            q.options.forEach((opt, i) => {
+                const isCorrect = i === q.correctIndex;
+                const isSelected = savedAnswer && savedAnswer.selectedIndex === i;
+                const answered = savedAnswer !== null;
+
+                let classes = 'quiz-option flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer';
+                let badgeClasses = 'option-badge bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
+
+                if (answered) {
+                    classes += ' disabled';
+                    if (isCorrect) {
+                        classes += ' correct';
+                        badgeClasses = 'option-badge bg-[#38A169] text-white';
+                    } else if (isSelected && !isCorrect) {
+                        classes += ' wrong';
+                        badgeClasses = 'option-badge bg-[#E43147] text-white';
+                    }
+                }
+
+                const letter = OPTION_LETTERS[i];
+                const checkIcon = answered && isCorrect ? '<i class="fa-solid fa-check-circle text-[#38A169] ml-auto shrink-0 mt-1"></i>' :
+                                 answered && isSelected && !isCorrect ? '<i class="fa-solid fa-times-circle text-[#E43147] ml-auto shrink-0 mt-1"></i>' : '';
+
+                const html = `
+                    <div class="${classes}" onclick="selectAnswer(${i})" data-index="${i}">
+                        <div class="${badgeClasses}">${letter}</div>
+                        <span class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed flex-1">${opt}</span>
+                        ${checkIcon}
+                    </div>
+                `;
+                optionsContainer.innerHTML += html;
+            });
+
+            // Explanation
+            const explBox = document.getElementById('quiz-explanation');
+            const explText = document.getElementById('quiz-explanation-text');
+            if (savedAnswer !== null) {
+                explBox.classList.remove('hidden');
+                const correctLetter = OPTION_LETTERS[q.correctIndex];
+                explText.innerHTML = `<b>Jawaban benar: ${correctLetter}</b><br>${q.explanation || ''}`;
+            } else {
+                explBox.classList.add('hidden');
+                explText.innerHTML = '';
+            }
+
+            // Next button state
+            const nextBtn = document.getElementById('quiz-next-btn');
+            const nextText = document.getElementById('quiz-next-text');
+
+            if (savedAnswer === null) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+
+            if (idx === total - 1) {
+                nextText.innerText = 'Lihat Hasil';
+            } else {
+                nextText.innerText = 'Lanjut';
+            }
+
+            // Animate
+            const container = document.getElementById('quiz-question-container');
+            container.classList.remove('animate-fade-in-up');
+            void container.offsetWidth;
+            container.classList.add('animate-fade-in-up');
+        }
+
+        function selectAnswer(optionIndex) {
+            const idx = quizState.currentIndex;
+            if (quizState.answers[idx] !== null) return; // sudah dijawab
+
+            const q = quizData[idx];
+            const isCorrect = optionIndex === q.correctIndex;
+
+            quizState.answers[idx] = {
+                selectedIndex: optionIndex,
+                isCorrect: isCorrect
+            };
+
+            if (isCorrect) quizState.score += 1;
+
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            const idx = quizState.currentIndex;
+            if (quizState.answers[idx] === null) return;
+
+            if (idx === quizData.length - 1) {
+                showResult();
+            } else {
+                quizState.currentIndex += 1;
+                renderQuestion();
+                document.querySelector('#view-quiz .scrollable-area').scrollTop = 0;
+            }
+        }
+
+        function showResult() {
+            const total = quizData.length;
+            const correct = quizState.score;
+            const wrong = total - correct;
+            const score = Math.round((correct / total) * 100);
+
+            document.getElementById('result-score').innerText = score;
+            document.getElementById('result-correct').innerText = correct;
+            document.getElementById('result-wrong').innerText = wrong;
+
+            let grade = '', message = '', emoji = '';
+            if (score >= 90) { grade = '🏆 Sempurna!'; message = 'Kamu benar-benar Expert Advisor Probiotik!'; emoji = 'trophy'; }
+            else if (score >= 80) { grade = '⭐ Luar Biasa!'; message = 'Pemahamanmu sangat baik tentang probiotik.'; emoji = 'star'; }
+            else if (score >= 70) { grade = '👍 Bagus!'; message = 'Tingkatkan lagi sedikit, kamu hampir sampai.'; emoji = 'thumbs-up'; }
+            else if (score >= 60) { grade = '📚 Cukup'; message = 'Pelajari lagi materi, kamu bisa lebih baik.'; emoji = 'book'; }
+            else { grade = '💪 Semangat!'; message = 'Jangan menyerah, coba lagi ya!'; emoji = 'dumbbell'; }
+
+            document.getElementById('result-grade').innerText = grade;
+            document.getElementById('result-message').innerText = message;
+
+            // Review
+            const reviewContainer = document.getElementById('result-review');
+            reviewContainer.innerHTML = '';
+
+            quizData.forEach((q, i) => {
+                const ans = quizState.answers[i];
+                const isCorrect = ans && ans.isCorrect;
+                const correctLetter = OPTION_LETTERS[q.correctIndex];
+                const selectedLetter = ans ? OPTION_LETTERS[ans.selectedIndex] : '—';
+
+                const reviewHTML = `
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border-l-4 ${isCorrect ? 'border-[#38A169]' : 'border-[#E43147]'} shadow-sm">
+                        <div class="flex items-start gap-3 mb-2">
+                            <div class="w-7 h-7 rounded-lg ${isCorrect ? 'bg-[#38A169]' : 'bg-[#E43147]'} text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                                ${i + 1}
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs font-semibold text-gray-800 dark:text-gray-200 leading-relaxed mb-2">${q.question}</p>
+                                <div class="flex flex-wrap gap-2 text-[11px]">
+                                    <span class="px-2 py-0.5 rounded-md ${isCorrect ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300'} font-semibold">
+                                        <i class="fa-solid fa-user-pen mr-1"></i>Jawabanmu: ${selectedLetter}
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded-md bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-semibold">
+                                        <i class="fa-solid fa-check mr-1"></i>Kunci: ${correctLetter}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                reviewContainer.innerHTML += reviewHTML;
+            });
+
+            showView(viewQuizResult);
+
+            // Confetti kalau skor >= 80
+            if (score >= 80) {
+                launchConfetti();
+            }
+        }
+
+        function launchConfetti() {
+            const colors = ['#E43147', '#7B61FF', '#38A169', '#ED8936', '#ED64A6', '#ECC94B', '#4299E1'];
+            for (let i = 0; i < 50; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + 'vw';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = Math.random() * 0.8 + 's';
+                piece.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+                if (Math.random() > 0.5) piece.style.borderRadius = '50%';
+                document.body.appendChild(piece);
+                setTimeout(() => piece.remove(), 4000);
+            }
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        function closeQuiz() {
+            showView(viewHome);
+            renderHome(filterByQuery(lastQuery));
+        }
+
+        // ============================================================
         // INIT
         // ============================================================
         document.addEventListener('DOMContentLoaded', () => {
             initDarkMode();
-            assignColors();       // assign warna random (sekali, disimpan)
+            assignColors();
+
+            // Sisipkan kartu kuis di paling atas (setelah assign warna supaya tidak ke-shuffle)
+            appData.unshift({
+                id: 'quiz-probiotik',
+                title: 'Kuis Probiotik — 25 Soal Expert',
+                tags: ['25 soal', 'Expert', 'Sertifikasi'],
+                icon: 'fa-graduation-cap',
+                isQuiz: true,
+                bgClass: 'bg-gradient-to-br from-[#7B61FF] to-[#4C1D95]',
+                headerColor: 'bg-[#7B61FF]'
+            });
+
             renderHome();
         });
 
