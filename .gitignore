@@ -31,3 +31,15 @@ firebase-debug.log
 # Extra
 *.zip
 **/import-users.html
+
+# Backup files
+backup-src/
+*.backup
+*.backup-before-minify
+*.before-obfuscate
+*.min.js
+*.obfuscated.js
+*.original
+*.bak2
+*.bak3
+*.bak4
