@@ -38,6 +38,7 @@ const homeMenu = [
 
 // 3. MENU LAPORAN
 const reportMenu = [
+    { id: 'y-custrev1',        label: 'Y-Cust Rev1',        icon: 'doc',    grad: 'from-amber-500 to-amber-600' },
     { id: 'y-cust',            label: 'Y-Customer',         icon: 'doc',    grad: 'from-rose-500 to-rose-600' },
     { id: 'ceklist',           label: 'Ceklist TKU',        icon: 'doc',    grad: 'from-blue-500 to-blue-600' },
     { id: 'lap-mingguan-staf', label: 'Lap. Mingguan Staf', icon: 'chart',  grad: 'from-indigo-500 to-indigo-600' },
@@ -206,6 +207,7 @@ const externalLinks = {
 };
 
 const APP_PATHS = {
+    'y-custrev1':        '/apps/y-custrev1.html',
     'y-cust':            '/apps/y-cust.html',
     'penjualan':         '/apps/penjualanbdl.html',
     'yakult-lady':       '/apps/kondisiyl.html',
