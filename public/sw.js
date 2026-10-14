@@ -3,7 +3,7 @@ cat > sw.js << 'SWEOF'
 // ============================================
 // Service Worker — Y-Hub App
 // ============================================
-const CACHE_NAME = 'yhub-app-v1.0.66';
+const CACHE_NAME = 'yhub-app-v1.0.67';
 
 const ASSETS = [
   './',
