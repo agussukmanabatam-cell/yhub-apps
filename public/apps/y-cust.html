@@ -209,7 +209,6 @@ input,textarea{ outline:none; border:0; background:transparent; }
   box-shadow: 0 8px 18px -6px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.3);
 }
 
-/* Overlay merah saat sheet kunjungan buka */
 .overlay.visit-mode{
   background: rgba(120, 10, 30, .58);
   backdrop-filter: blur(7px) saturate(120%);
@@ -649,7 +648,7 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   <div class="sheet-body">
     <div class="form-field"><label><i class="fa-solid fa-table"></i> Google Apps Script URL</label><input type="url" class="form-input" id="gasUrl" placeholder="https://script.google.com/macros/s/..."></div>
     <div style="background:var(--surface-2); border-radius:10px; padding:10px 12px; font-size:10.5px; color:var(--text-mute); line-height:1.5; margin-bottom:12px;">
-      💡 Sheet baru otomatis dibuat per <b>nama YL</b>. Foto otomatis di-upload ke <b>Google Drive</b>.
+      💡 Sheet baru otomatis dibuat per <b>nama YL</b>. Foto pelanggan & kunjungan otomatis di-upload ke <b>Google Drive</b>.
     </div>
     <div class="action-bar"><button class="btn-save" data-action="save-endpoints"><i class="fa-solid fa-floppy-disk"></i><span>Simpan</span></button></div>
     <div class="action-bar" style="margin-top:8px;"><button class="btn-clear" style="flex:1; justify-content:center;" data-action="sync-now"><i class="fa-solid fa-cloud-arrow-up"></i><span>Sync Sekarang</span></button></div>
@@ -771,6 +770,9 @@ function compressImage(file, maxDim=800, quality=0.7){
     };
     r.onerror = rej; r.readAsDataURL(file);
   });
+}
+function safeName(str, maxLen=30){
+  return String(str||'x').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'_').slice(0,maxLen) || 'x';
 }
 
 const getCustomersForToday = () => state.customers.filter(c => c.active !== false && (c.blockingDays||[]).includes(todayDayKey()));
@@ -1042,8 +1044,8 @@ function setHTML(){
       </div>
     </div>
     <div class="form-card" style="text-align:center; padding:14px;">
-      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v1.5</div>
-      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">Foto → Drive · Progress Sync · Teal Edition</div>
+      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v1.6</div>
+      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">Foto Pelanggan & Kunjungan → Drive</div>
     </div>
   `;
 }
@@ -1068,18 +1070,15 @@ function openSheet(id){
   const overlay = $('overlay');
   const sheetEl = $(id);
 
-  // Reset class khusus
   overlay.classList.remove('visit-mode');
   $$('.sheet').forEach(s => s.classList.remove('visit-sheet'));
 
-  // Khusus sheet kunjungan → pakai tema merah
   if(id === 'visitSheet'){
     overlay.classList.add('visit-mode');
     sheetEl.classList.add('visit-sheet');
   }
 
   overlay.classList.add('open');
-  // trigger reflow biar animasi restart
   void sheetEl.offsetWidth;
   sheetEl.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1190,8 +1189,12 @@ async function saveCustomer(){
   if(state.editDays.length === 0){ showToast('Jadwal kunjungan kosong · set di Mode Kerja'); return; }
   if(!state.pendingGPS?.lat){ showToast('Ambil GPS dulu'); return; }
   const ed = state.editingCustomer;
+  const cid = ed ? ed.id : uid('c');
+  const photoName = state.pendingPhoto
+    ? `cust_${safeName(state.editYL,20)}_${safeName(name,25)}_${cid}.jpg`
+    : (ed ? ed.photoName : null);
   const rec = {
-    id: ed ? ed.id : uid('c'),
+    id: cid,
     name,
     category: state.editCategory,
     blockingDays: [...state.editDays],
@@ -1199,6 +1202,7 @@ async function saveCustomer(){
     landmark: $('custLandmark').value.trim(),
     phone: formatPhone($('custPhone').value),
     photo: state.pendingPhoto,
+    photoName,
     lat: state.pendingGPS.lat, lng: state.pendingGPS.lng,
     notes: $('custNotes').value.trim(),
     tku: state.editTKU,
@@ -1336,8 +1340,9 @@ async function saveVisit(){
   let lat=null, lng=null;
   try{ const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000})); lat=pos.coords.latitude; lng=pos.coords.longitude; }
   catch(_){ if(c.lat){ lat=c.lat; lng=c.lng; } }
+  const vid = uid('v');
   const v = {
-    id: uid('v'), customerId: c.id, customerName: c.name, category: c.category,
+    id: vid, customerId: c.id, customerName: c.name, category: c.category,
     tku: state.sticky.tku, yl: state.sticky.yl,
     date: todayKey(), time: new Date().toTimeString().slice(0,5),
     status: state.visitStatus,
@@ -1345,7 +1350,9 @@ async function saveVisit(){
     payment: state.visitPayment, notes: $('visitNotes').value.trim(),
     lat, lng, timestamp: Date.now(),
     photo: state.visitPhoto || null,
-    photoName: `visit_${state.sticky.tku}_${(state.sticky.yl||'yl').replace(/\s+/g,'_')}_${todayKey()}_${Date.now()}.jpg`,
+    photoName: state.visitPhoto
+      ? `visit_${safeName(state.sticky.tku,10)}_${safeName(state.sticky.yl,20)}_${todayKey()}_${vid}.jpg`
+      : null,
     _syncedAt: null
   };
   await idbPut(ST_VISIT, v);
@@ -1393,7 +1400,7 @@ async function calcRoute(){
 }
 
 async function backupData(){
-  const data = { customers: state.customers, visits: state.visits, sticky: state.sticky, exportedAt: new Date().toISOString(), version: 6 };
+  const data = { customers: state.customers, visits: state.visits, sticky: state.sticky, exportedAt: new Date().toISOString(), version: 7 };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = `ycust_backup_${todayKey()}.json`;
@@ -1457,7 +1464,9 @@ async function syncNow(){
     customers: state.customers.map(c=>({
       id:c.id, name:c.name, category:c.category, blockingDays:(c.blockingDays||[]).join(','),
       address:c.address, landmark:c.landmark, phone:c.phone, lat:c.lat, lng:c.lng,
-      notes:c.notes, tku:c.tku, createdBy:c.createdBy, createdAt:c.createdAt
+      notes:c.notes, tku:c.tku, createdBy:c.createdBy, createdAt:c.createdAt,
+      photo: c.photo || null,
+      photoName: c.photoName || `cust_${safeName(c.createdBy||'yl',20)}_${safeName(c.name,25)}_${c.id}.jpg`
     })),
     visits: state.visits.map(v=>({
       id:v.id, customerId:v.customerId, customerName:v.customerName, category:v.category,
@@ -1466,11 +1475,12 @@ async function syncNow(){
       rp: hitungSetoran(v), payment:v.payment, notes:v.notes,
       lat:v.lat, lng:v.lng, timestamp:v.timestamp,
       photo: v.photo || null,
-      photoName: v.photoName || `visit_${v.id}.jpg`
+      photoName: v.photoName || `visit_${safeName(v.tku||'',10)}_${safeName(v.yl||'',20)}_${v.date||''}_${v.id}.jpg`
     })),
     timestamp: Date.now()
   };
   const ylCount = new Set([...payload.customers.map(c=>c.createdBy), ...payload.visits.map(v=>v.yl)].filter(Boolean)).size;
+  const photoCount = payload.customers.filter(c=>c.photo).length + payload.visits.filter(v=>v.photo).length;
 
   try{
     await fetch(state.gasUrl, { method:'POST', mode:'no-cors', headers:{ 'Content-Type':'text/plain' }, body: JSON.stringify(payload) });
@@ -1479,10 +1489,9 @@ async function syncNow(){
     overlay.classList.add('success');
     iconEl.textContent = '✅';
     titleEl.textContent = 'Berhasil terkirim!';
-    subEl.textContent = `${payload.customers.length} pelanggan · ${payload.visits.length} kunjungan · ${ylCount} sheet`;
+    subEl.textContent = `${payload.customers.length} pelanggan · ${payload.visits.length} kunjungan · ${photoCount} foto`;
     haptic([30, 40, 30]);
 
-    // Mark semua sebagai synced
     const now = Date.now();
     for(const c of state.customers){ c._syncedAt = now; await idbPut(ST_CUST, c); }
     for(const v of state.visits){ v._syncedAt = now; await idbPut(ST_VISIT, v); }
@@ -1550,15 +1559,27 @@ function doPost(e){
       let row = 4;
       sheet.getRange(row,1).setValue('=== PELANGGAN ===').setFontWeight('bold').setFontColor('#0D9488').setFontSize(12);
       row++;
-      const custHeaders = ['ID','Nama','Kategori','Hari Kunjungan','Alamat','Patokan','No HP','Lat','Lng','Catatan','TKU','Dibuat'];
+      const custHeaders = ['ID','Nama','Kategori','Hari Kunjungan','Alamat','Patokan','No HP','Lat','Lng','Catatan','TKU','Dibuat','Foto'];
       sheet.getRange(row,1,1,custHeaders.length).setValues([custHeaders]).setFontWeight('bold').setBackground('#0D9488').setFontColor('#FFFFFF').setHorizontalAlignment('center');
       row++;
       if(data.customers.length > 0){
-        const rows = data.customers.map(c => [
-          c.id || '', c.name || '', c.category || '', c.blockingDays || '',
-          c.address || '', c.landmark || '', c.phone || '', c.lat || '',
-          c.lng || '', c.notes || '', c.tku || '', c.createdAt ? new Date(c.createdAt) : ''
-        ]);
+        const rows = data.customers.map(c => {
+          let photoUrl = '-';
+          const rawPhoto = c.photo || '';
+          if(rawPhoto && typeof rawPhoto === 'string' && rawPhoto.length > 100){
+            try {
+              photoUrl = uploadBase64ToDrive(rawPhoto, c.photoName || ('cust_' + (c.id||'x') + '.jpg'), FOLDER_ID);
+            } catch(err) {
+              photoUrl = 'Gagal: ' + err.toString();
+            }
+          }
+          return [
+            c.id || '', c.name || '', c.category || '', c.blockingDays || '',
+            c.address || '', c.landmark || '', c.phone || '', c.lat || '',
+            c.lng || '', c.notes || '', c.tku || '', c.createdAt ? new Date(c.createdAt) : '',
+            photoUrl
+          ];
+        });
         sheet.getRange(row,1,rows.length,custHeaders.length).setValues(rows);
         row += rows.length;
       } else {
