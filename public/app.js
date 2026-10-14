@@ -344,28 +344,39 @@ async function loadEventData() {
         if (eventEl) eventEl.innerText = foundEvent;
         if (seragamEl) seragamEl.innerText = foundSeragam;
 
-        // === BIRTHDAY: HANYA HARI INI ===
+        // === BIRTHDAY: HANYA HARI INI (parser sama dengan birthday.html) ===
         const dataB = await fetchCSV(BIRTHDAY_CSV);
-        const monthIndex = { Jan:0, Feb:1, Mar:2, Apr:3, Mei:4, Jun:5, Jul:6, Agu:7, Sep:8, Okt:9, Nov:10, Des:11 };
         const todayDay = today.getDate();
-        const todayMon = today.getMonth();
+        const todayMon = today.getMonth() + 1;
         let todayList = [];
 
         dataB.forEach((row, index) => {
             if (index === 0) return;
             const nama = row[0] ? row[0].trim() : "";
-            const tglLahir = row[1] ? row[1].trim() : "";
-            if (!nama || !tglLahir) return;
+            const dateStr = row[1] ? row[1].trim() : "";
+            if (!nama || !dateStr) return;
 
-            const cleanDate = tglLahir.split(',')[0].trim();
-            const parts = cleanDate.split(/\s+/);
-            if (parts.length < 2) return;
+            let month, day;
+            
+            // Coba new Date() dulu (handle "10/15 1981" format)
+            let d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+                month = d.getMonth() + 1;
+                day = d.getDate();
+            } else {
+                // Fallback: parse manual
+                const parts = dateStr.split(/[\/\-\.]/);
+                if (parts.length >= 2) {
+                    month = parseInt(parts[0], 10);
+                    day = parseInt(parts[1], 10);
+                    if (isNaN(day) || isNaN(month)) return;
+                    if (month > 12) { const t = day; day = month; month = t; }
+                }
+            }
+            
+            if (!month || !day) return;
 
-            const day = parseInt(parts[0], 10);
-            const mon = monthIndex[parts[1].substring(0, 3)];
-            if (isNaN(day) || mon === undefined) return;
-
-            if (day === todayDay && mon === todayMon) {
+            if (day === todayDay && month === todayMon) {
                 todayList.push(nama);
             }
         });
