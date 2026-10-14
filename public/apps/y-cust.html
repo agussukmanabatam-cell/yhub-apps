@@ -159,6 +159,62 @@ input,textarea{ outline:none; border:0; background:transparent; }
 
 .sheet{ position:fixed; left:50%; bottom:0; transform:translateX(-50%) translateY(100%); width:100%; max-width:var(--app-max); max-height:92vh; max-height:92dvh; background:var(--surface); border-radius:24px 24px 0 0; z-index:95; overflow-y:auto; visibility:hidden; transition:transform .4s var(--ease),visibility .4s; padding-bottom:0; }
 .sheet.open{ transform:translateX(-50%) translateY(0); visibility:visible; }
+/* ============ KUNJUNGAN — RED TRANSITION ============ */
+@keyframes visitSheetPulse{
+  0%{ box-shadow:0 -30px 90px rgba(225,29,72,.7), 0 0 0 0 rgba(225,29,72,.6); }
+  50%{ box-shadow:0 -30px 90px rgba(225,29,72,.5), 0 0 0 16px rgba(225,29,72,0); }
+  100%{ box-shadow:0 -30px 90px rgba(225,29,72,.5), 0 0 0 0 rgba(225,29,72,0); }
+}
+.sheet.visit-sheet{
+  border-top: 4px solid var(--rose);
+  border-radius: 26px 26px 0 0;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+.sheet.visit-sheet::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:6px;
+  background: linear-gradient(90deg, #E11D48, #F43F5E, #E11D48);
+  border-radius: 26px 26px 0 0;
+  z-index: 3;
+  background-size: 200% 100%;
+  animation: redFlow 3s ease-in-out infinite;
+}
+@keyframes redFlow{
+  0%,100%{ background-position: 0% 50%; }
+  50%{ background-position: 100% 50%; }
+}
+.sheet.visit-sheet.open{
+  transform: translateX(-50%) translateY(0);
+  animation: visitSheetPulse 2.2s ease-out;
+}
+.sheet.visit-sheet .sheet-header{
+  background: linear-gradient(135deg, #E11D48 0%, #BE123C 50%, #9F1239 100%);
+  border-bottom: 1px solid rgba(255,255,255,.15);
+  border-radius: 26px 26px 0 0;
+}
+.sheet.visit-sheet .sheet-header .sheet-name{ color:#fff; }
+.sheet.visit-sheet .sheet-header .sheet-meta{ color:rgba(255,255,255,.8); }
+.sheet.visit-sheet .sheet-header .sheet-close{
+  background: rgba(255,255,255,.2);
+  color: #fff;
+}
+.sheet.visit-sheet .sheet-header .sheet-close:active{
+  background: rgba(255,255,255,.35);
+}
+.sheet.visit-sheet .sheet-handle{
+  background: rgba(255,255,255,.35);
+  margin-top: 12px;
+}
+.sheet.visit-sheet .sheet-avatar{
+  box-shadow: 0 8px 18px -6px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.3);
+}
+
+/* Overlay merah saat sheet kunjungan buka */
+.overlay.visit-mode{
+  background: rgba(120, 10, 30, .58);
+  backdrop-filter: blur(7px) saturate(120%);
+  -webkit-backdrop-filter: blur(7px) saturate(120%);
+}
 .sheet.wide{ max-width:100%; height:100vh; height:100dvh; max-height:100dvh; border-radius:0; }
 .sheet-handle{ width:40px; height:4px; border-radius:999px; background:var(--border); margin:10px auto 0; }
 .sheet-header{ padding:14px 18px 12px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface); z-index:2; }
@@ -1008,10 +1064,34 @@ function bindDDTriggers(){
 }
 function closeAllDD(){ $$('.dd.open').forEach(x => x.classList.remove('open')); }
 
-function openSheet(id){ $('overlay').classList.add('open'); $(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function openSheet(id){
+  const overlay = $('overlay');
+  const sheetEl = $(id);
+
+  // Reset class khusus
+  overlay.classList.remove('visit-mode');
+  $$('.sheet').forEach(s => s.classList.remove('visit-sheet'));
+
+  // Khusus sheet kunjungan → pakai tema merah
+  if(id === 'visitSheet'){
+    overlay.classList.add('visit-mode');
+    sheetEl.classList.add('visit-sheet');
+  }
+
+  overlay.classList.add('open');
+  // trigger reflow biar animasi restart
+  void sheetEl.offsetWidth;
+  sheetEl.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  haptic(id === 'visitSheet' ? 20 : 8);
+}
 function closeAllSheets(){
-  ['ctxSheet','custSheet','visitSheet','detailSheet','mapSheet','syncSheet'].forEach(id=>{ const el = $(id); if(el) el.classList.remove('open'); });
-  $('overlay').classList.remove('open'); document.body.style.overflow='';
+  ['ctxSheet','custSheet','visitSheet','detailSheet','mapSheet','syncSheet'].forEach(id=>{
+    const el = $(id);
+    if(el) el.classList.remove('open','visit-sheet');
+  });
+  $('overlay').classList.remove('open','visit-mode');
+  document.body.style.overflow='';
 }
 
 function openCtxSheet(){
