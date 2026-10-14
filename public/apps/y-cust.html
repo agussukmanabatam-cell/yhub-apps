@@ -157,8 +157,31 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .gps-btn:active{ transform:scale(.95); }
 .gps-btn.primary{ background: linear-gradient(135deg,var(--brand),var(--brand-3)); color:#fff; border-color: transparent; box-shadow: 0 6px 14px -6px rgba(13,148,136,.55); }
 
-.sheet{ position:fixed; left:50%; bottom:0; transform:translateX(-50%) translateY(100%); width:100%; max-width:var(--app-max); max-height:92vh; max-height:92dvh; background:var(--surface); border-radius:24px 24px 0 0; z-index:95; overflow-y:auto; visibility:hidden; transition:transform .4s var(--ease),visibility .4s; padding-bottom:0; }
+/* ============ SHEET ============ */
+.sheet{
+  position:fixed; left:50%; bottom:0;
+  transform:translateX(-50%) translateY(100%);
+  width:100%; max-width:var(--app-max);
+  max-height:92vh; max-height:92dvh;
+  background:var(--surface);
+  border-radius:24px 24px 0 0;
+  z-index:95; overflow-y:auto;
+  visibility:hidden;
+  transition:transform .32s cubic-bezier(.2,.9,.3,1), visibility .32s;
+  padding-bottom:0;
+}
 .sheet.open{ transform:translateX(-50%) translateY(0); visibility:visible; }
+.sheet.wide{ max-width:100%; height:100vh; height:100dvh; max-height:100dvh; border-radius:0; }
+.sheet-handle{ width:40px; height:4px; border-radius:999px; background:var(--border); margin:10px auto 0; }
+.sheet-header{ padding:14px 18px 12px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface); z-index:2; }
+.sheet-avatar{ width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-size:13.5px; font-weight:700; color:#fff; flex-shrink:0; }
+.sheet-info{ flex:1; min-width:0; }
+.sheet-name{ font-family:'Poppins',sans-serif; font-size:14px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sheet-meta{ font-size:10.5px; color:var(--text-mute); margin-top:2px; }
+.sheet-close{ width:32px; height:32px; border-radius:50%; background:var(--surface-2); color:var(--text-mute); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.sheet-close:active{ transform:scale(.9); }
+.sheet-body{ padding: 16px 18px calc(env(safe-area-inset-bottom,0px) + 20px); }
+
 /* ============ KUNJUNGAN — RED TRANSITION ============ */
 @keyframes visitSheetPulse{
   0%{ box-shadow:0 -30px 90px rgba(225,29,72,.7), 0 0 0 0 rgba(225,29,72,.6); }
@@ -166,6 +189,7 @@ input,textarea{ outline:none; border:0; background:transparent; }
   100%{ box-shadow:0 -30px 90px rgba(225,29,72,.5), 0 0 0 0 rgba(225,29,72,0); }
 }
 .sheet.visit-sheet{
+  background: linear-gradient(180deg, #E11D48 0%, #BE123C 80px, var(--surface) 80px);
   border-top: 4px solid var(--rose);
   border-radius: 26px 26px 0 0;
   transform-origin: bottom center;
@@ -202,11 +226,21 @@ input,textarea{ outline:none; border:0; background:transparent; }
   background: rgba(255,255,255,.35);
 }
 .sheet.visit-sheet .sheet-handle{
-  background: rgba(255,255,255,.35);
+  background: rgba(255,255,255,.45);
   margin-top: 12px;
+  position: relative;
+  z-index: 5;
 }
 .sheet.visit-sheet .sheet-avatar{
   box-shadow: 0 8px 18px -6px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.3);
+}
+.sheet.visit-sheet .sheet-body{
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  margin-top: -22px;
+  padding-top: 28px;
+  position: relative;
+  z-index: 2;
 }
 
 .overlay.visit-mode{
@@ -214,16 +248,6 @@ input,textarea{ outline:none; border:0; background:transparent; }
   backdrop-filter: blur(7px) saturate(120%);
   -webkit-backdrop-filter: blur(7px) saturate(120%);
 }
-.sheet.wide{ max-width:100%; height:100vh; height:100dvh; max-height:100dvh; border-radius:0; }
-.sheet-handle{ width:40px; height:4px; border-radius:999px; background:var(--border); margin:10px auto 0; }
-.sheet-header{ padding:14px 18px 12px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface); z-index:2; }
-.sheet-avatar{ width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-size:13.5px; font-weight:700; color:#fff; flex-shrink:0; }
-.sheet-info{ flex:1; min-width:0; }
-.sheet-name{ font-family:'Poppins',sans-serif; font-size:14px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.sheet-meta{ font-size:10.5px; color:var(--text-mute); margin-top:2px; }
-.sheet-close{ width:32px; height:32px; border-radius:50%; background:var(--surface-2); color:var(--text-mute); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
-.sheet-close:active{ transform:scale(.9); }
-.sheet-body{ padding: 16px 18px calc(env(safe-area-inset-bottom,0px) + 20px); }
 
 .section-title-bar{ display:flex; align-items:center; gap:10px; margin: 18px 0 12px; }
 .section-title-bar:first-child{ margin-top: 4px; }
@@ -1044,8 +1068,8 @@ function setHTML(){
       </div>
     </div>
     <div class="form-card" style="text-align:center; padding:14px;">
-      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v1.6</div>
-      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">Foto Pelanggan & Kunjungan → Drive</div>
+      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v1.7</div>
+      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">Foto Drive · Smooth Red Transition</div>
     </div>
   `;
 }
@@ -1070,16 +1094,23 @@ function openSheet(id){
   const overlay = $('overlay');
   const sheetEl = $(id);
 
+  // Reset class khusus
   overlay.classList.remove('visit-mode');
   $$('.sheet').forEach(s => s.classList.remove('visit-sheet'));
 
+  // Khusus sheet kunjungan → pakai tema merah
   if(id === 'visitSheet'){
     overlay.classList.add('visit-mode');
     sheetEl.classList.add('visit-sheet');
   }
 
+  // Show overlay dulu
   overlay.classList.add('open');
+
+  // Force reflow biar browser commit style SEBELUM slide
   void sheetEl.offsetWidth;
+
+  // Baru slide
   sheetEl.classList.add('open');
   document.body.style.overflow = 'hidden';
   haptic(id === 'visitSheet' ? 20 : 8);
@@ -1400,7 +1431,7 @@ async function calcRoute(){
 }
 
 async function backupData(){
-  const data = { customers: state.customers, visits: state.visits, sticky: state.sticky, exportedAt: new Date().toISOString(), version: 7 };
+  const data = { customers: state.customers, visits: state.visits, sticky: state.sticky, exportedAt: new Date().toISOString(), version: 8 };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = `ycust_backup_${todayKey()}.json`;
