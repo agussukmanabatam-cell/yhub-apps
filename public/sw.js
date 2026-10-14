@@ -1,9 +1,7 @@
-cd ~/yhub-apps/public
-cat > sw.js << 'SWEOF'
 // ============================================
 // Service Worker — Y-Hub App
 // ============================================
-const CACHE_NAME = 'yhub-app-v1.0.71';
+const CACHE_NAME = 'yhub-app-v1.0.73';
 
 const ASSETS = [
   './',
@@ -16,7 +14,6 @@ const ASSETS = [
   'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap'
 ];
 
-// Install
 self.addEventListener('install', event => {
   console.log('[SW] Installing...');
   event.waitUntil(
@@ -31,7 +28,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activate — hapus cache lama
 self.addEventListener('activate', event => {
   console.log('[SW] Activating...');
   event.waitUntil(
@@ -44,17 +40,12 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch — hanya cache GET, skip POST/Firebase/Google API
 self.addEventListener('fetch', event => {
   const url = event.request.url;
   const method = event.request.method;
 
-  // ⚠️ HANYA cache request GET. Skip POST, PUT, DELETE, dll.
-  if (method !== 'GET') {
-    return;
-  }
+  if (method !== 'GET') return;
 
-  // Skip chrome-extension, firebase, google API
   if (url.startsWith('chrome-extension://') ||
       url.includes('firestore.googleapis.com') ||
       url.includes('firebaseio.com') ||
@@ -68,7 +59,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
       if (cachedResponse) {
-        // Background refresh
         fetch(event.request).then(networkResponse => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse.clone()));
@@ -95,8 +85,3 @@ self.addEventListener('fetch', event => {
 self.addEventListener('message', event => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
-SWEOF
-
-# Verifikasi
-grep "CACHE_NAME" sw.js
-grep -c "method !== 'GET'" sw.js
