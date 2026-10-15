@@ -59,9 +59,9 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .banner-progress{ margin-top:12px; height:4px; border-radius:999px; background:rgba(0,0,0,.2); overflow:hidden; position:relative; z-index:1; }
 .banner-progress-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg,rgba(255,255,255,.7),#fff); transition:width .7s var(--ease); width:0%; }
 
-.tabbar{ display:flex; gap:3px; margin:-14px var(--app-pad) 0; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:5px; box-shadow:0 8px 22px -12px rgba(13,148,136,.25); position:relative; z-index:5; }
-.tab-btn{ flex:1; padding:9px 4px; border-radius:11px; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--text-dim); font-size:9px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; transition:all .2s; }
-.tab-btn i{ font-size:14px; }
+.tabbar{ display:flex; gap:1px; margin:-14px var(--app-pad) 0; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:5px; box-shadow:0 8px 22px -12px rgba(13,148,136,.25); position:relative; z-index:5; overflow-x: auto;}
+.tab-btn{ flex:1; min-width:54px; padding:9px 2px; border-radius:11px; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--text-dim); font-size:8px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; transition:all .2s; }
+.tab-btn i{ font-size:13px; }
 .tab-btn.active{ background:var(--brand-soft); color:var(--brand); }
 .tab-btn:active{ transform:scale(.95); }
 
@@ -266,8 +266,8 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 .cat-chip i{ font-size:15px; }
 .cat-chip.active{ background:var(--brand-soft); border-color:var(--brand); color:var(--brand); }
 
-.day-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
-.day-cell{ padding: 12px 4px; border:1.5px solid var(--border); border-radius:12px; background:var(--surface); font-size:11px; font-weight:700; color:var(--text-mute); text-align:center; cursor:pointer; transition:all .2s var(--ease); }
+.day-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.day-cell{ padding: 12px 2px; border:1.5px solid var(--border); border-radius:12px; background:var(--surface); font-size:9.5px; font-weight:700; color:var(--text-mute); text-align:center; cursor:pointer; transition:all .2s var(--ease); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .day-cell.active{ background:var(--brand); border-color:var(--brand); color:#fff; transform:scale(1.04); box-shadow:0 6px 14px -6px rgba(13,148,136,.6); }
 .day-cell:active{ transform:scale(.92); }
 
@@ -525,6 +525,17 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   line-height: 1.5;
 }
 .ai-step-desc b{ color: var(--brand); }
+
+/* ============ ANALISIS ============ */
+.chart-bar-wrap{ height: 8px; border-radius: 999px; background: var(--surface-3); margin-top: 8px; position: relative; overflow: hidden; }
+.chart-bar-fill{ height: 100%; position: absolute; left: 0; top: 0; border-radius: 999px; transition: width 1s var(--ease); }
+.stat-box{ background: var(--surface-2); border-radius: 12px; padding: 12px; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.stat-val{ font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; line-height: 1.1; margin-bottom: 4px; }
+.stat-lbl{ font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-mute); font-weight: 700; }
+.stat-trend{ font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.stat-trend.up{ color: var(--emerald); }
+.stat-trend.down{ color: var(--rose); }
+.stat-trend.neutral{ color: var(--text-dim); }
 </style>
 </head>
 <body>
@@ -552,6 +563,7 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
     <button class="tab-btn" data-tab="pelanggan"><i class="fa-solid fa-users"></i><span>Pelanggan</span></button>
     <button class="tab-btn" data-tab="migrasi"><i class="fa-solid fa-camera-retro"></i><span>Migrasi</span></button>
     <button class="tab-btn" data-tab="rute"><i class="fa-solid fa-route"></i><span>Rute</span></button>
+    <button class="tab-btn" data-tab="analisis"><i class="fa-solid fa-chart-line"></i><span>Analisis</span></button>
     <button class="tab-btn" data-tab="set"><i class="fa-solid fa-gear"></i><span>Set</span></button>
   </div>
 
@@ -782,11 +794,103 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
     </div>
     <div class="action-bar"><button class="btn-save" data-action="save-endpoints"><i class="fa-solid fa-floppy-disk"></i><span>Simpan</span></button></div>
     <div class="action-bar" style="margin-top:8px;"><button class="btn-clear" style="flex:1; justify-content:center;" data-action="sync-now"><i class="fa-solid fa-cloud-arrow-up"></i><span>Sync Sekarang</span></button></div>
-    <div class="action-bar" style="margin-top:8px;"><button class="btn-clear" style="flex:1; justify-content:center;" data-action="show-gas-code"><i class="fa-solid fa-file-code"></i><span>Lihat Kode GAS</span></button></div>
   </div>
 </div>
 
-<!-- SHEET: MIGRASI -->
+<!-- SHEET: PASSWORD SETTING -->
+<div class="sheet" id="passwordSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-avatar" style="background:linear-gradient(135deg,#E11D48,#BE123C);"><i class="fa-solid fa-lock"></i></div>
+    <div class="sheet-info"><div class="sheet-name">Akses Terkunci</div><div class="sheet-meta">Masukkan password khusus Admin</div></div>
+    <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div class="form-field">
+      <label>Password Admin</label>
+      <input type="password" class="form-input" id="setAdminPwd" placeholder="Masukkan password...">
+    </div>
+    <div class="action-bar" style="margin-top:16px;">
+      <button class="btn-primary" data-action="submit-password" style="width:100%; justify-content:center;">
+        <i class="fa-solid fa-unlock"></i><span>Buka Kunci</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: FIREBASE -->
+<div class="sheet" id="firebaseSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-avatar" style="background:linear-gradient(135deg,#F59E0B,#D97706);"><i class="fa-solid fa-database"></i></div>
+    <div class="sheet-info"><div class="sheet-name">Firebase Settings</div><div class="sheet-meta">Konfigurasi Database Realtime</div></div>
+    <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div style="background:var(--amber-soft); border:1px solid rgba(217,119,6,.2); border-radius:12px; padding:12px; font-size:11px; color:var(--amber); line-height:1.5; margin-bottom:14px;">
+      <b><i class="fa-solid fa-triangle-exclamation"></i> Modul Siap:</b> Masukkan kredensial Firebase Anda. Jika diatur, data akan dikirim juga ke Firebase agar bisa diakses terus-menerus.
+    </div>
+    <div class="form-field"><label>API Key</label><input type="text" class="form-input" id="fbApiKey" placeholder="AIzaSy..."></div>
+    <div class="form-field"><label>Project ID</label><input type="text" class="form-input" id="fbProjectId" placeholder="my-project-id"></div>
+    <div class="form-field"><label>Database URL</label><input type="text" class="form-input" id="fbDatabaseUrl" placeholder="https://my-project-id.firebaseio.com"></div>
+    
+    <div class="action-bar" style="margin-top:16px;">
+      <button class="btn-save" data-action="save-firebase"><i class="fa-solid fa-check"></i><span>Simpan Konfigurasi</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: MUTASI MASSAL -->
+<div class="sheet" id="mutasiSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-avatar" style="background:linear-gradient(135deg,#3B82F6,#2563EB);"><i class="fa-solid fa-people-arrows"></i></div>
+    <div class="sheet-info"><div class="sheet-name">Mutasi Pelanggan</div><div class="sheet-meta">Pindah YL atau Ganti Hari (Bulk)</div></div>
+    <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="sheet-body">
+    
+    <div class="section-title-bar" style="margin-top:0;">
+      <div class="label"><i class="fa-solid fa-box-open"></i> Sumber Data (Asal)</div>
+      <div class="line"></div>
+    </div>
+    <div class="form-field">
+      <div class="form-label">TKU Asal</div>
+      <select class="form-input" id="mutasiTkuAsal" style="appearance:auto; background:var(--surface);">
+        <option value="">-- Pilih TKU --</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <div class="form-label">YL Asal</div>
+      <select class="form-input" id="mutasiYlAsal" style="appearance:auto; background:var(--surface);">
+        <option value="">-- Pilih YL Asal --</option>
+      </select>
+    </div>
+
+    <div class="section-title-bar">
+      <div class="label"><i class="fa-solid fa-box"></i> Tujuan Mutasi</div>
+      <div class="line"></div>
+    </div>
+    <div class="form-field">
+      <div class="form-label">YL Tujuan (Biarkan kosong jika hanya ganti hari)</div>
+      <select class="form-input" id="mutasiYlTujuan" style="appearance:auto; background:var(--surface);">
+        <option value="">-- Tidak ganti YL --</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <div class="form-label">Hari Kunjungan Baru</div>
+      <div class="day-grid" id="mutasiDayGrid"></div>
+      <div style="font-size:10.5px; color:var(--text-dim); margin-top:8px;">Pilih hari baru. Kosongkan jika hari tidak berubah.</div>
+    </div>
+
+    <div class="action-bar" style="margin-top:20px;">
+      <button class="btn-primary" data-action="execute-mutasi" style="width:100%; justify-content:center;">
+        <i class="fa-solid fa-bolt"></i><span>Eksekusi Mutasi</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- SHEET: MIGRASI -->
 <div class="sheet" id="migrateSheet">
   <div class="sheet-handle"></div>
@@ -798,7 +902,7 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   <div class="sheet-body">
     <div class="form-field">
       <label><i class="fa-solid fa-tags" style="color:var(--brand);"></i> Kategori Default</label>
-<div class="cat-grid" id="migrateCatGrid"></div>
+      <div class="cat-grid" id="migrateCatGrid"></div>
     </div>
 
     <div style="background:var(--surface-2); border-radius:12px; padding:12px 14px; font-size:10.5px; color:var(--text-mute); line-height:1.55; margin:8px 0 16px;">
@@ -885,10 +989,10 @@ Pak Budi, Jl. Melati No 5"></textarea>
     </div>
 
     <div class="action-bar" style="margin-top:8px;">
-      <button type="button" class="btn-clear" style="flex:1; justify-content:center;" onclick="openDraftSheet()">
-  <i class="fa-solid fa-list-check"></i>
-  <span>Lihat Draft (<span id="draftCount">0</span>)</span>
-</button>
+      <button type="button" class="btn-clear" style="flex:1; justify-content:center;" data-action="open-drafts">
+        <i class="fa-solid fa-list-check"></i>
+        <span>Lihat Draft (<span id="draftCount">0</span>)</span>
+      </button>
     </div>
   </div>
 </div>
@@ -957,10 +1061,13 @@ const CATEGORIES = [
   { key:'lain',    label:'LAIN',    icon:'fa-ellipsis',      color:'#64748B' }
 ];
 const DAYS = [
-  { key:'sen', label:'Sen', js:1 },{ key:'sel', label:'Sel', js:2 },
-  { key:'rab', label:'Rab', js:3 },{ key:'kam', label:'Kam', js:4 },
-  { key:'jum', label:'Jum', js:5 },{ key:'sab', label:'Sab', js:6 },
-  { key:'min', label:'Min', js:0 }
+  { key:'sen', label:'Senin',  short:'Sen', js:1 },
+  { key:'sel', label:'Selasa', short:'Sel', js:2 },
+  { key:'rab', label:'Rabu',   short:'Rab', js:3 },
+  { key:'kam', label:'Kamis',  short:'Kam', js:4 },
+  { key:'jum', label:'Jumat',  short:'Jum', js:5 },
+  { key:'sab', label:'Sabtu',  short:'Sab', js:6 },
+  { key:'min', label:'Minggu', short:'Min', js:0 }
 ];
 const STATUSES = [
   { key:'beli',    label:'Beli',    icon:'fa-cart-plus',        cls:'beli' },
@@ -985,14 +1092,15 @@ const TKU_DATA = {
   BBT:{ center:'BUAHBATU', yl:['SYAIDA NURJAENI','SARI LESTARI','SRI MULYATI','WULANSARI','SAFITRI','USWATUN KHASANAH','RENI RAFIKASARI','TIARA ASYANTHIA','YOREN ZAQUALILINE','SITI KHOLIFAH','SUKAESIH','MELIA SANTI','LIA HARYANI','JARIYAH']}
 };
 const TKU_ORDER = ['PNY','ARC','UBR','KRC','ANT','MGY','BJS','BBT'];
-
 const DRAFT_PAGE_SIZE = 20;
 
 /* ============ STATE ============ */
 const state = {
+  isSettingsUnlocked: false,
   activeTab:'kunjungan',
   sticky:{ tku:'PNY', yl:null, category:'rumah', days:[] },
   editTKU:null, editYL:null, editCategory:null, editDays:[],
+  mutasiDays:[],
   customers:[], visits:[], drafts:[],
   editingCustomer:null, activeCustomer:null,
   custFilter:'all', custView:'list',
@@ -1000,7 +1108,10 @@ const state = {
   visitGPS:null, visitPhoto:null,
   visitStatus:'beli', visitPayment:'cash',
   visitQty:{om:0,os:0,yo:0,yt:0},
-  settings:{ theme:'auto' },
+  settings:{ 
+    theme:'auto',
+    firebase: { apiKey:'', projectId:'', databaseUrl:'' }
+  },
   gasUrl:'', geminiKey:'',
   mapInstance:null,
   migrateCategory:'rumah',
@@ -1021,13 +1132,13 @@ const todayKey = () => { const d = new Date(); return d.getFullYear()+'-'+String
 const todayDayKey = () => DAYS.find(d=>d.js===new Date().getDay()).key;
 const parseDateKey = dk => { const [y,m,d]=dk.split('-').map(Number); return new Date(y,m-1,d); };
 const fmtDateShort = dk => { const d = parseDateKey(dk); const m=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des']; return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`; };
-const relativeDay = dk => { const diff = Math.round((parseDateKey(dk) - parseDateKey(todayKey()))/86400000); if(diff===0) return 'Hari ini'; if(diff===-1) return 'Kemarin'; if(diff===1) return 'Besok'; const days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu']; return days[parseDateKey(dk).getDay()]; };
 const getInitials = n => { if(!n) return '?'; const p = n.trim().split(/\s+/).filter(Boolean); if(!p.length) return '?'; if(p.length===1) return p[0][0].toUpperCase(); return (p[0][0]+p[p.length-1][0]).toUpperCase(); };
 const catInfo = k => CATEGORIES.find(c=>c.key===k) || CATEGORIES[6];
 const hitungSetoran = d => d ? (d.om||0)*HARGA.om+(d.os||0)*HARGA.os+(d.yo||0)*HARGA.yo+(d.yt||0)*HARGA.yt : 0;
 const haversineKm = (lat1,lng1,lat2,lng2) => { const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180; const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2; return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); };
 const mapsLink = (lat,lng) => `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 const daysLabel = arr => (arr||[]).map(k => DAYS.find(d=>d.key===k)?.label || '').filter(Boolean).join(', ');
+const daysShortLabel = arr => (arr||[]).map(k => DAYS.find(d=>d.key===k)?.short || '').filter(Boolean).join(', ');
 
 function formatPhone(val){
   let digits = String(val||'').replace(/\D/g, '');
@@ -1056,6 +1167,47 @@ function compressImage(file, maxDim=800, quality=0.7){
 }
 function safeName(str, maxLen=30){
   return String(str||'x').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'_').slice(0,maxLen) || 'x';
+}
+
+/* ============ UPLOAD FOTO KE DRIVE VIA GAS ============ */
+async function uploadPhotoToDrive(base64Photo, photoName){
+  if(!state.gasUrl){
+    throw new Error('GAS URL belum diset');
+  }
+  if(!base64Photo || base64Photo.length < 100){
+    return null;
+  }
+  
+  showToast('⏳ Upload foto...');
+  
+  const payload = {
+    type: 'upload-photo',
+    base64: base64Photo,
+    fileName: photoName
+  };
+  
+  try{
+    const res = await fetch(state.gasUrl, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    
+    if(!res.ok){
+      throw new Error('HTTP ' + res.status);
+    }
+    
+    const json = await res.json();
+    
+    if(json.ok && json.url){
+      return json.url;
+    } else {
+      throw new Error(json.error || 'Upload gagal');
+    }
+  }catch(e){
+    throw new Error('Upload foto gagal: ' + e.message);
+  }
 }
 
 /* ============ HELPERS ============ */
@@ -1140,7 +1292,7 @@ function ctxChipsHTML(){
   const cat = catInfo(state.sticky.category);
   const ylName = state.sticky.yl || '— pilih YL —';
   const days = state.sticky.days || [];
-  const daysTxt = days.length > 0 ? daysLabel(days) : '—';
+  const daysTxt = days.length > 0 ? daysShortLabel(days) : '—';
   return `
     <span class="ctx-chip"><i class="fa-solid fa-store"></i>${state.sticky.tku}</span>
     <span class="ctx-chip"><i class="fa-solid fa-user"></i>${ylName.split(' ')[0]}</span>
@@ -1156,11 +1308,14 @@ function renderMain(){
   else if(t === 'pelanggan') m.innerHTML = pelangganHTML();
   else if(t === 'migrasi') m.innerHTML = migrasiTabHTML();
   else if(t === 'rute') m.innerHTML = ruteHTML();
+  else if(t === 'analisis') m.innerHTML = analisisHTML();
   else if(t === 'set') m.innerHTML = setHTML();
+  
   m.style.animation='none'; void m.offsetWidth; m.style.animation='';
+  
   if(t === 'kunjungan') postKunjungan();
   if(t === 'pelanggan') postPelanggan();
-  if(t === 'migrasi') postMigrasiTab();
+  if(t === 'analisis') postAnalisis();
 }
 
 /* ============ TAB: KUNJUNGAN ============ */
@@ -1215,7 +1370,7 @@ function renderCustList(){
     const statusTxt = v ? (v.status === 'beli' ? `✓ Beli ${(v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0)} btl` : `✓ ${STATUSES.find(s=>s.key===v.status)?.label || v.status}`) : '';
     const unsynced = c._syncedAt ? '' : '<span class="unsynced-dot"></span>';
     return `<div class="customer-card ${visited?'visited':''}" data-cust="${c.id}">
-      <div class="cust-photo">${c.photo?`<img src="${c.photo}">`:`<i class="fa-solid ${cat.icon}" style="color:${cat.color};"></i>`}${unsynced}</div>
+      <div class="cust-photo">${c.photoUrl?`<img src="${c.photoUrl}">`:`<i class="fa-solid ${cat.icon}" style="color:${cat.color};"></i>`}${unsynced}</div>
       <div class="cust-info">
         <div class="cust-name">${c.name}</div>
         <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span>${c.address ? c.address.slice(0,28)+(c.address.length>28?'…':'') : ''}</div>
@@ -1272,10 +1427,10 @@ function renderAllList(){
     const cat = catInfo(c.category);
     const unsynced = c._syncedAt ? '' : '<span class="unsynced-dot"></span>';
     return `<div class="customer-card" data-cust-detail="${c.id}">
-      <div class="cust-photo">${c.photo?`<img src="${c.photo}">`:`<i class="fa-solid ${cat.icon}" style="color:${cat.color};"></i>`}${unsynced}</div>
+      <div class="cust-photo">${c.photoUrl?`<img src="${c.photoUrl}">`:`<i class="fa-solid ${cat.icon}" style="color:${cat.color};"></i>`}${unsynced}</div>
       <div class="cust-info">
         <div class="cust-name">${c.name}</div>
-        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span>${daysLabel(c.blockingDays)}</div>
+        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span>${daysShortLabel(c.blockingDays)}</div>
       </div>
       <i class="fa-solid fa-chevron-right cust-action"></i>
     </div>`;
@@ -1322,30 +1477,15 @@ function migrasiTabHTML(){
       <div class="summary-cell"><div class="summary-cell-lbl">Perlu GPS</div><div class="summary-cell-val warn num">${draftCount - readyCount}</div></div>
     </div>
 
-    <div class="form-card" style="padding:14px;">
-      <div class="field-label" style="margin-bottom:10px;"><i class="fa-solid fa-circle-info"></i> Cara Pakai</div>
-      <div style="font-size:11.5px; color:var(--text-mute); line-height:1.7;">
-        <div style="margin-bottom:6px;"><b style="color:var(--brand);">1.</b> Buka Panel Migrasi → paste Gemini API Key</div>
-        <div style="margin-bottom:6px;"><b style="color:var(--brand);">2.</b> Pilih kategori default (misal: RUMAH)</div>
-        <div style="margin-bottom:6px;"><b style="color:var(--brand);">3.</b> Tap "Ambil Foto Halaman" → foto kertas</div>
-        <div style="margin-bottom:6px;"><b style="color:var(--brand);">4.</b> Tunggu AI baca (~5-8 detik) → draft muncul</div>
-        <div style="margin-bottom:6px;"><b style="color:var(--brand);">5.</b> Ulangi untuk halaman berikutnya</div>
-        <div style="margin-bottom:6px;"><b style="color:var(--brand);">6.</b> Buka draft → edit nama/alamat kalau salah</div>
-        <div style="margin-bottom:6px;"><b style="color:var(--brand);">7.</b> Ambil GPS tiap draft saat di lokasi</div>
-        <div><b style="color:var(--brand);">8.</b> Import yang ready → jadi pelanggan</div>
-      </div>
-    </div>
-
     ${draftCount > 0 ? `
       <div class="action-bar">
-        <button class="btn-save" onclick="openDraftSheet()" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);">
-  <i class="fa-solid fa-list-check"></i><span>Lihat ${draftCount} Draft</span>
-</button>
-        </div>
+        <button class="btn-save" data-action="open-drafts" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);">
+          <i class="fa-solid fa-list-check"></i><span>Lihat ${draftCount} Draft</span>
+        </button>
+      </div>
     ` : ''}
   `;
 }
-function postMigrasiTab(){ /* no-op, handled via sheet */ }
 
 /* ============ TAB: RUTE ============ */
 function ruteHTML(){
@@ -1361,12 +1501,77 @@ function ruteHTML(){
   `;
 }
 
+/* ============ TAB: ANALISIS ============ */
+function analisisHTML(){
+  return `
+    <div class="form-card">
+      <div class="field-label"><i class="fa-solid fa-chart-line"></i> Kinerja Kunjungan</div>
+      <div style="font-size:11.5px; color:var(--text-mute); line-height:1.5;">Analisis performa kunjungan hari ini dibandingkan hari yang sama pada minggu lalu.</div>
+    </div>
+    <div id="analisisResult" style="display:flex; flex-direction:column; gap:12px;"></div>
+  `;
+}
+function postAnalisis(){
+  const wrap = $('analisisResult');
+  if(!wrap) return;
+
+  const dToday = todayKey();
+  const lwDate = new Date(Date.now() - 7*86400*1000);
+  const dLw = lwDate.getFullYear()+'-'+String(lwDate.getMonth()+1).padStart(2,'0')+'-'+String(lwDate.getDate()).padStart(2,'0');
+
+  const vToday = state.visits.filter(v => v.date === dToday);
+  const vLw = state.visits.filter(v => v.date === dLw);
+
+  const mToday = { total: vToday.length, beli: vToday.filter(v=>v.status==='beli').length, tolak: vToday.filter(v=>v.status==='tolak'||v.status==='gak_beli').length, botol: vToday.reduce((s,v)=>s+(v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0),0) };
+  const mLw = { total: vLw.length, beli: vLw.filter(v=>v.status==='beli').length, botol: vLw.reduce((s,v)=>s+(v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0),0) };
+
+  const pctBeliToday = mToday.total > 0 ? (mToday.beli / mToday.total)*100 : 0;
+  const pctBeliLw = mLw.total > 0 ? (mLw.beli / mLw.total)*100 : 0;
+
+  const renderStat = (valT, valL, label) => {
+    const diff = valT - valL;
+    let trend = '';
+    if(diff > 0) trend = `<span class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> ${diff}</span>`;
+    else if(diff < 0) trend = `<span class="stat-trend down"><i class="fa-solid fa-arrow-down"></i> ${Math.abs(diff)}</span>`;
+    else trend = `<span class="stat-trend neutral">-</span>`;
+    return `<div class="stat-box"><div class="stat-val">${fmtNum(valT)}</div><div class="stat-lbl">${label}</div>${trend}</div>`;
+  };
+
+  wrap.innerHTML = `
+    <div style="display:flex; gap:8px;">
+      ${renderStat(mToday.beli, mLw.beli, 'Total Beli')}
+      ${renderStat(mToday.botol, mLw.botol, 'Total Botol')}
+      ${renderStat(mToday.tolak, vLw.filter(v=>v.status==='tolak'||v.status==='gak_beli').length, 'Tolak/Gak Beli')}
+    </div>
+    <div class="form-card" style="padding:16px;">
+      <div style="font-size:12px; font-weight:700; display:flex; justify-content:space-between;">
+        <span>Conversion Rate (Beli / Total)</span>
+        <span style="color:var(--brand);">${pctBeliToday.toFixed(1)}%</span>
+      </div>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar-fill" style="width:${pctBeliToday}%; background:var(--brand);"></div>
+      </div>
+      <div style="font-size:10px; color:var(--text-mute); margin-top:8px; text-align:right;">
+        Minggu lalu: <b>${pctBeliLw.toFixed(1)}%</b>
+      </div>
+    </div>
+  `;
+}
+
 /* ============ TAB: SET ============ */
 function setHTML(){
   const s = state.settings;
   const unsynced = state.visits.filter(v => !v._syncedAt).length + state.customers.filter(c => !c._syncedAt).length;
   return `
     <div class="form-card" style="padding:0;">
+      <div class="set-row">
+        <div><div class="set-lbl">Mutasi Pelanggan</div><div class="set-sub">Pindah YL atau ganti Hari Kunjungan</div></div>
+        <button class="set-btn" data-action="open-mutasi"><i class="fa-solid fa-people-arrows"></i> Mutasi</button>
+      </div>
+      <div class="set-row">
+        <div><div class="set-lbl">Database Firebase</div><div class="set-sub">Simpan online permanen</div></div>
+        <button class="set-btn" data-action="open-firebase"><i class="fa-solid fa-database"></i> Setup</button>
+      </div>
       <div class="set-row">
         <div><div class="set-lbl">Tema</div><div class="set-sub">Light / Dark / Auto</div></div>
         <div class="seg" data-seg="theme">
@@ -1376,11 +1581,11 @@ function setHTML(){
         </div>
       </div>
       <div class="set-row">
-        <div><div class="set-lbl">Database</div><div class="set-sub">${state.customers.length} pelanggan · ${state.visits.length} kunjungan${unsynced > 0 ? ` · <span style="color:var(--amber);font-weight:700;">${unsynced} belum sync</span>` : ''}</div></div>
+        <div><div class="set-lbl">Google Drive & Sheets</div><div class="set-sub">${state.customers.length} pelanggan · ${state.visits.length} kunjungan${unsynced > 0 ? ` · <span style="color:var(--amber);font-weight:700;">${unsynced} blm sync</span>` : ''}</div></div>
         <button class="set-btn" data-action="open-sync"><i class="fa-solid fa-cloud"></i> Cloud</button>
       </div>
       <div class="set-row">
-        <div><div class="set-lbl">Backup Data</div><div class="set-sub">Export JSON ke file</div></div>
+        <div><div class="set-lbl">Backup Data</div><div class="set-sub">Export JSON ke file lokal</div></div>
         <button class="set-btn" data-action="backup"><i class="fa-solid fa-download"></i> Backup</button>
       </div>
       <div class="set-row">
@@ -1394,8 +1599,8 @@ function setHTML(){
       </div>
     </div>
     <div class="form-card" style="text-align:center; padding:14px;">
-      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v2.0</div>
-      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">Migrasi + AI Gemini · Offline-First</div>
+      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v2.2</div>
+      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">Mutasi + Firebase + Analisis</div>
     </div>
   `;
 }
@@ -1437,7 +1642,7 @@ function openSheet(id){
   haptic(id === 'visitSheet' ? 20 : 8);
 }
 function closeAllSheets(){
-  ['ctxSheet','custSheet','visitSheet','detailSheet','mapSheet','syncSheet','migrateSheet','draftSheet','draftEditSheet'].forEach(id=>{
+  ['ctxSheet','custSheet','visitSheet','detailSheet','mapSheet','syncSheet','migrateSheet','draftSheet','draftEditSheet','mutasiSheet','firebaseSheet', 'passwordSheet'].forEach(id=>{
     const el = $(id);
     if(el) el.classList.remove('open','visit-sheet');
   });
@@ -1461,14 +1666,14 @@ function renderCtxSheet(){
   $('ctxMenuYL').innerHTML = yls.map(y=>`<button type="button" class="dd-item ${y===state.sticky.yl?'selected':''}" data-dd-item="ctx-yl" data-value="${encodeURIComponent(y)}"><span class="dd-item-main"><span class="dd-item-name">${y}</span></span><i class="fa-solid fa-check dd-check"></i></button>`).join('');
   $('ctxCatGrid').innerHTML = CATEGORIES.map(c=>`<button type="button" class="cat-chip ${c.key===state.sticky.category?'active':''}" data-ctx-cat="${c.key}"><i class="fa-solid ${c.icon}"></i><span>${c.label}</span></button>`).join('');
   const days = state.sticky.days || [];
-  $('ctxDayGrid').innerHTML = DAYS.map(d=>`<button type="button" class="day-cell ${days.includes(d.key)?'active':''}" data-ctx-day="${d.key}">${d.label}</button>`).join('');
+  $('ctxDayGrid').innerHTML = DAYS.map(d=>`<button type="button" class="day-cell ${days.includes(d.key)?'active':''}" data-ctx-day="${d.key}">${d.short}</button>`).join('');
 }
 
 /* ============ CUSTOMER FORM ============ */
 function openCustForm(cust){
   state.editingCustomer = cust;
   state.pendingGPS = cust ? { lat:cust.lat, lng:cust.lng } : null;
-  state.pendingPhoto = cust ? cust.photo : null;
+  state.pendingPhoto = cust ? (cust.photoUrl || null) : null;
   state.editTKU = cust ? cust.tku : state.sticky.tku;
   state.editYL = cust ? cust.createdBy : state.sticky.yl;
   state.editCategory = cust ? cust.category : state.sticky.category;
@@ -1493,7 +1698,7 @@ function renderCustCtxBar(){
   const ylName = state.editYL || '— pilih YL —';
   const cat = catInfo(state.editCategory);
   const days = state.editDays || [];
-  const daysTxt = days.length > 0 ? daysLabel(days) : '—';
+  const daysTxt = days.length > 0 ? daysShortLabel(days) : '—';
   $('custCtxMain').innerHTML = `
     <span class="ctx-chip"><i class="fa-solid fa-store"></i>${state.editTKU}</span>
     <span class="ctx-chip"><i class="fa-solid fa-user"></i>${ylName.split(' ')[0]}</span>
@@ -1542,11 +1747,23 @@ async function saveCustomer(){
   if(!addr){ showToast('Alamat wajib diisi'); return; }
   if(state.editDays.length === 0){ showToast('Jadwal kunjungan kosong · set di Mode Kerja'); return; }
   if(!state.pendingGPS?.lat){ showToast('Ambil GPS dulu'); return; }
+  
   const ed = state.editingCustomer;
   const cid = ed ? ed.id : uid('c');
-  const photoName = state.pendingPhoto
-    ? `cust_${safeName(state.editYL,20)}_${safeName(name,25)}_${cid}.jpg`
-    : (ed ? ed.photoName : null);
+  
+  // Upload foto kalau ada foto baru (base64, bukan URL)
+  let photoUrl = ed ? (ed.photoUrl || null) : null;
+  const isNewPhoto = state.pendingPhoto && !state.pendingPhoto.startsWith('http');
+  
+  if(isNewPhoto){
+    const photoName = `cust_${safeName(state.editYL,20)}_${safeName(name,25)}_${cid}.jpg`;
+    try{
+      photoUrl = await uploadPhotoToDrive(state.pendingPhoto, photoName);
+    }catch(e){
+      showToast('⚠️ Foto gagal upload, simpan tanpa foto');
+    }
+  }
+  
   const rec = {
     id: cid,
     name,
@@ -1555,9 +1772,10 @@ async function saveCustomer(){
     address: addr,
     landmark: $('custLandmark').value.trim(),
     phone: formatPhone($('custPhone').value),
-    photo: state.pendingPhoto,
-    photoName,
-    lat: state.pendingGPS.lat, lng: state.pendingGPS.lng,
+    photoUrl: photoUrl,
+    photoName: photoUrl ? `cust_${safeName(state.editYL,20)}_${safeName(name,25)}_${cid}.jpg` : null,
+    lat: state.pendingGPS.lat, 
+    lng: state.pendingGPS.lng,
     notes: $('custNotes').value.trim(),
     tku: state.editTKU,
     createdBy: state.editYL,
@@ -1566,11 +1784,21 @@ async function saveCustomer(){
     active: true,
     _syncedAt: ed ? ed._syncedAt : null
   };
+  
   await idbPut(ST_CUST, rec);
   const i = state.customers.findIndex(c=>c.id===rec.id);
-  if(i >= 0) state.customers[i] = rec; else state.customers.push(rec);
-  if(!ed){ state.sticky.tku = state.editTKU; state.sticky.yl = state.editYL; state.sticky.category = state.editCategory; saveSettings(); }
-  haptic(25); showToast(ed ? '✓ Diupdate' : `✓ ${name.split(' ')[0]} → ${state.editYL.split(' ')[0]}`);
+  if(i >= 0) state.customers[i] = rec; 
+  else state.customers.push(rec);
+  
+  if(!ed){ 
+    state.sticky.tku = state.editTKU; 
+    state.sticky.yl = state.editYL; 
+    state.sticky.category = state.editCategory; 
+    saveSettings(); 
+  }
+  
+  haptic(25); 
+  showToast(ed ? '✓ Diupdate' : `✓ ${name.split(' ')[0]} → ${state.editYL.split(' ')[0]}`);
   closeAllSheets(); renderBanner(); renderMain();
 }
 async function deleteCustomer(){
@@ -1595,7 +1823,7 @@ function openDetail(cid){
   $('dMeta').textContent = `${cat.label} · ${c.tku || ''} · ${c.createdBy || ''}`;
   const visits = getCustomerVisits(c.id).sort((a,b)=>b.timestamp-a.timestamp).slice(0,10);
   $('detailBody').innerHTML = `
-    ${c.photo?`<img src="${c.photo}" style="width:100%; border-radius:16px; margin-bottom:14px; max-height:220px; object-fit:cover;">`:''}
+    ${c.photoUrl?`<img src="${c.photoUrl}" style="width:100%; border-radius:16px; margin-bottom:14px; max-height:220px; object-fit:cover;">`:''}
     <div class="detail-box">
       <div class="detail-row"><i class="fa-solid ${cat.icon}" style="color:${cat.color};"></i> <b>${cat.label}</b> · ${daysLabel(c.blockingDays)}</div>
       <div class="detail-row"><i class="fa-solid fa-user"></i> <span>PIC: <b>${c.createdBy||'—'}</b> · ${c.tku||''}</span></div>
@@ -1613,7 +1841,7 @@ function openDetail(cid){
       visits.map(v=>{
         const st = STATUSES.find(s=>s.key===v.status);
         const botol = (v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0);
-        const thumb = v.photo ? `<img class="visit-thumb" src="${v.photo}" alt="">` : '';
+        const thumb = v.photoUrl ? `<img class="visit-thumb" src="${v.photoUrl}" alt="">` : '';
         return `<div class="visit-item">
           ${thumb}
           <div style="flex:1;min-width:0;"><div class="visit-item-l">${fmtDateShort(v.date)}</div><div class="visit-item-s">${st?st.label:v.status} · ${v.payment||'-'} · ${v.yl||''}</div></div>
@@ -1693,27 +1921,58 @@ async function saveVisit(){
   const c = state.activeCustomer; if(!c) return;
   if(!state.sticky.yl){ showToast('Pilih YL dulu di Mode Kerja'); return; }
   if(state.visitStatus === 'beli' && Object.values(state.visitQty).every(v=>!v)){ showToast('Isi jumlah produk dulu'); return; }
+  
   let lat=null, lng=null;
-  try{ const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000})); lat=pos.coords.latitude; lng=pos.coords.longitude; }
-  catch(_){ if(c.lat){ lat=c.lat; lng=c.lng; } }
+  try{ 
+    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000})); 
+    lat=pos.coords.latitude; 
+    lng=pos.coords.longitude; 
+  }catch(_){ 
+    if(c.lat){ lat=c.lat; lng=c.lng; } 
+  }
+  
   const vid = uid('v');
+  
+  // Upload foto kunjungan kalau ada
+  let photoUrl = null;
+  if(state.visitPhoto && !state.visitPhoto.startsWith('http')){
+    const photoName = `visit_${safeName(state.sticky.tku,10)}_${safeName(state.sticky.yl,20)}_${todayKey()}_${vid}.jpg`;
+    try{
+      photoUrl = await uploadPhotoToDrive(state.visitPhoto, photoName);
+    }catch(e){
+      showToast('⚠️ Foto gagal upload: ' + e.message);
+    }
+  }
+  
+  // Kalau status bukan 'beli', paksa qty = 0
+  const isBeli = state.visitStatus === 'beli';
   const v = {
-    id: vid, customerId: c.id, customerName: c.name, category: c.category,
-    tku: state.sticky.tku, yl: state.sticky.yl,
-    date: todayKey(), time: new Date().toTimeString().slice(0,5),
+    id: vid, 
+    customerId: c.id, 
+    customerName: c.name, 
+    category: c.category,
+    tku: state.sticky.tku, 
+    yl: state.sticky.yl,
+    date: todayKey(), 
+    time: new Date().toTimeString().slice(0,5),
     status: state.visitStatus,
-    om: state.visitQty.om||0, os: state.visitQty.os||0, yo: state.visitQty.yo||0, yt: state.visitQty.yt||0,
-    payment: state.visitPayment, notes: $('visitNotes').value.trim(),
-    lat, lng, timestamp: Date.now(),
-    photo: state.visitPhoto || null,
-    photoName: state.visitPhoto
-      ? `visit_${safeName(state.sticky.tku,10)}_${safeName(state.sticky.yl,20)}_${todayKey()}_${vid}.jpg`
-      : null,
+    om: isBeli ? (state.visitQty.om||0) : 0, 
+    os: isBeli ? (state.visitQty.os||0) : 0, 
+    yo: isBeli ? (state.visitQty.yo||0) : 0, 
+    yt: isBeli ? (state.visitQty.yt||0) : 0,
+    payment: isBeli ? state.visitPayment : 'cash', 
+    notes: $('visitNotes').value.trim(),
+    lat, lng, 
+    timestamp: Date.now(),
+    photoUrl: photoUrl,
+    photoName: photoUrl ? `visit_${safeName(state.sticky.tku,10)}_${safeName(state.sticky.yl,20)}_${todayKey()}_${vid}.jpg` : null,
     _syncedAt: null
   };
+  
   await idbPut(ST_VISIT, v);
   state.visits.push(v);
   haptic(25);
+  
   const botol = v.om+v.os+v.yo+v.yt;
   showToast(v.status === 'beli' ? `✓ ${c.name.split(' ')[0]} · ${botol} btl` : `✓ ${c.name.split(' ')[0]} · ${STATUSES.find(s=>s.key===v.status).label}`);
   closeAllSheets(); renderBanner(); renderMain();
@@ -1790,9 +2049,6 @@ function restoreData(){
 }
 
 /* ============ GEMINI OCR ============ */
-const GEMINI_MODEL = 'gemini-3.5-flash-lite';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-
 const AI_PROMPT_TEMPLATE = `Convert foto tulisan tangan ini ke format berikut.
 
 FORMAT OUTPUT (plain text, satu baris per pelanggan):
@@ -1817,78 +2073,6 @@ Toko Sinar Jaya | Jl. Kenanga No 88
 PENTING: Hanya tulis output sesuai format di atas. JANGAN tulis penjelasan apapun.
 Tulis semua pelanggan yang kamu lihat, jangan ada yang terlewat.`;
 
-const PROMPT_OCR = `Kamu adalah asisten OCR tulisan tangan Bahasa Indonesia.
-Baca gambar ini dan ekstrak SEMUA nama pelanggan + alamat dari daftar.
-
-Format output HARUS JSON valid:
-{"items":[{"nama":"...","alamat":"...","confidence":"high"}]}
-
-Aturan:
-- "nama" = nama orang (Bu/Pak/Mbak) atau nama warung/toko
-- "alamat" = jalan, nomor, RT/RW, patokan
-- Gabung alamat jadi 1 baris
-- Kalau tulisan tidak jelas, set confidence = "low"
-- Abaikan baris kosong / garis
-- JANGAN tambah field lain, JANGAN tulis penjelasan`;
-
-async function callGeminiOCR(base64Image){
-  if(!state.geminiKey){ throw new Error('API Key belum diset'); }
-  const cleanB64 = base64Image.replace(/^data:image\/\w+;base64,/,'');
-  const body = {
-    contents: [{
-      parts: [
-        { text: PROMPT_OCR },
-        { inline_data: { mime_type: 'image/jpeg', data: cleanB64 } }
-      ]
-    }],
-    generationConfig: {
-      temperature: 0.1,
-      response_mime_type: 'application/json'
-    }
-  };
-
-  // Model yang tersedia untuk key AQ. baru (per dokumentasi Google)
-const models = ['gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-2.5-flash'];
-let lastErr = null;
-  for(const model of models){
-    try{
-      // ⚠️ KUNCI: pakai URL parameter ?key= (BUKAN header)
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(state.geminiKey)}`;
-      
-      const res = await fetch(url, {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      if(res.ok){
-        const json = await res.json();
-        const txt = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        let parsed;
-        try{ parsed = JSON.parse(txt); }
-        catch(_){
-          const m = txt.match(/\{[\s\S]*\}/);
-          if(m) parsed = JSON.parse(m[0]);
-          else throw new Error('Format AI tidak valid');
-        }
-        return (parsed.items || []).filter(it => it.nama && it.nama.trim());
-      }
-
-      if(res.status === 503 || res.status === 429){
-        lastErr = new Error(`Model ${model} sibuk. Coba lagi...`);
-        await new Promise(r => setTimeout(r, 2000));
-        continue;
-      }
-
-      const errTxt = await res.text();
-      lastErr = new Error(`Gemini ${res.status}: ${errTxt.slice(0,150)}`);
-    }catch(e){
-      lastErr = e;
-    }
-  }
-  throw lastErr || new Error('Semua model gagal. Coba lagi nanti.');
-}
-/* ============ IMPORT DARI AI ============ */
 async function copyAIPrompt(){
   const btn = $('btnCopyPrompt');
   const originalHTML = btn.innerHTML;
@@ -1958,7 +2142,7 @@ async function parseAndCreateDrafts(){
   const text = (ta?.value || '').trim();
   if(!text){ showToast('Paste hasil dari AI dulu'); return; }
   const items = parseAIText(text);
-  if(items.length === 0){ showToast('❌ Format tidak terdeteksi. Cek contoh di bawah.'); return; }
+  if(items.length === 0){ showToast('❌ Format tidak terdeteksi.'); return; }
   if(!confirm(`Parse ${items.length} pelanggan jadi draft?`)) return;
   const batchId = uid('batch');
   let added = 0;
@@ -2009,52 +2193,6 @@ function renderMigrateCatGrid(){
 }
 function updateDraftCountUI(){
   const el = $('draftCount'); if(el) el.textContent = state.drafts.length;
-}
-
-async function processMigratePhoto(file){
-  if(!state.geminiKey){ showToast('Simpan API Key dulu'); return; }
-  if(!file){ return; }
-  const prog = $('migrateProgress');
-  const bar = $('migrateBarFill');
-  const stat = $('migrateStatus');
-  prog.classList.add('show');
-  bar.style.width = '15%';
-  stat.textContent = 'Compress foto...';
-  try{
-    const compressed = await compressImage(file, 1400, 0.8);
-    bar.style.width = '35%';
-    stat.textContent = 'Mengirim ke Gemini...';
-    const items = await callGeminiOCR(compressed);
-    bar.style.width = '80%';
-    stat.textContent = `${items.length} nama terbaca, menyimpan draft...`;
-    const batchId = uid('batch');
-    for(const it of items){
-      const draft = {
-        id: uid('d'),
-        nama: (it.nama||'').trim(),
-        alamat: (it.alamat||'').trim(),
-        kategori: state.migrateCategory,
-        lat: null, lng: null,
-        confidence: it.confidence || 'high',
-        batchId,
-        createdAt: Date.now()
-      };
-      await idbPut(ST_DRAFT, draft);
-      state.drafts.push(draft);
-    }
-    bar.style.width = '100%';
-    stat.textContent = `✓ ${items.length} draft ditambahkan`;
-    haptic([30, 40, 30]);
-    showToast(`✓ ${items.length} nama terbaca`);
-    updateDraftCountUI();
-    renderMain();
-    setTimeout(()=>{ prog.classList.remove('show'); bar.style.width = '0%'; }, 1200);
-  }catch(e){
-    prog.classList.remove('show');
-    bar.style.width = '0%';
-    haptic([60,50,60]);
-    showToast('❌ ' + (e.message || 'Gagal baca'));
-  }
 }
 
 async function openDraftSheet(){
@@ -2166,7 +2304,7 @@ async function importReadyDrafts(){
       id: cid, name: d.nama, category: d.kategori,
       blockingDays: [...(state.sticky.days||[])],
       address: d.alamat, landmark: '',
-      phone: '', photo: null, photoName: null,
+      phone: '', photoUrl: null, photoName: null,
       lat: d.lat, lng: d.lng,
       notes: 'Import dari draft (migrasi)',
       tku: state.sticky.tku, createdBy: yl,
@@ -2184,6 +2322,80 @@ async function importReadyDrafts(){
   closeAllSheets();
   renderBanner(); renderMain();
   setTimeout(()=>openDraftSheet(), 300);
+}
+
+/* ============ MUTASI ============ */
+function openMutasiSheet(){
+  const selTkuAsal = $('mutasiTkuAsal');
+  selTkuAsal.innerHTML = '<option value="">-- Pilih TKU --</option>' + TKU_ORDER.map(k=>`<option value="${k}">${TKU_DATA[k].center}</option>`).join('');
+  
+  $('mutasiYlAsal').innerHTML = '<option value="">-- Pilih YL Asal --</option>';
+  $('mutasiYlTujuan').innerHTML = '<option value="">-- Tidak ganti YL --</option>';
+  
+  selTkuAsal.onchange = (e) => {
+    const val = e.target.value;
+    if(!val) return;
+    const yls = TKU_DATA[val].yl;
+    $('mutasiYlAsal').innerHTML = '<option value="">-- Pilih YL Asal --</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
+    $('mutasiYlTujuan').innerHTML = '<option value="">-- Tidak ganti YL --</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
+  };
+
+  state.mutasiDays = [];
+  renderMutasiDays();
+
+  openSheet('mutasiSheet');
+}
+function renderMutasiDays(){
+  $('mutasiDayGrid').innerHTML = DAYS.map(d=>`<button type="button" class="day-cell ${state.mutasiDays.includes(d.key)?'active':''}" data-mutasi-day="${d.key}">${d.short}</button>`).join('');
+}
+async function executeMutasi(){
+  const tku = $('mutasiTkuAsal').value;
+  const ylAsal = $('mutasiYlAsal').value;
+  const ylTujuan = $('mutasiYlTujuan').value;
+  const hariTujuan = [...state.mutasiDays];
+
+  if(!tku || !ylAsal){ showToast('Pilih TKU dan YL Asal'); return; }
+  if(!ylTujuan && hariTujuan.length === 0){ showToast('Pilih minimal YL Tujuan atau Hari Baru'); return; }
+
+  const affected = state.customers.filter(c => c.tku === tku && c.createdBy === ylAsal);
+  if(affected.length === 0){ showToast('Tidak ada pelanggan di YL Asal ini'); return; }
+
+  let msg = `Mutasi ${affected.length} pelanggan dari YL "${ylAsal}"\n\n`;
+  if(ylTujuan) msg += `-> Ke YL: "${ylTujuan}"\n`;
+  if(hariTujuan.length > 0) msg += `-> Ke Hari: ${daysLabel(hariTujuan)}\n`;
+  msg += `\nLanjutkan?`;
+
+  if(!confirm(msg)) return;
+
+  for(const c of affected){
+    if(ylTujuan) c.createdBy = ylTujuan;
+    if(hariTujuan.length > 0) c.blockingDays = hariTujuan;
+    c._syncedAt = null;
+    await idbPut(ST_CUST, c);
+  }
+
+  haptic([30,40,30]);
+  showToast(`✓ Berhasil memutasi ${affected.length} pelanggan`);
+  closeAllSheets();
+  renderBanner(); renderMain();
+}
+
+/* ============ FIREBASE ============ */
+function openFirebaseSheet(){
+  $('fbApiKey').value = state.settings.firebase?.apiKey || '';
+  $('fbProjectId').value = state.settings.firebase?.projectId || '';
+  $('fbDatabaseUrl').value = state.settings.firebase?.databaseUrl || '';
+  openSheet('firebaseSheet');
+}
+function saveFirebaseSettings(){
+  if(!state.settings.firebase) state.settings.firebase = {};
+  state.settings.firebase.apiKey = $('fbApiKey').value.trim();
+  state.settings.firebase.projectId = $('fbProjectId').value.trim();
+  state.settings.firebase.databaseUrl = $('fbDatabaseUrl').value.trim();
+  saveSettings();
+  haptic(20);
+  showToast('✓ Konfigurasi Firebase tersimpan');
+  closeAllSheets();
 }
 
 /* ============ SYNC ============ */
@@ -2220,28 +2432,61 @@ async function syncNow(){
   const payload = {
     type:'customers',
     customers: state.customers.map(c=>({
-      id:c.id, name:c.name, category:c.category, blockingDays:(c.blockingDays||[]).join(','),
-      address:c.address, landmark:c.landmark, phone:c.phone, lat:c.lat, lng:c.lng,
-      notes:c.notes, tku:c.tku, createdBy:c.createdBy, createdAt:c.createdAt,
-      photo: c.photo || null,
-      photoName: c.photoName || `cust_${safeName(c.createdBy||'yl',20)}_${safeName(c.name,25)}_${c.id}.jpg`
+      id:c.id, 
+      name:c.name, 
+      category:c.category, 
+      blockingDays:(c.blockingDays||[]).join(','),
+      address:c.address, 
+      landmark:c.landmark, 
+      phone:c.phone, 
+      lat:c.lat, 
+      lng:c.lng,
+      notes:c.notes, 
+      tku:c.tku, 
+      createdBy:c.createdBy, 
+      createdAt:c.createdAt,
+      photoUrl: c.photoUrl || null,
+      photoName: c.photoName || null
     })),
     visits: state.visits.map(v=>({
-      id:v.id, customerId:v.customerId, customerName:v.customerName, category:v.category,
-      tku:v.tku, yl:v.yl, date:v.date, time:v.time, status:v.status,
-      om:v.om, os:v.os, yo:v.yo, yt:v.yt, total:(v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0),
-      rp: hitungSetoran(v), payment:v.payment, notes:v.notes,
-      lat:v.lat, lng:v.lng, timestamp:v.timestamp,
-      photo: v.photo || null,
-      photoName: v.photoName || `visit_${safeName(v.tku||'',10)}_${safeName(v.yl||'',20)}_${v.date||''}_${v.id}.jpg`
+      id:v.id, 
+      customerId:v.customerId, 
+      customerName:v.customerName, 
+      category:v.category,
+      tku:v.tku, 
+      yl:v.yl, 
+      date:v.date, 
+      time:v.time, 
+      status:v.status,
+      om:v.om, 
+      os:v.os, 
+      yo:v.yo, 
+      yt:v.yt, 
+      total:(v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0),
+      rp: hitungSetoran(v), 
+      payment:v.payment, 
+      notes:v.notes,
+      lat:v.lat, 
+      lng:v.lng, 
+      timestamp:v.timestamp,
+      photoUrl: v.photoUrl || null,
+      photoName: v.photoName || null
     })),
     timestamp: Date.now()
   };
-  const ylCount = new Set([...payload.customers.map(c=>c.createdBy), ...payload.visits.map(v=>v.yl)].filter(Boolean)).size;
-  const photoCount = payload.customers.filter(c=>c.photo).length + payload.visits.filter(v=>v.photo).length;
+  const photoCount = payload.customers.filter(c=>c.photoUrl).length + payload.visits.filter(v=>v.photoUrl).length;
 
   try{
-    await fetch(state.gasUrl, { method:'POST', mode:'no-cors', headers:{ 'Content-Type':'text/plain' }, body: JSON.stringify(payload) });
+    const res = await fetch(state.gasUrl, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json().catch(()=>({ ok:true }));
+    if(json.ok === false) throw new Error(json.error || 'Server tolak');
+    
     clearInterval(progressTimer);
     setProgress(100);
     overlay.classList.add('success');
@@ -2278,151 +2523,42 @@ async function syncNow(){
   }
 }
 
-/* ============ GAS CODE ============ */
-const GAS_CODE = `const SHEET_ID = 'PASTE_SPREADSHEET_ID';
-const FOLDER_ID = 'PASTE_FOLDER_ID';
-
-function doPost(e){
-  try{
-    const payload = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.openById(SHEET_ID);
-    if(payload.type !== 'customers') return json({ok:false, error:'invalid payload'});
-
-    const byYL = {};
-    (payload.customers || []).forEach(c => {
-      const yl = String(c.createdBy || 'UNKNOWN').trim().toUpperCase();
-      if(!byYL[yl]) byYL[yl] = { customers: [], visits: [] };
-      byYL[yl].customers.push(c);
-    });
-    (payload.visits || []).forEach(v => {
-      const yl = String(v.yl || 'UNKNOWN').trim().toUpperCase();
-      if(!byYL[yl]) byYL[yl] = { customers: [], visits: [] };
-      byYL[yl].visits.push(v);
-    });
-
-    const summary = [];
-    Object.keys(byYL).forEach(yl => {
-      const sheetName = sanitizeSheetName(yl);
-      let sheet = ss.getSheetByName(sheetName);
-      if(!sheet) sheet = ss.insertSheet(sheetName);
-      sheet.clear();
-      const data = byYL[yl];
-
-      sheet.getRange(1,1,1,4).merge().setValue('PELANGGAN & KUNJUNGAN - ' + yl)
-        .setFontWeight('bold').setFontSize(14).setFontColor('#FFFFFF').setBackground('#0D9488')
-        .setHorizontalAlignment('left').setVerticalAlignment('middle');
-      sheet.setRowHeight(1, 32);
-      sheet.getRange(2,1).setValue('Update terakhir: ' + new Date().toLocaleString('id-ID'))
-        .setFontStyle('italic').setFontColor('#64748B').setFontSize(10);
-
-      let row = 4;
-      sheet.getRange(row,1).setValue('=== PELANGGAN ===').setFontWeight('bold').setFontColor('#0D9488').setFontSize(12);
-      row++;
-      const custHeaders = ['ID','Nama','Kategori','Hari Kunjungan','Alamat','Patokan','No HP','Lat','Lng','Catatan','TKU','Dibuat','Foto'];
-      sheet.getRange(row,1,1,custHeaders.length).setValues([custHeaders]).setFontWeight('bold').setBackground('#0D9488').setFontColor('#FFFFFF').setHorizontalAlignment('center');
-      row++;
-      if(data.customers.length > 0){
-        const rows = data.customers.map(c => {
-          let photoUrl = '-';
-          const rawPhoto = c.photo || '';
-          if(rawPhoto && typeof rawPhoto === 'string' && rawPhoto.length > 100){
-            try { photoUrl = uploadBase64ToDrive(rawPhoto, c.photoName || ('cust_' + (c.id||'x') + '.jpg'), FOLDER_ID); }
-            catch(err) { photoUrl = 'Gagal: ' + err.toString(); }
-          }
-          return [
-            c.id || '', c.name || '', c.category || '', c.blockingDays || '',
-            c.address || '', c.landmark || '', c.phone || '', c.lat || '',
-            c.lng || '', c.notes || '', c.tku || '', c.createdAt ? new Date(c.createdAt) : '',
-            photoUrl
-          ];
-        });
-        sheet.getRange(row,1,rows.length,custHeaders.length).setValues(rows);
-        row += rows.length;
-      } else {
-        sheet.getRange(row,1).setValue('(Belum ada pelanggan)').setFontStyle('italic').setFontColor('#94A3B8');
-        row++;
-      }
-
-      row += 2;
-      sheet.getRange(row,1).setValue('=== KUNJUNGAN ===').setFontWeight('bold').setFontColor('#059669').setFontSize(12);
-      row++;
-
-      const visitHeaders = ['ID','Tanggal','Jam','Nama Pelanggan','Kategori','TKU','YL','Status','OM05','OS05','YO05','YT05','Total','Setoran','Pembayaran','Catatan','Lat','Lng','Timestamp','Foto'];
-      sheet.getRange(row,1,1,visitHeaders.length).setValues([visitHeaders]).setFontWeight('bold').setBackground('#059669').setFontColor('#FFFFFF').setHorizontalAlignment('center');
-      row++;
-
-      if(data.visits.length > 0){
-        const rows = data.visits.map(v => {
-          let photoUrl = '-';
-          const rawPhoto = v.photo || '';
-          if(rawPhoto && typeof rawPhoto === 'string' && rawPhoto.length > 100){
-            try { photoUrl = uploadBase64ToDrive(rawPhoto, v.photoName || ('visit_' + (v.id||'x') + '.jpg'), FOLDER_ID); }
-            catch(err) { photoUrl = 'Gagal: ' + err.toString(); }
-          }
-          return [
-            v.id || '', v.date || '', v.time || '', v.customerName || '', v.category || '',
-            v.tku || '', v.yl || '', v.status || '', v.om || 0, v.os || 0,
-            v.yo || 0, v.yt || 0, v.total || 0, v.rp || 0, v.payment || '',
-            v.notes || '', v.lat || '', v.lng || '',
-            v.timestamp ? new Date(v.timestamp) : '', photoUrl
-          ];
-        });
-        sheet.getRange(row,1,rows.length,visitHeaders.length).setValues(rows);
-        for(let i=0;i<rows.length;i++){
-          if(rows[i][7] === 'beli') sheet.getRange(row+i,1,1,visitHeaders.length).setBackground('#F0FDFA');
-        }
-        row += rows.length;
-      } else {
-        sheet.getRange(row,1).setValue('(Belum ada kunjungan)').setFontStyle('italic').setFontColor('#94A3B8');
-      }
-
-      sheet.autoResizeColumns(1, 6);
-      sheet.setColumnWidth(5, 240);
-      sheet.setColumnWidth(6, 200);
-      summary.push({ yl, customers: data.customers.length, visits: data.visits.length });
-    });
-    return json({ ok:true, sheets: summary, totalYL: summary.length });
-  }catch(err){ return json({ ok:false, error: String(err) }); }
-}
-
-function uploadBase64ToDrive(base64Data, fileName, folderId) {
-  try {
-    const trimmedData = base64Data.indexOf(",") > -1 ? base64Data.split(",")[1] : base64Data;
-    const decodedBytes = Utilities.base64Decode(trimmedData);
-    const blob = Utilities.newBlob(decodedBytes, MimeType.JPEG, fileName);
-    const folder = DriveApp.getFolderById(folderId);
-    const file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    return file.getUrl();
-  } catch(err) { return 'Error Upload: ' + err.toString(); }
-}
-
-function sanitizeSheetName(name){
-  let s = String(name || 'UNKNOWN').trim().toUpperCase();
-  s = s.replace(/[:\\\\/\\?\\*\\[\\]]/g, '');
-  if(s.length > 100) s = s.slice(0, 100);
-  return s || 'UNKNOWN';
-}
-function json(obj){ return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON); }`;
-
 /* ============ TOAST ============ */
-let toastT = null;
-function showToast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2400); }
+let toastTimer = null;
+function showToast(msg){
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2200);
+}
 
 /* ============ EVENTS ============ */
 document.addEventListener('click', async e => {
   const t = e.target;
+  
+  // Tab switching
   const tab = t.closest('[data-tab]');
   if(tab){
     haptic(8);
-    state.activeTab = tab.dataset.tab;
+    const targetTab = tab.dataset.tab;
+    
+    if(targetTab === 'set' && !state.isSettingsUnlocked) {
+      openSheet('passwordSheet');
+      setTimeout(() => $('setAdminPwd').focus(), 300);
+      return;
+    }
+    
+    state.activeTab = targetTab;
     $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab === state.activeTab));
     renderMain();
     return;
   }
+
   if(t.closest('[data-close]')){ closeAllSheets(); return; }
   if(t.id === 'overlay'){ closeAllSheets(); closeAllDD(); return; }
 
+  // Dropdown items
   const item = t.closest('[data-dd-item]');
   if(item){
     e.preventDefault(); e.stopPropagation();
@@ -2433,6 +2569,7 @@ document.addEventListener('click', async e => {
     return;
   }
 
+  // Context sheet selections
   const ctxCat = t.closest('[data-ctx-cat]');
   if(ctxCat){ haptic(6); state.sticky.category = ctxCat.dataset.ctxCat; saveSettings(); renderCtxSheet(); return; }
 
@@ -2449,6 +2586,16 @@ document.addEventListener('click', async e => {
     return;
   }
 
+  const mutDay = t.closest('[data-mutasi-day]');
+  if(mutDay){
+    haptic(6);
+    const k = mutDay.dataset.mutasiDay;
+    const idx = state.mutasiDays.indexOf(k);
+    if(idx >= 0) state.mutasiDays.splice(idx, 1); else state.mutasiDays.push(k);
+    renderMutasiDays();
+    return;
+  }
+
   const editCat = t.closest('[data-edit-cat]');
   if(editCat){
     haptic(6);
@@ -2462,6 +2609,7 @@ document.addEventListener('click', async e => {
   const migCat = t.closest('[data-migrate-cat]');
   if(migCat){ haptic(6); state.migrateCategory = migCat.dataset.migrateCat; saveSettings(); renderMigrateCatGrid(); return; }
 
+  // Draft filter
   const dfBtn = t.closest('[data-draft-filter]');
   if(dfBtn){ haptic(6); state.draftFilter = dfBtn.dataset.draftFilter; state.draftShown = DRAFT_PAGE_SIZE; renderDraftFilter(); renderDraftList(); return; }
 
@@ -2474,13 +2622,21 @@ document.addEventListener('click', async e => {
   const dDel = t.closest('[data-draft-del]');
   if(dDel){ await deleteDraft(dDel.dataset.draftDel); return; }
 
+  // Actions
   if(t.closest('[data-action="open-ctx"]')){ haptic(10); openCtxSheet(); return; }
   if(t.closest('[data-action="open-migrate"]')){ haptic(10); openMigrateSheet(); return; }
+  if(t.closest('[data-action="open-mutasi"]')){ haptic(10); openMutasiSheet(); return; }
+  if(t.closest('[data-action="open-firebase"]')){ haptic(10); openFirebaseSheet(); return; }
+  
+  if(t.closest('[data-action="execute-mutasi"]')){ await executeMutasi(); return; }
+  if(t.closest('[data-action="save-firebase"]')){ saveFirebaseSettings(); return; }
+
   if(t.closest('[data-action="save-ctx"]')){
     haptic(25);
-    if(!state.sticky.yl){ showToast('Pilih YL dulu'); return; }
-    if((state.sticky.days||[]).length === 0){ showToast('Pilih minimal 1 hari jadwal'); return; }
-    saveSettings(); showToast('✓ Mode kerja tersimpan');
+    if(!state.sticky.yl){ showToast('❌ Pilih YL dulu'); return; }
+    if((state.sticky.days||[]).length === 0){ showToast('❌ Pilih minimal 1 hari jadwal'); return; }
+    saveSettings(); 
+    showToast('✓ Mode kerja tersimpan');
     closeAllSheets(); renderBanner(); renderMain();
     return;
   }
@@ -2511,6 +2667,16 @@ document.addEventListener('click', async e => {
     sc.classList.add('active');
     const st = STATUSES.find(x=>x.key===state.visitStatus);
     if(st) sc.classList.add(st.cls);
+    // Reset qty kalau bukan 'beli'
+    if(state.visitStatus !== 'beli'){
+      state.visitQty = { om:0, os:0, yo:0, yt:0 };
+      state.visitPayment = 'cash';
+      renderStepper();
+      updateVisitTotal();
+      $$('#paymentGrid .status-chip').forEach(x=>x.classList.remove('active'));
+      const firstPay = document.querySelector('#paymentGrid [data-payment="cash"]');
+      if(firstPay) firstPay.classList.add('active');
+    }
     $('visitVariants').style.display = state.visitStatus === 'beli' ? '' : 'none';
     return;
   }
@@ -2526,29 +2692,76 @@ document.addEventListener('click', async e => {
   const act = t.closest('[data-action]')?.dataset.action;
   if(!act) return;
   haptic(12);
+  
   switch(act){
+    case 'submit-password': {
+      const pwd = $('setAdminPwd').value;
+      if(pwd === 'Yakult2027'){
+        state.isSettingsUnlocked = true;
+        closeAllSheets();
+        haptic(20);
+        showToast('✓ Akses Setting Dibuka');
+        $('setAdminPwd').value = '';
+        state.activeTab = 'set';
+        $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab === 'set'));
+        renderMain();
+      } else {
+        haptic([60, 40, 60]);
+        showToast('❌ Password Salah!');
+      }
+      break;
+    }
     case 'add-cust': openCustForm(null); break;
     case 'save-cust': await saveCustomer(); break;
     case 'delete-cust': await deleteCustomer(); break;
     case 'get-gps': getGPS(); break;
     case 'save-visit': await saveVisit(); break;
     case 'calc-route': await calcRoute(); break;
-    case 'edit-detail': { const c = state.activeCustomer; closeAllSheets(); setTimeout(()=>openCustForm(c), 200); break; }
-    case 'visit-from-detail': { const cid = state.activeCustomer?.id; closeAllSheets(); if(cid){ if(!state.sticky.yl){ state.activeTab='kunjungan'; $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab==='kunjungan')); renderMain(); showToast('Pilih YL dulu di Mode Kerja'); openCtxSheet(); } else setTimeout(()=>openVisitForm(cid), 200); } break; }
+    case 'edit-detail': { 
+      const c = state.activeCustomer; 
+      closeAllSheets(); 
+      setTimeout(()=>openCustForm(c), 200); 
+      break; 
+    }
+    case 'visit-from-detail': { 
+      const cid = state.activeCustomer?.id; 
+      closeAllSheets(); 
+      if(cid){ 
+        if(!state.sticky.yl){ 
+          state.activeTab='kunjungan'; 
+          $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab==='kunjungan')); 
+          renderMain(); 
+          showToast('Pilih YL dulu di Mode Kerja'); 
+          openCtxSheet(); 
+        } else {
+          setTimeout(()=>openVisitForm(cid), 200); 
+        } 
+      } 
+      break; 
+    }
     case 'open-sync': $('gasUrl').value = state.gasUrl; openSheet('syncSheet'); break;
     case 'save-endpoints': state.gasUrl = $('gasUrl').value.trim(); saveSettings(); showToast('✓ Disimpan'); break;
     case 'sync-now': await syncNow(); break;
-    case 'show-gas-code': { const w = window.open('','_blank'); if(w){ w.document.write('<pre style="padding:20px;font-size:12px;background:#0B1220;color:#E2E8F0;white-space:pre-wrap;font-family:monospace;">' + GAS_CODE.replace(/[<>&]/g, m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m])) + '</pre>'); } break; }
     case 'backup': await backupData(); break;
     case 'restore': restoreData(); break;
     case 'open-drafts': await openDraftSheet(); break;
     case 'import-drafts': await importReadyDrafts(); break;
     case 'save-draft-edit': await saveDraftEdit(); break;
-    case 'migrate-save-key': { state.geminiKey = $('geminiKey').value.trim(); saveSettings(); showToast(state.geminiKey ? '✓ API Key disimpan' : '⚠️ Key kosong'); break; }
-    case 'migrate-take-photo': $('migratePhotoInput').click(); break;
     case 'copy-ai-prompt': await copyAIPrompt(); break;
     case 'parse-paste': await parseAndCreateDrafts(); break;
-    case 'reset-all': if(confirm('Hapus SEMUA data?')){ for(const c of state.customers) await idbDel(ST_CUST, c.id); for(const v of state.visits) await idbDel(ST_VISIT, v.id); for(const d of state.drafts) await idbDel(ST_DRAFT, d.id); state.customers=[]; state.visits=[]; state.drafts=[]; showToast('✓ Direset'); renderBanner(); renderMain(); } break;
+    case 'reset-all': 
+      if(confirm('Hapus SEMUA data?')){ 
+        for(const c of state.customers) await idbDel(ST_CUST, c.id); 
+        for(const v of state.visits) await idbDel(ST_VISIT, v.id); 
+        for(const d of state.drafts) await idbDel(ST_DRAFT, d.id); 
+        state.customers=[]; 
+        state.visits=[]; 
+        state.drafts=[]; 
+        showToast('✓ Direset'); 
+        renderBanner(); 
+        renderMain(); 
+      } 
+      break;
   }
 });
 
@@ -2558,7 +2771,7 @@ document.addEventListener('input', e => {
   if(e.target.id === 'draftSearch'){ state.draftSearch = e.target.value; state.draftShown = DRAFT_PAGE_SIZE; renderDraftList(); return; }
   if(e.target.id === 'pasteArea'){ updatePasteCount(); return; }   
   if(e.target.id === 'custPhone'){
-const input = e.target;
+    const input = e.target;
     const before = input.value;
     const cursor = input.selectionStart;
     const digitsBefore = before.slice(0, cursor).replace(/\D/g, '').length;
@@ -2588,11 +2801,6 @@ document.addEventListener('change', async e => {
     try{ showToast('⏳ Memproses...'); state.visitPhoto = await compressImage(f, 800, 0.7); updateVisitPhotoUI(); showToast('✓ Foto bukti tersimpan'); }
     catch(_){ showToast('❌ Gagal'); }
     e.target.value = '';
-  }
-  if(e.target.id === 'migratePhotoInput'){
-    const f = e.target.files?.[0];
-    e.target.value = '';
-    if(f) await processMigratePhoto(f);
   }
 });
 
