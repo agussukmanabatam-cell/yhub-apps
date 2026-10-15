@@ -2816,7 +2816,7 @@ const tab = t.closest('[data-tab]');
   const act = t.closest('[data-action]')?.dataset.action;
   if(!act) return;
   haptic(12);
-switch(act){
+  switch(act){
     case 'submit-password': {
       const pwd = $('setAdminPwd').value;
       if(pwd === 'Yakult2027'){
@@ -2824,9 +2824,8 @@ switch(act){
         closeAllSheets();
         haptic(20);
         showToast('✓ Akses Setting Dibuka');
-        $('setAdminPwd').value = ''; // Kosongkan lagi form-nya
+        $('setAdminPwd').value = '';
         
-        // Langsung arahkan ke tab Set
         state.activeTab = 'set';
         $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab === 'set'));
         renderMain();
@@ -2836,17 +2835,34 @@ switch(act){
       }
       break;
     }
-    case 'add-cust': openCustForm(null); break; // Ini kode yang sudah ada sebelumnya
-    // ...
-
-  case 'add-cust': openCustForm(null); break;
+    case 'add-cust': openCustForm(null); break;
     case 'save-cust': await saveCustomer(); break;
     case 'delete-cust': await deleteCustomer(); break;
     case 'get-gps': getGPS(); break;
     case 'save-visit': await saveVisit(); break;
     case 'calc-route': await calcRoute(); break;
-    case 'edit-detail': { const c = state.activeCustomer; closeAllSheets(); setTimeout(()=>openCustForm(c), 200); break; }
-    case 'visit-from-detail': { const cid = state.activeCustomer?.id; closeAllSheets(); if(cid){ if(!state.sticky.yl){ state.activeTab='kunjungan'; $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab==='kunjungan')); renderMain(); showToast('Pilih YL dulu di Mode Kerja'); openCtxSheet(); } else setTimeout(()=>openVisitForm(cid), 200); } break; }
+    case 'edit-detail': { 
+      const c = state.activeCustomer; 
+      closeAllSheets(); 
+      setTimeout(()=>openCustForm(c), 200); 
+      break; 
+    }
+    case 'visit-from-detail': { 
+      const cid = state.activeCustomer?.id; 
+      closeAllSheets(); 
+      if(cid){ 
+        if(!state.sticky.yl){ 
+          state.activeTab='kunjungan'; 
+          $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab==='kunjungan')); 
+          renderMain(); 
+          showToast('Pilih YL dulu di Mode Kerja'); 
+          openCtxSheet(); 
+        } else {
+          setTimeout(()=>openVisitForm(cid), 200); 
+        } 
+      } 
+      break; 
+    }
     case 'open-sync': $('gasUrl').value = state.gasUrl; openSheet('syncSheet'); break;
     case 'save-endpoints': state.gasUrl = $('gasUrl').value.trim(); saveSettings(); showToast('✓ Disimpan'); break;
     case 'sync-now': await syncNow(); break;
@@ -2857,7 +2873,19 @@ switch(act){
     case 'save-draft-edit': await saveDraftEdit(); break;
     case 'copy-ai-prompt': await copyAIPrompt(); break;
     case 'parse-paste': await parseAndCreateDrafts(); break;
-    case 'reset-all': if(confirm('Hapus SEMUA data?')){ for(const c of state.customers) await idbDel(ST_CUST, c.id); for(const v of state.visits) await idbDel(ST_VISIT, v.id); for(const d of state.drafts) await idbDel(ST_DRAFT, d.id); state.customers=[]; state.visits=[]; state.drafts=[]; showToast('✓ Direset'); renderBanner(); renderMain(); } break;
+    case 'reset-all': 
+      if(confirm('Hapus SEMUA data?')){ 
+        for(const c of state.customers) await idbDel(ST_CUST, c.id); 
+        for(const v of state.visits) await idbDel(ST_VISIT, v.id); 
+        for(const d of state.drafts) await idbDel(ST_DRAFT, d.id); 
+        state.customers=[]; 
+        state.visits=[]; 
+        state.drafts=[]; 
+        showToast('✓ Direset'); 
+        renderBanner(); 
+        renderMain(); 
+      } 
+      break;
   }
 });
 
