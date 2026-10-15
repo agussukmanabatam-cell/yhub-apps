@@ -1,7 +1,7 @@
 // ============================================
 // Service Worker — Y-Hub App
 // ============================================
-const CACHE_NAME = 'yhub-app-v1.0.90';
+const CACHE_NAME = 'yhub-app-v1.0.91';
 
 const ASSETS = [
   './',

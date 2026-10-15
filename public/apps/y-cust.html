@@ -13,6 +13,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<!-- ============ FIREBASE SDK ============ -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
 <style>
 :root{
   --brand:#0D9488; --brand-2:#14B8A6; --brand-3:#0891B2;
@@ -37,7 +43,7 @@ html,body,*{ scrollbar-width:none; }
 *::-webkit-scrollbar{ display:none; }
 body{ font-family:'Plus Jakarta Sans',system-ui,sans-serif; font-size:13.5px; font-weight:500; line-height:1.5; color:var(--text); background:var(--bg); -webkit-font-smoothing:antialiased; overflow-x:hidden; }
 h1,h2,h3,h4{ font-family:'Poppins',sans-serif; letter-spacing:-.015em; line-height:1.25; }
-button,input,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+button,input,textarea,select{ font-family:inherit; font-size:inherit; color:inherit; }
 button{ background:none; border:0; cursor:pointer; padding:0; }
 input,textarea{ outline:none; border:0; background:transparent; }
 .num{ font-variant-numeric:tabular-nums; }
@@ -59,7 +65,7 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .banner-progress{ margin-top:12px; height:4px; border-radius:999px; background:rgba(0,0,0,.2); overflow:hidden; position:relative; z-index:1; }
 .banner-progress-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg,rgba(255,255,255,.7),#fff); transition:width .7s var(--ease); width:0%; }
 
-.tabbar{ display:flex; gap:1px; margin:-14px var(--app-pad) 0; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:5px; box-shadow:0 8px 22px -12px rgba(13,148,136,.25); position:relative; z-index:5; overflow-x: auto;}
+.tabbar{ display:flex; gap:1px; margin:-14px var(--app-pad) 0; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:5px; box-shadow:0 8px 22px -12px rgba(13,148,136,.25); position:relative; z-index:5; overflow-x:auto;}
 .tab-btn{ flex:1; min-width:54px; padding:9px 2px; border-radius:11px; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--text-dim); font-size:8px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; transition:all .2s; }
 .tab-btn i{ font-size:13px; }
 .tab-btn.active{ background:var(--brand-soft); color:var(--brand); }
@@ -87,6 +93,8 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .ctx-chip.cat i{ color:var(--cat-color,var(--brand)); }
 .ctx-chip.days{ color:var(--brand); }
 .ctx-chip.days i{ color:var(--brand); }
+.ctx-chip.session{ color:var(--amber); }
+.ctx-chip.session i{ color:var(--amber); }
 .ctx-bar-hint{ font-size:9.5px; font-weight:600; color:var(--brand); margin-top:5px; display:flex; align-items:center; gap:4px; opacity:.85; }
 .ctx-bar-edit{ width:32px; height:32px; border-radius:10px; background:var(--surface); border:1px solid var(--border); color:var(--brand); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
 
@@ -103,8 +111,9 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .customer-card.visited{ background:linear-gradient(90deg,var(--emerald-soft),transparent 45%); border-color:rgba(5,150,105,.25); }
 .customer-card.visited::before{ content:''; position:absolute; left:0; top:10px; bottom:10px; width:3px; background:var(--emerald); border-radius:0 3px 3px 0; }
 .cust-photo{ width:46px; height:46px; border-radius:12px; flex-shrink:0; background:var(--surface-2); display:flex; align-items:center; justify-content:center; overflow:hidden; color:var(--text-dim); font-size:16px; border:1px solid var(--border); position:relative; }
-.cust-photo img{ width:100%; height:100%; object-fit:cover; }
-.cust-photo .unsynced-dot{ position:absolute; top:-3px; right:-3px; width:12px; height:12px; border-radius:50%; background:var(--amber); border:2px solid var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.cust-photo img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
+.cust-initials{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; letter-spacing:-.02em; z-index:0; }
+.cust-photo .unsynced-dot{ position:absolute; top:-3px; right:-3px; width:12px; height:12px; border-radius:50%; background:var(--amber); border:2px solid var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.2); z-index:2; }
 .cust-info{ flex:1; min-width:0; }
 .cust-name{ font-size:13.5px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:-.01em; }
 .cust-meta{ font-size:10.5px; color:var(--text-mute); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -157,19 +166,7 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .gps-btn:active{ transform:scale(.95); }
 .gps-btn.primary{ background: linear-gradient(135deg,var(--brand),var(--brand-3)); color:#fff; border-color: transparent; box-shadow: 0 6px 14px -6px rgba(13,148,136,.55); }
 
-/* ============ SHEET ============ */
-.sheet{
-  position:fixed; left:50%; bottom:0;
-  transform:translateX(-50%) translateY(100%);
-  width:100%; max-width:var(--app-max);
-  max-height:92vh; max-height:92dvh;
-  background:var(--surface);
-  border-radius:24px 24px 0 0;
-  z-index:95; overflow-y:auto;
-  visibility:hidden;
-  transition:transform .32s cubic-bezier(.2,.9,.3,1), visibility .32s;
-  padding-bottom:0;
-}
+.sheet{ position:fixed; left:50%; bottom:0; transform:translateX(-50%) translateY(100%); width:100%; max-width:var(--app-max); max-height:92vh; max-height:92dvh; background:var(--surface); border-radius:24px 24px 0 0; z-index:95; overflow-y:auto; visibility:hidden; transition:transform .32s cubic-bezier(.2,.9,.3,1), visibility .32s; padding-bottom:0; }
 .sheet.open{ transform:translateX(-50%) translateY(0); visibility:visible; }
 .sheet.wide{ max-width:100%; height:100vh; height:100dvh; max-height:100dvh; border-radius:0; }
 .sheet-handle{ width:40px; height:4px; border-radius:999px; background:var(--border); margin:10px auto 0; }
@@ -182,40 +179,16 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .sheet-close:active{ transform:scale(.9); }
 .sheet-body{ padding: 16px 18px calc(env(safe-area-inset-bottom,0px) + 20px); }
 
-/* ============ KUNJUNGAN — RED TRANSITION ============ */
 @keyframes visitSheetPulse{
   0%{ box-shadow:0 -30px 90px rgba(225,29,72,.7), 0 0 0 0 rgba(225,29,72,.6); }
   50%{ box-shadow:0 -30px 90px rgba(225,29,72,.5), 0 0 0 16px rgba(225,29,72,0); }
   100%{ box-shadow:0 -30px 90px rgba(225,29,72,.5), 0 0 0 0 rgba(225,29,72,0); }
 }
-.sheet.visit-sheet{
-  background: linear-gradient(180deg, #E11D48 0%, #BE123C 80px, var(--surface) 80px);
-  border-top: 4px solid var(--rose);
-  border-radius: 26px 26px 0 0;
-  transform-origin: bottom center;
-  will-change: transform;
-}
-.sheet.visit-sheet::before{
-  content:''; position:absolute; top:0; left:0; right:0; height:6px;
-  background: linear-gradient(90deg, #E11D48, #F43F5E, #E11D48);
-  border-radius: 26px 26px 0 0;
-  z-index: 3;
-  background-size: 200% 100%;
-  animation: redFlow 3s ease-in-out infinite;
-}
-@keyframes redFlow{
-  0%,100%{ background-position: 0% 50%; }
-  50%{ background-position: 100% 50%; }
-}
-.sheet.visit-sheet.open{
-  transform: translateX(-50%) translateY(0);
-  animation: visitSheetPulse 2.2s ease-out;
-}
-.sheet.visit-sheet .sheet-header{
-  background: linear-gradient(135deg, #E11D48 0%, #BE123C 50%, #9F1239 100%);
-  border-bottom: 1px solid rgba(255,255,255,.15);
-  border-radius: 26px 26px 0 0;
-}
+.sheet.visit-sheet{ background: linear-gradient(180deg, #E11D48 0%, #BE123C 80px, var(--surface) 80px); border-top: 4px solid var(--rose); border-radius: 26px 26px 0 0; transform-origin: bottom center; will-change: transform; }
+.sheet.visit-sheet::before{ content:''; position:absolute; top:0; left:0; right:0; height:6px; background: linear-gradient(90deg, #E11D48, #F43F5E, #E11D48); border-radius: 26px 26px 0 0; z-index: 3; background-size: 200% 100%; animation: redFlow 3s ease-in-out infinite; }
+@keyframes redFlow{ 0%,100%{ background-position: 0% 50%; } 50%{ background-position: 100% 50%; } }
+.sheet.visit-sheet.open{ transform: translateX(-50%) translateY(0); animation: visitSheetPulse 2.2s ease-out; }
+.sheet.visit-sheet .sheet-header{ background: linear-gradient(135deg, #E11D48 0%, #BE123C 50%, #9F1239 100%); border-bottom: 1px solid rgba(255,255,255,.15); border-radius: 26px 26px 0 0; }
 .sheet.visit-sheet .sheet-header .sheet-name{ color:#fff; }
 .sheet.visit-sheet .sheet-header .sheet-meta{ color:rgba(255,255,255,.8); }
 .sheet.visit-sheet .sheet-header .sheet-close{ background: rgba(255,255,255,.2); color: #fff; }
@@ -224,11 +197,7 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .sheet.visit-sheet .sheet-avatar{ box-shadow: 0 8px 18px -6px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.3); }
 .sheet.visit-sheet .sheet-body{ background: var(--surface); border-radius: 22px 22px 0 0; margin-top: -22px; padding-top: 28px; position: relative; z-index: 2; }
 
-.overlay.visit-mode{
-  background: rgba(120, 10, 30, .58);
-  backdrop-filter: blur(7px) saturate(120%);
-  -webkit-backdrop-filter: blur(7px) saturate(120%);
-}
+.overlay.visit-mode{ background: rgba(120, 10, 30, .58); backdrop-filter: blur(7px) saturate(120%); -webkit-backdrop-filter: blur(7px) saturate(120%); }
 
 .section-title-bar{ display:flex; align-items:center; gap:10px; margin: 18px 0 12px; }
 .section-title-bar:first-child{ margin-top: 4px; }
@@ -353,7 +322,9 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 .sync-title{ font-family:'Poppins',sans-serif; font-size:15px; font-weight:700; color:var(--text); margin-bottom:5px; letter-spacing:-.01em; }
 .sync-sub{ font-size:11.5px; color:var(--text-dim); margin-bottom:20px; line-height:1.5; min-height:16px; }
 .sync-bar-track{ height:9px; border-radius:999px; background:var(--surface-2); overflow:hidden; margin-bottom:12px; position:relative; }
-.sync-bar-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg,#14B8A6,#0D9488,#0891B2); width:0%; transition:width .3s ease; box-shadow:0 0 14px rgba(13,148,136,.55); }
+.sync-bar-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg,#14B8A6,#0D9488,#0891B2); width:0%; transition:width .3s ease; box-shadow:0 0 14px rgba(13,148,136,.55); position:relative; overflow:hidden; }
+.sync-bar-fill::after{ content:''; position:absolute; top:0; left:-40%; width:40%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent); animation:shimmer 1.2s linear infinite; }
+@keyframes shimmer{ to{ left:100%; } }
 .sync-pct{ font-family:'Poppins',sans-serif; font-size:14px; font-weight:700; color:var(--brand); letter-spacing:.02em; font-variant-numeric:tabular-nums; }
 .sync-overlay.success .sync-icon{ animation:none; }
 .sync-overlay.success .sync-bar-fill{ background:linear-gradient(90deg,#34D399,#059669); box-shadow:0 0 14px rgba(5,150,105,.5); }
@@ -388,33 +359,64 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 .seg button{ padding:6px 10px; border-radius:8px; font-size:10.5px; font-weight:700; color:var(--text-mute); }
 .seg button.active{ background:var(--surface); color:var(--brand); box-shadow:0 1px 4px -1px rgba(13,148,136,.15); }
 
-/* ============ MIGRASI ============ */
-.migrate-hint{ background:linear-gradient(135deg,var(--brand-soft),rgba(8,145,178,.04)); border:1.5px solid var(--brand-ring); border-radius:14px; padding:12px 14px; font-size:11.5px; color:var(--text-mute); line-height:1.55; margin-bottom:12px; }
-.migrate-hint b{ color:var(--brand); font-weight:700; }
-.migrate-progress{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:12px; display:none; }
-.migrate-progress.show{ display:block; }
-.migrate-progress-title{ font-size:11px; font-weight:700; color:var(--brand); display:flex; align-items:center; gap:6px; margin-bottom:10px; }
-.migrate-bar-track{ height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; }
-.migrate-bar-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg,#14B8A6,#0D9488,#0891B2); width:0%; transition:width .3s ease; }
-.migrate-status{ font-size:10.5px; color:var(--text-dim); margin-top:6px; text-align:center; }
+.prompt-box{ background: linear-gradient(135deg, #F0FDF4, #DCFCE7); border: 1.5px solid #10B981; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+[data-theme="dark"] .prompt-box{ background: linear-gradient(135deg, rgba(16,185,129,.15), rgba(5,150,105,.08)); border-color: rgba(16,185,129,.5); }
+.prompt-box-title{ font-size: 11px; font-weight: 800; color: #065F46; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
+[data-theme="dark"] .prompt-box-title{ color: #6EE7B7; }
+.prompt-box-desc{ font-size: 10.5px; color: #047857; line-height: 1.5; margin-bottom: 10px; }
+[data-theme="dark"] .prompt-box-desc{ color: #A7F3D0; }
+.btn-copy-prompt{ width: 100%; padding: 12px 16px; border: 0; border-radius: 12px; font-size: 12.5px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #10B981, #059669); box-shadow: 0 8px 18px -8px rgba(16,185,129,.6); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all .18s; }
+.btn-copy-prompt:active{ transform: scale(.97); }
+.btn-copy-prompt.copied{ background: linear-gradient(135deg, #0D9488, #0F766E); }
+.paste-area{ width: 100%; min-height: 180px; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--surface); font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 12px; line-height: 1.6; color: var(--text); resize: vertical; transition: all .2s; }
+.paste-area:focus{ border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); outline: none; }
+.paste-area::placeholder{ color: var(--text-dim); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11.5px; }
+.paste-info{ display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 10.5px; color: var(--text-dim); font-weight: 600; }
+.paste-info-count{ color: var(--brand); font-weight: 700; font-family: 'Poppins', sans-serif; font-size: 11px; }
+.ai-step{ display: flex; gap: 10px; padding: 12px 14px; background: var(--surface-2); border-radius: 12px; margin-bottom: 8px; align-items: flex-start; }
+.ai-step-num{ width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.ai-step-body{ flex: 1; }
+.ai-step-title{ font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.ai-step-desc{ font-size: 10.5px; color: var(--text-mute); line-height: 1.5; }
 
-.draft-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:8px; position:relative; }
-.draft-card.ready{ background:linear-gradient(90deg,var(--emerald-soft),transparent 45%); border-color:rgba(5,150,105,.25); }
-.draft-card.ready::before{ content:''; position:absolute; left:0; top:10px; bottom:10px; width:3px; background:var(--emerald); border-radius:0 3px 3px 0; }
-.draft-card.low-conf{ border-left:3px solid var(--amber); }
-.draft-name{ font-size:13.5px; font-weight:700; margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-right:70px; }
-.draft-addr{ font-size:11px; color:var(--text-mute); line-height:1.4; margin-bottom:9px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; padding-right:70px; }
-.draft-actions{ display:flex; gap:5px; flex-wrap:wrap; }
-.draft-btn{ padding:6px 10px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface); font-size:10.5px; font-weight:700; color:var(--text-mute); display:flex; align-items:center; gap:4px; cursor:pointer; transition:all .15s; }
-.draft-btn:active{ transform:scale(.95); }
-.draft-btn.gps-ok{ color:var(--emerald); border-color:rgba(5,150,105,.3); background:var(--emerald-soft); }
-.draft-btn.gps-no{ color:var(--amber); border-color:rgba(217,119,6,.3); background:var(--amber-soft); }
-.draft-btn.danger{ color:var(--rose); border-color:rgba(225,29,72,.25); }
-.draft-confidence{ position:absolute; top:10px; right:10px; padding:2px 6px; border-radius:5px; font-size:8.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
-.draft-confidence.high{ background:var(--emerald-soft); color:var(--emerald); }
-.draft-confidence.low{ background:var(--amber-soft); color:var(--amber); }
-.load-more{ width:100%; padding:12px; border-radius:12px; background:var(--surface-2); border:1.5px dashed var(--border); color:var(--brand); font-size:12px; font-weight:700; cursor:pointer; margin-top:6px; display:flex; align-items:center; justify-content:center; gap:6px; }
-.load-more:active{ transform:scale(.98); }
+.chart-bar-wrap{ height: 8px; border-radius: 999px; background: var(--surface-3); margin-top: 8px; position: relative; overflow: hidden; }
+.chart-bar-fill{ height: 100%; position: absolute; left: 0; top: 0; border-radius: 999px; transition: width 1s var(--ease); }
+.stat-box{ background: var(--surface-2); border-radius: 12px; padding: 12px; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.stat-val{ font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; line-height: 1.1; margin-bottom: 4px; }
+.stat-lbl{ font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-mute); font-weight: 700; }
+.stat-trend{ font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.stat-trend.up{ color: var(--emerald); }
+.stat-trend.down{ color: var(--rose); }
+.stat-trend.neutral{ color: var(--text-dim); }
+
+.route-map{ position:relative; padding:30px 12px 20px; background:linear-gradient(180deg,var(--surface),var(--surface-2)); border-radius:16px; border:1px solid var(--border); overflow:hidden; margin-bottom:12px; }
+.route-nodes{ position:relative; z-index:2; display:flex; flex-wrap:wrap; gap:24px 12px; justify-content:center; padding:0 8px; }
+.route-node{ width:64px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; animation:nodePop .5s cubic-bezier(.34,1.56,.64,1) backwards; }
+.route-node:nth-child(1){ animation-delay:.05s; }
+.route-node:nth-child(2){ animation-delay:.10s; }
+.route-node:nth-child(3){ animation-delay:.15s; }
+.route-node:nth-child(4){ animation-delay:.20s; }
+.route-node:nth-child(5){ animation-delay:.25s; }
+.route-node:nth-child(6){ animation-delay:.30s; }
+.route-node:nth-child(7){ animation-delay:.35s; }
+.route-node:nth-child(8){ animation-delay:.40s; }
+.route-node:nth-child(9){ animation-delay:.45s; }
+.route-node:nth-child(10){ animation-delay:.50s; }
+@keyframes nodePop{ from{ opacity:0; transform:scale(.3); } to{ opacity:1; transform:scale(1); } }
+.route-circle{ width:50px; height:50px; border-radius:50%; background:var(--surface); border:3px solid var(--brand); display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-size:18px; font-weight:700; color:var(--brand); position:relative; box-shadow:0 6px 16px -6px rgba(13,148,136,.5); transition:all .2s; }
+.route-circle::before{ content:''; position:absolute; inset:-6px; border-radius:50%; border:2px solid var(--brand); opacity:.3; animation:ripple 2s ease-out infinite; }
+.route-node:nth-child(2) .route-circle::before{ animation-delay:.3s; }
+.route-node:nth-child(3) .route-circle::before{ animation-delay:.6s; }
+.route-node:nth-child(4) .route-circle::before{ animation-delay:.9s; }
+.route-node:nth-child(5) .route-circle::before{ animation-delay:1.2s; }
+@keyframes ripple{ 0%{ transform:scale(.9); opacity:.5; } 100%{ transform:scale(1.4); opacity:0; } }
+.route-stars{ display:flex; gap:2px; font-size:11px; }
+.route-stars i.filled{ color:var(--amber); }
+.route-stars i.empty{ color:var(--surface-3); }
+.route-node.locked .route-circle{ border-color:var(--text-dim); color:var(--text-dim); opacity:.6; }
+.route-node.locked .route-circle::before{ display:none; }
+.route-label{ font-size:10px; font-weight:700; text-align:center; color:var(--text-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:64px; }
+.route-node:active .route-circle{ transform:scale(.95); }
 
 .spin{ animation:spin 1s linear infinite; }
 @keyframes spin{ to{ transform:rotate(360deg); } }
@@ -426,116 +428,6 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   .stepper-row{ grid-template-columns:repeat(4,1fr); }
   .sheet{ max-width:100%; border-radius:28px 28px 0 0; }
 }
-/* ============ IMPORT DARI AI ============ */
-.prompt-box{
-  background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
-  border: 1.5px solid #10B981;
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 12px;
-}
-.prompt-box-title{
-  font-size: 11px; font-weight: 800; color: #065F46;
-  display: flex; align-items: center; gap: 6px;
-  margin-bottom: 8px;
-  text-transform: uppercase; letter-spacing: .05em;
-}
-.prompt-box-desc{
-  font-size: 10.5px; color: #047857; line-height: 1.5;
-  margin-bottom: 10px;
-}
-.btn-copy-prompt{
-  width: 100%; padding: 12px 16px;
-  border: 0; border-radius: 12px;
-  font-size: 12.5px; font-weight: 700; color: #fff;
-  background: linear-gradient(135deg, #10B981, #059669);
-  box-shadow: 0 8px 18px -8px rgba(16,185,129,.6);
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  cursor: pointer;
-  transition: all .18s;
-}
-.btn-copy-prompt:active{ transform: scale(.97); }
-.btn-copy-prompt.copied{
-  background: linear-gradient(135deg, #0D9488, #0F766E);
-}
-.paste-area{
-  width: 100%; min-height: 180px;
-  padding: 12px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--text);
-  resize: vertical;
-  transition: all .2s;
-}
-.paste-area:focus{
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--brand-soft);
-  outline: none;
-}
-.paste-area::placeholder{
-  color: var(--text-dim);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 11.5px;
-}
-.paste-info{
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 8px;
-  font-size: 10.5px;
-  color: var(--text-dim);
-  font-weight: 600;
-}
-.paste-info-count{
-  color: var(--brand);
-  font-weight: 700;
-  font-family: 'Poppins', sans-serif;
-  font-size: 11px;
-}
-.ai-step{
-  display: flex; gap: 10px;
-  padding: 12px 14px;
-  background: var(--surface-2);
-  border-radius: 12px;
-  margin-bottom: 8px;
-  align-items: flex-start;
-}
-.ai-step-num{
-  width: 24px; height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--brand), var(--brand-3));
-  color: #fff;
-  font-family: 'Poppins', sans-serif;
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.ai-step-body{ flex: 1; }
-.ai-step-title{
-  font-size: 12px; font-weight: 700;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-.ai-step-desc{
-  font-size: 10.5px;
-  color: var(--text-mute);
-  line-height: 1.5;
-}
-.ai-step-desc b{ color: var(--brand); }
-
-/* ============ ANALISIS ============ */
-.chart-bar-wrap{ height: 8px; border-radius: 999px; background: var(--surface-3); margin-top: 8px; position: relative; overflow: hidden; }
-.chart-bar-fill{ height: 100%; position: absolute; left: 0; top: 0; border-radius: 999px; transition: width 1s var(--ease); }
-.stat-box{ background: var(--surface-2); border-radius: 12px; padding: 12px; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-.stat-val{ font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; line-height: 1.1; margin-bottom: 4px; }
-.stat-lbl{ font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-mute); font-weight: 700; }
-.stat-trend{ font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
-.stat-trend.up{ color: var(--emerald); }
-.stat-trend.down{ color: var(--rose); }
-.stat-trend.neutral{ color: var(--text-dim); }
 </style>
 </head>
 <body>
@@ -598,6 +490,10 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
     <div class="form-field">
       <div class="form-label"><i class="fa-solid fa-tags"></i> Kategori Default</div>
       <div class="cat-grid" id="ctxCatGrid"></div>
+    </div>
+    <div class="form-field">
+      <div class="form-label"><i class="fa-solid fa-clock"></i> Waktu Kunjungan</div>
+      <div class="day-grid" style="grid-template-columns:1fr 1fr;" id="ctxSessionGrid"></div>
     </div>
     <div class="form-field">
       <div class="form-label"><i class="fa-solid fa-calendar-day"></i> Jadwal Kunjungan YL</div>
@@ -779,24 +675,6 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   <div id="mapContainer"></div>
 </div>
 
-<!-- SHEET: SYNC -->
-<div class="sheet" id="syncSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <div class="sheet-avatar" style="background:linear-gradient(135deg,#14B8A6,#0D9488);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-    <div class="sheet-info"><div class="sheet-name">Koneksi Cloud</div><div class="sheet-meta">Google Sheets + Drive · 1 sheet per YL</div></div>
-    <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
-  </div>
-  <div class="sheet-body">
-    <div class="form-field"><label><i class="fa-solid fa-table"></i> Google Apps Script URL</label><input type="url" class="form-input" id="gasUrl" placeholder="https://script.google.com/macros/s/..."></div>
-    <div style="background:var(--surface-2); border-radius:10px; padding:10px 12px; font-size:10.5px; color:var(--text-mute); line-height:1.5; margin-bottom:12px;">
-      💡 Sheet baru otomatis dibuat per <b>nama YL</b>. Foto pelanggan & kunjungan otomatis di-upload ke <b>Google Drive</b>.
-    </div>
-    <div class="action-bar"><button class="btn-save" data-action="save-endpoints"><i class="fa-solid fa-floppy-disk"></i><span>Simpan</span></button></div>
-    <div class="action-bar" style="margin-top:8px;"><button class="btn-clear" style="flex:1; justify-content:center;" data-action="sync-now"><i class="fa-solid fa-cloud-arrow-up"></i><span>Sync Sekarang</span></button></div>
-  </div>
-</div>
-
 <!-- SHEET: PASSWORD SETTING -->
 <div class="sheet" id="passwordSheet">
   <div class="sheet-handle"></div>
@@ -818,40 +696,17 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   </div>
 </div>
 
-<!-- SHEET: FIREBASE -->
-<div class="sheet" id="firebaseSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-header">
-    <div class="sheet-avatar" style="background:linear-gradient(135deg,#F59E0B,#D97706);"><i class="fa-solid fa-database"></i></div>
-    <div class="sheet-info"><div class="sheet-name">Firebase Settings</div><div class="sheet-meta">Konfigurasi Database Realtime</div></div>
-    <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
-  </div>
-  <div class="sheet-body">
-    <div style="background:var(--amber-soft); border:1px solid rgba(217,119,6,.2); border-radius:12px; padding:12px; font-size:11px; color:var(--amber); line-height:1.5; margin-bottom:14px;">
-      <b><i class="fa-solid fa-triangle-exclamation"></i> Modul Siap:</b> Masukkan kredensial Firebase Anda. Jika diatur, data akan dikirim juga ke Firebase agar bisa diakses terus-menerus.
-    </div>
-    <div class="form-field"><label>API Key</label><input type="text" class="form-input" id="fbApiKey" placeholder="AIzaSy..."></div>
-    <div class="form-field"><label>Project ID</label><input type="text" class="form-input" id="fbProjectId" placeholder="my-project-id"></div>
-    <div class="form-field"><label>Database URL</label><input type="text" class="form-input" id="fbDatabaseUrl" placeholder="https://my-project-id.firebaseio.com"></div>
-    
-    <div class="action-bar" style="margin-top:16px;">
-      <button class="btn-save" data-action="save-firebase"><i class="fa-solid fa-check"></i><span>Simpan Konfigurasi</span></button>
-    </div>
-  </div>
-</div>
-
-<!-- SHEET: MUTASI MASSAL -->
+<!-- SHEET: MUTASI -->
 <div class="sheet" id="mutasiSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header">
     <div class="sheet-avatar" style="background:linear-gradient(135deg,#3B82F6,#2563EB);"><i class="fa-solid fa-people-arrows"></i></div>
-    <div class="sheet-info"><div class="sheet-name">Mutasi Pelanggan</div><div class="sheet-meta">Pindah YL atau Ganti Hari (Bulk)</div></div>
+    <div class="sheet-info"><div class="sheet-name">Mutasi Pelanggan</div><div class="sheet-meta" id="mutasiMeta">Pilih pelanggan yang mau dipindah</div></div>
     <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
   </div>
   <div class="sheet-body">
-    
     <div class="section-title-bar" style="margin-top:0;">
-      <div class="label"><i class="fa-solid fa-box-open"></i> Sumber Data (Asal)</div>
+      <div class="label"><i class="fa-solid fa-filter"></i> Filter Sumber</div>
       <div class="line"></div>
     </div>
     <div class="form-field">
@@ -866,26 +721,45 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
         <option value="">-- Pilih YL Asal --</option>
       </select>
     </div>
+    <div class="form-field">
+      <div class="form-label">Cari Nama</div>
+      <input type="text" class="form-input" id="mutasiSearch" placeholder="🔍 Ketik nama pelanggan...">
+    </div>
+
+    <div class="section-title-bar">
+      <div class="label"><i class="fa-solid fa-list-check"></i> Pilih Pelanggan <span id="mutasiCount" style="margin-left:6px; color:var(--brand);"></span></div>
+      <div class="line"></div>
+    </div>
+    <div style="display:flex; gap:6px; margin-bottom:10px;">
+      <button type="button" class="btn-clear" style="flex:1; padding:8px; font-size:11px; justify-content:center;" data-action="mutasi-select-all"><i class="fa-solid fa-check-double"></i> Pilih Semua</button>
+      <button type="button" class="btn-clear" style="flex:1; padding:8px; font-size:11px; justify-content:center;" data-action="mutasi-clear-all"><i class="fa-solid fa-xmark"></i> Kosongkan</button>
+    </div>
+    <div id="mutasiCustList" style="max-height:280px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; padding:6px;"></div>
 
     <div class="section-title-bar">
       <div class="label"><i class="fa-solid fa-box"></i> Tujuan Mutasi</div>
       <div class="line"></div>
     </div>
     <div class="form-field">
-      <div class="form-label">YL Tujuan (Biarkan kosong jika hanya ganti hari)</div>
+      <div class="form-label">TKU Tujuan (opsional)</div>
+      <select class="form-input" id="mutasiTkuTujuan" style="appearance:auto; background:var(--surface);">
+        <option value="">-- Tidak ganti TKU --</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <div class="form-label">YL Tujuan (opsional)</div>
       <select class="form-input" id="mutasiYlTujuan" style="appearance:auto; background:var(--surface);">
         <option value="">-- Tidak ganti YL --</option>
       </select>
     </div>
     <div class="form-field">
-      <div class="form-label">Hari Kunjungan Baru</div>
+      <div class="form-label">Hari Kunjungan Baru (opsional)</div>
       <div class="day-grid" id="mutasiDayGrid"></div>
-      <div style="font-size:10.5px; color:var(--text-dim); margin-top:8px;">Pilih hari baru. Kosongkan jika hari tidak berubah.</div>
     </div>
 
     <div class="action-bar" style="margin-top:20px;">
       <button class="btn-primary" data-action="execute-mutasi" style="width:100%; justify-content:center;">
-        <i class="fa-solid fa-bolt"></i><span>Eksekusi Mutasi</span>
+        <i class="fa-solid fa-bolt"></i><span id="mutasiBtnLbl">Eksekusi Mutasi</span>
       </button>
     </div>
   </div>
@@ -1049,6 +923,17 @@ Pak Budi, Jl. Melati No 5"></textarea>
 <div class="toast" id="toast">Tersimpan</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+/* ============================================================
+   KONFIGURASI DEFAULT
+   ============================================================ */
+const GAS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbzOmlQLm-1tE1p0iAfL1AicbkbCKbIi17-S5FoIIOWZefeZuMCWdKdATHOmr2NmUY5NPg/exec';
+const FIREBASE_CONFIG_DEFAULT = {
+  apiKey: 'AIzaSyDrJ0LoSy5JQBGOYhFzcCuXzq1tQ0ViBqY',
+  projectId: 'data-pelanggan-apps',
+  databaseUrl: 'https://data-pelanggan-apps-default-rtdb.asia-southeast1.firebasedatabase.app'
+};
+const ADMIN_PASSWORD = 'Yakult2027';
+
 /* ============ CONSTANTS ============ */
 const HARGA = { om:2130, os:2130, yo:2040, yt:2460 };
 const CATEGORIES = [
@@ -1068,6 +953,10 @@ const DAYS = [
   { key:'jum', label:'Jumat',  short:'Jum', js:5 },
   { key:'sab', label:'Sabtu',  short:'Sab', js:6 },
   { key:'min', label:'Minggu', short:'Min', js:0 }
+];
+const SESSIONS = [
+  { key:'pagi', label:'Pagi', icon:'fa-sun',        color:'#F59E0B' },
+  { key:'sore', label:'Sore', icon:'fa-cloud-sun',  color:'#F97316' }
 ];
 const STATUSES = [
   { key:'beli',    label:'Beli',    icon:'fa-cart-plus',        cls:'beli' },
@@ -1094,13 +983,35 @@ const TKU_DATA = {
 const TKU_ORDER = ['PNY','ARC','UBR','KRC','ANT','MGY','BJS','BBT'];
 const DRAFT_PAGE_SIZE = 20;
 
+/* ============ FIREBASE INIT ============ */
+let firebaseReady = false;
+let firestoreDB = null;
+try {
+  if(FIREBASE_CONFIG_DEFAULT.apiKey && FIREBASE_CONFIG_DEFAULT.projectId){
+    firebase.initializeApp(FIREBASE_CONFIG_DEFAULT);
+    firestoreDB = firebase.firestore();
+    firebase.auth().signInAnonymously()
+      .then(() => {
+        firebaseReady = true;
+        console.log('✓ Firebase ready (anonymous)');
+      })
+      .catch(err => {
+        console.error('Firebase auth error:', err);
+      });
+  } else {
+    console.log('Firebase config kosong, skip init');
+  }
+} catch(e){
+  console.warn('Firebase init skipped:', e.message);
+}
+
 /* ============ STATE ============ */
 const state = {
   isSettingsUnlocked: false,
   activeTab:'kunjungan',
-  sticky:{ tku:'PNY', yl:null, category:'rumah', days:[] },
-  editTKU:null, editYL:null, editCategory:null, editDays:[],
-  mutasiDays:[],
+  sticky:{ tku:'PNY', yl:null, category:'rumah', days:[], session:'pagi' },
+  editTKU:null, editYL:null, editCategory:null, editDays:[], editSession:'pagi',
+  mutasiDays:[], mutasiSelected: new Set(),
   customers:[], visits:[], drafts:[],
   editingCustomer:null, activeCustomer:null,
   custFilter:'all', custView:'list',
@@ -1108,10 +1019,7 @@ const state = {
   visitGPS:null, visitPhoto:null,
   visitStatus:'beli', visitPayment:'cash',
   visitQty:{om:0,os:0,yo:0,yt:0},
-  settings:{ 
-    theme:'auto',
-    firebase: { apiKey:'', projectId:'', databaseUrl:'' }
-  },
+  settings:{ theme:'auto', firebase: { ...FIREBASE_CONFIG_DEFAULT } },
   gasUrl:'', geminiKey:'',
   mapInstance:null,
   migrateCategory:'rumah',
@@ -1139,6 +1047,7 @@ const haversineKm = (lat1,lng1,lat2,lng2) => { const R=6371, dLat=(lat2-lat1)*Ma
 const mapsLink = (lat,lng) => `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 const daysLabel = arr => (arr||[]).map(k => DAYS.find(d=>d.key===k)?.label || '').filter(Boolean).join(', ');
 const daysShortLabel = arr => (arr||[]).map(k => DAYS.find(d=>d.key===k)?.short || '').filter(Boolean).join(', ');
+const sessionInfo = k => SESSIONS.find(s=>s.key===k) || SESSIONS[0];
 
 function formatPhone(val){
   let digits = String(val||'').replace(/\D/g, '');
@@ -1169,45 +1078,26 @@ function safeName(str, maxLen=30){
   return String(str||'x').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'_').slice(0,maxLen) || 'x';
 }
 
-/* ============ UPLOAD FOTO KE DRIVE VIA GAS ============ */
-async function uploadPhotoToDrive(base64Photo, photoName){
-  if(!state.gasUrl){
-    throw new Error('GAS URL belum diset');
-  }
-  if(!base64Photo || base64Photo.length < 100){
-    return null;
-  }
+async function uploadPhotoToDrive(base64Photo, photoName, tku){
+  if(!state.gasUrl) throw new Error('GAS URL belum diset');
+  if(!base64Photo || base64Photo.length < 100) return null;
   
-  showToast('⏳ Upload foto...');
-  
-  const payload = {
-    type: 'upload-photo',
-    base64: base64Photo,
-    fileName: photoName
+  const payload = { 
+    type:'upload-photo', 
+    base64: base64Photo, 
+    fileName: photoName,
+    tku: tku || state.sticky.tku
   };
   
-  try{
-    const res = await fetch(state.gasUrl, {
-      method: 'POST',
-      redirect: 'follow',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    });
-    
-    if(!res.ok){
-      throw new Error('HTTP ' + res.status);
-    }
-    
-    const json = await res.json();
-    
-    if(json.ok && json.url){
-      return json.url;
-    } else {
-      throw new Error(json.error || 'Upload gagal');
-    }
-  }catch(e){
-    throw new Error('Upload foto gagal: ' + e.message);
-  }
+  const res = await fetch(state.gasUrl, {
+    method:'POST', redirect:'follow',
+    headers: { 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  const json = await res.json();
+  if(json.ok && json.url) return json.url;
+  throw new Error(json.error || 'Upload gagal');
 }
 
 /* ============ HELPERS ============ */
@@ -1258,7 +1148,8 @@ function saveSettings(){
 function loadSettings(){
   try{
     const s = localStorage.getItem('ycust_settings'); if(s) Object.assign(state.settings, JSON.parse(s));
-    state.gasUrl = localStorage.getItem('ycust_gas') || '';
+    if(!state.settings.firebase) state.settings.firebase = { ...FIREBASE_CONFIG_DEFAULT };
+    state.gasUrl = localStorage.getItem('ycust_gas') || GAS_URL_DEFAULT;
     state.geminiKey = localStorage.getItem('ycust_gemini') || '';
     const migCat = localStorage.getItem('ycust_migrate_cat');
     if(migCat && CATEGORIES.find(c=>c.key===migCat)) state.migrateCategory = migCat;
@@ -1269,6 +1160,7 @@ function loadSettings(){
       if(p.yl) state.sticky.yl = p.yl;
       if(p.category && CATEGORIES.find(c=>c.key===p.category)) state.sticky.category = p.category;
       if(Array.isArray(p.days)) state.sticky.days = p.days;
+      if(p.session && SESSIONS.find(s=>s.key===p.session)) state.sticky.session = p.session;
     }
   }catch(_){}
 }
@@ -1290,6 +1182,7 @@ function renderBanner(){
 /* ============ CTX CHIPS ============ */
 function ctxChipsHTML(){
   const cat = catInfo(state.sticky.category);
+  const ses = sessionInfo(state.sticky.session);
   const ylName = state.sticky.yl || '— pilih YL —';
   const days = state.sticky.days || [];
   const daysTxt = days.length > 0 ? daysShortLabel(days) : '—';
@@ -1297,6 +1190,7 @@ function ctxChipsHTML(){
     <span class="ctx-chip"><i class="fa-solid fa-store"></i>${state.sticky.tku}</span>
     <span class="ctx-chip"><i class="fa-solid fa-user"></i>${ylName.split(' ')[0]}</span>
     <span class="ctx-chip cat" style="--cat-color:${cat.color};"><i class="fa-solid ${cat.icon}"></i>${cat.label}</span>
+    <span class="ctx-chip session" style="color:${ses.color};"><i class="fa-solid ${ses.icon}" style="color:${ses.color};"></i>${ses.label}</span>
     <span class="ctx-chip days"><i class="fa-solid fa-calendar-day"></i>${daysTxt}</span>
   `;
 }
@@ -1365,15 +1259,20 @@ function renderCustList(){
   }
   w.innerHTML = list.map(c => {
     const cat = catInfo(c.category);
+    const ses = sessionInfo(c.session || 'pagi');
     const visited = hasVisitedToday(c.id);
     const v = getTodayVisit(c.id);
     const statusTxt = v ? (v.status === 'beli' ? `✓ Beli ${(v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0)} btl` : `✓ ${STATUSES.find(s=>s.key===v.status)?.label || v.status}`) : '';
     const unsynced = c._syncedAt ? '' : '<span class="unsynced-dot"></span>';
     return `<div class="customer-card ${visited?'visited':''}" data-cust="${c.id}">
-      <div class="cust-photo">${c.photoUrl?`<img src="${c.photoUrl}">`:`<i class="fa-solid ${cat.icon}" style="color:${cat.color};"></i>`}${unsynced}</div>
+      <div class="cust-photo">
+        <span class="cust-initials" style="color:${cat.color};">${getInitials(c.name)}</span>
+        ${c.photoUrl?`<img src="${c.photoUrl}" onerror="this.remove()">`:''}
+        ${unsynced}
+      </div>
       <div class="cust-info">
         <div class="cust-name">${c.name}</div>
-        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span>${c.address ? c.address.slice(0,28)+(c.address.length>28?'…':'') : ''}</div>
+        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span><span style="color:${ses.color};font-weight:700;">${ses.label}</span> · ${c.address ? c.address.slice(0,22)+(c.address.length>22?'…':'') : ''}</div>
         ${statusTxt?`<div class="cust-status">${statusTxt}</div>`:''}
       </div>
       <i class="fa-solid fa-chevron-right cust-action"></i>
@@ -1425,12 +1324,17 @@ function renderAllList(){
   }
   w.innerHTML = list.map(c => {
     const cat = catInfo(c.category);
+    const ses = sessionInfo(c.session || 'pagi');
     const unsynced = c._syncedAt ? '' : '<span class="unsynced-dot"></span>';
     return `<div class="customer-card" data-cust-detail="${c.id}">
-      <div class="cust-photo">${c.photoUrl?`<img src="${c.photoUrl}">`:`<i class="fa-solid ${cat.icon}" style="color:${cat.color};"></i>`}${unsynced}</div>
+      <div class="cust-photo">
+        <span class="cust-initials" style="color:${cat.color};">${getInitials(c.name)}</span>
+        ${c.photoUrl?`<img src="${c.photoUrl}" onerror="this.remove()">`:''}
+        ${unsynced}
+      </div>
       <div class="cust-info">
         <div class="cust-name">${c.name}</div>
-        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span>${daysShortLabel(c.blockingDays)}</div>
+        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span><span style="color:${ses.color};font-weight:700;">${ses.label}</span> · ${daysShortLabel(c.blockingDays)}</div>
       </div>
       <i class="fa-solid fa-chevron-right cust-action"></i>
     </div>`;
@@ -1562,15 +1466,16 @@ function postAnalisis(){
 function setHTML(){
   const s = state.settings;
   const unsynced = state.visits.filter(v => !v._syncedAt).length + state.customers.filter(c => !c._syncedAt).length;
+  const photoQueue = state.customers.filter(c => c.photoPending).length + state.visits.filter(v => v.photoPending).length;
   return `
     <div class="form-card" style="padding:0;">
       <div class="set-row">
-        <div><div class="set-lbl">Mutasi Pelanggan</div><div class="set-sub">Pindah YL atau ganti Hari Kunjungan</div></div>
+        <div><div class="set-lbl">Mutasi Pelanggan</div><div class="set-sub">Pindah YL / TKU / Hari (fleksibel)</div></div>
         <button class="set-btn" data-action="open-mutasi"><i class="fa-solid fa-people-arrows"></i> Mutasi</button>
       </div>
       <div class="set-row">
-        <div><div class="set-lbl">Database Firebase</div><div class="set-sub">Simpan online permanen</div></div>
-        <button class="set-btn" data-action="open-firebase"><i class="fa-solid fa-database"></i> Setup</button>
+        <div><div class="set-lbl">Database Cloud</div><div class="set-sub">${state.gasUrl ? '✓ GAS' : '⚠️ GAS'} · ${firebaseReady ? '✓ Firebase' : '⚠️ Firebase'}</div></div>
+        <span class="set-btn" style="cursor:default; color:${state.gasUrl?'var(--emerald)':'var(--rose)'};"><i class="fa-solid ${state.gasUrl?'fa-circle-check':'fa-circle-xmark'}"></i></span>
       </div>
       <div class="set-row">
         <div><div class="set-lbl">Tema</div><div class="set-sub">Light / Dark / Auto</div></div>
@@ -1581,8 +1486,8 @@ function setHTML(){
         </div>
       </div>
       <div class="set-row">
-        <div><div class="set-lbl">Google Drive & Sheets</div><div class="set-sub">${state.customers.length} pelanggan · ${state.visits.length} kunjungan${unsynced > 0 ? ` · <span style="color:var(--amber);font-weight:700;">${unsynced} blm sync</span>` : ''}</div></div>
-        <button class="set-btn" data-action="open-sync"><i class="fa-solid fa-cloud"></i> Cloud</button>
+        <div><div class="set-lbl">Sync Manual</div><div class="set-sub">${state.customers.length} pelanggan · ${state.visits.length} kunjungan${unsynced > 0 ? ` · <span style="color:var(--amber);font-weight:700;">${unsynced} blm sync</span>` : ''}${photoQueue > 0 ? ` · <span style="color:var(--brand);">${photoQueue} foto antri</span>` : ''}</div></div>
+        <button class="set-btn" data-action="sync-now"><i class="fa-solid fa-cloud-arrow-up"></i> Sync</button>
       </div>
       <div class="set-row">
         <div><div class="set-lbl">Backup Data</div><div class="set-sub">Export JSON ke file lokal</div></div>
@@ -1599,8 +1504,8 @@ function setHTML(){
       </div>
     </div>
     <div class="form-card" style="text-align:center; padding:14px;">
-      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v2.2</div>
-      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">Mutasi + Firebase + Analisis</div>
+      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v2.4</div>
+      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">GAS + Firebase · Foto Queue · Level Map</div>
     </div>
   `;
 }
@@ -1626,15 +1531,9 @@ function closeAllDD(){ $$('.dd.open').forEach(x => x.classList.remove('open')); 
 function openSheet(id){
   const overlay = $('overlay');
   const sheetEl = $(id);
-
   overlay.classList.remove('visit-mode');
   $$('.sheet').forEach(s => s.classList.remove('visit-sheet'));
-
-  if(id === 'visitSheet'){
-    overlay.classList.add('visit-mode');
-    sheetEl.classList.add('visit-sheet');
-  }
-
+  if(id === 'visitSheet'){ overlay.classList.add('visit-mode'); sheetEl.classList.add('visit-sheet'); }
   overlay.classList.add('open');
   void sheetEl.offsetWidth;
   sheetEl.classList.add('open');
@@ -1642,9 +1541,8 @@ function openSheet(id){
   haptic(id === 'visitSheet' ? 20 : 8);
 }
 function closeAllSheets(){
-  ['ctxSheet','custSheet','visitSheet','detailSheet','mapSheet','syncSheet','migrateSheet','draftSheet','draftEditSheet','mutasiSheet','firebaseSheet', 'passwordSheet'].forEach(id=>{
-    const el = $(id);
-    if(el) el.classList.remove('open','visit-sheet');
+  ['ctxSheet','custSheet','visitSheet','detailSheet','mapSheet','migrateSheet','draftSheet','draftEditSheet','mutasiSheet','passwordSheet'].forEach(id=>{
+    const el = $(id); if(el) el.classList.remove('open','visit-sheet');
   });
   $('overlay').classList.remove('open','visit-mode');
   document.body.style.overflow='';
@@ -1665,6 +1563,7 @@ function renderCtxSheet(){
   const yls = TKU_DATA[state.sticky.tku].yl;
   $('ctxMenuYL').innerHTML = yls.map(y=>`<button type="button" class="dd-item ${y===state.sticky.yl?'selected':''}" data-dd-item="ctx-yl" data-value="${encodeURIComponent(y)}"><span class="dd-item-main"><span class="dd-item-name">${y}</span></span><i class="fa-solid fa-check dd-check"></i></button>`).join('');
   $('ctxCatGrid').innerHTML = CATEGORIES.map(c=>`<button type="button" class="cat-chip ${c.key===state.sticky.category?'active':''}" data-ctx-cat="${c.key}"><i class="fa-solid ${c.icon}"></i><span>${c.label}</span></button>`).join('');
+  $('ctxSessionGrid').innerHTML = SESSIONS.map(s=>`<button type="button" class="day-cell ${state.sticky.session===s.key?'active':''}" data-ctx-session="${s.key}" style="${state.sticky.session===s.key?'':'color:'+s.color+';'}"><i class="fa-solid ${s.icon}" style="margin-right:4px;"></i>${s.label}</button>`).join('');
   const days = state.sticky.days || [];
   $('ctxDayGrid').innerHTML = DAYS.map(d=>`<button type="button" class="day-cell ${days.includes(d.key)?'active':''}" data-ctx-day="${d.key}">${d.short}</button>`).join('');
 }
@@ -1678,6 +1577,7 @@ function openCustForm(cust){
   state.editYL = cust ? cust.createdBy : state.sticky.yl;
   state.editCategory = cust ? cust.category : state.sticky.category;
   state.editDays = cust ? (cust.blockingDays||[]) : [...(state.sticky.days||[])];
+  state.editSession = cust ? (cust.session || 'pagi') : (state.sticky.session || 'pagi');
 
   $('custSheetTitle').textContent = cust ? 'Edit Pelanggan' : 'Pelanggan Baru';
   $('btnSaveCustLbl').textContent = cust ? 'Update Pelanggan' : 'Simpan Pelanggan';
@@ -1697,12 +1597,14 @@ function openCustForm(cust){
 function renderCustCtxBar(){
   const ylName = state.editYL || '— pilih YL —';
   const cat = catInfo(state.editCategory);
+  const ses = sessionInfo(state.editSession);
   const days = state.editDays || [];
   const daysTxt = days.length > 0 ? daysShortLabel(days) : '—';
   $('custCtxMain').innerHTML = `
     <span class="ctx-chip"><i class="fa-solid fa-store"></i>${state.editTKU}</span>
     <span class="ctx-chip"><i class="fa-solid fa-user"></i>${ylName.split(' ')[0]}</span>
     <span class="ctx-chip cat" style="--cat-color:${cat.color};"><i class="fa-solid ${cat.icon}"></i>${cat.label}</span>
+    <span class="ctx-chip session" style="color:${ses.color};"><i class="fa-solid ${ses.icon}" style="color:${ses.color};"></i>${ses.label}</span>
     <span class="ctx-chip days"><i class="fa-solid fa-calendar-day"></i>${daysTxt}</span>
   `;
 }
@@ -1751,29 +1653,27 @@ async function saveCustomer(){
   const ed = state.editingCustomer;
   const cid = ed ? ed.id : uid('c');
   
-  // Upload foto kalau ada foto baru (base64, bukan URL)
-  let photoUrl = ed ? (ed.photoUrl || null) : null;
+  const photoUrl = ed ? (ed.photoUrl || null) : null;
   const isNewPhoto = state.pendingPhoto && !state.pendingPhoto.startsWith('http');
-  
-  if(isNewPhoto){
-    const photoName = `cust_${safeName(state.editYL,20)}_${safeName(name,25)}_${cid}.jpg`;
-    try{
-      photoUrl = await uploadPhotoToDrive(state.pendingPhoto, photoName);
-    }catch(e){
-      showToast('⚠️ Foto gagal upload, simpan tanpa foto');
-    }
-  }
+  const pendingPhoto = isNewPhoto ? state.pendingPhoto : (ed ? ed.photoPending : null);
+  const photoName = isNewPhoto 
+    ? `cust_${safeName(state.editYL,20)}_${safeName(name,25)}_${cid}.jpg`
+    : (ed?.photoName || null);
+  const photoTku = isNewPhoto ? state.editTKU : (ed?.photoTku || null);
   
   const rec = {
     id: cid,
     name,
     category: state.editCategory,
+    session: state.editSession,
     blockingDays: [...state.editDays],
     address: addr,
     landmark: $('custLandmark').value.trim(),
     phone: formatPhone($('custPhone').value),
     photoUrl: photoUrl,
-    photoName: photoUrl ? `cust_${safeName(state.editYL,20)}_${safeName(name,25)}_${cid}.jpg` : null,
+    photoName: photoName,
+    photoPending: pendingPhoto,
+    photoTku: photoTku,
     lat: state.pendingGPS.lat, 
     lng: state.pendingGPS.lng,
     notes: $('custNotes').value.trim(),
@@ -1782,7 +1682,7 @@ async function saveCustomer(){
     createdAt: ed ? ed.createdAt : Date.now(),
     updatedAt: Date.now(),
     active: true,
-    _syncedAt: ed ? ed._syncedAt : null
+    _syncedAt: null
   };
   
   await idbPut(ST_CUST, rec);
@@ -1794,11 +1694,15 @@ async function saveCustomer(){
     state.sticky.tku = state.editTKU; 
     state.sticky.yl = state.editYL; 
     state.sticky.category = state.editCategory; 
+    state.sticky.session = state.editSession;
     saveSettings(); 
   }
   
   haptic(25); 
-  showToast(ed ? '✓ Diupdate' : `✓ ${name.split(' ')[0]} → ${state.editYL.split(' ')[0]}`);
+  const msg = isNewPhoto 
+    ? `✓ ${name.split(' ')[0]} · foto antri upload`
+    : (ed ? '✓ Diupdate' : `✓ ${name.split(' ')[0]}`);
+  showToast(msg);
   closeAllSheets(); renderBanner(); renderMain();
 }
 async function deleteCustomer(){
@@ -1817,15 +1721,16 @@ function openDetail(cid){
   const c = getCustomerById(cid); if(!c) return;
   state.activeCustomer = c;
   const cat = catInfo(c.category);
+  const ses = sessionInfo(c.session || 'pagi');
   $('dAvatar').textContent = getInitials(c.name);
   $('dAvatar').style.background = cat.color;
   $('dName').textContent = c.name;
-  $('dMeta').textContent = `${cat.label} · ${c.tku || ''} · ${c.createdBy || ''}`;
+  $('dMeta').textContent = `${cat.label} · ${ses.label} · ${c.tku || ''}`;
   const visits = getCustomerVisits(c.id).sort((a,b)=>b.timestamp-a.timestamp).slice(0,10);
   $('detailBody').innerHTML = `
     ${c.photoUrl?`<img src="${c.photoUrl}" style="width:100%; border-radius:16px; margin-bottom:14px; max-height:220px; object-fit:cover;">`:''}
     <div class="detail-box">
-      <div class="detail-row"><i class="fa-solid ${cat.icon}" style="color:${cat.color};"></i> <b>${cat.label}</b> · ${daysLabel(c.blockingDays)}</div>
+      <div class="detail-row"><i class="fa-solid ${cat.icon}" style="color:${cat.color};"></i> <b>${cat.label}</b> · <span style="color:${ses.color};font-weight:700;">${ses.label}</span> · ${daysLabel(c.blockingDays)}</div>
       <div class="detail-row"><i class="fa-solid fa-user"></i> <span>PIC: <b>${c.createdBy||'—'}</b> · ${c.tku||''}</span></div>
       <div class="detail-row"><i class="fa-solid fa-location-dot"></i> <span>${c.address||'—'}${c.landmark?`<br><i style="opacity:.6;">(${c.landmark})</i>`:''}</span></div>
       ${c.phone?`<div class="detail-row"><i class="fa-solid fa-phone"></i> <a href="tel:${c.phone.replace(/-/g,'')}" style="color:var(--brand); text-decoration:none; font-weight:600;">${c.phone}</a></div>`:''}
@@ -1862,10 +1767,11 @@ function openVisitForm(cid){
   state.visitPhoto = null;
   state.visitGPS = null;
   const cat = catInfo(c.category);
+  const ses = sessionInfo(c.session || 'pagi');
   $('vAvatar').textContent = getInitials(c.name);
   $('vAvatar').style.background = cat.color;
   $('vName').textContent = c.name;
-  $('vMeta').textContent = `${cat.label} · PIC: ${state.sticky.yl || c.createdBy || '—'}`;
+  $('vMeta').textContent = `${cat.label} · ${ses.label} · PIC: ${state.sticky.yl || c.createdBy || '—'}`;
   $('visitNotes').value = '';
   $('statusGrid').innerHTML = STATUSES.map(s=>`<div class="status-chip ${s.key==='beli'?'active '+s.cls:''}" data-status="${s.key}"><i class="fa-solid ${s.icon}"></i><span>${s.label}</span></div>`).join('');
   $('paymentGrid').innerHTML = PAYMENTS.map(p=>`<div class="status-chip ${p.key==='cash'?'active':''}" data-payment="${p.key}"><i class="fa-solid ${p.icon}"></i><span>${p.label}</span></div>`).join('');
@@ -1933,24 +1839,20 @@ async function saveVisit(){
   
   const vid = uid('v');
   
-  // Upload foto kunjungan kalau ada
-  let photoUrl = null;
-  if(state.visitPhoto && !state.visitPhoto.startsWith('http')){
-    const photoName = `visit_${safeName(state.sticky.tku,10)}_${safeName(state.sticky.yl,20)}_${todayKey()}_${vid}.jpg`;
-    try{
-      photoUrl = await uploadPhotoToDrive(state.visitPhoto, photoName);
-    }catch(e){
-      showToast('⚠️ Foto gagal upload: ' + e.message);
-    }
-  }
+  const hasNewPhoto = state.visitPhoto && !state.visitPhoto.startsWith('http');
+  const pendingPhoto = hasNewPhoto ? state.visitPhoto : null;
+  const photoName = hasNewPhoto 
+    ? `visit_${safeName(state.sticky.tku,10)}_${safeName(state.sticky.yl,20)}_${todayKey()}_${vid}.jpg`
+    : null;
+  const photoTku = hasNewPhoto ? state.sticky.tku : null;
   
-  // Kalau status bukan 'beli', paksa qty = 0
   const isBeli = state.visitStatus === 'beli';
   const v = {
     id: vid, 
     customerId: c.id, 
     customerName: c.name, 
     category: c.category,
+    session: c.session || 'pagi',
     tku: state.sticky.tku, 
     yl: state.sticky.yl,
     date: todayKey(), 
@@ -1964,8 +1866,10 @@ async function saveVisit(){
     notes: $('visitNotes').value.trim(),
     lat, lng, 
     timestamp: Date.now(),
-    photoUrl: photoUrl,
-    photoName: photoUrl ? `visit_${safeName(state.sticky.tku,10)}_${safeName(state.sticky.yl,20)}_${todayKey()}_${vid}.jpg` : null,
+    photoUrl: null,
+    photoName: photoName,
+    photoPending: pendingPhoto,
+    photoTku: photoTku,
     _syncedAt: null
   };
   
@@ -1982,28 +1886,75 @@ async function saveVisit(){
 async function calcRoute(){
   const list = getCustomersForToday().filter(c => !hasVisitedToday(c.id) && c.lat && c.lng);
   const w = $('routeResult');
-  if(list.length === 0){ w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-route"></i><div class="empty-state-title">Tidak ada pelanggan</div><div class="empty-state-desc">Semua pelanggan hari ini sudah dikunjungi atau belum punya lokasi GPS.</div></div>`; return; }
+  if(list.length === 0){ 
+    w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-route"></i><div class="empty-state-title">Tidak ada pelanggan</div><div class="empty-state-desc">Semua pelanggan hari ini sudah dikunjungi atau belum punya lokasi GPS.</div></div>`; 
+    return; 
+  }
+  
   w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner spin"></i><div class="empty-state-title">Menghitung rute...</div><div class="empty-state-desc">Mengambil lokasi Anda saat ini</div></div>`;
+  
   let userLoc = null;
-  try{ const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000})); userLoc = { lat:pos.coords.latitude, lng:pos.coords.longitude }; }catch(_){}
+  try{ 
+    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000})); 
+    userLoc = { lat:pos.coords.latitude, lng:pos.coords.longitude }; 
+  }catch(_){}
+  
   const startLat = userLoc?.lat ?? list[0].lat, startLng = userLoc?.lng ?? list[0].lng;
   const rem = list.map(c=>({...c}));
   const ordered = [];
   let curLat = startLat, curLng = startLng;
+  
   while(rem.length > 0){
     let bi=0, bd=Infinity;
     rem.forEach((c,i)=>{ const d = haversineKm(curLat,curLng,c.lat,c.lng); if(d<bd){bd=d;bi=i;} });
     const ch = rem.splice(bi,1)[0]; ch.stepDist = bd; ordered.push(ch);
     curLat = ch.lat; curLng = ch.lng;
   }
+  
   const totalKm = ordered.reduce((s,c)=>s+c.stepDist,0);
   const etaMin = Math.round(totalKm/20*60);
+  const MAX_NODES = 10;
+  const shown = ordered.slice(0, MAX_NODES);
+  const locked = ordered.length > MAX_NODES;
+  
+  const starsFor = (km) => km < 0.5 ? 3 : km < 1.5 ? 2 : km < 3 ? 1 : 0;
+  
+  const nodesHTML = shown.map((c,i)=>{
+    const stars = starsFor(c.stepDist);
+    const starsHTML = [0,1,2].map(j => `<i class="fa-solid fa-star ${j < stars ? 'filled' : 'empty'}"></i>`).join('');
+    return `<div class="route-node ${i === 0 ? 'current' : ''}" data-route-cust="${c.id}" title="${c.name}">
+      <div class="route-circle">${i+1}</div>
+      <div class="route-stars">${starsHTML}</div>
+      <div class="route-label">${c.name.split(' ').slice(0,2).join(' ')}</div>
+    </div>`;
+  }).join('');
+  
+  const lockedNode = locked ? `
+    <div class="route-node locked" title="Terkunci">
+      <div class="route-circle"><i class="fa-solid fa-lock"></i></div>
+      <div class="route-stars"><i class="fa-solid fa-star empty"></i><i class="fa-solid fa-star empty"></i><i class="fa-solid fa-star empty"></i></div>
+      <div class="route-label">+${ordered.length - MAX_NODES} lagi</div>
+    </div>
+  ` : '';
+  
   w.innerHTML = `
     <div class="form-card" style="display:flex; justify-content:space-around; text-align:center; padding:16px;">
       <div><div style="font-family:'Poppins';font-size:22px;font-weight:700;color:var(--brand);">${ordered.length}</div><div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">Titik</div></div>
       <div><div style="font-family:'Poppins';font-size:22px;font-weight:700;color:var(--brand);">${totalKm.toFixed(1)}</div><div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">KM</div></div>
       <div><div style="font-family:'Poppins';font-size:22px;font-weight:700;color:var(--brand);">${etaMin}</div><div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">Menit</div></div>
     </div>
+    
+    <div class="route-map">
+      <div style="font-size:10px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--brand); text-align:center; margin-bottom:14px;">
+        <i class="fa-solid fa-map-signs"></i> Level Map Rute
+      </div>
+      <div class="route-nodes">
+        ${nodesHTML}
+        ${lockedNode}
+      </div>
+    </div>
+    
+    <div style="font-size:10.5px; font-weight:700; color:var(--text-mute); text-transform:uppercase; letter-spacing:.1em; margin:16px 0 8px;">Daftar Urutan</div>
     ${ordered.map((c,i)=>{
       const cat = catInfo(c.category);
       return `<div class="route-item" data-cust="${c.id}">
@@ -2017,7 +1968,7 @@ async function calcRoute(){
 
 /* ============ BACKUP / RESTORE ============ */
 async function backupData(){
-  const data = { customers: state.customers, visits: state.visits, drafts: state.drafts, sticky: state.sticky, exportedAt: new Date().toISOString(), version: 9 };
+  const data = { customers: state.customers, visits: state.visits, drafts: state.drafts, sticky: state.sticky, exportedAt: new Date().toISOString(), version: 10 };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = `ycust_backup_${todayKey()}.json`;
@@ -2048,7 +1999,7 @@ function restoreData(){
   inp.click();
 }
 
-/* ============ GEMINI OCR ============ */
+/* ============ AI PROMPT ============ */
 const AI_PROMPT_TEMPLATE = `Convert foto tulisan tangan ini ke format berikut.
 
 FORMAT OUTPUT (plain text, satu baris per pelanggan):
@@ -2302,9 +2253,10 @@ async function importReadyDrafts(){
     const cid = uid('c');
     const rec = {
       id: cid, name: d.nama, category: d.kategori,
+      session: state.sticky.session || 'pagi',
       blockingDays: [...(state.sticky.days||[])],
       address: d.alamat, landmark: '',
-      phone: '', photoUrl: null, photoName: null,
+      phone: '', photoUrl: null, photoName: null, photoPending: null,
       lat: d.lat, lng: d.lng,
       notes: 'Import dari draft (migrasi)',
       tku: state.sticky.tku, createdBy: yl,
@@ -2324,83 +2276,247 @@ async function importReadyDrafts(){
   setTimeout(()=>openDraftSheet(), 300);
 }
 
-/* ============ MUTASI ============ */
+/* ============ MUTASI FLEKSIBEL ============ */
 function openMutasiSheet(){
   const selTkuAsal = $('mutasiTkuAsal');
   selTkuAsal.innerHTML = '<option value="">-- Pilih TKU --</option>' + TKU_ORDER.map(k=>`<option value="${k}">${TKU_DATA[k].center}</option>`).join('');
-  
   $('mutasiYlAsal').innerHTML = '<option value="">-- Pilih YL Asal --</option>';
+  $('mutasiTkuTujuan').innerHTML = '<option value="">-- Tidak ganti TKU --</option>' + TKU_ORDER.map(k=>`<option value="${k}">${TKU_DATA[k].center}</option>`).join('');
   $('mutasiYlTujuan').innerHTML = '<option value="">-- Tidak ganti YL --</option>';
+  $('mutasiSearch').value = '';
+  $('mutasiCount').textContent = '';
+  $('mutasiBtnLbl').textContent = 'Eksekusi Mutasi';
+  state.mutasiSelected = new Set();
+  state.mutasiDays = [];
   
   selTkuAsal.onchange = (e) => {
     const val = e.target.value;
-    if(!val) return;
+    if(!val){ $('mutasiYlAsal').innerHTML = '<option value="">-- Pilih YL Asal --</option>'; renderMutasiList(); return; }
     const yls = TKU_DATA[val].yl;
-    $('mutasiYlAsal').innerHTML = '<option value="">-- Pilih YL Asal --</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
+    $('mutasiYlAsal').innerHTML = '<option value="">-- Semua YL --</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
+    renderMutasiList();
+  };
+  $('mutasiYlAsal').onchange = renderMutasiList;
+  $('mutasiSearch').oninput = renderMutasiList;
+  $('mutasiTkuTujuan').onchange = (e) => {
+    const val = e.target.value;
+    if(!val){ $('mutasiYlTujuan').innerHTML = '<option value="">-- Tidak ganti YL --</option>'; return; }
+    const yls = TKU_DATA[val].yl;
     $('mutasiYlTujuan').innerHTML = '<option value="">-- Tidak ganti YL --</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
   };
-
-  state.mutasiDays = [];
+  
   renderMutasiDays();
-
+  renderMutasiList();
   openSheet('mutasiSheet');
 }
-function renderMutasiDays(){
-  $('mutasiDayGrid').innerHTML = DAYS.map(d=>`<button type="button" class="day-cell ${state.mutasiDays.includes(d.key)?'active':''}" data-mutasi-day="${d.key}">${d.short}</button>`).join('');
-}
-async function executeMutasi(){
+
+function renderMutasiList(){
+  const w = $('mutasiCustList'); if(!w) return;
   const tku = $('mutasiTkuAsal').value;
-  const ylAsal = $('mutasiYlAsal').value;
+  const yl = $('mutasiYlAsal').value;
+  const q = ($('mutasiSearch').value||'').toLowerCase();
+  
+  if(!tku){ w.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11.5px;">Pilih TKU dulu untuk melihat daftar</div>'; return; }
+  
+  let list = state.customers.filter(c => c.tku === tku);
+  if(yl) list = list.filter(c => c.createdBy === yl);
+  if(q) list = list.filter(c => c.name.toLowerCase().includes(q));
+  list.sort((a,b)=>a.name.localeCompare(b.name));
+  
+  if(list.length === 0){
+    w.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11.5px;">Tidak ada pelanggan</div>';
+    return;
+  }
+  
+  w.innerHTML = list.map(c => {
+    const sel = state.mutasiSelected.has(c.id);
+    const cat = catInfo(c.category);
+    return `<label style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;${sel?'background:var(--brand-soft);':''}">
+      <input type="checkbox" data-mutasi-check="${c.id}" ${sel?'checked':''} style="width:18px;height:18px;accent-color:var(--brand);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12.5px;font-weight:700;">${c.name}</div>
+        <div style="font-size:10px;color:var(--text-dim);">${cat.label} · ${daysShortLabel(c.blockingDays)}</div>
+      </div>
+    </label>`;
+  }).join('');
+  
+  updateMutasiCount();
+}
+
+function updateMutasiCount(){
+  const n = state.mutasiSelected.size;
+  $('mutasiCount').textContent = n > 0 ? `(${n} dipilih)` : '';
+  $('mutasiBtnLbl').textContent = n > 0 ? `Mutasi ${n} Pelanggan` : 'Eksekusi Mutasi';
+}
+
+async function executeMutasi(){
+  const ids = Array.from(state.mutasiSelected);
+  if(ids.length === 0){ showToast('Pilih minimal 1 pelanggan'); return; }
+  
+  const tkuTujuan = $('mutasiTkuTujuan').value;
   const ylTujuan = $('mutasiYlTujuan').value;
   const hariTujuan = [...state.mutasiDays];
-
-  if(!tku || !ylAsal){ showToast('Pilih TKU dan YL Asal'); return; }
-  if(!ylTujuan && hariTujuan.length === 0){ showToast('Pilih minimal YL Tujuan atau Hari Baru'); return; }
-
-  const affected = state.customers.filter(c => c.tku === tku && c.createdBy === ylAsal);
-  if(affected.length === 0){ showToast('Tidak ada pelanggan di YL Asal ini'); return; }
-
-  let msg = `Mutasi ${affected.length} pelanggan dari YL "${ylAsal}"\n\n`;
-  if(ylTujuan) msg += `-> Ke YL: "${ylTujuan}"\n`;
-  if(hariTujuan.length > 0) msg += `-> Ke Hari: ${daysLabel(hariTujuan)}\n`;
+  
+  if(!tkuTujuan && !ylTujuan && hariTujuan.length === 0){
+    showToast('Pilih minimal TKU/YL/Hari tujuan'); return;
+  }
+  
+  let msg = `Mutasi ${ids.length} pelanggan:\n\n`;
+  if(tkuTujuan) msg += `• TKU → ${TKU_DATA[tkuTujuan].center}\n`;
+  if(ylTujuan) msg += `• YL → ${ylTujuan}\n`;
+  if(hariTujuan.length > 0) msg += `• Hari → ${daysLabel(hariTujuan)}\n`;
   msg += `\nLanjutkan?`;
-
+  
   if(!confirm(msg)) return;
-
-  for(const c of affected){
+  
+  for(const id of ids){
+    const c = state.customers.find(x=>x.id===id);
+    if(!c) continue;
+    if(tkuTujuan) c.tku = tkuTujuan;
     if(ylTujuan) c.createdBy = ylTujuan;
-    if(hariTujuan.length > 0) c.blockingDays = hariTujuan;
+    if(hariTujuan.length > 0) c.blockingDays = [...hariTujuan];
     c._syncedAt = null;
     await idbPut(ST_CUST, c);
   }
-
+  
   haptic([30,40,30]);
-  showToast(`✓ Berhasil memutasi ${affected.length} pelanggan`);
+  showToast(`✓ ${ids.length} pelanggan dimutasi`);
   closeAllSheets();
   renderBanner(); renderMain();
 }
 
-/* ============ FIREBASE ============ */
-function openFirebaseSheet(){
-  $('fbApiKey').value = state.settings.firebase?.apiKey || '';
-  $('fbProjectId').value = state.settings.firebase?.projectId || '';
-  $('fbDatabaseUrl').value = state.settings.firebase?.databaseUrl || '';
-  openSheet('firebaseSheet');
-}
-function saveFirebaseSettings(){
-  if(!state.settings.firebase) state.settings.firebase = {};
-  state.settings.firebase.apiKey = $('fbApiKey').value.trim();
-  state.settings.firebase.projectId = $('fbProjectId').value.trim();
-  state.settings.firebase.databaseUrl = $('fbDatabaseUrl').value.trim();
-  saveSettings();
-  haptic(20);
-  showToast('✓ Konfigurasi Firebase tersimpan');
-  closeAllSheets();
+function renderMutasiDays(){
+  $('mutasiDayGrid').innerHTML = DAYS.map(d=>`<button type="button" class="day-cell ${state.mutasiDays.includes(d.key)?'active':''}" data-mutasi-day="${d.key}">${d.short}</button>`).join('');
 }
 
 /* ============ SYNC ============ */
+async function syncPhotos(onProgress){
+  const queue = [
+    ...state.customers.filter(c => c.photoPending && !c.photoUrl).map(c => ({ kind:'cust', item:c })),
+    ...state.visits.filter(v => v.photoPending && !v.photoUrl).map(v => ({ kind:'visit', item:v }))
+  ];
+  
+  if(queue.length === 0) return { uploaded: 0, failed: 0 };
+  
+  let uploaded = 0, failed = 0;
+  const total = queue.length;
+  
+  for(let i = 0; i < total; i++){
+    const { kind, item } = queue[i];
+    if(onProgress) onProgress(i, total, item.customerName || item.name);
+    try{
+      const url = await uploadPhotoToDrive(
+        item.photoPending, 
+        item.photoName, 
+        item.photoTku || state.sticky.tku
+      );
+      if(url){
+        item.photoUrl = url;
+        item.photoPending = null;
+        item._syncedAt = null;
+        if(kind === 'cust') await idbPut(ST_CUST, item);
+        else await idbPut(ST_VISIT, item);
+        uploaded++;
+      } else {
+        failed++;
+      }
+    }catch(e){
+      failed++;
+    }
+  }
+  
+  if(onProgress) onProgress(total, total, '');
+  return { uploaded, failed };
+}
+
+/* ============ FIREBASE SAVE ============ */
+async function saveToFirestore(){
+  if(!firebaseReady || !firestoreDB){
+    console.log('Firestore gak siap, skip');
+    return { saved: 0 };
+  }
+  
+  let saved = 0;
+  const batchSize = 400;
+  
+  try{
+    for(let i = 0; i < state.customers.length; i += batchSize){
+      const batch = firestoreDB.batch();
+      const slice = state.customers.slice(i, i + batchSize);
+      
+      slice.forEach(c => {
+        const ref = firestoreDB.collection('customers').doc(c.id);
+        batch.set(ref, {
+          id: c.id,
+          name: c.name,
+          category: c.category,
+          session: c.session || 'pagi',
+          blockingDays: c.blockingDays || [],
+          address: c.address || '',
+          landmark: c.landmark || '',
+          phone: c.phone || '',
+          lat: c.lat || null,
+          lng: c.lng || null,
+          notes: c.notes || '',
+          tku: c.tku || '',
+          createdBy: c.createdBy || '',
+          createdAt: c.createdAt || Date.now(),
+          updatedAt: Date.now(),
+          photoUrl: c.photoUrl || null,
+          active: c.active !== false
+        }, { merge: true });
+        saved++;
+      });
+      
+      await batch.commit();
+    }
+    
+    for(let i = 0; i < state.visits.length; i += batchSize){
+      const batch = firestoreDB.batch();
+      const slice = state.visits.slice(i, i + batchSize);
+      
+      slice.forEach(v => {
+        const ref = firestoreDB.collection('visits').doc(v.id);
+        batch.set(ref, {
+          id: v.id,
+          customerId: v.customerId,
+          customerName: v.customerName,
+          category: v.category,
+          session: v.session || 'pagi',
+          tku: v.tku,
+          yl: v.yl,
+          date: v.date,
+          time: v.time || '',
+          status: v.status,
+          om: v.om || 0,
+          os: v.os || 0,
+          yo: v.yo || 0,
+          yt: v.yt || 0,
+          total: (v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0),
+          rp: hitungSetoran(v),
+          payment: v.payment || 'cash',
+          notes: v.notes || '',
+          lat: v.lat || null,
+          lng: v.lng || null,
+          timestamp: v.timestamp || Date.now(),
+          photoUrl: v.photoUrl || null
+        }, { merge: true });
+        saved++;
+      });
+      
+      await batch.commit();
+    }
+    
+    console.log('✓ Firestore saved:', saved);
+    return { saved };
+  }catch(e){
+    console.error('Firestore save error:', e);
+    throw e;
+  }
+}
+
 async function syncNow(){
-  if(!state.gasUrl){ showToast('Isi GAS URL dulu'); return; }
+  if(!state.gasUrl){ showToast('GAS URL belum diset'); return; }
 
   const overlay = $('syncOverlay');
   const barFill = $('syncBarFill');
@@ -2429,57 +2545,56 @@ async function syncNow(){
     if(progress < 90){ setProgress(Math.min(90, progress + Math.random() * 4 + 2)); }
   }, 200);
 
-  const payload = {
-    type:'customers',
-    customers: state.customers.map(c=>({
-      id:c.id, 
-      name:c.name, 
-      category:c.category, 
-      blockingDays:(c.blockingDays||[]).join(','),
-      address:c.address, 
-      landmark:c.landmark, 
-      phone:c.phone, 
-      lat:c.lat, 
-      lng:c.lng,
-      notes:c.notes, 
-      tku:c.tku, 
-      createdBy:c.createdBy, 
-      createdAt:c.createdAt,
-      photoUrl: c.photoUrl || null,
-      photoName: c.photoName || null
-    })),
-    visits: state.visits.map(v=>({
-      id:v.id, 
-      customerId:v.customerId, 
-      customerName:v.customerName, 
-      category:v.category,
-      tku:v.tku, 
-      yl:v.yl, 
-      date:v.date, 
-      time:v.time, 
-      status:v.status,
-      om:v.om, 
-      os:v.os, 
-      yo:v.yo, 
-      yt:v.yt, 
-      total:(v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0),
-      rp: hitungSetoran(v), 
-      payment:v.payment, 
-      notes:v.notes,
-      lat:v.lat, 
-      lng:v.lng, 
-      timestamp:v.timestamp,
-      photoUrl: v.photoUrl || null,
-      photoName: v.photoName || null
-    })),
-    timestamp: Date.now()
-  };
-  const photoCount = payload.customers.filter(c=>c.photoUrl).length + payload.visits.filter(v=>v.photoUrl).length;
-
   try{
+    // FASE 1: Upload foto
+    const photoQueueCount = state.customers.filter(c => c.photoPending).length + state.visits.filter(v => v.photoPending).length;
+    if(photoQueueCount > 0){
+      clearInterval(progressTimer);
+      titleEl.textContent = 'Upload foto...';
+      subEl.textContent = '0 / ' + photoQueueCount;
+      const result = await syncPhotos((i, total, name) => {
+        setProgress(20 + (i/total)*50);
+        subEl.textContent = `📷 Upload ${i+1}/${total}${name ? ' · ' + name.split(' ')[0] : ''}`;
+      });
+      if(result.failed > 0){
+        subEl.textContent = `⚠️ ${result.uploaded} sukses, ${result.failed} gagal`;
+        await new Promise(r=>setTimeout(r, 1500));
+      }
+    }
+    
+    // FASE 2: Kirim ke GAS
+    titleEl.textContent = 'Kirim ke Spreadsheet...';
+    subEl.textContent = 'Menghubungkan...';
+    setProgress(75);
+    
+    const payload = {
+      type:'customers',
+      customers: state.customers.map(c=>({
+        id:c.id, name:c.name, category:c.category, session:c.session || 'pagi',
+        blockingDays:(c.blockingDays||[]).join(','),
+        address:c.address, landmark:c.landmark, phone:c.phone,
+        lat:c.lat, lng:c.lng, notes:c.notes, tku:c.tku, createdBy:c.createdBy,
+        createdAt:c.createdAt,
+        photoUrl: c.photoUrl || null,
+        photoName: c.photoName || null
+      })),
+      visits: state.visits.map(v=>({
+        id:v.id, customerId:v.customerId, customerName:v.customerName, category:v.category,
+        session:v.session || 'pagi',
+        tku:v.tku, yl:v.yl, date:v.date, time:v.time, status:v.status,
+        om:v.om, os:v.os, yo:v.yo, yt:v.yt,
+        total:(v.om||0)+(v.os||0)+(v.yo||0)+(v.yt||0),
+        rp: hitungSetoran(v), payment:v.payment, notes:v.notes,
+        lat:v.lat, lng:v.lng, timestamp:v.timestamp,
+        photoUrl: v.photoUrl || null,
+        photoName: v.photoName || null
+      })),
+      timestamp: Date.now()
+    };
+    const photoCount = payload.customers.filter(c=>c.photoUrl).length + payload.visits.filter(v=>v.photoUrl).length;
+
     const res = await fetch(state.gasUrl, {
-      method: 'POST',
-      redirect: 'follow',
+      method: 'POST', redirect: 'follow',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
     });
@@ -2487,7 +2602,15 @@ async function syncNow(){
     const json = await res.json().catch(()=>({ ok:true }));
     if(json.ok === false) throw new Error(json.error || 'Server tolak');
     
-    clearInterval(progressTimer);
+    // FASE 3: Save ke Firestore
+    titleEl.textContent = 'Save ke Firestore...';
+    setProgress(90);
+    try{
+      await saveToFirestore();
+    }catch(fe){
+      console.warn('Firestore gagal (gak fatal):', fe.message);
+    }
+    
     setProgress(100);
     overlay.classList.add('success');
     iconEl.textContent = '✅';
@@ -2519,6 +2642,7 @@ async function syncNow(){
       showToast('❌ Gagal: ' + e.message);
     }, 1800);
   } finally {
+    clearInterval(progressTimer);
     if(fab) fab.classList.remove('loading');
   }
 }
@@ -2530,25 +2654,22 @@ function showToast(msg){
   el.textContent = msg;
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>el.classList.remove('show'), 2200);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2500);
 }
 
 /* ============ EVENTS ============ */
 document.addEventListener('click', async e => {
   const t = e.target;
   
-  // Tab switching
   const tab = t.closest('[data-tab]');
   if(tab){
     haptic(8);
     const targetTab = tab.dataset.tab;
-    
     if(targetTab === 'set' && !state.isSettingsUnlocked) {
       openSheet('passwordSheet');
       setTimeout(() => $('setAdminPwd').focus(), 300);
       return;
     }
-    
     state.activeTab = targetTab;
     $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab === state.activeTab));
     renderMain();
@@ -2558,7 +2679,6 @@ document.addEventListener('click', async e => {
   if(t.closest('[data-close]')){ closeAllSheets(); return; }
   if(t.id === 'overlay'){ closeAllSheets(); closeAllDD(); return; }
 
-  // Dropdown items
   const item = t.closest('[data-dd-item]');
   if(item){
     e.preventDefault(); e.stopPropagation();
@@ -2569,9 +2689,11 @@ document.addEventListener('click', async e => {
     return;
   }
 
-  // Context sheet selections
   const ctxCat = t.closest('[data-ctx-cat]');
   if(ctxCat){ haptic(6); state.sticky.category = ctxCat.dataset.ctxCat; saveSettings(); renderCtxSheet(); return; }
+
+  const ctxSession = t.closest('[data-ctx-session]');
+  if(ctxSession){ haptic(6); state.sticky.session = ctxSession.dataset.ctxSession; saveSettings(); renderCtxSheet(); return; }
 
   const ctxDay = t.closest('[data-ctx-day]');
   if(ctxDay){
@@ -2596,6 +2718,17 @@ document.addEventListener('click', async e => {
     return;
   }
 
+  const mutCheck = t.closest('[data-mutasi-check]');
+  if(mutCheck){
+    const id = mutCheck.dataset.mutasiCheck;
+    if(mutCheck.checked) state.mutasiSelected.add(id);
+    else state.mutasiSelected.delete(id);
+    const parent = mutCheck.closest('label');
+    if(parent) parent.style.background = mutCheck.checked ? 'var(--brand-soft)' : '';
+    updateMutasiCount();
+    return;
+  }
+
   const editCat = t.closest('[data-edit-cat]');
   if(editCat){
     haptic(6);
@@ -2609,7 +2742,6 @@ document.addEventListener('click', async e => {
   const migCat = t.closest('[data-migrate-cat]');
   if(migCat){ haptic(6); state.migrateCategory = migCat.dataset.migrateCat; saveSettings(); renderMigrateCatGrid(); return; }
 
-  // Draft filter
   const dfBtn = t.closest('[data-draft-filter]');
   if(dfBtn){ haptic(6); state.draftFilter = dfBtn.dataset.draftFilter; state.draftShown = DRAFT_PAGE_SIZE; renderDraftFilter(); renderDraftList(); return; }
 
@@ -2622,14 +2754,31 @@ document.addEventListener('click', async e => {
   const dDel = t.closest('[data-draft-del]');
   if(dDel){ await deleteDraft(dDel.dataset.draftDel); return; }
 
-  // Actions
   if(t.closest('[data-action="open-ctx"]')){ haptic(10); openCtxSheet(); return; }
   if(t.closest('[data-action="open-migrate"]')){ haptic(10); openMigrateSheet(); return; }
   if(t.closest('[data-action="open-mutasi"]')){ haptic(10); openMutasiSheet(); return; }
-  if(t.closest('[data-action="open-firebase"]')){ haptic(10); openFirebaseSheet(); return; }
   
   if(t.closest('[data-action="execute-mutasi"]')){ await executeMutasi(); return; }
-  if(t.closest('[data-action="save-firebase"]')){ saveFirebaseSettings(); return; }
+
+  if(t.closest('[data-action="mutasi-select-all"]')){
+    haptic(6);
+    const tku = $('mutasiTkuAsal').value;
+    const yl = $('mutasiYlAsal').value;
+    const q = ($('mutasiSearch').value||'').toLowerCase();
+    let list = state.customers.filter(c => c.tku === tku);
+    if(yl) list = list.filter(c => c.createdBy === yl);
+    if(q) list = list.filter(c => c.name.toLowerCase().includes(q));
+    list.forEach(c => state.mutasiSelected.add(c.id));
+    renderMutasiList();
+    return;
+  }
+
+  if(t.closest('[data-action="mutasi-clear-all"]')){
+    haptic(6);
+    state.mutasiSelected.clear();
+    renderMutasiList();
+    return;
+  }
 
   if(t.closest('[data-action="save-ctx"]')){
     haptic(25);
@@ -2646,6 +2795,9 @@ document.addEventListener('click', async e => {
 
   const cd = t.closest('[data-cust-detail]');
   if(cd){ haptic(10); openDetail(cd.dataset.custDetail); return; }
+
+  const rc = t.closest('[data-route-cust]');
+  if(rc){ haptic(10); openDetail(rc.dataset.routeCust); return; }
 
   const f = t.closest('[data-filter]');
   if(f){ haptic(6); state.custFilter = f.dataset.filter; if(state.activeTab==='kunjungan'){ renderFilterRow(); renderCustList(); } else { renderAllFilter(); renderAllList(); } return; }
@@ -2667,7 +2819,6 @@ document.addEventListener('click', async e => {
     sc.classList.add('active');
     const st = STATUSES.find(x=>x.key===state.visitStatus);
     if(st) sc.classList.add(st.cls);
-    // Reset qty kalau bukan 'beli'
     if(state.visitStatus !== 'beli'){
       state.visitQty = { om:0, os:0, yo:0, yt:0 };
       state.visitPayment = 'cash';
@@ -2696,7 +2847,7 @@ document.addEventListener('click', async e => {
   switch(act){
     case 'submit-password': {
       const pwd = $('setAdminPwd').value;
-      if(pwd === 'Yakult2027'){
+      if(pwd === ADMIN_PASSWORD){
         state.isSettingsUnlocked = true;
         closeAllSheets();
         haptic(20);
@@ -2739,8 +2890,6 @@ document.addEventListener('click', async e => {
       } 
       break; 
     }
-    case 'open-sync': $('gasUrl').value = state.gasUrl; openSheet('syncSheet'); break;
-    case 'save-endpoints': state.gasUrl = $('gasUrl').value.trim(); saveSettings(); showToast('✓ Disimpan'); break;
     case 'sync-now': await syncNow(); break;
     case 'backup': await backupData(); break;
     case 'restore': restoreData(); break;
@@ -2792,13 +2941,13 @@ document.addEventListener('input', e => {
 document.addEventListener('change', async e => {
   if(e.target.id === 'photoInput'){
     const f = e.target.files?.[0]; if(!f) return;
-    try{ showToast('⏳ Memproses...'); state.pendingPhoto = await compressImage(f, 800, 0.7); updatePhotoUI(); showToast('✓ Foto tersimpan'); }
+    try{ showToast('⏳ Memproses...'); state.pendingPhoto = await compressImage(f, 800, 0.7); updatePhotoUI(); showToast('✓ Foto siap (akan diupload saat sync)'); }
     catch(_){ showToast('❌ Gagal'); }
     e.target.value = '';
   }
   if(e.target.id === 'visitPhotoInput'){
     const f = e.target.files?.[0]; if(!f) return;
-    try{ showToast('⏳ Memproses...'); state.visitPhoto = await compressImage(f, 800, 0.7); updateVisitPhotoUI(); showToast('✓ Foto bukti tersimpan'); }
+    try{ showToast('⏳ Memproses...'); state.visitPhoto = await compressImage(f, 800, 0.7); updateVisitPhotoUI(); showToast('✓ Foto bukti siap (antri upload)'); }
     catch(_){ showToast('❌ Gagal'); }
     e.target.value = '';
   }
