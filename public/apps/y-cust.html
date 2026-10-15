@@ -428,11 +428,11 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   .stepper-row{ grid-template-columns:repeat(4,1fr); }
   .sheet{ max-width:100%; border-radius:28px 28px 0 0; }
 }
-/* Ganti focus ring jadi merah */
-.tab-btn:focus-visible{ outline:2px solid var(--rose) !important; outline-offset:2px; border-radius:12px; }
-.tab-btn:focus:not(:focus-visible){ outline:none; }
-button:focus-visible, a:focus-visible, [role="button"]:focus-visible{ outline:2px solid var(--rose) !important; outline-offset:2px; }
-button:focus:not(:focus-visible), a:focus:not(:focus-visible){ outline:none; }
+/* Focus ring merah pas tap */
+.tab-btn:focus{ outline:2px solid var(--rose) !important; outline-offset:2px; border-radius:12px; }
+.tab-btn.active:focus{ outline:2px solid var(--rose) !important; outline-offset:2px; border-radius:12px; }
+button:focus{ outline:2px solid var(--rose) !important; outline-offset:2px; }
+button:focus:not(:focus-visible){ outline:2px solid var(--rose) !important; outline-offset:2px; }
 </style>
 </head>
 <body>
