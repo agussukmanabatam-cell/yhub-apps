@@ -268,9 +268,16 @@
                 </div>
                 <span class="font-heading font-bold text-gray-800">Y-Hub App</span>
             </div>
-            <button onclick="logout()" class="font-heading text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition">
+            <div class="flex items-center gap-2">
+                <button onclick="forceSyncApp()" id="syncBtn" class="font-heading text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 p-2 rounded-full transition" title="Sync update">
+                    <svg id="syncIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                </button>
+                <button onclick="logout()" class="font-heading text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition">
                 Logout
-            </button>
+                </button>
+            </div>
         </header>
 
         <main id="app-content" class="flex-1 overflow-y-auto p-4 md:p-8 relative z-10" style="padding-bottom: calc(96px + env(safe-area-inset-bottom));"></main>

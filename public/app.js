@@ -412,6 +412,48 @@ function updateActiveNav(pageId) {
     });
 }
 
+
+// ==========================================
+// FORCE SYNC — Refresh app + Service Worker
+// ==========================================
+async function forceSyncApp() {
+    if (!confirm('Sync ulang aplikasi?\n\nHalaman akan refresh dan ambil versi terbaru.')) return;
+    
+    const btn = document.getElementById('syncBtn');
+    const icon = document.getElementById('syncIcon');
+    if (icon) icon.classList.add('animate-spin');
+    
+    try {
+        // 1. Unregister semua Service Worker
+        if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(r => r.unregister()));
+            console.log('[Sync] SW unregistered:', regs.length);
+        }
+        
+        // 2. Hapus semua cache
+        if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+            console.log('[Sync] Cache deleted:', keys.length);
+        }
+        
+        // 3. Clear session storage (tapi simpan session login)
+        // Nggak hapus session biar user tetap login
+        
+        // 4. Info + reload
+        alert('✅ Sync berhasil!\n\nHalaman akan refresh ke versi terbaru.');
+        
+        // Hard reload
+        window.location.reload(true);
+        
+    } catch (err) {
+        console.error('[Sync] Error:', err);
+        alert('❌ Sync gagal: ' + err.message);
+        if (icon) icon.classList.remove('animate-spin');
+    }
+}
+
 // 14. BACK BUTTON
 window.addEventListener('popstate', (e) => {
     const pageId = (e.state && e.state.page) || 'home';
