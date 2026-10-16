@@ -105,7 +105,7 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .summary-cell-val.good{ color:var(--emerald); }
 .summary-cell-val.warn{ color:var(--amber); }
 
-.customer-card{ display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--surface); border:1px solid var(--border); border-radius:14px; margin-bottom:8px; cursor:pointer; position:relative; transition:all .15s; }
+.customer-card{ display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:var(--surface); border:1px solid var(--border); border-radius:14px; margin-bottom:8px; cursor:pointer; position:relative; transition:all .15s; }
 .customer-card:active{ background:var(--surface-2); transform:scale(.99); }
 .customer-card.visited{ background:linear-gradient(90deg,var(--emerald-soft),transparent 45%); border-color:rgba(5,150,105,.25); }
 .customer-card.visited::before{ content:''; position:absolute; left:0; top:10px; bottom:10px; width:3px; background:var(--emerald); border-radius:0 3px 3px 0; }
@@ -117,8 +117,10 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .cust-name{ font-size:13.5px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:-.01em; }
 .cust-meta{ font-size:10.5px; color:var(--text-mute); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .cust-cat{ display:inline-block; padding:2px 7px; border-radius:5px; font-size:9px; font-weight:700; text-transform:uppercase; margin-right:5px; letter-spacing:.03em; }
-.cust-status{ font-size:10px; font-weight:600; margin-top:2px; color:var(--emerald); }
-.cust-action{ color:var(--text-dim); font-size:12px; flex-shrink:0; }
+.cust-addr{ font-size:11px; color:var(--text-mute); margin-top:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.4; word-break:break-word; }
+.cust-addr i{ color:var(--brand); margin-right:4px; font-size:10px; }
+.cust-status{ font-size:10px; font-weight:600; margin-top:3px; color:var(--emerald); }
+.cust-action{ color:var(--text-dim); font-size:12px; flex-shrink:0; margin-top:14px; }
 
 .filter-row{ display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; }
 .filter-chip{ padding:7px 12px; border-radius:999px; background:var(--surface); border:1.5px solid var(--border); font-size:11px; font-weight:700; color:var(--text-mute); white-space:nowrap; cursor:pointer; transition:all .18s; }
@@ -285,6 +287,24 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 .popup-meta{ font-size:10.5px; color:#64748B; margin-bottom:6px; }
 .popup-btn{ display:inline-block; padding:6px 10px; background:#0D9488; color:#fff; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; margin-top:4px; }
 
+/* ===== ROUTE MAP LEAFLET ===== */
+#routeMapBox, #inlineRouteMap{
+  width:100%; height:320px; border-radius:16px; overflow:hidden;
+  border:1px solid var(--border); background:var(--surface-2); margin-bottom:8px;
+}
+#routeMapBox .leaflet-container, #inlineRouteMap .leaflet-container{ font-family:'Plus Jakarta Sans',sans-serif; }
+.route-num-marker{
+  background:#E11D48; color:#fff; border-radius:50%; width:30px; height:30px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Poppins',sans-serif; font-weight:700; font-size:13px;
+  border:2.5px solid #fff; box-shadow:0 3px 10px rgba(0,0,0,.35);
+}
+.route-start-marker{
+  background:#16A34A; color:#fff; border-radius:50%; width:34px; height:34px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; border:3px solid #fff; box-shadow:0 3px 12px rgba(22,163,74,.6);
+}
+
 .seg-tabs{ display:flex; background:var(--surface-2); border-radius:12px; padding:3px; margin-bottom:12px; }
 .seg-tabs button{ flex:1; padding:9px 10px; border-radius:9px; font-size:11.5px; font-weight:700; color:var(--text-mute); display:flex; align-items:center; justify-content:center; gap:6px; }
 .seg-tabs button.active{ background:var(--surface); color:var(--brand); box-shadow:0 2px 8px -2px rgba(13,148,136,.25); }
@@ -305,7 +325,7 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 @media (max-width:559px){ .fab{ right:16px; } }
 .fab:active{ transform:scale(.92); }
 
-.fab-sync{ position:fixed; right:calc((100vw - var(--app-max))/2 + 84px); bottom:calc(env(safe-area-inset-bottom,0px) + 20px); width:56px; height:56px; border-radius:18px; background:var(--surface); border:1.5px solid var(--border); color:var(--brand); display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 10px 24px -10px rgba(13,148,136,.45); z-index:49; transition:all .2s; position:fixed; }
+.fab-sync{ position:fixed; right:calc((100vw - var(--app-max))/2 + 84px); bottom:calc(env(safe-area-inset-bottom,0px) + 20px); width:56px; height:56px; border-radius:18px; background:var(--surface); border:1.5px solid var(--border); color:var(--brand); display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 10px 24px -10px rgba(13,148,136,.45); z-index:49; transition:all .2s; }
 @media (max-width:559px){ .fab-sync{ right:84px; } }
 .fab-sync:active{ transform:scale(.92); background:var(--brand-soft); }
 .fab-sync.loading{ pointer-events:none; opacity:.85; }
@@ -388,40 +408,6 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 .stat-trend.down{ color: var(--rose); }
 .stat-trend.neutral{ color: var(--text-dim); }
 
-.route-map{ position:relative; padding:30px 12px 20px; background:linear-gradient(180deg,var(--surface),var(--surface-2)); border-radius:16px; border:1px solid var(--border); overflow:hidden; margin-bottom:12px; }
-.route-nodes{ position:relative; z-index:2; display:flex; flex-wrap:wrap; gap:24px 12px; justify-content:center; padding:0 8px; }
-.route-node{ width:64px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; animation:nodePop .5s cubic-bezier(.34,1.56,.64,1) backwards; }
-.route-node:nth-child(1){ animation-delay:.05s; }
-.route-node:nth-child(2){ animation-delay:.10s; }
-.route-node:nth-child(3){ animation-delay:.15s; }
-.route-node:nth-child(4){ animation-delay:.20s; }
-.route-node:nth-child(5){ animation-delay:.25s; }
-.route-node:nth-child(6){ animation-delay:.30s; }
-.route-node:nth-child(7){ animation-delay:.35s; }
-.route-node:nth-child(8){ animation-delay:.40s; }
-.route-node:nth-child(9){ animation-delay:.45s; }
-.route-node:nth-child(10){ animation-delay:.50s; }
-@keyframes nodePop{ from{ opacity:0; transform:scale(.3); } to{ opacity:1; transform:scale(1); } }
-.route-circle{ width:50px; height:50px; border-radius:50%; background:var(--surface); border:3px solid var(--brand); display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-size:18px; font-weight:700; color:var(--brand); position:relative; box-shadow:0 6px 16px -6px rgba(13,148,136,.5); transition:all .2s; }
-.route-circle::before{ content:''; position:absolute; inset:-6px; border-radius:50%; border:2px solid var(--brand); opacity:.3; animation:ripple 2s ease-out infinite; }
-.route-node:nth-child(2) .route-circle::before{ animation-delay:.3s; }
-.route-node:nth-child(3) .route-circle::before{ animation-delay:.6s; }
-.route-node:nth-child(4) .route-circle::before{ animation-delay:.9s; }
-.route-node:nth-child(5) .route-circle::before{ animation-delay:1.2s; }
-@keyframes ripple{ 0%{ transform:scale(.9); opacity:.5; } 100%{ transform:scale(1.4); opacity:0; } }
-.route-stars{ display:flex; gap:2px; font-size:11px; }
-.route-stars i.filled{ color:var(--amber); }
-.route-stars i.empty{ color:var(--surface-3); }
-.route-node.locked .route-circle{ border-color:var(--text-dim); color:var(--text-dim); opacity:.6; }
-.route-node.locked .route-circle::before{ display:none; }
-.route-label{ font-size:10px; font-weight:700; text-align:center; color:var(--text-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:64px; }
-.route-node:active .route-circle{ transform:scale(.95); }
-
-.spin{ animation:spin 1s linear infinite; }
-@keyframes spin{ to{ transform:rotate(360deg); } }
-.hidden{ display:none !important; }
-
-/* ============ DRAFT CARD (REDESIGN) ============ */
 .draft-card{
   background: var(--surface);
   border: 1px solid var(--border);
@@ -493,6 +479,8 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 .draft-btn.cat-badge{ cursor: default; background: color-mix(in srgb, currentColor 10%, transparent); border-color: currentColor; opacity: .9; }
 .load-more{ width:100%; padding:12px; border-radius:12px; background:var(--surface-2); border:1.5px dashed var(--border); color:var(--brand); font-size:12px; font-weight:700; cursor:pointer; margin-top:6px; display:flex; align-items:center; justify-content:center; gap:6px; }
 .load-more:active{ transform:scale(.98); }
+
+.route-map{ position:relative; padding:16px; background:linear-gradient(180deg,var(--surface),var(--surface-2)); border-radius:16px; border:1px solid var(--border); overflow:hidden; margin-bottom:12px; }
 
 @media (min-width:720px){
   :root{ --app-max:100%; --app-pad:24px; }
@@ -827,6 +815,47 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
         <i class="fa-solid fa-bolt"></i><span id="mutasiBtnLbl">Eksekusi Mutasi</span>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- ===== NEW: PULL FROM CLOUD ===== -->
+<div class="sheet" id="pullSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-avatar" style="background:linear-gradient(135deg,#0EA5E9,#0284C7);"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+    <div class="sheet-info"><div class="sheet-name">Tarik Data dari Cloud</div><div class="sheet-meta">Panggil pelanggan berdasarkan TKU + YL</div></div>
+    <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="sheet-body">
+    <div style="background:var(--surface-2); border-radius:12px; padding:12px 14px; font-size:10.5px; color:var(--text-mute); line-height:1.55; margin-bottom:16px;">
+      ℹ️ Data pelanggan tetap tersimpan di Firestore. Kalau ganti HP / device baru, tinggal tarik dari sini.
+    </div>
+    <div class="form-field">
+      <div class="form-label"><i class="fa-solid fa-store"></i> TKU</div>
+      <select class="form-input" id="pullTku" style="appearance:auto; background:var(--surface);">
+        <option value="">-- Semua TKU --</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <div class="form-label"><i class="fa-solid fa-user"></i> Nama YL</div>
+      <select class="form-input" id="pullYl" style="appearance:auto; background:var(--surface);">
+        <option value="">-- Semua YL --</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <div class="form-label"><i class="fa-solid fa-calendar"></i> Tarik Kunjungan Sejak</div>
+      <input type="date" class="form-input" id="pullDateFrom" value="">
+    </div>
+    <div style="background:var(--surface-2); border-radius:12px; padding:10px 12px; font-size:10.5px; color:var(--text-mute); line-height:1.5; margin-bottom:12px;">
+      Kosongkan tanggal kalau cuma mau tarik pelanggan.
+    </div>
+    <div class="action-bar">
+      <button class="btn-primary" data-action="pull-cloud" style="flex:1;">
+        <i class="fa-solid fa-cloud-arrow-down"></i>
+        <span id="pullBtnLbl">Tarik Data</span>
+      </button>
+    </div>
+    <div id="pullResult" style="margin-top:14px;"></div>
   </div>
 </div>
 
@@ -1257,6 +1286,14 @@ function kunjunganHTML(){
       <div class="summary-cell"><div class="summary-cell-lbl">Sudah</div><div class="summary-cell-val good num">${getCustomersForToday().filter(c=>hasVisitedToday(c.id)).length}</div></div>
       <div class="summary-cell"><div class="summary-cell-lbl">Sisa</div><div class="summary-cell-val warn num">${getCustomersForToday().filter(c=>!hasVisitedToday(c.id)).length}</div></div>
     </div>
+    <div class="form-card" style="padding:12px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <div class="field-label" style="margin:0;"><i class="fa-solid fa-map-location-dot"></i> Peta Kunjungan Hari Ini</div>
+        <button class="btn-clear" style="padding:6px 10px; font-size:10.5px;" data-action="toggle-inline-map" id="btnToggleInlineMap"><i class="fa-solid fa-eye-slash"></i> Sembunyi</button>
+      </div>
+      <div id="inlineRouteMap"></div>
+      <div style="font-size:10.5px; color:var(--text-dim); text-align:center; margin-top:6px;">Tap marker untuk lihat pelanggan</div>
+    </div>
     <div class="form-field" style="margin-bottom:0;"><input type="text" class="form-input" id="custSearch" placeholder="🔍 Cari pelanggan..."></div>
     <div class="filter-row" id="filterRow"></div>
     <div id="custList"></div>
@@ -1265,7 +1302,28 @@ function kunjunganHTML(){
     </button>
   `;
 }
-function postKunjungan(){ renderFilterRow(); renderCustList(); }
+function postKunjungan(){
+  renderFilterRow();
+  renderCustList();
+  drawInlineRouteMap();
+}
+function drawInlineRouteMap(){
+  const list = getCustomersForToday().filter(c => c.lat && c.lng);
+  if(list.length === 0){
+    const el = $('inlineRouteMap');
+    if(el) el.innerHTML = '<div style="padding:20px;text-align:center;font-size:11px;color:var(--text-dim);">Belum ada pelanggan dengan GPS. Tambahkan GPS dulu.</div>';
+    return;
+  }
+  const rem = [...list]; const result = [];
+  let curLat = rem[0].lat, curLng = rem[0].lng;
+  while(rem.length > 0){
+    let bi=0, bd=Infinity;
+    rem.forEach((c,i)=>{ const d = haversineKm(curLat,curLng,c.lat,c.lng); if(d<bd){bd=d;bi=i;} });
+    const ch = rem.splice(bi,1)[0]; ch.stepDist = bd; result.push(ch);
+    curLat = ch.lat; curLng = ch.lng;
+  }
+  setTimeout(()=>drawRouteMap('inlineRouteMap', result, null), 100);
+}
 function renderFilterRow(){
   const r = $('filterRow'); if(!r) return;
   const c = {}; CATEGORIES.forEach(x=>c[x.key] = getCustomersForToday().filter(y=>y.category===x.key).length);
@@ -1298,7 +1356,8 @@ function renderCustList(){
       </div>
       <div class="cust-info">
         <div class="cust-name">${c.name}</div>
-        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span><span style="color:${ses.color};font-weight:700;">${ses.label}</span> · ${c.address ? c.address.slice(0,22)+(c.address.length>22?'…':'') : ''}</div>
+        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span><span style="color:${ses.color};font-weight:700;">${ses.label}</span></div>
+        <div class="cust-addr"><i class="fa-solid fa-location-dot"></i>${c.address || '— alamat belum diisi —'}</div>
         ${statusTxt?`<div class="cust-status">${statusTxt}</div>`:''}
       </div>
       <i class="fa-solid fa-chevron-right cust-action"></i>
@@ -1361,6 +1420,7 @@ function renderAllList(){
       <div class="cust-info">
         <div class="cust-name">${c.name}</div>
         <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span><span style="color:${ses.color};font-weight:700;">${ses.label}</span> · ${daysShortLabel(c.blockingDays)}</div>
+        <div class="cust-addr"><i class="fa-solid fa-location-dot"></i>${c.address || '— alamat belum diisi —'}</div>
       </div>
       <i class="fa-solid fa-chevron-right cust-action"></i>
     </div>`;
@@ -1487,6 +1547,10 @@ function setHTML(){
   return `
     <div class="form-card" style="padding:0;">
       <div class="set-row">
+        <div><div class="set-lbl">Tarik Data Cloud</div><div class="set-sub">Panggil pelanggan by TKU + YL dari Firestore</div></div>
+        <button class="set-btn" data-action="open-pull"><i class="fa-solid fa-cloud-arrow-down"></i> Tarik</button>
+      </div>
+      <div class="set-row">
         <div><div class="set-lbl">Mutasi Pelanggan</div><div class="set-sub">Pindah YL / TKU / Hari (fleksibel)</div></div>
         <button class="set-btn" data-action="open-mutasi"><i class="fa-solid fa-people-arrows"></i> Mutasi</button>
       </div>
@@ -1521,8 +1585,8 @@ function setHTML(){
       </div>
     </div>
     <div class="form-card" style="text-align:center; padding:14px;">
-      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v2.5</div>
-      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">GAS + Firebase · Foto Queue · Level Map</div>
+      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v3.1</div>
+      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">GAS + Firebase · Foto Queue · Route Map</div>
     </div>
   `;
 }
@@ -1558,7 +1622,7 @@ function openSheet(id){
   haptic(id === 'visitSheet' ? 20 : 8);
 }
 function closeAllSheets(){
-  ['ctxSheet','custSheet','visitSheet','detailSheet','mapSheet','migrateSheet','draftSheet','draftEditSheet','mutasiSheet','passwordSheet'].forEach(id=>{
+  ['ctxSheet','custSheet','visitSheet','detailSheet','mapSheet','migrateSheet','draftSheet','draftEditSheet','mutasiSheet','pullSheet','passwordSheet'].forEach(id=>{
     const el = $(id); if(el) el.classList.remove('open','visit-sheet');
   });
   $('overlay').classList.remove('open','visit-mode');
@@ -1845,6 +1909,8 @@ async function saveVisit(){
 }
 
 /* ============ ROUTE ============ */
+let _routeMap = null, _routeInlineMap = null;
+
 async function calcRoute(){
   const list = getCustomersForToday().filter(c => !hasVisitedToday(c.id) && c.lat && c.lng);
   const w = $('routeResult');
@@ -1856,6 +1922,7 @@ async function calcRoute(){
   let userLoc = null;
   try{ const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000})); userLoc = { lat:pos.coords.latitude, lng:pos.coords.longitude }; }catch(_){}
   const startLat = userLoc?.lat ?? list[0].lat, startLng = userLoc?.lng ?? list[0].lng;
+
   const rem = list.map(c=>({...c}));
   const ordered = [];
   let curLat = startLat, curLng = startLng;
@@ -1867,26 +1934,7 @@ async function calcRoute(){
   }
   const totalKm = ordered.reduce((s,c)=>s+c.stepDist,0);
   const etaMin = Math.round(totalKm/20*60);
-  const MAX_NODES = 10;
-  const shown = ordered.slice(0, MAX_NODES);
-  const locked = ordered.length > MAX_NODES;
-  const starsFor = (km) => km < 0.5 ? 3 : km < 1.5 ? 2 : km < 3 ? 1 : 0;
-  const nodesHTML = shown.map((c,i)=>{
-    const stars = starsFor(c.stepDist);
-    const starsHTML = [0,1,2].map(j => `<i class="fa-solid fa-star ${j < stars ? 'filled' : 'empty'}"></i>`).join('');
-    return `<div class="route-node ${i === 0 ? 'current' : ''}" data-route-cust="${c.id}" title="${c.name}">
-      <div class="route-circle">${i+1}</div>
-      <div class="route-stars">${starsHTML}</div>
-      <div class="route-label">${c.name.split(' ').slice(0,2).join(' ')}</div>
-    </div>`;
-  }).join('');
-  const lockedNode = locked ? `
-    <div class="route-node locked" title="Terkunci">
-      <div class="route-circle"><i class="fa-solid fa-lock"></i></div>
-      <div class="route-stars"><i class="fa-solid fa-star empty"></i><i class="fa-solid fa-star empty"></i><i class="fa-solid fa-star empty"></i></div>
-      <div class="route-label">+${ordered.length - MAX_NODES} lagi</div>
-    </div>
-  ` : '';
+
   w.innerHTML = `
     <div class="form-card" style="display:flex; justify-content:space-around; text-align:center; padding:16px;">
       <div><div style="font-family:'Poppins';font-size:22px;font-weight:700;color:var(--brand);">${ordered.length}</div><div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">Titik</div></div>
@@ -1895,9 +1943,9 @@ async function calcRoute(){
     </div>
     <div class="route-map">
       <div style="font-size:10px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--brand); text-align:center; margin-bottom:14px;">
-        <i class="fa-solid fa-map-signs"></i> Level Map Rute
+        <i class="fa-solid fa-map-signs"></i> Peta Rute Kunjungan
       </div>
-      <div class="route-nodes">${nodesHTML}${lockedNode}</div>
+      <div id="routeMapBox"></div>
     </div>
     <div style="font-size:10.5px; font-weight:700; color:var(--text-mute); text-transform:uppercase; letter-spacing:.1em; margin:16px 0 8px;">Daftar Urutan</div>
     ${ordered.map((c,i)=>{
@@ -1909,11 +1957,190 @@ async function calcRoute(){
       </div>`;
     }).join('')}
   `;
+
+  setTimeout(()=>drawRouteMap('routeMapBox', ordered, { lat:startLat, lng:startLng }), 80);
+}
+
+function drawRouteMap(containerId, ordered, startLoc){
+  const el = $(containerId); if(!el) return null;
+  if(containerId === 'routeMapBox' && _routeMap){ _routeMap.remove(); _routeMap = null; }
+  if(containerId === 'inlineRouteMap' && _routeInlineMap){ _routeInlineMap.remove(); _routeInlineMap = null; }
+
+  const map = L.map(el, { zoomControl:true, attributionControl:false }).setView([-6.9175, 107.6191], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(map);
+
+  if(containerId === 'routeMapBox') _routeMap = map;
+  else _routeInlineMap = map;
+
+  const pts = [];
+
+  if(startLoc && startLoc.lat){
+    const startIcon = L.divIcon({
+      className:'', html:'<div class="route-start-marker"><i class="fa-solid fa-arrow-up"></i></div>',
+      iconSize:[34,34], iconAnchor:[17,17]
+    });
+    L.marker([startLoc.lat, startLoc.lng], { icon:startIcon }).addTo(map).bindPopup('<b>🚩 Titik Awal</b><br>Lokasi Anda saat ini');
+    pts.push([startLoc.lat, startLoc.lng]);
+  }
+
+  const linePts = [];
+  if(startLoc?.lat) linePts.push([startLoc.lat, startLoc.lng]);
+  ordered.forEach(c => linePts.push([c.lat, c.lng]));
+  if(linePts.length > 1){
+    L.polyline(linePts, { color:'#16A34A', weight:5, opacity:0.85, lineJoin:'round' }).addTo(map);
+  }
+
+  ordered.forEach((c, i) => {
+    const numIcon = L.divIcon({
+      className:'', html:`<div class="route-num-marker">${i+1}</div>`,
+      iconSize:[30,30], iconAnchor:[15,15]
+    });
+    const cat = catInfo(c.category);
+    const m = L.marker([c.lat, c.lng], { icon:numIcon }).addTo(map);
+    m.bindPopup(`
+      <div class="popup-name">#${i+1} ${c.name}</div>
+      <div class="popup-meta">${cat.label} · ${c.stepDist.toFixed(2)} km</div>
+      <div class="popup-meta" style="font-size:10px;">${c.address||''}</div>
+      <a href="#" class="popup-btn" onclick="event.preventDefault();window.__openDetail('${c.id}');return false;">Lihat Detail →</a>
+    `);
+    pts.push([c.lat, c.lng]);
+  });
+
+  if(pts.length > 1) map.fitBounds(pts, { padding:[40,40] });
+  return map;
+}
+
+/* ============ PULL FROM CLOUD ============ */
+async function pullCustomersFromCloud(opts = {}){
+  if(!firebaseReady || !firestoreDB) throw new Error('Firestore belum siap');
+  const { tku, yl } = opts;
+  let query = firestoreDB.collection('customers');
+  if(tku) query = query.where('tku', '==', tku);
+  if(yl) query = query.where('createdBy', '==', yl);
+  const snap = await query.get();
+  let pulled = 0, merged = 0;
+  const existingIds = new Set(state.customers.map(c => c.id));
+  for(const doc of snap.docs){
+    const data = doc.data();
+    pulled++;
+    if(existingIds.has(data.id)) continue;
+    const rec = {
+      id: data.id,
+      name: data.name,
+      category: data.category || 'rumah',
+      session: data.session || 'pagi',
+      blockingDays: Array.isArray(data.blockingDays) ? data.blockingDays : [],
+      address: data.address || '',
+      landmark: data.landmark || '',
+      phone: data.phone || '',
+      photoUrl: data.photoUrl || null,
+      photoName: null, photoPending: null, photoTku: null,
+      lat: data.lat || null,
+      lng: data.lng || null,
+      notes: data.notes || '',
+      tku: data.tku || '',
+      createdBy: data.createdBy || '',
+      createdAt: data.createdAt || Date.now(),
+      updatedAt: data.updatedAt || Date.now(),
+      active: data.active !== false,
+      _syncedAt: Date.now()
+    };
+    await idbPut(ST_CUST, rec);
+    state.customers.push(rec);
+    existingIds.add(rec.id);
+    merged++;
+  }
+  return { pulled, merged };
+}
+async function pullVisitsFromCloud(opts = {}){
+  if(!firebaseReady || !firestoreDB) throw new Error('Firestore belum siap');
+  const { tku, yl, dateFrom } = opts;
+  let query = firestoreDB.collection('visits');
+  if(tku) query = query.where('tku', '==', tku);
+  if(yl) query = query.where('yl', '==', yl);
+  if(dateFrom) query = query.where('date', '>=', dateFrom);
+  const snap = await query.get();
+  let pulled = 0, merged = 0;
+  const existingIds = new Set(state.visits.map(v => v.id));
+  for(const doc of snap.docs){
+    const data = doc.data();
+    pulled++;
+    if(existingIds.has(data.id)) continue;
+    const rec = {
+      id: data.id,
+      customerId: data.customerId,
+      customerName: data.customerName || '',
+      category: data.category || 'rumah',
+      session: data.session || 'pagi',
+      tku: data.tku || '',
+      yl: data.yl || '',
+      date: data.date,
+      time: data.time || '',
+      status: data.status || 'beli',
+      om: data.om || 0, os: data.os || 0, yo: data.yo || 0, yt: data.yt || 0,
+      payment: data.payment || 'cash',
+      notes: data.notes || '',
+      lat: data.lat || null, lng: data.lng || null,
+      timestamp: data.timestamp || Date.now(),
+      photoUrl: data.photoUrl || null, photoName: null, photoPending: null, photoTku: null,
+      _syncedAt: Date.now()
+    };
+    await idbPut(ST_VISIT, rec);
+    state.visits.push(rec);
+    existingIds.add(rec.id);
+    merged++;
+  }
+  return { pulled, merged };
+}
+
+function openPullSheet(){
+  const selTku = $('pullTku');
+  selTku.innerHTML = '<option value="">-- Semua TKU --</option>' + TKU_ORDER.map(k=>`<option value="${k}">${TKU_DATA[k].center}</option>`).join('');
+  $('pullYl').innerHTML = '<option value="">-- Semua YL --</option>';
+  $('pullDateFrom').value = '';
+  $('pullResult').innerHTML = '';
+  $('pullBtnLbl').textContent = 'Tarik Data';
+  selTku.onchange = (e)=>{
+    const v = e.target.value;
+    if(!v){ $('pullYl').innerHTML = '<option value="">-- Semua YL --</option>'; return; }
+    const yls = TKU_DATA[v].yl;
+    $('pullYl').innerHTML = '<option value="">-- Semua YL --</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
+  };
+  openSheet('pullSheet');
+}
+
+async function executePull(){
+  const tku = $('pullTku').value;
+  const yl = $('pullYl').value;
+  const dateFrom = $('pullDateFrom').value || null;
+  const btn = $('pullBtnLbl');
+  const res = $('pullResult');
+  btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> Menarik...';
+  res.innerHTML = '';
+  try{
+    const cust = await pullCustomersFromCloud({ tku, yl });
+    let vis = { pulled:0, merged:0 };
+    if(dateFrom) vis = await pullVisitsFromCloud({ tku, yl, dateFrom });
+    res.innerHTML = `
+      <div style="background:var(--emerald-soft); border:1px solid rgba(5,150,105,.3); border-radius:12px; padding:14px; font-size:11.5px;">
+        <div style="font-weight:700; color:var(--emerald); margin-bottom:6px;"><i class="fa-solid fa-circle-check"></i> Selesai</div>
+        <div>Pelanggan ditarik: <b>${cust.pulled}</b> · baru: <b style="color:var(--brand);">${cust.merged}</b></div>
+        ${dateFrom?`<div>Kunjungan ditarik: <b>${vis.pulled}</b> · baru: <b style="color:var(--brand);">${vis.merged}</b></div>`:''}
+      </div>
+    `;
+    haptic([30,40,30]);
+    showToast(`✓ ${cust.merged} pelanggan baru dari cloud`);
+    renderBanner(); renderMain();
+  }catch(e){
+    res.innerHTML = `<div style="background:var(--rose-soft); border:1px solid rgba(225,29,72,.3); border-radius:12px; padding:14px; font-size:11.5px; color:var(--rose);"><b>❌ Gagal:</b> ${e.message}</div>`;
+    showToast('❌ ' + e.message);
+  }
+  btn.textContent = 'Tarik Data';
 }
 
 /* ============ BACKUP / RESTORE ============ */
 async function backupData(){
-  const data = { customers: state.customers, visits: state.visits, drafts: state.drafts, sticky: state.sticky, exportedAt: new Date().toISOString(), version: 10 };
+  const data = { customers: state.customers, visits: state.visits, drafts: state.drafts, sticky: state.sticky, exportedAt: new Date().toISOString(), version: 11 };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = `ycust_backup_${todayKey()}.json`;
@@ -2371,6 +2598,43 @@ async function saveToFirestore(){
   }catch(e){ console.error('Firestore save error:', e); throw e; }
 }
 
+/**
+ * AUTO-INSERT ORPHAN CUSTOMERS
+ * Cek tiap visit — kalau customerId-nya tidak ada di state.customers,
+ * buat customer minimal dari data visit. Ini mencegah sheet "loncat".
+ */
+async function autoInsertOrphanCustomers(){
+  const custIds = new Set(state.customers.map(c => c.id));
+  const orphanVisits = state.visits.filter(v => !custIds.has(v.customerId));
+  if(orphanVisits.length === 0) return 0;
+  for(const v of orphanVisits){
+    const rec = {
+      id: v.customerId,
+      name: v.customerName || 'Tanpa Nama',
+      category: v.category || 'rumah',
+      session: v.session || 'pagi',
+      blockingDays: [],
+      address: '(alamat belum diisi)',
+      landmark: '',
+      phone: '',
+      photoUrl: null, photoName: null, photoPending: null, photoTku: null,
+      lat: v.lat || null, lng: v.lng || null,
+      notes: '⚠️ Auto-insert dari kunjungan (data pelanggan tidak ditemukan)',
+      tku: v.tku || '',
+      createdBy: v.yl || '',
+      createdAt: v.timestamp || Date.now(),
+      updatedAt: Date.now(),
+      active: true,
+      _syncedAt: null
+    };
+    await idbPut(ST_CUST, rec);
+    state.customers.push(rec);
+    custIds.add(rec.id);
+  }
+  console.log(`⚠️ Auto-inserted ${orphanVisits.length} orphan customer`);
+  return orphanVisits.length;
+}
+
 async function syncNow(){
   if(!state.gasUrl){ showToast('GAS URL belum diset'); return; }
   const overlay = $('syncOverlay');
@@ -2392,6 +2656,14 @@ async function syncNow(){
   const setProgress = p => { progress = Math.min(100, p); barFill.style.width = progress + '%'; pctEl.textContent = Math.round(progress) + '%'; };
   const progressTimer = setInterval(() => { if(progress < 90){ setProgress(Math.min(90, progress + Math.random() * 4 + 2)); } }, 200);
   try{
+    // === AUTO-INSERT ORPHAN CUSTOMER (v3.1) ===
+    const orphanAdded = await autoInsertOrphanCustomers();
+    if(orphanAdded > 0){
+      titleEl.textContent = 'Fix data pelanggan...';
+      subEl.textContent = `${orphanAdded} pelanggan auto-insert`;
+      await new Promise(r=>setTimeout(r, 600));
+    }
+
     const photoQueueCount = state.customers.filter(c => c.photoPending).length + state.visits.filter(v => v.photoPending).length;
     if(photoQueueCount > 0){
       clearInterval(progressTimer);
@@ -2442,7 +2714,7 @@ async function syncNow(){
     overlay.classList.add('success');
     iconEl.textContent = '✅';
     titleEl.textContent = 'Berhasil terkirim!';
-    subEl.textContent = `${payload.customers.length} pelanggan · ${payload.visits.length} kunjungan · ${photoCount} foto`;
+    subEl.textContent = `${payload.customers.length} pelanggan · ${payload.visits.length} kunjungan · ${photoCount} foto${orphanAdded > 0 ? ` · ${orphanAdded} auto-fix` : ''}`;
     haptic([30, 40, 30]);
     const now = Date.now();
     for(const c of state.customers){ c._syncedAt = now; await idbPut(ST_CUST, c); }
@@ -2563,7 +2835,19 @@ document.addEventListener('click', async e => {
   if(t.closest('[data-action="open-ctx"]')){ haptic(10); openCtxSheet(); return; }
   if(t.closest('[data-action="open-migrate"]')){ haptic(10); openMigrateSheet(); return; }
   if(t.closest('[data-action="open-mutasi"]')){ haptic(10); openMutasiSheet(); return; }
+  if(t.closest('[data-action="open-pull"]')){ haptic(10); openPullSheet(); return; }
   if(t.closest('[data-action="execute-mutasi"]')){ await executeMutasi(); return; }
+  if(t.closest('[data-action="pull-cloud"]')){ await executePull(); return; }
+  if(t.closest('[data-action="toggle-inline-map"]')){
+    const box = $('inlineRouteMap');
+    const btn = $('btnToggleInlineMap');
+    if(!box) return;
+    const hidden = box.style.display === 'none';
+    box.style.display = hidden ? '' : 'none';
+    btn.innerHTML = hidden ? '<i class="fa-solid fa-eye-slash"></i> Sembunyi' : '<i class="fa-solid fa-eye"></i> Tampilkan';
+    if(hidden && !_routeInlineMap) drawInlineRouteMap();
+    return;
+  }
   if(t.closest('[data-action="mutasi-select-all"]')){
     haptic(6);
     const tku = $('mutasiTkuAsal').value;
