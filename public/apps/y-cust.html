@@ -340,16 +340,16 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 
 .fab-add{
   position:fixed;
-  right:calc((100vw - var(--app-max))/2 + 152px);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+  right:calc((100vw - var(--app-max))/2 + 16px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 88px);
   width:56px; height:56px; border-radius:18px;
   background:linear-gradient(135deg,#10B981,#059669);
   color:#fff; display:flex; align-items:center; justify-content:center;
   font-size:22px;
   box-shadow:0 14px 28px -10px rgba(16,185,129,.6);
-  z-index:49; transition:all .2s;
+  z-index:48; transition:all .2s;
 }
-@media (max-width:559px){ .fab-add{ right:152px; } }
+@media (max-width:559px){ .fab-add{ right:16px; } }
 .fab-add:active{ transform:scale(.92); }
 
 .fab-pull{
@@ -1226,7 +1226,7 @@ const state = {
   mutasiDays:[], mutasiSelected: new Set(),
   customers:[], visits:[], drafts:[],
   editingCustomer:null, activeCustomer:null,
-  custFilter:'all', custFilterTku:'', custFilterYl:'', custView:'list',
+  custFilter:'all', custFilterTku:'', custFilterYl:'', custFilterDays:[], custFilterSessions:[], custView:'list',
   routeFilterTku:'', routeFilterYl:'',
   pendingGPS:null, pendingPhoto:null,
   visitGPS:null, visitPhoto:null,
@@ -1521,16 +1521,36 @@ function pelangganHTML(){
       <button class="${state.custView==='map'?'active':''}" data-custview="map"><i class="fa-solid fa-map-location-dot"></i> Peta</button>
     </div>
     <div class="filter-bar-card">
-      <select id="filterTku">
-        <option value="">🏢 Semua TKU</option>
-        ${TKU_ORDER.map(k=>`<option value="${k}">${TKU_DATA[k].center}</option>`).join('')}
-      </select>
-      <select id="filterYl">
-        <option value="">👤 Semua YL</option>
-      </select>
+      <div class="select-smooth-wrap" id="filterTkuWrap">
+        <button type="button" class="select-smooth-trigger" data-filter-dd="tku">
+          <span class="sst-text" id="filterTkuText">🏢 Semua TKU</span>
+          <i class="fa-solid fa-chevron-down sst-arrow"></i>
+        </button>
+        <div class="select-smooth-menu" id="filterTkuMenu"></div>
+      </div>
+      <div class="select-smooth-wrap" id="filterYlWrap">
+        <button type="button" class="select-smooth-trigger" data-filter-dd="yl">
+          <span class="sst-text" id="filterYlText">👤 Semua YL</span>
+          <i class="fa-solid fa-chevron-down sst-arrow"></i>
+        </button>
+        <div class="select-smooth-menu" id="filterYlMenu"></div>
+      </div>
+      <div class="select-smooth-wrap" id="filterDayWrap">
+        <button type="button" class="select-smooth-trigger" data-filter-dd="day">
+          <span class="sst-text" id="filterDayText">📅 Semua Hari</span>
+          <i class="fa-solid fa-chevron-down sst-arrow"></i>
+        </button>
+        <div class="select-smooth-menu" id="filterDayMenu"></div>
+      </div>
+      <div class="select-smooth-wrap" id="filterSessionWrap">
+        <button type="button" class="select-smooth-trigger" data-filter-dd="session">
+          <span class="sst-text" id="filterSessionText">⏰ Semua Sesi</span>
+          <i class="fa-solid fa-chevron-down sst-arrow"></i>
+        </button>
+        <div class="select-smooth-menu" id="filterSessionMenu"></div>
+      </div>
     </div>
     ${state.custView === 'list' ? `
-      <div class="form-field" style="margin-bottom:0;"><input type="text" class="form-input" id="allSearch" placeholder="🔍 Cari pelanggan..."></div>
       <div class="filter-row" id="allFilter"></div>
       <div id="allList"></div>
       <div class="action-bar" style="margin-top:8px;">
@@ -1560,36 +1580,112 @@ function getFilteredCustomers(){
   let list = [...state.customers];
   if(state.custFilterTku) list = list.filter(c => c.tku === state.custFilterTku);
   if(state.custFilterYl) list = list.filter(c => c.createdBy === state.custFilterYl);
+  // Filter hari (multi) — kalau kosong = semua hari
+  if(state.custFilterDays && state.custFilterDays.length > 0){
+    list = list.filter(c => {
+      const days = c.blockingDays || [];
+      return state.custFilterDays.some(d => days.includes(d));
+    });
+  }
+  // Filter sesi (multi) — kalau kosong = semua sesi
+  if(state.custFilterSessions && state.custFilterSessions.length > 0){
+    list = list.filter(c => state.custFilterSessions.includes(c.session || 'pagi'));
+  }
   return list;
 }
-function postPelanggan(){
-  const selTku = $('filterTku');
-  const selYl = $('filterYl');
-  if(selTku){
-    selTku.value = state.custFilterTku || '';
-    if(state.custFilterTku){
-      const yls = TKU_DATA[state.custFilterTku].yl;
-      selYl.innerHTML = '<option value="">👤 Semua YL</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
-      selYl.value = state.custFilterYl || '';
-    }
-    selTku.onchange = (e) => {
-      state.custFilterTku = e.target.value;
-      state.custFilterYl = '';
-      if(!e.target.value){
-        selYl.innerHTML = '<option value="">👤 Semua YL</option>';
-      } else {
-        const yls = TKU_DATA[e.target.value].yl;
-        selYl.innerHTML = '<option value="">👤 Semua YL</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
-      }
-      renderAllFilter(); renderAllList();
-      if(state.custView === 'map') renderMap();
-    };
-    selYl.onchange = (e) => {
-      state.custFilterYl = e.target.value;
-      renderAllFilter(); renderAllList();
-      if(state.custView === 'map') renderMap();
-    };
+
+// ============ CUSTOM DROPDOWN FILTER ============
+function renderFilterDropdowns(){
+  const tkuMenu = document.getElementById('filterTkuMenu');
+  const ylMenu = document.getElementById('filterYlMenu');
+  const dayMenu = document.getElementById('filterDayMenu');
+  const sessionMenu = document.getElementById('filterSessionMenu');
+  if(!tkuMenu || !ylMenu) return;
+  
+  // TKU options
+  const tkuOptions = [
+    { value: '', label: '🏢 Semua TKU' },
+    ...TKU_ORDER.map(k => ({ value: k, label: TKU_DATA[k].center }))
+  ];
+  tkuMenu.innerHTML = tkuOptions.map(o => `
+    <button type="button" class="select-smooth-item ${state.custFilterTku === o.value ? 'active' : ''}" data-tku-val="${o.value}">
+      <span>${o.label}</span>
+      <i class="fa-solid fa-check ssi-check"></i>
+    </button>
+  `).join('');
+  
+  // YL options
+  const ylOptions = [{ value: '', label: '👤 Semua YL' }];
+  if(state.custFilterTku && TKU_DATA[state.custFilterTku]){
+    TKU_DATA[state.custFilterTku].yl.forEach(y => {
+      ylOptions.push({ value: y, label: y });
+    });
+  } else {
+    Object.values(TKU_DATA).forEach(t => {
+      t.yl.forEach(y => {
+        if(!ylOptions.find(o => o.value === y)){
+          ylOptions.push({ value: y, label: y });
+        }
+      });
+    });
   }
+  ylMenu.innerHTML = ylOptions.map(o => `
+    <button type="button" class="select-smooth-item ${state.custFilterYl === o.value ? 'active' : ''}" data-yl-val="${o.value}">
+      <span>${o.label}</span>
+      <i class="fa-solid fa-check ssi-check"></i>
+    </button>
+  `).join('');
+  
+  // Update trigger text
+  // DAY options (multi-select)
+  if(dayMenu){
+    dayMenu.innerHTML = DAYS.map(d => `
+      <button type="button" class="select-smooth-item ${state.custFilterDays.includes(d.key) ? 'active' : ''}" data-day-val="${d.key}">
+        <span>${d.label}</span>
+        <i class="fa-solid fa-check ssi-check"></i>
+      </button>
+    `).join('');
+    const clearDayBtn = state.custFilterDays.length > 0 
+      ? '<button type="button" class="select-smooth-item" data-day-clear style="color:var(--rose);border-top:1px solid var(--border);border-radius:0;margin-top:6px;padding-top:10px;">✕ Reset Semua Hari</button>' 
+      : '';
+    dayMenu.innerHTML += clearDayBtn;
+  }
+  
+  // SESSION options (multi-select)
+  if(sessionMenu){
+    sessionMenu.innerHTML = SESSIONS.map(s => `
+      <button type="button" class="select-smooth-item ${state.custFilterSessions.includes(s.key) ? 'active' : ''}" data-session-val="${s.key}">
+        <span><i class="fa-solid ${s.icon}" style="color:${s.color};margin-right:6px;"></i>${s.label}</span>
+        <i class="fa-solid fa-check ssi-check"></i>
+      </button>
+    `).join('');
+    const clearSesBtn = state.custFilterSessions.length > 0 
+      ? '<button type="button" class="select-smooth-item" data-session-clear style="color:var(--rose);border-top:1px solid var(--border);border-radius:0;margin-top:6px;padding-top:10px;">✕ Reset Semua Sesi</button>' 
+      : '';
+    sessionMenu.innerHTML += clearSesBtn;
+  }
+  
+  // Update trigger text
+  const tkuText = document.getElementById('filterTkuText');
+  const ylText = document.getElementById('filterYlText');
+  const dayText = document.getElementById('filterDayText');
+  const sessionText = document.getElementById('filterSessionText');
+  if(tkuText) tkuText.textContent = state.custFilterTku ? TKU_DATA[state.custFilterTku].center : '🏢 Semua TKU';
+  if(ylText) ylText.textContent = state.custFilterYl || '👤 Semua YL';
+  if(dayText){
+    dayText.textContent = state.custFilterDays.length > 0 
+      ? `📅 ${state.custFilterDays.map(k => DAYS.find(d=>d.key===k)?.short).join(', ')}`
+      : '📅 Semua Hari';
+  }
+  if(sessionText){
+    sessionText.textContent = state.custFilterSessions.length > 0 
+      ? `⏰ ${state.custFilterSessions.map(k => sessionInfo(k).label).join(' + ')}`
+      : '⏰ Semua Sesi';
+  }
+}
+
+function postPelanggan(){
+  renderFilterDropdowns();
   if(state.custView === 'list'){ renderAllFilter(); renderAllList(); }
   else renderMap();
 }
@@ -1602,13 +1698,12 @@ function renderAllFilter(){
 }
 function renderAllList(){
   const w = $('allList'); if(!w) return;
-  const q = ($('allSearch')?.value || '').toLowerCase();
   let list = getFilteredCustomers();
   if(state.custFilter !== 'all') list = list.filter(c => c.category === state.custFilter);
-  if(q) list = list.filter(c => c.name.toLowerCase().includes(q) || (c.address||'').toLowerCase().includes(q));
   list.sort((a,b)=>a.name.localeCompare(b.name));
   if(list.length === 0){
-    w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-users"></i><div class="empty-state-title">${q||state.custFilterTku||state.custFilterYl?'Tidak ditemukan':'Belum ada pelanggan'}</div><div class="empty-state-desc">${state.custFilterTku||state.custFilterYl?'Coba ubah filter TKU/YL':'Tap + di kanan bawah untuk tambah pelanggan baru.'}</div></div>`;
+    const hasFilter = state.custFilterTku || state.custFilterYl || state.custFilterDays.length > 0 || state.custFilterSessions.length > 0;
+    w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-users"></i><div class="empty-state-title">${hasFilter?'Tidak ditemukan':'Belum ada pelanggan'}</div><div class="empty-state-desc">${hasFilter?'Coba ubah filter':'Tap + di kanan bawah untuk tambah pelanggan baru.'}</div></div>`;
     return;
   }
   w.innerHTML = list.map(c => {
@@ -3031,6 +3126,96 @@ document.addEventListener('click', async e => {
     return;
   }
   if(t.closest('[data-close]')){ closeAllSheets(); return; }
+
+  // ============ CUSTOM DROPDOWN HANDLERS ============
+  const fddTrigger = t.closest('[data-filter-dd]');
+  if(fddTrigger){
+    haptic(8);
+    const kind = fddTrigger.dataset.filterDd;
+    const menuMap = { 'tku': 'filterTkuMenu', 'yl': 'filterYlMenu', 'day': 'filterDayMenu', 'session': 'filterSessionMenu' };
+    const menuId = menuMap[kind];
+    const menu = menuId ? document.getElementById(menuId) : null;
+    const isOpen = menu && menu.classList.contains('open');
+    document.querySelectorAll('.select-smooth-menu').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.select-smooth-trigger').forEach(b => b.classList.remove('open'));
+    if(!isOpen && menu){
+      menu.classList.add('open');
+      fddTrigger.classList.add('open');
+    }
+    return;
+  }
+  
+  const tkuItem = t.closest('[data-tku-val]');
+  if(tkuItem){
+    haptic(8);
+    state.custFilterTku = tkuItem.dataset.tkuVal;
+    state.custFilterYl = '';
+    document.querySelectorAll('.select-smooth-menu').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.select-smooth-trigger').forEach(b => b.classList.remove('open'));
+    renderFilterDropdowns();
+    renderAllFilter(); renderAllList();
+    if(state.custView === 'map') renderMap();
+    return;
+  }
+  
+  const ylItem = t.closest('[data-yl-val]');
+  if(ylItem){
+    haptic(8);
+    state.custFilterYl = ylItem.dataset.ylVal;
+    document.querySelectorAll('.select-smooth-menu').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.select-smooth-trigger').forEach(b => b.classList.remove('open'));
+    renderFilterDropdowns();
+    renderAllFilter(); renderAllList();
+    if(state.custView === 'map') renderMap();
+    return;
+  }
+  
+  const dayItem = t.closest('[data-day-val]');
+  if(dayItem){
+    haptic(8);
+    const k = dayItem.dataset.dayVal;
+    const idx = state.custFilterDays.indexOf(k);
+    if(idx >= 0) state.custFilterDays.splice(idx, 1);
+    else state.custFilterDays.push(k);
+    renderFilterDropdowns();
+    renderAllList();
+    if(state.custView === 'map') renderMap();
+    return;
+  }
+  if(t.closest('[data-day-clear]')){
+    haptic(8);
+    state.custFilterDays = [];
+    document.querySelectorAll('.select-smooth-menu').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.select-smooth-trigger').forEach(b => b.classList.remove('open'));
+    renderFilterDropdowns();
+    renderAllList();
+    if(state.custView === 'map') renderMap();
+    return;
+  }
+  
+  const sesItem = t.closest('[data-session-val]');
+  if(sesItem){
+    haptic(8);
+    const k = sesItem.dataset.sessionVal;
+    const idx = state.custFilterSessions.indexOf(k);
+    if(idx >= 0) state.custFilterSessions.splice(idx, 1);
+    else state.custFilterSessions.push(k);
+    renderFilterDropdowns();
+    renderAllList();
+    if(state.custView === 'map') renderMap();
+    return;
+  }
+  if(t.closest('[data-session-clear]')){
+    haptic(8);
+    state.custFilterSessions = [];
+    document.querySelectorAll('.select-smooth-menu').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.select-smooth-trigger').forEach(b => b.classList.remove('open'));
+    renderFilterDropdowns();
+    renderAllList();
+    if(state.custView === 'map') renderMap();
+    return;
+  }
+  // ============ END HANDLERS ============
   if(t.id === 'overlay'){ closeAllSheets(); closeAllDD(); return; }
   const item = t.closest('[data-dd-item]');
   if(item){
@@ -3270,7 +3455,6 @@ document.addEventListener('click', async e => {
 
 document.addEventListener('input', e => {
   if(e.target.id === 'custSearch'){ renderCustList(); return; }
-  if(e.target.id === 'allSearch'){ renderAllList(); return; }
   if(e.target.id === 'draftSearch'){ state.draftSearch = e.target.value; state.draftShown = DRAFT_PAGE_SIZE; renderDraftList(); return; }
   if(e.target.id === 'pasteArea'){ updatePasteCount(); return; }
   if(e.target.id === 'custPhone'){
