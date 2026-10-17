@@ -417,40 +417,82 @@ function updateActiveNav(pageId) {
 // FORCE SYNC — Refresh app + Service Worker
 // ==========================================
 async function forceSyncApp() {
-    if (!confirm('Sync ulang aplikasi?\n\nHalaman akan refresh dan ambil versi terbaru.')) return;
+    // Tampilkan modal custom
+    const modal = document.getElementById('syncModal');
+    const card = document.getElementById('syncModalCard');
+    const title = document.getElementById('syncModalTitle');
+    const desc = document.getElementById('syncModalDesc');
     
-    const btn = document.getElementById('syncBtn');
-    const icon = document.getElementById('syncIcon');
-    if (icon) icon.classList.add('animate-spin');
-    
-    try {
-        // 1. Unregister semua Service Worker
-        if ('serviceWorker' in navigator) {
-            const regs = await navigator.serviceWorker.getRegistrations();
-            await Promise.all(regs.map(r => r.unregister()));
-            console.log('[Sync] SW unregistered:', regs.length);
+    if(modal && card){
+        // Reset state
+        card.classList.remove('success');
+        title.textContent = 'Sync Aplikasi?';
+        desc.textContent = 'Halaman akan refresh dan ambil versi terbaru.';
+        
+        // Reset tombol
+        const btn = document.querySelector('#syncModalActions .confirm');
+        if(btn) btn.classList.remove('loading');
+        
+        // Tampilkan
+        modal.classList.add('show');
+        
+        // Set global function buat konfirmasi
+        window.__doSync = async function(){
+            if(btn) btn.classList.add('loading');
+            
+            try {
+                // 1. Unregister semua Service Worker
+                if ('serviceWorker' in navigator) {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map(r => r.unregister()));
+                    console.log('[Sync] SW unregistered:', regs.length);
+                }
+                
+                // 2. Hapus semua cache
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(k => caches.delete(k)));
+                    console.log('[Sync] Cache deleted:', keys.length);
+                }
+                
+                // Tampilkan success state
+                card.classList.add('success');
+                title.textContent = 'Sync Berhasil!';
+                desc.textContent = 'Halaman akan refresh ke versi terbaru.';
+                
+                const actions = document.getElementById('syncModalActions');
+                if(actions){
+                    actions.innerHTML = '<button class="custom-modal-btn confirm" onclick="window.location.reload(true)" style="flex:1;">OK, Refresh</button>';
+                }
+                
+                // Auto refresh setelah 2 detik
+                setTimeout(() => {
+                    window.location.reload(true);
+                }, 2000);
+                
+            } catch (err) {
+                console.error('[Sync] Error:', err);
+                desc.textContent = '❌ Gagal: ' + err.message;
+                if(btn) btn.classList.remove('loading');
+            }
+        };
+    } else {
+        // Fallback kalau modal nggak ada
+        if (!confirm('Sync ulang aplikasi? Halaman akan refresh.')) return;
+        try {
+            if ('serviceWorker' in navigator) {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(regs.map(r => r.unregister()));
+            }
+            if ('caches' in window) {
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+            }
+            alert('Sync berhasil! Halaman akan refresh.');
+            window.location.reload(true);
+        } catch (err) {
+            alert('Gagal: ' + err.message);
         }
-        
-        // 2. Hapus semua cache
-        if ('caches' in window) {
-            const keys = await caches.keys();
-            await Promise.all(keys.map(k => caches.delete(k)));
-            console.log('[Sync] Cache deleted:', keys.length);
-        }
-        
-        // 3. Clear session storage (tapi simpan session login)
-        // Nggak hapus session biar user tetap login
-        
-        // 4. Info + reload
-        alert('✅ Sync berhasil!\n\nHalaman akan refresh ke versi terbaru.');
-        
-        // Hard reload
-        window.location.reload(true);
-        
-    } catch (err) {
-        console.error('[Sync] Error:', err);
-        alert('❌ Sync gagal: ' + err.message);
-        if (icon) icon.classList.remove('animate-spin');
     }
 }
 
