@@ -32,7 +32,7 @@ const homeMenu = [
     { id: 'breakdown',   label: 'Breakdown',   img: '/assets/menu/breakdown.png' },
     { id: 'birthday',    label: 'Birthday',    img: '/assets/menu/birthday.png' },
     { id: 'event',       label: 'Event',       img: '/assets/menu/event.png' },
-    { id: 'prospek',     label: 'Prospek',     img: '/assets/menu/prospek.png' },
+    { id: 'prospek',     label: 'Jo & Va',      img: '/assets/menu/prospek.png' },
     { id: 'join-team',   label: 'Join Team',   img: '/assets/menu/join-team.png' },
 ];
 
