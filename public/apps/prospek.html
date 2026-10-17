@@ -1,23 +1,334 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Prospek Potensi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-        iframe { width: 100%; height: 100vh; border: 0; display: block; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0D9488">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Field CRM Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #F8FAFC; margin: 0; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
+  .font-heading { font-family: 'Poppins', sans-serif; }
+  .input-flat { width: 100%; background: #F8FAFC; border: 2px solid transparent; border-radius: 14px; padding: 13px 16px; font-size: 14px; font-weight: 500; outline: none; transition: 0.2s; }
+  .input-flat:focus { background: #fff; border-color: #0D9488; box-shadow: 0 0 0 4px rgba(13,148,136,0.12); }
+  
+  /* CSS PIN */
+  .pin-input { width: 100%; height: 60px; text-align: center; font-size: 26px; font-weight: 800; font-family: Poppins; background: #F8FAFC; border: 2px solid transparent; border-radius: 14px; outline: none; }
+  .pin-input:focus { background: #fff; border-color: #0D9488; box-shadow: 0 0 0 4px rgba(13,148,136,0.15); }
+  
+  .sheet-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; }
+  .sheet-backdrop.show { opacity: 1; pointer-events: auto; }
+  .bottom-sheet { position: fixed; left: 50%; bottom: 0; transform: translate(-50%, 100%); width: 100%; max-width: 640px; max-height: 92vh; background: #fff; border-radius: 28px 28px 0 0; z-index: 110; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(.32,.72,0,1); }
+  .bottom-sheet.show { transform: translate(-50%, 0); }
+  .sheet-handle { width: 44px; height: 5px; border-radius: 999px; background: #CBD5E1; margin: 12px auto 8px; }
+  .sheet-body { overflow-y: auto; flex: 1; }
+  
+  .calendar-cell { aspect-ratio: 1; border-radius: 12px; font-size: 13px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; border: 2px solid transparent; }
+  .calendar-cell.active { background: #0D9488; color: white; box-shadow: 0 4px 12px rgba(13,148,136,0.3); }
+  .calendar-cell.today { background: #FEF2F2; color: #DC2626; border-color: #FCA5A5; animation: pulse 2s infinite; }
+  
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  #map, #pinMap { width: 100%; height: 100%; z-index: 1; background: #E8F4F8; }
+</style>
 </head>
-<body>
-    <iframe 
-        src="https://docs.google.com/forms/d/e/1FAIpQLSd5TH9ZtXSW4MTkFODNfmiBjpHimORsjD79O5B2oi-iUXqZDQ/viewform?embedded=true"
-        frameborder="0"
-        marginheight="0"
-        marginwidth="0"
-        loading="lazy">
-        Memuat formulir...
-    </iframe>
+<body class="text-slate-800">
+
+<!-- LOGIN -->
+<div id="loginScreen" class="fixed inset-0 z-[150] flex items-center justify-center p-6" style="background: linear-gradient(135deg, #0D9488 0%, #059669 100%);">
+  <div class="w-full max-w-sm">
+    <div class="text-center mb-8">
+      <h1 class="font-heading text-3xl font-black text-white mb-2">Field CRM Pro</h1>
+      <p class="text-teal-100 text-sm font-semibold italic">Mini CRM & Field Force Management</p>
+    </div>
+    <div class="bg-white rounded-3xl p-7 shadow-2xl">
+      <h2 class="font-heading text-lg font-black text-slate-900 mb-1">Masuk</h2>
+      <p class="text-[12px] text-slate-500 font-medium mb-6">Pilih nama & masukkan PIN 4 digit</p>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-2">Pilih Staf</label>
+          <select id="loginStaff" class="input-flat">
+            <option value="">-- Pilih nama --</option>
+            <option value="S001">Joko Adi Wibowo</option>
+            <option value="S002">Novalia Andani</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-2">PIN 4 Digit</label>
+          <div class="flex gap-2 justify-between">
+            <input type="password" maxlength="1" class="pin-input pin-1 flex-1">
+            <input type="password" maxlength="1" class="pin-input pin-2 flex-1">
+            <input type="password" maxlength="1" class="pin-input pin-3 flex-1">
+            <input type="password" maxlength="1" class="pin-input pin-4 flex-1">
+          </div>
+          <p id="loginError" class="text-[11px] font-bold text-rose-500 mt-2 hidden">PIN salah!</p>
+        </div>
+        <button onclick="doLogin()" class="w-full text-white py-4 rounded-xl font-heading font-black text-base shadow-lg mt-2" style="background: #0D9488;">Masuk</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header id="appHeader" class="hidden sticky top-0 z-30 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl text-white flex items-center justify-center font-heading font-black text-base bg-teal-600" id="headerInitial">J</div>
+    <div>
+      <h1 id="headerTitle" class="font-heading text-sm font-extrabold text-slate-900">Field CRM</h1>
+      <p id="headerSubtext" class="text-[11px] text-slate-500 italic">Sales</p>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN APP -->
+<main id="appMain" class="hidden max-w-lg mx-auto p-4">
+  
+  <!-- TAB AGENDA -->
+  <section id="tab-agenda" class="tab-content active">
+    <div class="bg-teal-600 rounded-3xl p-5 text-white shadow-lg mb-4">
+      <p class="text-[10px] font-extrabold bg-white/20 inline-block px-2 py-1 rounded mb-2 uppercase">Hari Ini</p>
+      <h2 class="font-heading text-2xl font-black mb-1">Halo, <span id="heroName">User</span>!</h2>
+      <p class="text-sm italic opacity-90">Semangat kunjungan hari ini.</p>
+    </div>
+    
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
+      <div class="flex justify-between items-center mb-4">
+        <button onclick="changeMonth(-1)" class="text-slate-500 font-bold px-3 py-1 bg-slate-100 rounded-lg active:scale-90 transition">‹</button>
+        <h3 id="calMonthLabel" class="font-heading font-bold text-sm">-</h3>
+        <button onclick="changeMonth(1)" class="text-slate-500 font-bold px-3 py-1 bg-slate-100 rounded-lg active:scale-90 transition">›</button>
+      </div>
+      <div class="grid grid-cols-7 gap-1 text-center mb-2">
+        <div class="text-[10px] font-bold text-red-500">MIN</div><div class="text-[10px] font-bold text-slate-400">SEN</div>
+        <div class="text-[10px] font-bold text-slate-400">SEL</div><div class="text-[10px] font-bold text-slate-400">RAB</div>
+        <div class="text-[10px] font-bold text-slate-400">KAM</div><div class="text-[10px] font-bold text-slate-400">JUM</div>
+        <div class="text-[10px] font-bold text-slate-400">SAB</div>
+      </div>
+      <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+    </div>
+
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="font-heading font-bold text-sm italic">Agenda</h3>
+      <span id="agendaCount" class="text-[10px] font-bold bg-teal-50 text-teal-700 px-2 py-1 rounded">0</span>
+    </div>
+    <div id="agendaList" class="space-y-2"></div>
+  </section>
+
+  <!-- TAB RUTE -->
+  <section id="tab-rute" class="tab-content hidden flex-col h-[80vh]">
+    <div id="map" class="flex-1 rounded-2xl overflow-hidden shadow-sm border border-slate-200 relative mb-3"></div>
+  </section>
+
+  <!-- TAB REPORT -->
+  <section id="tab-report" class="tab-content hidden">
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-4">
+      <h3 class="font-heading font-bold text-sm mb-3">Status Kunjungan</h3>
+      <div class="flex justify-between text-xs mb-2"><span>✅ Berhasil</span><span class="font-bold text-emerald-600" id="statBerhasil">0</span></div>
+      <div class="flex justify-between text-xs mb-2"><span>🟡 Follow Up</span><span class="font-bold text-amber-600" id="statFollowup">0</span></div>
+      <div class="flex justify-between text-xs"><span>❌ Tidak Berhasil</span><span class="font-bold text-rose-600" id="statTidak">0</span></div>
+    </div>
+    <button onclick="doLogout()" class="w-full bg-rose-50 text-rose-600 font-bold py-3 rounded-xl border border-rose-200">Keluar Akun</button>
+  </section>
+</main>
+
+<button id="fabBtn" onclick="openFormPlan()" class="hidden fixed bottom-24 right-6 w-14 h-14 rounded-full text-white text-3xl flex items-center justify-center shadow-lg z-40" style="background: #E11D48;">+</button>
+
+<nav id="bottomNav" class="hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 z-40">
+  <button onclick="switchTab('agenda')" data-tab="agenda" class="nav-btn flex flex-col items-center p-2 text-teal-600 w-20"><span class="text-[10px] font-bold">Agenda</span></button>
+  <button onclick="switchTab('rute')" data-tab="rute" class="nav-btn flex flex-col items-center p-2 text-slate-400 w-20"><span class="text-[10px] font-bold">Rute</span></button>
+  <button onclick="switchTab('report')" data-tab="report" class="nav-btn flex flex-col items-center p-2 text-slate-400 w-20"><span class="text-[10px] font-bold">Report</span></button>
+</nav>
+
+<!-- FORM PLAN -->
+<div id="planBackdrop" class="sheet-backdrop" onclick="closeFormPlan()"></div>
+<div id="planSheet" class="bottom-sheet">
+  <div class="sheet-handle"></div>
+  <div class="p-4 border-b flex justify-between"><h3 class="font-heading font-bold">Rencana Baru</h3><button onclick="closeFormPlan()" class="text-2xl">&times;</button></div>
+  <div class="sheet-body p-4 space-y-4">
+    <select id="planTku" class="input-flat"><option>Panyileukan</option><option>Arcamanik</option><option>Ujung Berung</option><option>Kiara Condong</option><option>Antapani</option></select>
+    <select id="planType" class="input-flat"><option value="Sekolah">Sekolah</option><option value="Kantor">Kantor</option></select>
+    <input type="text" id="planName" class="input-flat" placeholder="Nama Institusi">
+    <textarea id="planAddress" class="input-flat" rows="2" placeholder="Alamat"></textarea>
+    <button onclick="openPinModal()" id="pinBtn" class="w-full bg-slate-50 border-2 border-dashed rounded-xl p-3 text-sm font-bold text-slate-600">📍 Pin Lokasi Peta</button>
+    <button onclick="savePlan()" class="w-full text-white py-3 rounded-xl font-bold" style="background: #0D9488;">Simpan Rencana</button>
+  </div>
+</div>
+
+<!-- PIN MODAL -->
+<div id="pinModal" class="fixed inset-0 z-[200] hidden flex-col bg-white">
+  <div class="p-4 flex justify-between border-b"><h3 class="font-heading font-bold">Pilih Lokasi</h3><button onclick="closePinModal()" class="text-2xl">&times;</button></div>
+  <div class="flex-1 relative"><div id="pinMap"></div></div>
+  <div class="p-4 bg-slate-50"><button onclick="confirmPin()" class="w-full text-white py-3 rounded-xl font-bold" style="background: #0D9488;">Pakai Lokasi Ini</button></div>
+</div>
+
+<!-- FORM REALISASI -->
+<div id="realBackdrop" class="sheet-backdrop" onclick="closeRealisasi()"></div>
+<div id="realSheet" class="bottom-sheet">
+  <div class="sheet-handle"></div>
+  <div class="p-4 border-b flex justify-between"><h3 class="font-heading font-bold" id="realTitle">Realisasi</h3><button onclick="closeRealisasi()" class="text-2xl">&times;</button></div>
+  <div class="sheet-body p-4 space-y-4">
+    <!-- TOMBOL JAM OTOMATIS -->
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <button onclick="getJam('in', this)" id="btnIn" class="w-full bg-slate-100 border-2 border-slate-300 text-slate-700 text-xs font-bold py-3 rounded-xl">⏱️ Ambil Jam Masuk</button>
+      <button onclick="getJam('out', this)" id="btnOut" class="w-full bg-slate-100 border-2 border-slate-300 text-slate-700 text-xs font-bold py-3 rounded-xl">⏱️ Ambil Jam Keluar</button>
+    </div>
+    <button onclick="ambilGPS()" id="btnGps" class="w-full bg-slate-800 text-white text-xs font-bold py-3 rounded-xl">📍 Ambil Titik GPS</button>
+    <label class="block border-2 border-dashed rounded-xl p-4 text-center cursor-pointer">
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="previewPhoto(this)">
+      <span class="text-xs font-bold text-slate-500" id="camLabel">📸 Ambil Foto Bukti</span>
+    </label>
+    <input type="text" id="realPic" class="input-flat" placeholder="Nama PIC">
+    <textarea id="realNote" class="input-flat" rows="2" placeholder="Hasil Nego..."></textarea>
+    <div class="grid grid-cols-3 gap-2">
+      <button onclick="setStatus('berhasil', this)" class="status-btn border rounded-xl py-2 text-xs font-bold">✅ Berhasil</button>
+      <button onclick="setStatus('followup', this)" class="status-btn border rounded-xl py-2 text-xs font-bold">🟡 Follow Up</button>
+      <button onclick="setStatus('tidak', this)" class="status-btn border rounded-xl py-2 text-xs font-bold">❌ Tidak</button>
+    </div>
+    <button onclick="submitRealisasi()" class="w-full text-white py-3 rounded-xl font-bold mt-2" style="background: #059669;">Simpan Realisasi</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // ==========================================
+  // 🔥 ISI CONFIG FIREBASE KAMU DI SINI 🔥
+  // ==========================================
+const firebaseConfig = {
+  apiKey: "AIzaSyC2pc_VSMf9MvhVI-lRawY8FOC6Mu6wzg8",
+  authDomain: "jo-va2026.firebaseapp.com",
+  projectId: "jo-va2026",
+  storageBucket: "jo-va2026.firebasestorage.app",
+  messagingSenderId: "386953525176",
+  appId: "1:386953525176:web:e95848ccb9fd9ccd40414d",
+  measurementId: "G-B6W1MPE3W9"
+};
+
+  // ==========================================
+  // 🔗 ISI URL GAS KAMU DI SINI 🔗
+  // ==========================================
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbxB1jkq9V4MtlCdfRYAwi4dQnfmvEELPYPsqQpMxLINK1PdPnOf8neaJxIhSjcM04hP/exec";
+
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const visitsRef = ref(db, 'field_crm_visits');
+    
+    window.fbPush = push; window.fbUpdate = update; window.fbRef = ref; window.fbDB = db; window.fbVisitsRef = visitsRef;
+
+    onValue(visitsRef, (snapshot) => {
+      const data = snapshot.val();
+      const loaded = [];
+      if (data) Object.keys(data).forEach(k => loaded.push({ fbKey: k, ...data[k] }));
+      window.App.data = loaded;
+      if (window.App && window.App.user) {
+        if (typeof renderAgenda === 'function') renderAgenda();
+        if (typeof renderReport === 'function') renderReport();
+      }
+    });
+  } catch (e) { console.error('Firebase Error:', e); }
+</script>
+
+<script>
+const STAFF = { 'S001': { name: 'Joko Adi Wibowo', role: 'Sales' }, 'S002': { name: 'Novalia Andani', role: 'Sales' } };
+window.App = { user: null, data: [], activeDate: new Date().toISOString().split('T')[0], calDate: new Date(), pinMap: null, tempPin: null, tempPhoto: null, tempGps: null, activeRealId: null, activeStatus: null, tempIn: null, tempOut: null };
+
+function doLogin() {
+  const id = document.getElementById('loginStaff').value;
+  const pin = Array.from(document.querySelectorAll('.pin-input')).map(i => i.value).join('');
+  if (pin !== '1234') { document.getElementById('loginError').classList.remove('hidden'); return; }
+  localStorage.setItem('crm_user', id); App.user = STAFF[id];
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appHeader').classList.remove('hidden');
+  document.getElementById('appMain').classList.remove('hidden');
+  document.getElementById('bottomNav').classList.remove('hidden');
+  document.getElementById('fabBtn').classList.remove('hidden');
+  document.getElementById('headerTitle').textContent = App.user.name;
+  document.getElementById('heroName').textContent = App.user.name.split(' ')[0];
+  renderCalendar(); renderAgenda(); renderReport();
+}
+
+function doLogout() { localStorage.removeItem('crm_user'); location.reload(); }
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); });
+  document.getElementById(`tab-${tab}`).classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(el => { el.classList.remove('text-teal-600'); el.classList.add('text-slate-400'); });
+  document.querySelector(`[data-tab="${tab}"]`).classList.remove('text-slate-400'); document.querySelector(`[data-tab="${tab}"]`).classList.add('text-teal-600');
+  if (tab === 'rute') renderRute();
+}
+function changeMonth(dir) { App.calDate.setMonth(App.calDate.getMonth() + dir); renderCalendar(); }
+function renderCalendar() {
+  const y = App.calDate.getFullYear(), m = App.calDate.getMonth();
+  document.getElementById('calMonthLabel').textContent = `${new Date(y, m).toLocaleString('id-ID', {month:'long'})} ${y}`;
+  const firstDay = new Date(y, m, 1).getDay(), days = new Date(y, m+1, 0).getDate(), grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+  for (let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
+  const todayStr = new Date().toISOString().split('T')[0];
+  for (let d=1; d<=days; d++) {
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`, isActive = dateStr === App.activeDate, isToday = dateStr === todayStr;
+    grid.innerHTML += `<div onclick="selectDate('${dateStr}')" class="calendar-cell ${isActive?'active':isToday?'today':'bg-slate-50 text-slate-700'}">${d}</div>`;
+  }
+}
+function selectDate(dateStr) { App.activeDate = dateStr; renderCalendar(); renderAgenda(); }
+function renderAgenda() {
+  const filtered = App.data.filter(d => d.date === App.activeDate), list = document.getElementById('agendaList'); list.innerHTML = '';
+  document.getElementById('agendaCount').textContent = filtered.length;
+  if (filtered.length === 0) { list.innerHTML = `<div class="text-center py-6 border-2 border-dashed rounded-2xl text-xs text-slate-400">Belum ada rencana</div>`; return; }
+  filtered.forEach(item => {
+    let badge = item.realisasi ? (item.realisasi.status==='berhasil'?'✅ Berhasil':item.realisasi.status==='followup'?'🟡 Follow':'❌ Tidak') : '⚪ Belum';
+    list.innerHTML += `<div class="p-3 bg-white rounded-xl border flex justify-between items-center">
+      <div><span class="text-[9px] bg-slate-100 px-1 border rounded">${item.tku}</span> <span class="text-[10px]">${badge}</span><p class="font-bold text-sm">${item.name}</p></div>
+      <button onclick="openRealisasi('${item.id}')" class="text-[10px] font-bold px-3 py-1.5 rounded-lg ${item.realisasi ? 'bg-slate-100' : 'bg-teal-600 text-white'}">${item.realisasi ? 'Lihat' : 'Realisasi'}</button>
+    </div>`;
+  });
+}
+function openFormPlan() { document.getElementById('planName').value = ''; App.tempPin = null; document.getElementById('pinBtn').innerHTML = '📍 Pin Lokasi Peta'; document.getElementById('planBackdrop').classList.add('show'); document.getElementById('planSheet').classList.add('show'); }
+function closeFormPlan() { document.getElementById('planBackdrop').classList.remove('show'); document.getElementById('planSheet').classList.remove('show'); }
+function savePlan() {
+  const newData = { id: 'REQ-'+Date.now(), staffId: localStorage.getItem('crm_user'), date: App.activeDate, tku: document.getElementById('planTku').value, type: document.getElementById('planType').value, name: document.getElementById('planName').value, address: document.getElementById('planAddress').value, lat: App.tempPin?.lat, lng: App.tempPin?.lng, realisasi: null };
+  App.data.push(newData); if (window.fbPush) window.fbPush(window.fbVisitsRef, newData);
+  if (GAS_URL && GAS_URL !== "MASUKKAN_URL_GAS") fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(newData) });
+  closeFormPlan(); renderAgenda(); alert('Rencana disimpan!');
+}
+function openPinModal() { document.getElementById('pinModal').classList.remove('hidden'); document.getElementById('pinModal').classList.add('flex'); setTimeout(()=>{ if(!App.pinMap){ App.pinMap = L.map('pinMap').setView([-6.9248, 107.6792], 15); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(App.pinMap); App.pinMap.on('moveend',()=>{ App.tempPin = App.pinMap.getCenter(); }); App.tempPin={lat:-6.9248,lng:107.6792}; } App.pinMap.invalidateSize(); }, 200); }
+function closePinModal() { document.getElementById('pinModal').classList.add('hidden'); document.getElementById('pinModal').classList.remove('flex'); }
+function confirmPin() { document.getElementById('pinBtn').innerHTML = `📍 ${App.tempPin.lat.toFixed(4)}, ${App.tempPin.lng.toFixed(4)}`; closePinModal(); }
+function openRealisasi(id) {
+  const data = App.data.find(d => d.id === id); App.activeRealId = id; App.tempPhoto = data.realisasi?.photo || null; App.tempGps = data.realisasi?.gps || null; App.activeStatus = data.realisasi?.status || null; App.tempIn = data.realisasi?.in || null; App.tempOut = data.realisasi?.out || null;
+  document.getElementById('realTitle').textContent = data.name; document.getElementById('realPic').value = data.realisasi?.pic || ''; document.getElementById('realNote').value = data.realisasi?.note || '';
+  document.getElementById('btnIn').innerHTML = App.tempIn ? `✅ Masuk: ${App.tempIn}` : '⏱️ Ambil Jam Masuk'; document.getElementById('btnOut').innerHTML = App.tempOut ? `✅ Keluar: ${App.tempOut}` : '⏱️ Ambil Jam Keluar';
+  document.querySelectorAll('.status-btn').forEach(b => { b.style.background=''; b.style.color=''; }); if(App.activeStatus){ const btn = document.querySelector(`button[onclick*="${App.activeStatus}"]`); if(btn){ btn.style.background='#0D9488'; btn.style.color='white'; } }
+  document.getElementById('realBackdrop').classList.add('show'); document.getElementById('realSheet').classList.add('show');
+}
+function closeRealisasi() { document.getElementById('realBackdrop').classList.remove('show'); document.getElementById('realSheet').classList.remove('show'); }
+function getJam(type, btn) { const time = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}); if(type==='in'){ App.tempIn=time; btn.innerHTML=`✅ Masuk: ${time}`; } else { App.tempOut=time; btn.innerHTML=`✅ Keluar: ${time}`; } btn.style.background='#ECFDF5'; btn.style.borderColor='#059669'; }
+function ambilGPS() { navigator.geolocation.getCurrentPosition(p => { App.tempGps = { lat: p.coords.latitude, lng: p.coords.longitude }; document.getElementById('btnGps').innerHTML = '✅ GPS Tersimpan'; }, () => alert('GPS gagal')); }
+function previewPhoto(i) { if(i.files[0]){ const r=new FileReader(); r.onload=(e)=>{App.tempPhoto=e.target.result; document.getElementById('camLabel').innerHTML='✅ Foto Siap';}; r.readAsDataURL(i.files[0]); } }
+function setStatus(s, btn) { App.activeStatus=s; document.querySelectorAll('.status-btn').forEach(b=>{b.style.background='';b.style.color='';}); btn.style.background='#0D9488'; btn.style.color='white'; }
+function submitRealisasi() {
+  if(!App.tempGps || !App.tempPhoto || !App.activeStatus) return alert('Lengkapi GPS, Foto, & Status!');
+  const data = App.data.find(d => d.id === App.activeRealId); data.realisasi = { in: App.tempIn || '-', out: App.tempOut || '-', pic: document.getElementById('realPic').value, note: document.getElementById('realNote').value, status: App.activeStatus, gps: App.tempGps, photo: App.tempPhoto };
+  if(window.fbUpdate && data.fbKey) window.fbUpdate(window.fbRef(window.fbDB, 'field_crm_visits/'+data.fbKey), data);
+  if (GAS_URL && GAS_URL !== "MASUKKAN_URL_GAS") fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action:'realisasi', ...data}) });
+  closeRealisasi(); renderAgenda(); renderReport(); alert('Realisasi Disimpan!');
+}
+function renderRute() {
+  if(!App.ruteMap){ App.ruteMap = L.map('map').setView([-6.9248,107.6792],12); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(App.ruteMap); } setTimeout(()=>App.ruteMap.invalidateSize(),200);
+  App.ruteMap.eachLayer(l=>{ if(l instanceof L.Marker) App.ruteMap.removeLayer(l); });
+  App.data.filter(d=>d.date===App.activeDate && d.realisasi).forEach(d=>{ L.marker([d.realisasi.gps.lat,d.realisasi.gps.lng]).addTo(App.ruteMap).bindPopup(d.name); });
+}
+function renderReport() { const real = App.data.filter(d=>d.realisasi); document.getElementById('statBerhasil').textContent = real.filter(d=>d.realisasi.status==='berhasil').length; document.getElementById('statFollowup').textContent = real.filter(d=>d.realisasi.status==='followup').length; document.getElementById('statTidak').textContent = real.filter(d=>d.realisasi.status==='tidak').length; }
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pin-input').forEach((inp, idx) => { inp.addEventListener('input', (e) => { if (e.target.value.length === 1 && idx < 3) document.querySelector(`.pin-${idx+2}`).focus(); }); });
+  if(localStorage.getItem('crm_user')){ document.getElementById('loginStaff').value = localStorage.getItem('crm_user'); ['1','2','3','4'].forEach((v,i)=>document.querySelector(`.pin-${i+1}`).value=v); doLogin(); }
+});
+</script>
 </body>
 </html>
