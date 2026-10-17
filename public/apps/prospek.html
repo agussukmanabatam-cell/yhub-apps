@@ -10,30 +10,100 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #F8FAFC; margin: 0; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
+  :root { --brand: #0D9488; --brand-dark: #0F766E; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #F8FAFC; margin: 0; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; transition: background .3s, color .3s; }
   .font-heading { font-family: 'Poppins', sans-serif; }
-  .input-flat { width: 100%; background: #F8FAFC; border: 2px solid transparent; border-radius: 14px; padding: 13px 16px; font-size: 14px; font-weight: 500; outline: none; transition: 0.2s; }
-  .input-flat:focus { background: #fff; border-color: #0D9488; box-shadow: 0 0 0 4px rgba(13,148,136,0.12); }
-  
-  /* CSS PIN */
+  body.dark { background: #0f172a; color: #e2e8f0; }
+  body.dark .bg-white { background: #1e293b !important; }
+  body.dark .bg-slate-50 { background: #0f172a !important; }
+  body.dark .bg-slate-100 { background: #334155 !important; }
+  body.dark .text-slate-900 { color: #f1f5f9 !important; }
+  body.dark .text-slate-800 { color: #e2e8f0 !important; }
+  body.dark .text-slate-700 { color: #cbd5e1 !important; }
+  body.dark .text-slate-600 { color: #94a3b8 !important; }
+  body.dark .text-slate-500 { color: #94a3b8 !important; }
+  body.dark .text-slate-400 { color: #64748b !important; }
+  body.dark .border-slate-200 { border-color: #334155 !important; }
+  body.dark .border-slate-100 { border-color: #1e293b !important; }
+  body.dark header { background: #1e293b !important; border-color: #334155 !important; }
+  body.dark nav { background: #1e293b !important; border-color: #334155 !important; }
+  body.dark .bottom-sheet { background: #1e293b !important; }
+  body.dark .input-flat { background: #0f172a !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+  body.dark .input-flat:focus { border-color: var(--brand) !important; }
+  body.dark .pin-input { background: #0f172a !important; color: #e2e8f0 !important; }
+  body.dark .calendar-cell { background: #1e293b !important; color: #cbd5e1 !important; }
+  body.dark .sheet-handle { background: #475569 !important; }
+
+  .input-flat { width: 100%; background: #F8FAFC; border: 2px solid transparent; border-radius: 14px; padding: 13px 16px; font-size: 14px; font-weight: 500; outline: none; transition: 0.2s; font-family: inherit; }
+  .input-flat:focus { background: #fff; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(13,148,136,0.12); }
+
   .pin-input { width: 100%; height: 60px; text-align: center; font-size: 26px; font-weight: 800; font-family: Poppins; background: #F8FAFC; border: 2px solid transparent; border-radius: 14px; outline: none; }
-  .pin-input:focus { background: #fff; border-color: #0D9488; box-shadow: 0 0 0 4px rgba(13,148,136,0.15); }
-  
+  .pin-input:focus { background: #fff; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(13,148,136,0.15); }
+
   .sheet-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; }
   .sheet-backdrop.show { opacity: 1; pointer-events: auto; }
   .bottom-sheet { position: fixed; left: 50%; bottom: 0; transform: translate(-50%, 100%); width: 100%; max-width: 640px; max-height: 92vh; background: #fff; border-radius: 28px 28px 0 0; z-index: 110; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(.32,.72,0,1); }
   .bottom-sheet.show { transform: translate(-50%, 0); }
-  .sheet-handle { width: 44px; height: 5px; border-radius: 999px; background: #CBD5E1; margin: 12px auto 8px; }
-  .sheet-body { overflow-y: auto; flex: 1; }
-  
+  .sheet-handle { width: 44px; height: 5px; border-radius: 999px; background: #CBD5E1; margin: 12px auto 8px; cursor: grab; }
+  .sheet-body { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+
   .calendar-cell { aspect-ratio: 1; border-radius: 12px; font-size: 13px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; border: 2px solid transparent; }
-  .calendar-cell.active { background: #0D9488; color: white; box-shadow: 0 4px 12px rgba(13,148,136,0.3); }
+  .calendar-cell.active { background: var(--brand); color: white; box-shadow: 0 4px 12px rgba(13,148,136,0.3); }
   .calendar-cell.today { background: #FEF2F2; color: #DC2626; border-color: #FCA5A5; animation: pulse 2s infinite; }
-  
+
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  
+  @keyframes popupFade { from { opacity: 0; transform: translateY(-8px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
   #map, #pinMap { width: 100%; height: 100%; z-index: 1; background: #E8F4F8; }
+
+  /* TOAST */
+  #toastWrap { position: fixed; bottom: calc(96px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; max-width: 92vw; }
+  .toast { background: #0f172a; color: #fff; font-size: 12.5px; font-weight: 700; padding: 11px 20px; border-radius: 999px; box-shadow: 0 12px 32px rgba(0,0,0,0.28); opacity: 0; transform: translateY(12px); transition: all 0.28s; white-space: nowrap; max-width: 100%; display: flex; align-items: center; gap: 8px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { background: linear-gradient(135deg, #059669, #047857); }
+  .toast.error   { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+  .toast.info    { background: linear-gradient(135deg, #2563EB, #1e40af); }
+  .toast.warning { background: linear-gradient(135deg, #EA580C, #C2410C); }
+
+  /* STEP INDICATOR */
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; transition: all 0.3s; }
+  .step-dot.active { background: #EA580C; color: white; box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.15); }
+  .step-dot.done { background: #059669; color: white; }
+  .step-dot.idle { background: #f1f5f9; color: #94a3b8; }
+  body.dark .step-dot.idle { background: #334155; color: #64748b; }
+
+  /* STAGE COLORS */
+  .stage-baru { background: #E0E7FF; color: #4338CA; border-color: #C7D2FE; }
+  .stage-dihubungi { background: #DBEAFE; color: #1D4ED8; border-color: #BFDBFE; }
+  .stage-tertarik { background: #FEF9C3; color: #A16207; border-color: #FEF08A; }
+  .stage-nego { background: #FFEDD5; color: #C2410C; border-color: #FED7AA; }
+  .stage-deal { background: #D1FAE5; color: #065F46; border-color: #A7F3D0; }
+  .stage-gagal { background: #FEE2E2; color: #B91C1C; border-color: #FECACA; }
+
+  /* POPUP DROPDOWN */
+  .popup-anim { animation: popupFade 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+  /* SEARCH BAR */
+  .search-wrap { position: relative; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #94a3b8; pointer-events: none; }
+
+  /* FAB */
+  #fabBtn { transition: transform .2s, opacity .2s; }
+  #fabBtn:active { transform: scale(0.9); }
+
+  /* CUSTOM CHECKBOX CHIP */
+  .chip { padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; border: 1.5px solid transparent; transition: all .2s; cursor: pointer; white-space: nowrap; }
+  .chip.active { background: var(--brand); color: white; }
+  .chip.inactive { background: transparent; color: #64748b; border-color: #cbd5e1; }
+
+  /* Activity timeline line */
+  .timeline-item { position: relative; padding-left: 24px; }
+  .timeline-item::before { content: ''; position: absolute; left: 7px; top: 20px; bottom: -20px; width: 2px; background: #e2e8f0; }
+  .timeline-item:last-child::before { display: none; }
+  .timeline-item::after { content: ''; position: absolute; left: 0; top: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--brand); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--brand); }
+  body.dark .timeline-item::before { background: #334155; }
+  body.dark .timeline-item::after { border-color: #1e293b; }
 </style>
 </head>
 <body class="text-slate-800">
@@ -67,34 +137,72 @@
           </div>
           <p id="loginError" class="text-[11px] font-bold text-rose-500 mt-2 hidden">PIN salah!</p>
         </div>
-        <button onclick="doLogin()" class="w-full text-white py-4 rounded-xl font-heading font-black text-base shadow-lg mt-2" style="background: #0D9488;">Masuk</button>
+        <button onclick="doLogin()" class="w-full text-white py-4 rounded-xl font-heading font-black text-base shadow-lg mt-2" style="background: var(--brand);">Masuk</button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- HEADER -->
-<header id="appHeader" class="hidden sticky top-0 z-30 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
+<header id="appHeader" class="hidden sticky top-0 z-30 bg-white border-b border-slate-100 p-4 flex justify-between items-center" style="padding-top: calc(16px + env(safe-area-inset-top));">
   <div class="flex items-center gap-3">
-    <div class="w-10 h-10 rounded-xl text-white flex items-center justify-center font-heading font-black text-base bg-teal-600" id="headerInitial">J</div>
+    <div class="w-10 h-10 rounded-xl text-white flex items-center justify-center font-heading font-black text-base" style="background: var(--brand);" id="headerInitial">J</div>
     <div>
       <h1 id="headerTitle" class="font-heading text-sm font-extrabold text-slate-900">Field CRM</h1>
-      <p id="headerSubtext" class="text-[11px] text-slate-500 italic">Sales</p>
+      <p id="headerSubtext" class="text-[11px] text-slate-500 italic flex items-center gap-1.5">
+        <span id="syncDot" class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+        <span id="syncText">Menghubungkan...</span>
+      </p>
     </div>
+  </div>
+  <div class="flex items-center gap-1.5">
+    <button onclick="goBackToPWA()" title="Kembali ke PWA" class="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-600 flex items-center justify-center active:scale-95 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <button onclick="toggleDarkMode()" title="Mode gelap" class="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-600 flex items-center justify-center active:scale-95 transition">
+      <svg id="darkIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+    </button>
   </div>
 </header>
 
 <!-- MAIN APP -->
 <main id="appMain" class="hidden max-w-lg mx-auto p-4">
-  
+
   <!-- TAB AGENDA -->
   <section id="tab-agenda" class="tab-content active">
-    <div class="bg-teal-600 rounded-3xl p-5 text-white shadow-lg mb-4">
-      <p class="text-[10px] font-extrabold bg-white/20 inline-block px-2 py-1 rounded mb-2 uppercase">Hari Ini</p>
+
+    <!-- DAILY BRIEFING -->
+    <div class="rounded-3xl p-5 text-white shadow-lg mb-4" style="background: linear-gradient(135deg, #0D9488, #059669);">
+      <p class="text-[10px] font-extrabold bg-white/20 inline-block px-2 py-1 rounded mb-2 uppercase">Hari Ini · <span id="todayDateLabel"></span></p>
       <h2 class="font-heading text-2xl font-black mb-1">Halo, <span id="heroName">User</span>!</h2>
-      <p class="text-sm italic opacity-90">Semangat kunjungan hari ini.</p>
+      <div class="grid grid-cols-3 gap-2 mt-3">
+        <div class="bg-white/15 rounded-xl p-2 text-center">
+          <p class="text-[9px] font-bold uppercase opacity-80">Kunjungan</p>
+          <p class="font-heading text-lg font-black" id="statKunjunganToday">0</p>
+        </div>
+        <div class="bg-white/15 rounded-xl p-2 text-center">
+          <p class="text-[9px] font-bold uppercase opacity-80">Deal</p>
+          <p class="font-heading text-lg font-black" id="statDealToday">0</p>
+        </div>
+        <div class="bg-white/15 rounded-xl p-2 text-center">
+          <p class="text-[9px] font-bold uppercase opacity-80">Follow Up</p>
+          <p class="font-heading text-lg font-black" id="statFollowToday">0</p>
+        </div>
+      </div>
     </div>
-    
+
+    <!-- REMINDER FOLLOW UP -->
+    <div id="reminderSection" class="hidden mb-4">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-heading font-bold text-sm flex items-center gap-1.5">
+          <span class="text-base">⏰</span> Follow Up Jatuh Tempo
+        </h3>
+        <span id="reminderCount" class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded">0</span>
+      </div>
+      <div id="reminderList" class="space-y-2"></div>
+    </div>
+
+    <!-- KALENDER -->
     <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
       <div class="flex justify-between items-center mb-4">
         <button onclick="changeMonth(-1)" class="text-slate-500 font-bold px-3 py-1 bg-slate-100 rounded-lg active:scale-90 transition">‹</button>
@@ -110,92 +218,294 @@
       <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
     </div>
 
+    <!-- SEARCH & FILTER -->
+    <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200 mb-4 space-y-2.5">
+      <div class="search-wrap">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="searchInput" oninput="onSearchInput(this.value)" placeholder="Cari nama / PIC / alamat..." class="input-flat pl-10">
+      </div>
+      <div class="flex gap-1.5 overflow-x-auto pb-1" id="stageChips"></div>
+    </div>
+
+    <!-- AGENDA LIST -->
     <div class="flex justify-between items-center mb-3">
-      <h3 class="font-heading font-bold text-sm italic">Agenda</h3>
+      <h3 class="font-heading font-bold text-sm italic">Daftar Prospek</h3>
       <span id="agendaCount" class="text-[10px] font-bold bg-teal-50 text-teal-700 px-2 py-1 rounded">0</span>
     </div>
     <div id="agendaList" class="space-y-2"></div>
   </section>
 
   <!-- TAB RUTE -->
-  <section id="tab-rute" class="tab-content hidden flex-col h-[80vh]">
-    <div id="map" class="flex-1 rounded-2xl overflow-hidden shadow-sm border border-slate-200 relative mb-3"></div>
+  <section id="tab-rute" class="tab-content hidden flex-col" style="height: calc(100vh - 180px);">
+    <div class="bg-white rounded-2xl p-3 mb-2 shadow-sm border border-slate-200 flex items-center justify-between gap-2">
+      <div>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">Rute Harian</p>
+        <p class="font-heading text-sm font-black text-slate-900" id="routeTotalInfo">-</p>
+      </div>
+      <button onclick="optimizeRoute()" class="text-[11px] font-extrabold px-3 py-2 rounded-xl text-white shadow-md active:scale-95 transition" style="background: var(--brand);">
+        🔄 Optimalkan
+      </button>
+    </div>
+    <div id="map" class="flex-1 rounded-2xl overflow-hidden shadow-sm border border-slate-200 relative"></div>
   </section>
 
   <!-- TAB REPORT -->
   <section id="tab-report" class="tab-content hidden">
     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-4">
-      <h3 class="font-heading font-bold text-sm mb-3">Status Kunjungan</h3>
-      <div class="flex justify-between text-xs mb-2"><span>✅ Berhasil</span><span class="font-bold text-emerald-600" id="statBerhasil">0</span></div>
-      <div class="flex justify-between text-xs mb-2"><span>🟡 Follow Up</span><span class="font-bold text-amber-600" id="statFollowup">0</span></div>
-      <div class="flex justify-between text-xs"><span>❌ Tidak Berhasil</span><span class="font-bold text-rose-600" id="statTidak">0</span></div>
+      <h3 class="font-heading font-bold text-sm mb-3">Funnel Pipeline</h3>
+      <div class="space-y-2" id="funnelStats"></div>
     </div>
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-4">
+      <h3 class="font-heading font-bold text-sm mb-3">Performa Hari Ini</h3>
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between"><span>👣 Kunjungan</span><span class="font-bold" id="reportKunjungan">0</span></div>
+        <div class="flex justify-between"><span>💰 Total Potensi Deal</span><span class="font-bold text-emerald-600" id="reportPotensi">Rp 0</span></div>
+        <div class="flex justify-between"><span>📊 Aktivitas Tercatat</span><span class="font-bold" id="reportActivities">0</span></div>
+      </div>
+    </div>
+    <button onclick="exportCSV()" class="w-full bg-emerald-50 text-emerald-700 font-bold py-3 rounded-xl border border-emerald-200 mb-2">📥 Export CSV</button>
     <button onclick="doLogout()" class="w-full bg-rose-50 text-rose-600 font-bold py-3 rounded-xl border border-rose-200">Keluar Akun</button>
   </section>
 </main>
 
 <button id="fabBtn" onclick="openFormPlan()" class="hidden fixed bottom-24 right-6 w-14 h-14 rounded-full text-white text-3xl flex items-center justify-center shadow-lg z-40" style="background: #E11D48;">+</button>
 
-<nav id="bottomNav" class="hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 z-40">
-  <button onclick="switchTab('agenda')" data-tab="agenda" class="nav-btn flex flex-col items-center p-2 text-teal-600 w-20"><span class="text-[10px] font-bold">Agenda</span></button>
+<nav id="bottomNav" class="hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 z-40" style="padding-bottom: calc(8px + env(safe-area-inset-bottom));">
+  <button onclick="switchTab('agenda')" data-tab="agenda" class="nav-btn flex flex-col items-center p-2 text-teal-600 w-20"><span class="text-[10px] font-bold">Prospek</span></button>
   <button onclick="switchTab('rute')" data-tab="rute" class="nav-btn flex flex-col items-center p-2 text-slate-400 w-20"><span class="text-[10px] font-bold">Rute</span></button>
   <button onclick="switchTab('report')" data-tab="report" class="nav-btn flex flex-col items-center p-2 text-slate-400 w-20"><span class="text-[10px] font-bold">Report</span></button>
 </nav>
 
-<!-- FORM PLAN -->
+<!-- ============ FORM PLAN (MULTI-STEP) ============ -->
 <div id="planBackdrop" class="sheet-backdrop" onclick="closeFormPlan()"></div>
 <div id="planSheet" class="bottom-sheet">
   <div class="sheet-handle"></div>
-  <div class="p-4 border-b flex justify-between"><h3 class="font-heading font-bold">Rencana Baru</h3><button onclick="closeFormPlan()" class="text-2xl">&times;</button></div>
-  <div class="sheet-body p-4 space-y-4">
-    <select id="planTku" class="input-flat"><option>Panyileukan</option><option>Arcamanik</option><option>Ujung Berung</option><option>Kiara Condong</option><option>Antapani</option></select>
-    <select id="planType" class="input-flat"><option value="Sekolah">Sekolah</option><option value="Kantor">Kantor</option></select>
-    <input type="text" id="planName" class="input-flat" placeholder="Nama Institusi">
-    <textarea id="planAddress" class="input-flat" rows="2" placeholder="Alamat"></textarea>
-    <button onclick="openPinModal()" id="pinBtn" class="w-full bg-slate-50 border-2 border-dashed rounded-xl p-3 text-sm font-bold text-slate-600">📍 Pin Lokasi Peta</button>
-    <button onclick="savePlan()" class="w-full text-white py-3 rounded-xl font-bold" style="background: #0D9488;">Simpan Rencana</button>
+  <div class="p-4 border-b flex justify-between items-center">
+    <div>
+      <h3 class="font-heading font-bold">Prospek Baru</h3>
+      <p class="text-[10px] text-slate-500">Langkah <span id="planStepNum">1</span> dari 2</p>
+    </div>
+    <button onclick="closeFormPlan()" class="text-2xl">&times;</button>
+  </div>
+
+  <div class="px-4 py-3 flex items-center justify-center gap-3">
+    <div class="step-dot active" id="planDot1">1</div>
+    <div class="h-0.5 w-8 bg-slate-200"></div>
+    <div class="step-dot idle" id="planDot2">2</div>
+  </div>
+
+  <div class="sheet-body p-4 space-y-3">
+    <!-- STEP 1 -->
+    <div id="planStep1" class="space-y-3">
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">TKU *</label>
+        <select id="planTku" class="input-flat">
+          <option>Panyileukan</option><option>Arcamanik</option><option>Ujung Berung</option>
+          <option>Kiara Condong</option><option>Antapani</option><option>Gede Bage</option>
+          <option>Margahayu</option><option>Bojong Soang</option><option>Buah Batu</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">Tipe *</label>
+          <select id="planType" class="input-flat">
+            <option>Sekolah</option><option>Kantor</option><option>Toko</option><option>Rumah</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">Tanggal *</label>
+          <input type="date" id="planDate" class="input-flat">
+        </div>
+      </div>
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">Nama Institusi *</label>
+        <input type="text" id="planName" class="input-flat" placeholder="SDN Cibiru 1">
+      </div>
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">Alamat</label>
+        <textarea id="planAddress" class="input-flat" rows="2" placeholder="Jl. Cibiru Hilir No. 1..."></textarea>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="planStep2" class="space-y-3 hidden">
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">Nama PIC</label>
+        <input type="text" id="planPicName" class="input-flat" placeholder="Bu Siti">
+      </div>
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">No. WhatsApp PIC</label>
+        <input type="tel" id="planPicPhone" class="input-flat" placeholder="08xxxxxxxxxx">
+      </div>
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">Potensi (Rp)</label>
+        <input type="number" id="planPotensi" class="input-flat" placeholder="5000000">
+      </div>
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">Produk Diminati</label>
+        <div class="flex flex-wrap gap-1.5" id="productChips"></div>
+      </div>
+      <button onclick="openPinModal()" id="pinBtn" class="w-full bg-slate-50 border-2 border-dashed rounded-xl p-3 text-sm font-bold text-slate-600">📍 Pin Lokasi Peta</button>
+    </div>
+  </div>
+
+  <div class="p-4 border-t flex gap-2" style="padding-bottom: calc(16px + env(safe-area-inset-bottom));">
+    <button type="button" id="planBackBtn" onclick="planPrevStep()" class="hidden px-4 py-3 text-xs font-bold text-slate-600 bg-slate-100 rounded-xl">‹ Kembali</button>
+    <button type="button" id="planNextBtn" onclick="planNextStep()" class="flex-1 text-white py-3 rounded-xl font-bold shadow-md" style="background: var(--brand);">Lanjut ›</button>
+    <button type="button" id="planSaveBtn" onclick="savePlan()" class="hidden flex-1 text-white py-3 rounded-xl font-bold shadow-md" style="background: #059669;">✓ Simpan</button>
   </div>
 </div>
 
-<!-- PIN MODAL -->
-<div id="pinModal" class="fixed inset-0 z-[200] hidden flex-col bg-white">
+<!-- ============ PIN MODAL ============ -->
+<div id="pinModal" class="fixed inset-0 z-[200] hidden flex-col bg-white" style="padding-top: env(safe-area-inset-top);">
   <div class="p-4 flex justify-between border-b"><h3 class="font-heading font-bold">Pilih Lokasi</h3><button onclick="closePinModal()" class="text-2xl">&times;</button></div>
-  <div class="flex-1 relative"><div id="pinMap"></div></div>
-  <div class="p-4 bg-slate-50"><button onclick="confirmPin()" class="w-full text-white py-3 rounded-xl font-bold" style="background: #0D9488;">Pakai Lokasi Ini</button></div>
+  <div class="flex-1 relative"><div id="pinMap"></div>
+    <div class="absolute top-3 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow text-[10px] font-bold text-slate-600 z-[400] pointer-events-none">Geser peta, pin = center</div>
+  </div>
+  <div class="p-4 bg-slate-50" style="padding-bottom: calc(16px + env(safe-area-inset-bottom));"><button onclick="confirmPin()" class="w-full text-white py-3 rounded-xl font-bold" style="background: var(--brand);">Pakai Lokasi Ini</button></div>
 </div>
 
-<!-- FORM REALISASI -->
-<div id="realBackdrop" class="sheet-backdrop" onclick="closeRealisasi()"></div>
-<div id="realSheet" class="bottom-sheet">
+<!-- ============ DETAIL PROSPEK SHEET ============ -->
+<div id="detailBackdrop" class="sheet-backdrop" onclick="closeDetail()"></div>
+<div id="detailSheet" class="bottom-sheet">
   <div class="sheet-handle"></div>
-  <div class="p-4 border-b flex justify-between"><h3 class="font-heading font-bold" id="realTitle">Realisasi</h3><button onclick="closeRealisasi()" class="text-2xl">&times;</button></div>
-  <div class="sheet-body p-4 space-y-4">
-    <!-- TOMBOL JAM OTOMATIS -->
-    <div class="grid grid-cols-2 gap-2 mb-2">
-      <button onclick="getJam('in', this)" id="btnIn" class="w-full bg-slate-100 border-2 border-slate-300 text-slate-700 text-xs font-bold py-3 rounded-xl">⏱️ Ambil Jam Masuk</button>
-      <button onclick="getJam('out', this)" id="btnOut" class="w-full bg-slate-100 border-2 border-slate-300 text-slate-700 text-xs font-bold py-3 rounded-xl">⏱️ Ambil Jam Keluar</button>
+  <div class="p-4 border-b flex justify-between items-start">
+    <div class="min-w-0 flex-1">
+      <h3 class="font-heading font-bold text-base" id="detailName">-</h3>
+      <p class="text-[11px] text-slate-500 mt-0.5" id="detailSub">-</p>
     </div>
-    <button onclick="ambilGPS()" id="btnGps" class="w-full bg-slate-800 text-white text-xs font-bold py-3 rounded-xl">📍 Ambil Titik GPS</button>
-    <label class="block border-2 border-dashed rounded-xl p-4 text-center cursor-pointer">
-      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="previewPhoto(this)">
-      <span class="text-xs font-bold text-slate-500" id="camLabel">📸 Ambil Foto Bukti</span>
-    </label>
-    <input type="text" id="realPic" class="input-flat" placeholder="Nama PIC">
-    <textarea id="realNote" class="input-flat" rows="2" placeholder="Hasil Nego..."></textarea>
+    <button onclick="closeDetail()" class="text-2xl shrink-0">&times;</button>
+  </div>
+  <div class="sheet-body p-4 space-y-3" style="padding-bottom: calc(20px + env(safe-area-inset-bottom));">
+
+    <!-- STAGE SELECTOR -->
+    <div>
+      <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">Ubah Stage</label>
+      <div class="grid grid-cols-3 gap-1.5" id="detailStageButtons"></div>
+    </div>
+
+    <!-- INFO -->
+    <div class="bg-slate-50 rounded-xl p-3 space-y-1.5 text-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-slate-500">PIC</span>
+        <span class="font-bold" id="detailPic">-</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-500">WhatsApp</span>
+        <a id="detailWa" class="font-bold text-emerald-600" href="#">-</a>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-500">Potensi</span>
+        <span class="font-bold text-emerald-600" id="detailPotensi">-</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-500">Alamat</span>
+        <span class="font-bold text-right max-w-[60%] truncate" id="detailAddr">-</span>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
     <div class="grid grid-cols-3 gap-2">
-      <button onclick="setStatus('berhasil', this)" class="status-btn border rounded-xl py-2 text-xs font-bold">✅ Berhasil</button>
-      <button onclick="setStatus('followup', this)" class="status-btn border rounded-xl py-2 text-xs font-bold">🟡 Follow Up</button>
-      <button onclick="setStatus('tidak', this)" class="status-btn border rounded-xl py-2 text-xs font-bold">❌ Tidak</button>
+      <button onclick="quickWA()" class="bg-emerald-50 text-emerald-700 font-bold py-2.5 rounded-xl text-[11px] border border-emerald-200">💬 WA</button>
+      <button onclick="quickCall()" class="bg-blue-50 text-blue-700 font-bold py-2.5 rounded-xl text-[11px] border border-blue-200">📞 Telp</button>
+      <button onclick="quickNav()" class="bg-orange-50 text-orange-700 font-bold py-2.5 rounded-xl text-[11px] border border-orange-200">🧭 Navigasi</button>
     </div>
-    <button onclick="submitRealisasi()" class="w-full text-white py-3 rounded-xl font-bold mt-2" style="background: #059669;">Simpan Realisasi</button>
+
+    <!-- TIMELINE -->
+    <div>
+      <div class="flex justify-between items-center mb-2">
+        <h4 class="font-heading font-bold text-sm">📝 Timeline Aktivitas</h4>
+        <span id="detailActCount" class="text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded">0</span>
+      </div>
+      <div id="detailTimeline" class="space-y-3"></div>
+    </div>
+
+    <button onclick="openAktivitas()" class="w-full text-white py-3 rounded-xl font-bold shadow-md" style="background: var(--brand);">
+      + Tambah Aktivitas Baru
+    </button>
   </div>
 </div>
+
+<!-- ============ FORM AKTIVITAS (MULTI-STEP) ============ -->
+<div id="actBackdrop" class="sheet-backdrop" onclick="closeAktivitas()"></div>
+<div id="actSheet" class="bottom-sheet">
+  <div class="sheet-handle"></div>
+  <div class="p-4 border-b flex justify-between items-center">
+    <div>
+      <h3 class="font-heading font-bold">Aktivitas Baru</h3>
+      <p class="text-[10px] text-slate-500">Langkah <span id="actStepNum">1</span> dari 3</p>
+    </div>
+    <button onclick="closeAktivitas()" class="text-2xl">&times;</button>
+  </div>
+
+  <div class="px-4 py-3 flex items-center justify-center gap-2">
+    <div class="step-dot active" id="actDot1">1</div>
+    <div class="h-0.5 w-6 bg-slate-200"></div>
+    <div class="step-dot idle" id="actDot2">2</div>
+    <div class="h-0.5 w-6 bg-slate-200"></div>
+    <div class="step-dot idle" id="actDot3">3</div>
+  </div>
+
+  <div class="sheet-body p-4 space-y-3">
+    <!-- STEP 1: Check-in -->
+    <div id="actStep1" class="space-y-3">
+      <div class="bg-orange-50 border border-orange-200 rounded-xl p-3 space-y-1">
+        <p class="text-[11px] font-extrabold text-orange-700 uppercase">Langkah 1 — Check-in</p>
+        <p class="text-[10px] text-orange-600">Ambil jam otomatis & GPS lokasi kunjungan</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="getJam('in', this)" id="actBtnIn" class="w-full bg-slate-100 border-2 border-slate-300 text-slate-700 text-xs font-bold py-3 rounded-xl">⏱️ Jam Masuk</button>
+        <button onclick="getJam('out', this)" id="actBtnOut" class="w-full bg-slate-100 border-2 border-slate-300 text-slate-700 text-xs font-bold py-3 rounded-xl">⏱️ Jam Keluar</button>
+      </div>
+      <button onclick="ambilGPS()" id="actBtnGps" class="w-full bg-slate-800 text-white text-xs font-bold py-3 rounded-xl">📍 Ambil Titik GPS</button>
+      <div id="geofenceInfo" class="hidden text-[10px] font-bold p-2 rounded-lg"></div>
+    </div>
+
+    <!-- STEP 2: Foto & Note -->
+    <div id="actStep2" class="space-y-3 hidden">
+      <div class="bg-orange-50 border border-orange-200 rounded-xl p-3 space-y-1">
+        <p class="text-[11px] font-extrabold text-orange-700 uppercase">Langkah 2 — Bukti & Catatan</p>
+        <p class="text-[10px] text-orange-600">Minimal 1 foto, max 5. Watermark otomatis ditambahkan.</p>
+      </div>
+      <label class="block border-2 border-dashed rounded-xl p-4 text-center cursor-pointer">
+        <input type="file" accept="image/*" capture="environment" class="hidden" onchange="addPhoto(this)" multiple>
+        <span class="text-xs font-bold text-slate-500">📸 Ambil Foto (max 5)</span>
+      </label>
+      <div id="photoPreview" class="grid grid-cols-3 gap-1.5"></div>
+      <input type="text" id="actPic" class="input-flat" placeholder="Nama PIC (yang ditemui)">
+      <textarea id="actNote" class="input-flat" rows="3" placeholder="Hasil nego / catatan..."></textarea>
+    </div>
+
+    <!-- STEP 3: Review -->
+    <div id="actStep3" class="space-y-3 hidden">
+      <div class="bg-orange-50 border border-orange-200 rounded-xl p-3 space-y-1">
+        <p class="text-[11px] font-extrabold text-orange-700 uppercase">Langkah 3 — Review</p>
+        <p class="text-[10px] text-orange-600">Cek ulang data sebelum simpan</p>
+      </div>
+      <div id="actSummary" class="bg-slate-50 rounded-xl p-3 space-y-1.5 text-xs"></div>
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-500 uppercase mb-1.5">Update Stage</label>
+        <div class="grid grid-cols-3 gap-1.5" id="actStageButtons"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-4 border-t flex gap-2" style="padding-bottom: calc(16px + env(safe-area-inset-bottom));">
+    <button type="button" id="actBackBtn" onclick="actPrevStep()" class="hidden px-4 py-3 text-xs font-bold text-slate-600 bg-slate-100 rounded-xl">‹ Kembali</button>
+    <button type="button" id="actNextBtn" onclick="actNextStep()" class="flex-1 text-white py-3 rounded-xl font-bold shadow-md" style="background: #EA580C;">Lanjut ›</button>
+    <button type="button" id="actSaveBtn" onclick="saveAktivitas()" class="hidden flex-1 text-white py-3 rounded-xl font-bold shadow-md" style="background: #059669;">✓ Simpan</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toastWrap"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-  // ==========================================
-  // 🔥 ISI CONFIG FIREBASE KAMU DI SINI 🔥
-  // ==========================================
+// ==========================================
+// CONFIG
+// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyC2pc_VSMf9MvhVI-lRawY8FOC6Mu6wzg8",
   authDomain: "jo-va2026.firebaseapp.com",
@@ -203,49 +513,85 @@ const firebaseConfig = {
   storageBucket: "jo-va2026.firebasestorage.app",
   messagingSenderId: "386953525176",
   appId: "1:386953525176:web:e95848ccb9fd9ccd40414d",
-  measurementId: "G-B6W1MPE3W9"
+  measurementId: "G-B6W1MPE3W9",
+  databaseURL: "https://jo-va2026-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
-
-  // ==========================================
-  // 🔗 ISI URL GAS KAMU DI SINI 🔗
-  // ==========================================
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbxB1jkq9V4MtlCdfRYAwi4dQnfmvEELPYPsqQpMxLINK1PdPnOf8neaJxIhSjcM04hP/exec";
-
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxB1jkq9V4MtlCdfRYAwi4dQnfmvEELPYPsqQpMxLINK1PdPnOf8neaJxIhSjcM04hP/exec";
 </script>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-  try {
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const visitsRef = ref(db, 'field_crm_visits');
-    
-    window.fbPush = push; window.fbUpdate = update; window.fbRef = ref; window.fbDB = db; window.fbVisitsRef = visitsRef;
+try {
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const visitsRef = ref(db, 'field_crm_visits');
 
-    onValue(visitsRef, (snapshot) => {
-      const data = snapshot.val();
-      const loaded = [];
-      if (data) Object.keys(data).forEach(k => loaded.push({ fbKey: k, ...data[k] }));
-      window.App.data = loaded;
-      if (window.App && window.App.user) {
-        if (typeof renderAgenda === 'function') renderAgenda();
-        if (typeof renderReport === 'function') renderReport();
-      }
-    });
-  } catch (e) { console.error('Firebase Error:', e); }
+  window.fbPush = push; window.fbUpdate = update; window.fbRef = ref; window.fbDB = db; window.fbVisitsRef = visitsRef;
+
+  onValue(visitsRef, (snapshot) => {
+    const data = snapshot.val();
+    const loaded = [];
+    if (data) Object.keys(data).forEach(k => loaded.push({ fbKey: k, ...data[k] }));
+    window.App.data = loaded;
+    const dot = document.getElementById('syncDot');
+    const txt = document.getElementById('syncText');
+    if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+    if (txt) txt.textContent = 'Tersinkron';
+    if (window.App && window.App.user) {
+      if (typeof renderAgenda === 'function') renderAgenda();
+      if (typeof renderReport === 'function') renderReport();
+      if (typeof renderReminder === 'function') renderReminder();
+    }
+  }, (err) => {
+    const dot = document.getElementById('syncDot');
+    const txt = document.getElementById('syncText');
+    if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+    if (txt) txt.textContent = 'Mode offline';
+    console.error('Firebase:', err);
+  });
+} catch (e) { console.error('Firebase init error:', e); }
 </script>
 
 <script>
+// ==========================================
+// STATE
+// ==========================================
 const STAFF = { 'S001': { name: 'Joko Adi Wibowo', role: 'Sales' }, 'S002': { name: 'Novalia Andani', role: 'Sales' } };
-window.App = { user: null, data: [], activeDate: new Date().toISOString().split('T')[0], calDate: new Date(), pinMap: null, tempPin: null, tempPhoto: null, tempGps: null, activeRealId: null, activeStatus: null, tempIn: null, tempOut: null };
+const STAGES = [
+  { id: 'baru', label: 'Baru', color: 'stage-baru', emoji: '🟢' },
+  { id: 'dihubungi', label: 'Dihubungi', color: 'stage-dihubungi', emoji: '🔵' },
+  { id: 'tertarik', label: 'Tertarik', color: 'stage-tertarik', emoji: '🟡' },
+  { id: 'nego', label: 'Nego', color: 'stage-nego', emoji: '🟠' },
+  { id: 'deal', label: 'Deal', color: 'stage-deal', emoji: '🟣' },
+  { id: 'gagal', label: 'Gagal', color: 'stage-gagal', emoji: '🔴' }
+];
+const PRODUCTS = ['Probiotik', 'YO', 'OM', 'OS', 'YT'];
 
+window.App = {
+  user: null, data: [],
+  activeDate: new Date().toISOString().split('T')[0],
+  calDate: new Date(),
+  pinMap: null, tempPin: null,
+  currentPlanStep: 1, currentActStep: 1,
+  activeDetailId: null,
+  activeStageFilter: 'all',
+  searchTerm: '',
+  newActivity: { in: null, out: null, gps: null, photos: [], pic: '', note: '', stage: null },
+  selectedProducts: []
+};
+
+// ==========================================
+// LOGIN
+// ==========================================
 function doLogin() {
   const id = document.getElementById('loginStaff').value;
   const pin = Array.from(document.querySelectorAll('.pin-input')).map(i => i.value).join('');
+  if (!id) { toast('Pilih staf dulu', 'error'); return; }
   if (pin !== '1234') { document.getElementById('loginError').classList.remove('hidden'); return; }
-  localStorage.setItem('crm_user', id); App.user = STAFF[id];
+  localStorage.setItem('crm_user', id);
+  App.user = STAFF[id];
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appHeader').classList.remove('hidden');
   document.getElementById('appMain').classList.remove('hidden');
@@ -253,82 +599,914 @@ function doLogin() {
   document.getElementById('fabBtn').classList.remove('hidden');
   document.getElementById('headerTitle').textContent = App.user.name;
   document.getElementById('heroName').textContent = App.user.name.split(' ')[0];
-  renderCalendar(); renderAgenda(); renderReport();
+  const d = new Date();
+  document.getElementById('todayDateLabel').textContent = `${d.getDate()}/${d.getMonth()+1}`;
+  renderCalendar();
+  renderAgenda();
+  renderReport();
+  renderReminder();
+  initStageChips();
+}
+function doLogout() { localStorage.removeItem('crm_user'); location.reload(); }
+
+function goBackToPWA() {
+  if (history.length > 1) history.back();
+  else toast('Tidak ada halaman sebelumnya', 'info');
 }
 
-function doLogout() { localStorage.removeItem('crm_user'); location.reload(); }
+// ==========================================
+// DARK MODE
+// ==========================================
+let darkMode = localStorage.getItem('crm_dark') === '1';
+function applyDarkMode() {
+  document.body.classList.toggle('dark', darkMode);
+  const icon = document.getElementById('darkIcon');
+  if (icon) {
+    icon.innerHTML = darkMode
+      ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>'
+      : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>';
+  }
+}
+function toggleDarkMode() {
+  darkMode = !darkMode;
+  localStorage.setItem('crm_dark', darkMode ? '1' : '0');
+  applyDarkMode();
+  toast(darkMode ? 'Mode gelap aktif' : 'Mode terang aktif', 'info', 1500);
+}
+
+// ==========================================
+// TOAST
+// ==========================================
+function toast(msg, type = 'default', duration = 2400) {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type !== 'default' ? type : '');
+  const iconMap = {
+    success: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>',
+    error: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>',
+    info: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+    warning: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
+    default: ''
+  };
+  el.innerHTML = (iconMap[type] || '') + '<span>' + msg + '</span>';
+  wrap.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 320);
+  }, duration);
+}
+
+// ==========================================
+// TAB & CALENDAR
+// ==========================================
 function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); });
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
   document.getElementById(`tab-${tab}`).classList.remove('hidden');
   document.querySelectorAll('.nav-btn').forEach(el => { el.classList.remove('text-teal-600'); el.classList.add('text-slate-400'); });
-  document.querySelector(`[data-tab="${tab}"]`).classList.remove('text-slate-400'); document.querySelector(`[data-tab="${tab}"]`).classList.add('text-teal-600');
+  const active = document.querySelector(`[data-tab="${tab}"]`);
+  active.classList.remove('text-slate-400'); active.classList.add('text-teal-600');
   if (tab === 'rute') renderRute();
+  if (tab === 'report') renderReport();
 }
 function changeMonth(dir) { App.calDate.setMonth(App.calDate.getMonth() + dir); renderCalendar(); }
+
 function renderCalendar() {
   const y = App.calDate.getFullYear(), m = App.calDate.getMonth();
   document.getElementById('calMonthLabel').textContent = `${new Date(y, m).toLocaleString('id-ID', {month:'long'})} ${y}`;
-  const firstDay = new Date(y, m, 1).getDay(), days = new Date(y, m+1, 0).getDate(), grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+  const firstDay = new Date(y, m, 1).getDay(), days = new Date(y, m+1, 0).getDate(), grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '';
   for (let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
   const todayStr = new Date().toISOString().split('T')[0];
   for (let d=1; d<=days; d++) {
-    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`, isActive = dateStr === App.activeDate, isToday = dateStr === todayStr;
-    grid.innerHTML += `<div onclick="selectDate('${dateStr}')" class="calendar-cell ${isActive?'active':isToday?'today':'bg-slate-50 text-slate-700'}">${d}</div>`;
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isActive = dateStr === App.activeDate, isToday = dateStr === todayStr;
+    const count = App.data.filter(x => x.date === dateStr && (x.staffId === localStorage.getItem('crm_user') || !x.staffId)).length;
+    let cls = 'calendar-cell ';
+    if (isActive) cls += 'active';
+    else if (isToday) cls += 'today';
+    else cls += 'bg-slate-50 text-slate-700';
+    grid.innerHTML += `<div onclick="selectDate('${dateStr}')" class="${cls}">
+      <span>${d}</span>
+      ${count > 0 ? `<span class="text-[8px] font-black opacity-80">${count}</span>` : ''}
+    </div>`;
   }
 }
 function selectDate(dateStr) { App.activeDate = dateStr; renderCalendar(); renderAgenda(); }
-function renderAgenda() {
-  const filtered = App.data.filter(d => d.date === App.activeDate), list = document.getElementById('agendaList'); list.innerHTML = '';
-  document.getElementById('agendaCount').textContent = filtered.length;
-  if (filtered.length === 0) { list.innerHTML = `<div class="text-center py-6 border-2 border-dashed rounded-2xl text-xs text-slate-400">Belum ada rencana</div>`; return; }
-  filtered.forEach(item => {
-    let badge = item.realisasi ? (item.realisasi.status==='berhasil'?'✅ Berhasil':item.realisasi.status==='followup'?'🟡 Follow':'❌ Tidak') : '⚪ Belum';
-    list.innerHTML += `<div class="p-3 bg-white rounded-xl border flex justify-between items-center">
-      <div><span class="text-[9px] bg-slate-100 px-1 border rounded">${item.tku}</span> <span class="text-[10px]">${badge}</span><p class="font-bold text-sm">${item.name}</p></div>
-      <button onclick="openRealisasi('${item.id}')" class="text-[10px] font-bold px-3 py-1.5 rounded-lg ${item.realisasi ? 'bg-slate-100' : 'bg-teal-600 text-white'}">${item.realisasi ? 'Lihat' : 'Realisasi'}</button>
-    </div>`;
+
+// ==========================================
+// STAGE CHIPS
+// ==========================================
+function initStageChips() {
+  const wrap = document.getElementById('stageChips');
+  let html = `<button onclick="setStageFilter('all')" data-stage="all" class="chip ${App.activeStageFilter==='all'?'active':'inactive'}">Semua</button>`;
+  STAGES.forEach(s => {
+    html += `<button onclick="setStageFilter('${s.id}')" data-stage="${s.id}" class="chip ${App.activeStageFilter===s.id?'active':'inactive'}">${s.emoji} ${s.label}</button>`;
+  });
+  wrap.innerHTML = html;
+}
+function setStageFilter(stage) {
+  App.activeStageFilter = stage;
+  initStageChips();
+  renderAgenda();
+}
+function onSearchInput(val) {
+  App.searchTerm = (val || '').toLowerCase().trim();
+  renderAgenda();
+}
+
+// ==========================================
+// AGENDA LIST
+// ==========================================
+function getFilteredData() {
+  const staffId = localStorage.getItem('crm_user');
+  return App.data.filter(d => {
+    if (d.staffId && d.staffId !== staffId) return false;
+    if (d.date !== App.activeDate) return false;
+    const stage = d.stage || 'baru';
+    if (App.activeStageFilter !== 'all' && stage !== App.activeStageFilter) return false;
+    if (App.searchTerm) {
+      const hay = [d.name, d.address, d.pic?.name, d.tku].join(' ').toLowerCase();
+      if (!hay.includes(App.searchTerm)) return false;
+    }
+    return true;
   });
 }
-function openFormPlan() { document.getElementById('planName').value = ''; App.tempPin = null; document.getElementById('pinBtn').innerHTML = '📍 Pin Lokasi Peta'; document.getElementById('planBackdrop').classList.add('show'); document.getElementById('planSheet').classList.add('show'); }
-function closeFormPlan() { document.getElementById('planBackdrop').classList.remove('show'); document.getElementById('planSheet').classList.remove('show'); }
+
+function renderAgenda() {
+  const filtered = getFilteredData();
+  const list = document.getElementById('agendaList');
+  list.innerHTML = '';
+  document.getElementById('agendaCount').textContent = filtered.length;
+
+  // Stats
+  const todayAll = App.data.filter(d => d.date === App.activeDate && (d.staffId === localStorage.getItem('crm_user') || !d.staffId));
+  const dealCount = todayAll.filter(d => d.stage === 'deal').length;
+  const followCount = todayAll.filter(d => d.stage === 'nego' || d.stage === 'tertarik').length;
+  const el = id => document.getElementById(id);
+  if (el('statKunjunganToday')) el('statKunjunganToday').textContent = todayAll.length;
+  if (el('statDealToday')) el('statDealToday').textContent = dealCount;
+  if (el('statFollowToday')) el('statFollowToday').textContent = followCount;
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="text-center py-10 border-2 border-dashed rounded-2xl text-xs text-slate-400 bg-white">
+      <div class="text-3xl mb-2">📭</div>
+      Belum ada prospek pada filter ini
+    </div>`;
+    return;
+  }
+
+  filtered.forEach(item => list.appendChild(buildCard(item)));
+}
+
+function buildCard(item) {
+  const stage = STAGES.find(s => s.id === (item.stage || 'baru')) || STAGES[0];
+  const card = document.createElement('div');
+  card.className = 'bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm active:scale-[0.98] transition cursor-pointer';
+  card.onclick = () => openDetail(item.fbKey || item.id);
+
+  const picName = item.pic?.name || '-';
+  const picPhone = item.pic?.phone || '';
+  const potensi = item.potensi ? 'Rp ' + Number(item.potensi).toLocaleString('id-ID') : '-';
+  const actCount = (item.activities || []).length;
+  const products = (item.produk || []).slice(0,3).map(p => `<span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-bold">${p}</span>`).join(' ');
+
+  card.innerHTML = `
+    <div class="flex justify-between items-start gap-2 mb-1.5">
+      <span class="text-[10px] font-extrabold px-2 py-0.5 rounded border ${stage.color}">${stage.emoji} ${stage.label}</span>
+      <span class="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded font-bold text-slate-600">${item.tku || '-'}</span>
+    </div>
+    <p class="font-heading font-black text-sm text-slate-900 leading-tight">${item.name || '-'}</p>
+    <p class="text-[11px] text-slate-500 font-semibold mt-0.5 truncate">${item.address || '-'}</p>
+    <div class="flex items-center justify-between mt-2.5">
+      <div class="flex items-center gap-1.5 flex-wrap">
+        ${products}
+        ${actCount > 0 ? `<span class="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold">${actCount} aktivitas</span>` : ''}
+      </div>
+      <span class="text-[10px] font-bold text-emerald-600">${potensi}</span>
+    </div>
+    <div class="flex gap-1.5 mt-2.5" onclick="event.stopPropagation()">
+      ${picPhone ? `<a href="https://wa.me/${normalizePhone(picPhone)}" target="_blank" class="flex-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold py-1.5 rounded-lg text-center border border-emerald-200">💬 WA</a>` : ''}
+      ${picPhone ? `<a href="tel:${picPhone}" class="flex-1 bg-blue-50 text-blue-700 text-[10px] font-bold py-1.5 rounded-lg text-center border border-blue-200">📞 Telp</a>` : ''}
+      <button onclick="event.stopPropagation(); openAktivitasFor('${item.fbKey || item.id}')" class="flex-1 bg-orange-50 text-orange-700 text-[10px] font-bold py-1.5 rounded-lg border border-orange-200">+ Aktivitas</button>
+    </div>
+  `;
+  return card;
+}
+
+function normalizePhone(p) {
+  let c = String(p).replace(/[^0-9]/g, '');
+  if (c.startsWith('0')) c = '62' + c.slice(1);
+  else if (c.startsWith('8')) c = '62' + c;
+  return c;
+}
+
+// ==========================================
+// REMINDER FOLLOW-UP
+// ==========================================
+function renderReminder() {
+  const today = new Date().toISOString().split('T')[0];
+  const staffId = localStorage.getItem('crm_user');
+  const due = App.data.filter(d => {
+    if (d.staffId && d.staffId !== staffId) return false;
+    if (!d.nextFollowUp) return false;
+    return d.nextFollowUp <= today && d.stage !== 'deal' && d.stage !== 'gagal';
+  });
+  const sec = document.getElementById('reminderSection');
+  const list = document.getElementById('reminderList');
+  document.getElementById('reminderCount').textContent = due.length;
+  if (due.length === 0) { sec.classList.add('hidden'); return; }
+  sec.classList.remove('hidden');
+  list.innerHTML = '';
+  due.slice(0, 5).forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'bg-amber-50 border border-amber-200 rounded-xl p-2.5 flex justify-between items-center cursor-pointer active:scale-[0.98] transition';
+    el.onclick = () => { selectDate(item.date); switchTab('agenda'); };
+    el.innerHTML = `
+      <div class="min-w-0">
+        <p class="text-xs font-bold text-amber-900 truncate">${item.name}</p>
+        <p class="text-[10px] text-amber-700">Jatuh tempo: ${item.nextFollowUp}</p>
+      </div>
+      <span class="text-[10px] bg-white text-amber-700 px-2 py-1 rounded font-bold border border-amber-200">→</span>
+    `;
+    list.appendChild(el);
+  });
+}
+
+// ==========================================
+// PLAN FORM (MULTI-STEP)
+// ==========================================
+function openFormPlan() {
+  App.currentPlanStep = 1;
+  App.tempPin = null;
+  App.selectedProducts = [];
+  document.getElementById('planName').value = '';
+  document.getElementById('planAddress').value = '';
+  document.getElementById('planPicName').value = '';
+  document.getElementById('planPicPhone').value = '';
+  document.getElementById('planPotensi').value = '';
+  document.getElementById('planDate').value = App.activeDate;
+  document.getElementById('pinBtn').innerHTML = '📍 Pin Lokasi Peta';
+  renderProductChips();
+  renderPlanStep();
+  document.getElementById('planBackdrop').classList.add('show');
+  document.getElementById('planSheet').classList.add('show');
+}
+function closeFormPlan() {
+  document.getElementById('planBackdrop').classList.remove('show');
+  document.getElementById('planSheet').classList.remove('show');
+}
+function renderProductChips() {
+  const wrap = document.getElementById('productChips');
+  wrap.innerHTML = PRODUCTS.map(p => {
+    const active = App.selectedProducts.includes(p);
+    return `<button type="button" onclick="toggleProduct('${p}')" class="chip ${active?'active':'inactive'}">${p}</button>`;
+  }).join('');
+}
+function toggleProduct(p) {
+  const idx = App.selectedProducts.indexOf(p);
+  if (idx >= 0) App.selectedProducts.splice(idx, 1);
+  else App.selectedProducts.push(p);
+  renderProductChips();
+}
+function renderPlanStep() {
+  document.getElementById('planStep1').classList.toggle('hidden', App.currentPlanStep !== 1);
+  document.getElementById('planStep2').classList.toggle('hidden', App.currentPlanStep !== 2);
+  document.getElementById('planStepNum').textContent = App.currentPlanStep;
+  ['planDot1','planDot2'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done','idle');
+    if (i+1 === App.currentPlanStep) el.classList.add('active');
+    else if (i+1 < App.currentPlanStep) el.classList.add('done');
+    else el.classList.add('idle');
+  });
+  document.getElementById('planBackBtn').classList.toggle('hidden', App.currentPlanStep === 1);
+  document.getElementById('planNextBtn').classList.toggle('hidden', App.currentPlanStep === 2);
+  document.getElementById('planSaveBtn').classList.toggle('hidden', App.currentPlanStep !== 2);
+}
+function planNextStep() {
+  const name = document.getElementById('planName').value.trim();
+  if (!name) { toast('Nama institusi wajib diisi', 'error'); return; }
+  App.currentPlanStep = 2;
+  renderPlanStep();
+}
+function planPrevStep() { App.currentPlanStep = 1; renderPlanStep(); }
+
 function savePlan() {
-  const newData = { id: 'REQ-'+Date.now(), staffId: localStorage.getItem('crm_user'), date: App.activeDate, tku: document.getElementById('planTku').value, type: document.getElementById('planType').value, name: document.getElementById('planName').value, address: document.getElementById('planAddress').value, lat: App.tempPin?.lat, lng: App.tempPin?.lng, realisasi: null };
-  App.data.push(newData); if (window.fbPush) window.fbPush(window.fbVisitsRef, newData);
-  if (GAS_URL && GAS_URL !== "MASUKKAN_URL_GAS") fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(newData) });
-  closeFormPlan(); renderAgenda(); alert('Rencana disimpan!');
+  const newData = {
+    id: 'REQ-' + Date.now(),
+    staffId: localStorage.getItem('crm_user'),
+    date: document.getElementById('planDate').value || App.activeDate,
+    tku: document.getElementById('planTku').value,
+    type: document.getElementById('planType').value,
+    name: document.getElementById('planName').value,
+    address: document.getElementById('planAddress').value,
+    lat: App.tempPin?.lat,
+    lng: App.tempPin?.lng,
+    pic: {
+      name: document.getElementById('planPicName').value,
+      phone: document.getElementById('planPicPhone').value
+    },
+    potensi: parseInt(document.getElementById('planPotensi').value) || 0,
+    produk: App.selectedProducts,
+    stage: 'baru',
+    activities: [],
+    createdAt: new Date().toISOString()
+  };
+  App.data.push(newData);
+  if (window.fbPush) window.fbPush(window.fbVisitsRef, newData);
+  if (GAS_URL) fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(newData) }).catch(()=>{});
+  closeFormPlan();
+  App.activeDate = newData.date;
+  renderCalendar();
+  renderAgenda();
+  toast('Prospek tersimpan!', 'success');
 }
-function openPinModal() { document.getElementById('pinModal').classList.remove('hidden'); document.getElementById('pinModal').classList.add('flex'); setTimeout(()=>{ if(!App.pinMap){ App.pinMap = L.map('pinMap').setView([-6.9248, 107.6792], 15); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(App.pinMap); App.pinMap.on('moveend',()=>{ App.tempPin = App.pinMap.getCenter(); }); App.tempPin={lat:-6.9248,lng:107.6792}; } App.pinMap.invalidateSize(); }, 200); }
-function closePinModal() { document.getElementById('pinModal').classList.add('hidden'); document.getElementById('pinModal').classList.remove('flex'); }
-function confirmPin() { document.getElementById('pinBtn').innerHTML = `📍 ${App.tempPin.lat.toFixed(4)}, ${App.tempPin.lng.toFixed(4)}`; closePinModal(); }
-function openRealisasi(id) {
-  const data = App.data.find(d => d.id === id); App.activeRealId = id; App.tempPhoto = data.realisasi?.photo || null; App.tempGps = data.realisasi?.gps || null; App.activeStatus = data.realisasi?.status || null; App.tempIn = data.realisasi?.in || null; App.tempOut = data.realisasi?.out || null;
-  document.getElementById('realTitle').textContent = data.name; document.getElementById('realPic').value = data.realisasi?.pic || ''; document.getElementById('realNote').value = data.realisasi?.note || '';
-  document.getElementById('btnIn').innerHTML = App.tempIn ? `✅ Masuk: ${App.tempIn}` : '⏱️ Ambil Jam Masuk'; document.getElementById('btnOut').innerHTML = App.tempOut ? `✅ Keluar: ${App.tempOut}` : '⏱️ Ambil Jam Keluar';
-  document.querySelectorAll('.status-btn').forEach(b => { b.style.background=''; b.style.color=''; }); if(App.activeStatus){ const btn = document.querySelector(`button[onclick*="${App.activeStatus}"]`); if(btn){ btn.style.background='#0D9488'; btn.style.color='white'; } }
-  document.getElementById('realBackdrop').classList.add('show'); document.getElementById('realSheet').classList.add('show');
+
+// ==========================================
+// PIN MAP
+// ==========================================
+function openPinModal() {
+  document.getElementById('pinModal').classList.remove('hidden');
+  document.getElementById('pinModal').classList.add('flex');
+  setTimeout(() => {
+    if (!App.pinMap) {
+      App.pinMap = L.map('pinMap').setView([-6.9248, 107.6792], 15);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(App.pinMap);
+      App.pinMap.on('moveend', () => { App.tempPin = App.pinMap.getCenter(); });
+      App.tempPin = { lat: -6.9248, lng: 107.6792 };
+    }
+    App.pinMap.invalidateSize();
+  }, 200);
 }
-function closeRealisasi() { document.getElementById('realBackdrop').classList.remove('show'); document.getElementById('realSheet').classList.remove('show'); }
-function getJam(type, btn) { const time = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}); if(type==='in'){ App.tempIn=time; btn.innerHTML=`✅ Masuk: ${time}`; } else { App.tempOut=time; btn.innerHTML=`✅ Keluar: ${time}`; } btn.style.background='#ECFDF5'; btn.style.borderColor='#059669'; }
-function ambilGPS() { navigator.geolocation.getCurrentPosition(p => { App.tempGps = { lat: p.coords.latitude, lng: p.coords.longitude }; document.getElementById('btnGps').innerHTML = '✅ GPS Tersimpan'; }, () => alert('GPS gagal')); }
-function previewPhoto(i) { if(i.files[0]){ const r=new FileReader(); r.onload=(e)=>{App.tempPhoto=e.target.result; document.getElementById('camLabel').innerHTML='✅ Foto Siap';}; r.readAsDataURL(i.files[0]); } }
-function setStatus(s, btn) { App.activeStatus=s; document.querySelectorAll('.status-btn').forEach(b=>{b.style.background='';b.style.color='';}); btn.style.background='#0D9488'; btn.style.color='white'; }
-function submitRealisasi() {
-  if(!App.tempGps || !App.tempPhoto || !App.activeStatus) return alert('Lengkapi GPS, Foto, & Status!');
-  const data = App.data.find(d => d.id === App.activeRealId); data.realisasi = { in: App.tempIn || '-', out: App.tempOut || '-', pic: document.getElementById('realPic').value, note: document.getElementById('realNote').value, status: App.activeStatus, gps: App.tempGps, photo: App.tempPhoto };
-  if(window.fbUpdate && data.fbKey) window.fbUpdate(window.fbRef(window.fbDB, 'field_crm_visits/'+data.fbKey), data);
-  if (GAS_URL && GAS_URL !== "MASUKKAN_URL_GAS") fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({action:'realisasi', ...data}) });
-  closeRealisasi(); renderAgenda(); renderReport(); alert('Realisasi Disimpan!');
+function closePinModal() {
+  document.getElementById('pinModal').classList.add('hidden');
+  document.getElementById('pinModal').classList.remove('flex');
 }
+function confirmPin() {
+  document.getElementById('pinBtn').innerHTML = `📍 ${App.tempPin.lat.toFixed(4)}, ${App.tempPin.lng.toFixed(4)}`;
+  document.getElementById('pinBtn').classList.add('bg-emerald-50','border-emerald-400','text-emerald-700');
+  closePinModal();
+}
+
+// ==========================================
+// DETAIL SHEET
+// ==========================================
+function openDetail(id) {
+  const item = App.data.find(d => (d.fbKey || d.id) === id);
+  if (!item) return;
+  App.activeDetailId = id;
+
+  const stage = STAGES.find(s => s.id === (item.stage || 'baru')) || STAGES[0];
+  document.getElementById('detailName').textContent = item.name || '-';
+  document.getElementById('detailSub').innerHTML = `<span class="font-bold">${stage.emoji} ${stage.label}</span> · ${item.tku || '-'} · ${item.date || '-'}`;
+
+  // Stage buttons
+  const sb = document.getElementById('detailStageButtons');
+  sb.innerHTML = STAGES.map(s => {
+    const active = (item.stage || 'baru') === s.id;
+    return `<button onclick="changeStage('${item.fbKey || item.id}','${s.id}')" class="text-[10px] font-bold py-2 rounded-lg border ${s.color} ${active?'ring-2 ring-offset-1 ring-slate-800':''}">${s.emoji} ${s.label}</button>`;
+  }).join('');
+
+  document.getElementById('detailPic').textContent = item.pic?.name || '-';
+  const wa = document.getElementById('detailWa');
+  if (item.pic?.phone) {
+    wa.textContent = item.pic.phone;
+    wa.href = `https://wa.me/${normalizePhone(item.pic.phone)}`;
+  } else { wa.textContent = '-'; wa.href = '#'; }
+  document.getElementById('detailPotensi').textContent = item.potensi ? 'Rp ' + Number(item.potensi).toLocaleString('id-ID') : '-';
+  document.getElementById('detailAddr').textContent = item.address || '-';
+
+  // Timeline
+  const timeline = document.getElementById('detailTimeline');
+  const acts = item.activities || [];
+  document.getElementById('detailActCount').textContent = acts.length;
+  if (acts.length === 0) {
+    timeline.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-bold bg-slate-50 rounded-xl">Belum ada aktivitas</div>`;
+  } else {
+    const sorted = [...acts].sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+    timeline.innerHTML = sorted.map(a => {
+      const s = STAGES.find(x => x.id === (a.stage || 'baru')) || STAGES[0];
+      const photos = (a.photos || []).slice(0,3).map(p => `<img src="${p}" class="w-full h-16 object-cover rounded-lg border">`).join('');
+      return `<div class="timeline-item pb-4">
+        <div class="flex justify-between items-start gap-2 mb-1">
+          <span class="text-[10px] font-extrabold px-2 py-0.5 rounded border ${s.color}">${s.emoji} ${s.label}</span>
+          <span class="text-[10px] font-bold text-slate-500">${a.date || ''} · ${a.in || '--:--'}–${a.out || '--:--'}</span>
+        </div>
+        ${a.note ? `<p class="text-xs text-slate-700 font-medium mb-1.5">"${a.note}"</p>` : ''}
+        ${photos ? `<div class="grid grid-cols-3 gap-1 mb-1">${photos}</div>` : ''}
+        ${a.pic ? `<p class="text-[10px] text-slate-500 font-bold">👤 PIC: ${a.pic}</p>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('detailBackdrop').classList.add('show');
+  document.getElementById('detailSheet').classList.add('show');
+}
+function closeDetail() {
+  document.getElementById('detailBackdrop').classList.remove('show');
+  document.getElementById('detailSheet').classList.remove('show');
+}
+function changeStage(id, newStage) {
+  const item = App.data.find(d => (d.fbKey || d.id) === id);
+  if (!item) return;
+  item.stage = newStage;
+  if (window.fbUpdate && item.fbKey) {
+    window.fbUpdate(window.fbRef(window.fbDB, 'field_crm_visits/' + item.fbKey), { stage: newStage });
+  }
+  toast('Stage diubah ke ' + newStage, 'success', 1500);
+  openDetail(id);
+  renderAgenda();
+}
+
+function quickWA() {
+  const item = App.data.find(d => (d.fbKey || d.id) === App.activeDetailId);
+  if (item?.pic?.phone) window.open(`https://wa.me/${normalizePhone(item.pic.phone)}`, '_blank');
+  else toast('PIC belum punya nomor WA', 'error');
+}
+function quickCall() {
+  const item = App.data.find(d => (d.fbKey || d.id) === App.activeDetailId);
+  if (item?.pic?.phone) window.location.href = `tel:${item.pic.phone}`;
+  else toast('PIC belum punya nomor telepon', 'error');
+}
+function quickNav() {
+  const item = App.data.find(d => (d.fbKey || d.id) === App.activeDetailId);
+  if (item?.lat && item?.lng) window.open(`https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lng}`, '_blank');
+  else toast('Lokasi prospek belum di-pin', 'error');
+}
+
+// ==========================================
+// AKTIVITAS (MULTI-STEP)
+// ==========================================
+function openAktivitas() { openAktivitasFor(App.activeDetailId); }
+function openAktivitasFor(id) {
+  App.activeDetailId = id;
+  App.currentActStep = 1;
+  App.newActivity = { in: null, out: null, gps: null, photos: [], pic: '', note: '', stage: null };
+  document.getElementById('actBtnIn').innerHTML = '⏱️ Jam Masuk';
+  document.getElementById('actBtnIn').style.cssText = '';
+  document.getElementById('actBtnOut').innerHTML = '⏱️ Jam Keluar';
+  document.getElementById('actBtnOut').style.cssText = '';
+  document.getElementById('actBtnGps').innerHTML = '📍 Ambil Titik GPS';
+  document.getElementById('actBtnGps').style.cssText = '';
+  document.getElementById('actPic').value = '';
+  document.getElementById('actNote').value = '';
+  document.getElementById('photoPreview').innerHTML = '';
+  document.getElementById('geofenceInfo').classList.add('hidden');
+  closeDetail();
+  renderActStep();
+  document.getElementById('actBackdrop').classList.add('show');
+  document.getElementById('actSheet').classList.add('show');
+}
+function closeAktivitas() {
+  document.getElementById('actBackdrop').classList.remove('show');
+  document.getElementById('actSheet').classList.remove('show');
+}
+function renderActStep() {
+  ['1','2','3'].forEach(n => document.getElementById('actStep'+n).classList.toggle('hidden', parseInt(n) !== App.currentActStep));
+  document.getElementById('actStepNum').textContent = App.currentActStep;
+  ['actDot1','actDot2','actDot3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done','idle');
+    if (i+1 === App.currentActStep) el.classList.add('active');
+    else if (i+1 < App.currentActStep) el.classList.add('done');
+    else el.classList.add('idle');
+  });
+  document.getElementById('actBackBtn').classList.toggle('hidden', App.currentActStep === 1);
+  document.getElementById('actNextBtn').classList.toggle('hidden', App.currentActStep === 3);
+  document.getElementById('actSaveBtn').classList.toggle('hidden', App.currentActStep !== 3);
+  if (App.currentActStep === 3) renderActSummary();
+}
+function actNextStep() {
+  if (App.currentActStep === 1) {
+    if (!App.newActivity.in) { toast('Ambil jam masuk dulu', 'error'); return; }
+    if (!App.newActivity.gps) { toast('Ambil GPS dulu', 'error'); return; }
+  }
+  if (App.currentActStep === 2) {
+    if (App.newActivity.photos.length === 0) { toast('Minimal 1 foto bukti', 'error'); return; }
+  }
+  App.currentActStep++;
+  renderActStep();
+}
+function actPrevStep() { App.currentActStep--; renderActStep(); }
+
+function getJam(type, btn) {
+  const time = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+  if (type === 'in') { App.newActivity.in = time; btn.innerHTML = `✅ Masuk: ${time}`; }
+  else { App.newActivity.out = time; btn.innerHTML = `✅ Keluar: ${time}`; }
+  btn.style.background = '#ECFDF5';
+  btn.style.borderColor = '#059669';
+  btn.style.color = '#059669';
+}
+
+function ambilGPS() {
+  const btn = document.getElementById('actBtnGps');
+  btn.innerHTML = '⏳ Mengambil lokasi...';
+  navigator.geolocation.getCurrentPosition(p => {
+    App.newActivity.gps = { lat: p.coords.latitude, lng: p.coords.longitude };
+    btn.innerHTML = `✅ GPS: ${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`;
+    btn.style.background = '#ECFDF5';
+    btn.style.color = '#059669';
+    checkGeofence();
+  }, (err) => {
+    btn.innerHTML = '📍 Ambil Titik GPS (gagal, coba lagi)';
+    toast('GPS gagal: ' + err.message, 'error');
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+function checkGeofence() {
+  const item = App.data.find(d => (d.fbKey || d.id) === App.activeDetailId);
+  if (!item?.lat || !item?.lng || !App.newActivity.gps) return;
+  const R = 6371000;
+  const dLat = (item.lat - App.newActivity.gps.lat) * Math.PI / 180;
+  const dLng = (item.lng - App.newActivity.gps.lng) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(App.newActivity.gps.lat*Math.PI/180) * Math.cos(item.lat*Math.PI/180) * Math.sin(dLng/2)**2;
+  const dist = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const info = document.getElementById('geofenceInfo');
+  info.classList.remove('hidden');
+  if (dist <= 100) {
+    info.className = 'text-[10px] font-bold p-2 rounded-lg bg-emerald-100 text-emerald-700';
+    info.innerHTML = `✅ Dalam radius (${dist.toFixed(0)}m dari pin)`;
+  } else {
+    info.className = 'text-[10px] font-bold p-2 rounded-lg bg-rose-100 text-rose-700';
+    info.innerHTML = `⚠️ Di luar radius (${dist.toFixed(0)}m dari pin). Tetap bisa simpan, tapi akan ditandai.`;
+  }
+  App.newActivity.geofenceDist = Math.round(dist);
+}
+
+function addPhoto(input) {
+  if (!input.files) return;
+  const remaining = 5 - App.newActivity.photos.length;
+  Array.from(input.files).slice(0, remaining).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      watermarkPhoto(e.target.result, (watermarked) => {
+        App.newActivity.photos.push(watermarked);
+        renderPhotoPreview();
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function watermarkPhoto(src, callback) {
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const maxW = 1000;
+    const scale = Math.min(1, maxW / img.width);
+    canvas.width = img.width * scale;
+    canvas.height = img.height * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const lines = [
+      `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`,
+      App.newActivity.gps ? `${App.newActivity.gps.lat.toFixed(5)}, ${App.newActivity.gps.lng.toFixed(5)}` : 'GPS belum diambil',
+      App.user ? App.user.name : ''
+    ].filter(Boolean);
+
+    const fontSize = Math.max(14, Math.floor(canvas.width / 40));
+    ctx.font = `bold ${fontSize}px Poppins, sans-serif`;
+    ctx.textBaseline = 'bottom';
+    const padding = fontSize * 0.6;
+    let y = canvas.height - padding;
+    lines.reverse().forEach(line => {
+      ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(line, padding, y);
+      y -= fontSize + 4;
+    });
+    callback(canvas.toDataURL('image/jpeg', 0.8));
+  };
+  img.src = src;
+}
+
+function renderPhotoPreview() {
+  const wrap = document.getElementById('photoPreview');
+  wrap.innerHTML = App.newActivity.photos.map((p, i) => `
+    <div class="relative">
+      <img src="${p}" class="w-full h-20 object-cover rounded-lg border">
+      <button onclick="removePhoto(${i})" class="absolute top-0.5 right-0.5 w-5 h-5 bg-rose-600 text-white rounded-full text-[10px] font-bold">×</button>
+    </div>
+  `).join('');
+}
+function removePhoto(i) { App.newActivity.photos.splice(i, 1); renderPhotoPreview(); }
+
+function renderActSummary() {
+  const a = App.newActivity;
+  const item = App.data.find(d => (d.fbKey || d.id) === App.activeDetailId);
+  document.getElementById('actSummary').innerHTML = `
+    <div class="flex justify-between"><span class="text-slate-500">Prospek</span><span class="font-bold">${item?.name || '-'}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">Jam</span><span class="font-bold">${a.in || '--'} – ${a.out || '--'}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">GPS</span><span class="font-bold text-[10px]">${a.gps ? `${a.gps.lat.toFixed(4)}, ${a.gps.lng.toFixed(4)}` : '-'}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">Foto</span><span class="font-bold">${a.photos.length} foto</span></div>
+    ${a.note ? `<div><span class="text-slate-500 block mb-0.5">Catatan</span><p class="font-medium italic">"${a.note}"</p></div>` : ''}
+  `;
+  // Stage buttons
+  const sb = document.getElementById('actStageButtons');
+  const currentStage = item?.stage || 'baru';
+  sb.innerHTML = STAGES.map(s => `
+    <button onclick="setActStage('${s.id}')" data-actstage="${s.id}" class="text-[10px] font-bold py-2 rounded-lg border ${s.color} ${currentStage===s.id?'ring-2 ring-slate-800':''}">${s.emoji} ${s.label}</button>
+  `).join('');
+  App.newActivity.stage = currentStage;
+}
+function setActStage(s) {
+  App.newActivity.stage = s;
+  document.querySelectorAll('[data-actstage]').forEach(b => b.classList.remove('ring-2','ring-slate-800'));
+  const btn = document.querySelector(`[data-actstage="${s}"]`);
+  if (btn) btn.classList.add('ring-2','ring-slate-800');
+}
+
+function saveAktivitas() {
+  const item = App.data.find(d => (d.fbKey || d.id) === App.activeDetailId);
+  if (!item) return;
+  const d = new Date();
+  const dateStr = d.toISOString().split('T')[0];
+  const activity = {
+    id: 'ACT-' + Date.now(),
+    date: dateStr,
+    in: App.newActivity.in || '-',
+    out: App.newActivity.out || '-',
+    gps: App.newActivity.gps,
+    geofenceDist: App.newActivity.geofenceDist || null,
+    photos: App.newActivity.photos,
+    pic: document.getElementById('actPic').value,
+    note: document.getElementById('actNote').value,
+    stage: App.newActivity.stage || item.stage || 'baru',
+    createdAt: new Date().toISOString()
+  };
+  const activities = [...(item.activities || []), activity];
+  const updates = { activities, stage: activity.stage };
+  if (window.fbUpdate && item.fbKey) {
+    window.fbUpdate(window.fbRef(window.fbDB, 'field_crm_visits/' + item.fbKey), updates);
+  } else {
+    Object.assign(item, updates);
+  }
+  // Sync ke GAS
+  if (GAS_URL) {
+    fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'activity', ...item, ...updates, latestActivity: activity }) }).catch(()=>{});
+  }
+  closeAktivitas();
+  renderAgenda();
+  renderReminder();
+  toast('Aktivitas tersimpan!', 'success');
+}
+
+// ==========================================
+// RUTE
+// ==========================================
 function renderRute() {
-  if(!App.ruteMap){ App.ruteMap = L.map('map').setView([-6.9248,107.6792],12); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(App.ruteMap); } setTimeout(()=>App.ruteMap.invalidateSize(),200);
-  App.ruteMap.eachLayer(l=>{ if(l instanceof L.Marker) App.ruteMap.removeLayer(l); });
-  App.data.filter(d=>d.date===App.activeDate && d.realisasi).forEach(d=>{ L.marker([d.realisasi.gps.lat,d.realisasi.gps.lng]).addTo(App.ruteMap).bindPopup(d.name); });
+  if (!window.App.ruteMap) {
+    App.ruteMap = L.map('map').setView([-6.9248, 107.6792], 12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(App.ruteMap);
+  }
+  setTimeout(() => App.ruteMap.invalidateSize(), 200);
+
+  App.ruteMap.eachLayer(l => {
+    if (l instanceof L.Marker || l instanceof L.Polyline) App.ruteMap.removeLayer(l);
+  });
+
+  const staffId = localStorage.getItem('crm_user');
+  const todayPoints = App.data.filter(d => d.date === App.activeDate && (d.staffId === staffId || !d.staffId) && d.lat && d.lng);
+
+  if (todayPoints.length === 0) {
+    document.getElementById('routeTotalInfo').textContent = 'Belum ada prospek ber-pin';
+    return;
+  }
+
+  // Sort nearest-neighbor
+  const sorted = nearestNeighbor(todayPoints);
+
+  // Draw markers + polyline
+  const latlngs = [];
+  sorted.forEach((p, i) => {
+    latlngs.push([p.lat, p.lng]);
+    L.marker([p.lat, p.lng])
+      .addTo(App.ruteMap)
+      .bindPopup(`<b>${i+1}. ${p.name}</b><br>${p.tku || ''}`);
+  });
+  if (latlngs.length > 1) {
+    L.polyline(latlngs, { color: '#0D9488', weight: 4, opacity: 0.7, dashArray: '8 6' }).addTo(App.ruteMap);
+  }
+  App.ruteMap.fitBounds(latlngs, { padding: [40, 40] });
+
+  // Estimate distance
+  let total = 0;
+  for (let i = 1; i < latlngs.length; i++) {
+    total += haversineKm(latlngs[i-1], latlngs[i]);
+  }
+  const est = Math.round(total * 3); // ~3 min/km rough
+  document.getElementById('routeTotalInfo').textContent = `${sorted.length} titik · ${total.toFixed(1)} km · ±${est} menit`;
 }
-function renderReport() { const real = App.data.filter(d=>d.realisasi); document.getElementById('statBerhasil').textContent = real.filter(d=>d.realisasi.status==='berhasil').length; document.getElementById('statFollowup').textContent = real.filter(d=>d.realisasi.status==='followup').length; document.getElementById('statTidak').textContent = real.filter(d=>d.realisasi.status==='tidak').length; }
-window.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.pin-input').forEach((inp, idx) => { inp.addEventListener('input', (e) => { if (e.target.value.length === 1 && idx < 3) document.querySelector(`.pin-${idx+2}`).focus(); }); });
-  if(localStorage.getItem('crm_user')){ document.getElementById('loginStaff').value = localStorage.getItem('crm_user'); ['1','2','3','4'].forEach((v,i)=>document.querySelector(`.pin-${i+1}`).value=v); doLogin(); }
+
+function optimizeRoute() {
+  renderRute();
+  toast('Rute dioptimalkan (nearest-neighbor)', 'success');
+}
+
+function nearestNeighbor(points) {
+  if (points.length <= 1) return [...points];
+  const remaining = [...points];
+  const ordered = [remaining.shift()];
+  while (remaining.length) {
+    const last = ordered[ordered.length - 1];
+    let bestIdx = 0, bestDist = Infinity;
+    remaining.forEach((p, i) => {
+      const dist = haversineKm([last.lat, last.lng], [p.lat, p.lng]);
+      if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+    });
+    ordered.push(remaining.splice(bestIdx, 1)[0]);
+  }
+  return ordered;
+}
+
+function haversineKm(a, b) {
+  const R = 6371;
+  const dLat = (b[0] - a[0]) * Math.PI / 180;
+  const dLng = (b[1] - a[1]) * Math.PI / 180;
+  const x = Math.sin(dLat/2)**2 + Math.cos(a[0]*Math.PI/180) * Math.cos(b[0]*Math.PI/180) * Math.sin(dLng/2)**2;
+  return 2 * R * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+}
+
+// ==========================================
+// REPORT
+// ==========================================
+function renderReport() {
+  const staffId = localStorage.getItem('crm_user');
+  const staffData = App.data.filter(d => !d.staffId || d.staffId === staffId);
+  const el = id => document.getElementById(id);
+
+  const funnel = document.getElementById('funnelStats');
+  if (funnel) {
+    funnel.innerHTML = STAGES.map(s => {
+      const count = staffData.filter(d => (d.stage || 'baru') === s.id).length;
+      const pct = staffData.length ? Math.round(count / staffData.length * 100) : 0;
+      return `
+        <div>
+          <div class="flex justify-between text-xs font-bold mb-1">
+            <span>${s.emoji} ${s.label}</span>
+            <span>${count} (${pct}%)</span>
+          </div>
+          <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full" style="width:${pct}%; background: currentColor;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  const todayData = staffData.filter(d => d.date === today);
+  const totalPotensi = staffData.filter(d => d.stage === 'deal').reduce((s,d) => s + (parseInt(d.potensi)||0), 0);
+  const totalActs = staffData.reduce((s,d) => s + (d.activities?.length || 0), 0);
+  if (el('reportKunjungan')) el('reportKunjungan').textContent = todayData.length;
+  if (el('reportPotensi')) el('reportPotensi').textContent = 'Rp ' + totalPotensi.toLocaleString('id-ID');
+  if (el('reportActivities')) el('reportActivities').textContent = totalActs;
+}
+
+// ==========================================
+// EXPORT CSV
+// ==========================================
+function exportCSV() {
+  if (App.data.length === 0) { toast('Belum ada data', 'error'); return; }
+  const headers = ['ID','Staff','Tanggal','TKU','Tipe','Nama','Alamat','PIC','Phone','Potensi','Produk','Stage','Aktivitas'];
+  const rows = App.data.map(d => [
+    d.id || d.fbKey || '',
+    d.staffId || '',
+    d.date || '',
+    d.tku || '',
+    d.type || '',
+    d.name || '',
+    d.address || '',
+    d.pic?.name || '',
+    d.pic?.phone || '',
+    d.potensi || 0,
+    (d.produk||[]).join('|'),
+    d.stage || 'baru',
+    (d.activities||[]).length
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `field_crm_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`${App.data.length} data diexport`, 'success');
+}
+
+// ==========================================
+// SWIPE DOWN TO DISMISS
+// ==========================================
+function setupSwipeDismiss() {
+  ['planSheet','detailSheet','actSheet'].forEach(id => {
+    const sheet = document.getElementById(id);
+    if (!sheet) return;
+    const handle = sheet.querySelector('.sheet-handle');
+    if (!handle) return;
+    let startY = 0, curY = 0, dragging = false;
+    const onStart = e => { startY = e.touches ? e.touches[0].clientY : e.clientY; dragging = true; sheet.style.transition = 'none'; };
+    const onMove = e => {
+      if (!dragging) return;
+      curY = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+      if (curY > 0) sheet.style.transform = `translate(-50%, ${curY}px)`;
+    };
+    const onEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      sheet.style.transition = '';
+      sheet.style.transform = '';
+      if (curY > 100) {
+        if (id === 'planSheet') closeFormPlan();
+        if (id === 'detailSheet') closeDetail();
+        if (id === 'actSheet') closeAktivitas();
+      }
+      curY = 0;
+    };
+    handle.addEventListener('touchstart', onStart, { passive: true });
+    handle.addEventListener('touchmove', onMove, { passive: true });
+    handle.addEventListener('touchend', onEnd);
+    handle.addEventListener('mousedown', onStart);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+  });
+}
+
+// ==========================================
+// ESCAPE
+// ==========================================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeFormPlan(); closePinModal(); closeDetail(); closeAktivitas();
+  }
 });
+
+// ==========================================
+// INIT
+// ==========================================
+window.addEventListener('DOMContentLoaded', () => {
+  applyDarkMode();
+  document.querySelectorAll('.pin-input').forEach((inp, idx) => {
+    inp.addEventListener('input', (e) => {
+      if (e.target.value.length === 1 && idx < 3) document.querySelector(`.pin-${idx+2}`).focus();
+    });
+  });
+  setupSwipeDismiss();
+  // Auto-login
+  if (localStorage.getItem('crm_user')) {
+    document.getElementById('loginStaff').value = localStorage.getItem('crm_user');
+    ['1','2','3','4'].forEach((v,i)=>document.querySelector(`.pin-${i+1}`).value=v);
+    doLogin();
+  }
+});
+
+// Expose to window
+window.doLogin = doLogin;
+window.doLogout = doLogout;
+window.goBackToPWA = goBackToPWA;
+window.toggleDarkMode = toggleDarkMode;
+window.switchTab = switchTab;
+window.changeMonth = changeMonth;
+window.selectDate = selectDate;
+window.setStageFilter = setStageFilter;
+window.onSearchInput = onSearchInput;
+window.openFormPlan = openFormPlan;
+window.closeFormPlan = closeFormPlan;
+window.planNextStep = planNextStep;
+window.planPrevStep = planPrevStep;
+window.savePlan = savePlan;
+window.toggleProduct = toggleProduct;
+window.openPinModal = openPinModal;
+window.closePinModal = closePinModal;
+window.confirmPin = confirmPin;
+window.openDetail = openDetail;
+window.closeDetail = closeDetail;
+window.changeStage = changeStage;
+window.quickWA = quickWA;
+window.quickCall = quickCall;
+window.quickNav = quickNav;
+window.openAktivitas = openAktivitas;
+window.openAktivitasFor = openAktivitasFor;
+window.closeAktivitas = closeAktivitas;
+window.actNextStep = actNextStep;
+window.actPrevStep = actPrevStep;
+window.getJam = getJam;
+window.ambilGPS = ambilGPS;
+window.addPhoto = addPhoto;
+window.removePhoto = removePhoto;
+window.setActStage = setActStage;
+window.saveAktivitas = saveAktivitas;
+window.optimizeRoute = optimizeRoute;
+window.exportCSV = exportCSV;
+window.toast = toast;
 </script>
 </body>
 </html>
