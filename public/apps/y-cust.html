@@ -340,30 +340,30 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 
 .fab-add{
   position:fixed;
-  right:calc((100vw - var(--app-max))/2 + 16px);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 88px);
+  right:calc((100vw - var(--app-max))/2 + 152px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
   width:56px; height:56px; border-radius:18px;
   background:linear-gradient(135deg,#10B981,#059669);
   color:#fff; display:flex; align-items:center; justify-content:center;
   font-size:22px;
   box-shadow:0 14px 28px -10px rgba(16,185,129,.6);
-  z-index:48; transition:all .2s;
+  z-index:49; transition:all .2s;
 }
-@media (max-width:559px){ .fab-add{ right:16px; } }
+@media (max-width:559px){ .fab-add{ right:152px; } }
 .fab-add:active{ transform:scale(.92); }
 
 .fab-pull{
   position:fixed;
-  right:calc((100vw - var(--app-max))/2 + 16px);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 88px);
+  right:calc((100vw - var(--app-max))/2 + 152px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
   width:56px; height:56px; border-radius:18px;
   background:linear-gradient(135deg,#0EA5E9,#0284C7);
   color:#fff; display:flex; align-items:center; justify-content:center;
   font-size:22px;
   box-shadow:0 10px 24px -10px rgba(14,165,233,.55);
-  z-index:48; transition:all .2s;
+  z-index:49; transition:all .2s;
 }
-@media (max-width:559px){ .fab-pull{ right:16px; } }
+@media (max-width:559px){ .fab-pull{ right:152px; } }
 .fab-pull:active{ transform:scale(.92); }
 
 @keyframes cloudPulse{
@@ -547,15 +547,29 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 
 /* Filter bar di tab Pelanggan & Rute */
 .filter-bar-card{
-  background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  background:var(--surface); border:1px solid var(--border); border-radius:16px;
   padding:10px 12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  box-shadow:0 2px 8px -4px rgba(13,148,136,.08);
 }
 .filter-bar-card select{
-  flex:1; min-width:120px; padding:9px 12px; border:1.5px solid var(--border);
-  border-radius:10px; background:var(--surface); font-size:12px; font-weight:600;
-  color:var(--text); appearance:auto;
+  flex:1; min-width:140px; padding:12px 36px 12px 14px; border:1.5px solid var(--border);
+  border-radius:12px; background:var(--surface); font-size:12.5px; font-weight:600;
+  color:var(--text);
+  appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230D9488' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:12px;
+  cursor:pointer;
+  transition:all .25s cubic-bezier(.2,.8,.2,1);
 }
-.filter-bar-card select:focus{ border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft); }
+.filter-bar-card select:hover{ border-color:var(--brand); background-color:var(--brand-soft); }
+.filter-bar-card select:focus{
+  border-color:var(--brand);
+  box-shadow:0 0 0 4px var(--brand-soft);
+  outline:none;
+}
+.filter-bar-card select:active{ transform:scale(.98); }
 
 @media (min-width:720px){
   :root{ --app-max:100%; --app-pad:24px; }
@@ -1614,20 +1628,23 @@ function migrasiTabHTML(){
 
 /* ============ TAB: RUTE ============ */
 function ruteHTML(){
+  const tkuTxt = state.custFilterTku ? TKU_DATA[state.custFilterTku]?.center : 'Semua TKU';
+  const ylTxt = state.custFilterYl || 'Semua YL';
   return `
     <div class="form-card">
       <div class="field-label"><i class="fa-solid fa-route"></i> Rute Optimal</div>
       <div style="font-size:11.5px; color:var(--text-mute); line-height:1.5; margin-bottom:12px;">
-        Pilih TKU + YL, atau langsung hitung semua pelanggan hari ini.
+        Rute otomatis dari filter di menu <b>Pelanggan</b>.
       </div>
-      <div style="display:flex; gap:8px; margin-bottom:10px;">
-        <select id="routeTku" class="form-input" style="flex:1; appearance:auto; background:var(--surface); font-size:12px; padding:10px 12px;">
-          <option value="">🏢 Semua TKU</option>
-          ${TKU_ORDER.map(k=>`<option value="${k}">${TKU_DATA[k].center}</option>`).join('')}
-        </select>
-        <select id="routeYl" class="form-input" style="flex:1; appearance:auto; background:var(--surface); font-size:12px; padding:10px 12px;">
-          <option value="">👤 Semua YL</option>
-        </select>
+      <div style="background:var(--brand-soft); border:1.5px solid var(--brand-ring); border-radius:12px; padding:12px 14px; margin-bottom:12px;">
+        <div style="font-size:9.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--brand); margin-bottom:6px;">Filter Aktif</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <span class="ctx-chip"><i class="fa-solid fa-store"></i>${tkuTxt}</span>
+          <span class="ctx-chip"><i class="fa-solid fa-user"></i>${ylTxt}</span>
+        </div>
+        <div style="font-size:10px; color:var(--text-mute); margin-top:8px;">
+          Ubah filter di menu Pelanggan · ${getFilteredCustomers().filter(c=>c.lat&&c.lng).length} pelanggan dengan GPS
+        </div>
       </div>
       <div class="action-bar" style="margin-top:0;">
         <button class="btn-primary" style="flex:1;" data-action="calc-route">
@@ -1640,28 +1657,8 @@ function ruteHTML(){
 }
 
 function postRute(){
-  const selTku = $('routeTku');
-  const selYl = $('routeYl');
-  if(!selTku) return;
-  selTku.value = state.routeFilterTku || '';
-  if(state.routeFilterTku){
-    const yls = TKU_DATA[state.routeFilterTku].yl;
-    selYl.innerHTML = '<option value="">👤 Semua YL</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
-    selYl.value = state.routeFilterYl || '';
-  }
-  selTku.onchange = (e) => {
-    state.routeFilterTku = e.target.value;
-    state.routeFilterYl = '';
-    if(!e.target.value){
-      selYl.innerHTML = '<option value="">👤 Semua YL</option>';
-    } else {
-      const yls = TKU_DATA[e.target.value].yl;
-      selYl.innerHTML = '<option value="">👤 Semua YL</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
-    }
-  };
-  selYl.onchange = (e) => {
-    state.routeFilterYl = e.target.value;
-  };
+  // Filter dihapus — auto dari menu pelanggan (state.custFilterTku / custFilterYl)
+  // Nggak perlu bind apa-apa
 }
 
 /* ============ TAB: ANALISIS ============ */
@@ -2088,8 +2085,9 @@ async function saveVisit(){
 let _routeMap = null, _routeInlineMap = null;
 
 async function calcRoute(){
-  const tkuFilter = $('routeTku')?.value || '';
-  const ylFilter = $('routeYl')?.value || '';
+  // Pakai filter dari menu Pelanggan
+  const tkuFilter = state.custFilterTku || '';
+  const ylFilter = state.custFilterYl || '';
   let baseList = state.customers.filter(c => c.active !== false && c.lat && c.lng);
   if(tkuFilter) baseList = baseList.filter(c => c.tku === tkuFilter);
   if(ylFilter) baseList = baseList.filter(c => c.createdBy === ylFilter);
@@ -3047,7 +3045,18 @@ document.addEventListener('click', async e => {
   if(t.closest('[data-action="open-ctx"]')){ haptic(10); openCtxSheet(); return; }
   if(t.closest('[data-action="open-migrate"]')){ haptic(10); openMigrateSheet(); return; }
   if(t.closest('[data-action="open-mutasi"]')){ haptic(10); openMutasiSheet(); return; }
-  if(t.closest('[data-action="open-pull"]')){ haptic(10); openPullSheet(); return; }
+  if(t.closest('[data-action="open-pull"]')){
+    haptic(10);
+    const pwd = prompt('🔒 Fitur Tarik Data dari Cloud\n\nMasukkan password Admin:');
+    if(pwd === null) return; // user cancel
+    if(pwd === 'Yakult2027'){
+      openPullSheet();
+    } else {
+      haptic([60,40,60]);
+      showToast('❌ Password salah');
+    }
+    return;
+  }
   if(t.closest('[data-action="execute-mutasi"]')){ await executeMutasi(); return; }
   if(t.closest('[data-action="pull-cloud"]')){ await executePull(); return; }
   if(t.closest('[data-action="add-cust-from-kunjungan"]')){ haptic(12); openCustForm(null); return; }
