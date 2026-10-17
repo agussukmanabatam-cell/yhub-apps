@@ -116,7 +116,13 @@ input,textarea{ outline:none; border:0; background:transparent; }
 .cust-info{ flex:1; min-width:0; }
 .cust-name{ font-size:13.5px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:-.01em; }
 .cust-meta{ font-size:10.5px; color:var(--text-mute); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.cust-cat{ display:inline-block; padding:2px 7px; border-radius:5px; font-size:9px; font-weight:700; text-transform:uppercase; margin-right:5px; letter-spacing:.03em; }
+.cust-cat{
+  display:inline-flex; align-items:center; padding:3px 8px; border-radius:6px;
+  font-size:9px; font-weight:700; text-transform:uppercase;
+  margin-right:5px; letter-spacing:.03em;
+  border:1px solid rgba(0,0,0,.05);
+}
+[data-theme="dark"] .cust-cat{ border-color:rgba(255,255,255,.08); }
 .cust-addr{ font-size:11px; color:var(--text-mute); margin-top:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.4; word-break:break-word; }
 .cust-addr i{ color:var(--brand); margin-right:4px; font-size:10px; }
 .cust-status{ font-size:10px; font-weight:600; margin-top:3px; color:var(--emerald); }
@@ -321,6 +327,7 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 .empty-state-title{ font-size:13.5px; font-weight:700; margin-bottom:5px; }
 .empty-state-desc{ font-size:11.5px; color:var(--text-dim); line-height:1.5; }
 
+/* FAB Style */
 .fab{ position:fixed; right:calc((100vw - var(--app-max))/2 + 16px); bottom:calc(env(safe-area-inset-bottom,0px) + 20px); width:56px; height:56px; border-radius:18px; background:linear-gradient(135deg,#14B8A6,#0D9488); color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 14px 28px -10px rgba(13,148,136,.7); z-index:50; transition:all .2s; }
 @media (max-width:559px){ .fab{ right:16px; } }
 .fab:active{ transform:scale(.92); }
@@ -329,9 +336,40 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 @media (max-width:559px){ .fab-sync{ right:84px; } }
 .fab-sync:active{ transform:scale(.92); background:var(--brand-soft); }
 .fab-sync.loading{ pointer-events:none; opacity:.85; }
-.fab-sync-icon{ font-size:24px; line-height:1; display:block; }
-.fab-sync.loading .fab-sync-icon{ animation:rocketFloat 1.2s ease-in-out infinite; }
-@keyframes rocketFloat{ 0%,100%{ transform:translateY(0) rotate(-3deg); } 50%{ transform:translateY(-6px) rotate(3deg); } }
+.fab-sync.loading i{ animation:cloudPulse 1.2s ease-in-out infinite; }
+
+.fab-add{
+  position:fixed;
+  right:calc((100vw - var(--app-max))/2 + 16px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 88px);
+  width:56px; height:56px; border-radius:18px;
+  background:linear-gradient(135deg,#10B981,#059669);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:22px;
+  box-shadow:0 14px 28px -10px rgba(16,185,129,.6);
+  z-index:48; transition:all .2s;
+}
+@media (max-width:559px){ .fab-add{ right:16px; } }
+.fab-add:active{ transform:scale(.92); }
+
+.fab-pull{
+  position:fixed;
+  right:calc((100vw - var(--app-max))/2 + 16px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 88px);
+  width:56px; height:56px; border-radius:18px;
+  background:linear-gradient(135deg,#0EA5E9,#0284C7);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:22px;
+  box-shadow:0 10px 24px -10px rgba(14,165,233,.55);
+  z-index:48; transition:all .2s;
+}
+@media (max-width:559px){ .fab-pull{ right:16px; } }
+.fab-pull:active{ transform:scale(.92); }
+
+@keyframes cloudPulse{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-4px); }
+}
 
 .sync-overlay{ position:fixed; inset:0; background:rgba(8,19,26,.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:300; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:opacity .3s, visibility .3s; }
 .sync-overlay.show{ opacity:1; visibility:visible; }
@@ -482,6 +520,43 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 
 .route-map{ position:relative; padding:16px; background:linear-gradient(180deg,var(--surface),var(--surface-2)); border-radius:16px; border:1px solid var(--border); overflow:hidden; margin-bottom:12px; }
 
+/* Sheet Mode Kerja merah soft */
+.sheet.ctx-sheet{
+  background: linear-gradient(180deg, #F87171 0%, #E11D48 80px, var(--surface) 80px);
+  border-top: 4px solid #E11D48;
+  border-radius: 26px 26px 0 0;
+}
+.sheet.ctx-sheet::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:6px;
+  background: linear-gradient(90deg, #F87171, #E11D48, #F87171);
+  border-radius: 26px 26px 0 0; z-index:3;
+  background-size: 200% 100%;
+  animation: redFlow 3s ease-in-out infinite;
+}
+.sheet.ctx-sheet .sheet-header{
+  background: linear-gradient(135deg, #F87171 0%, #E11D48 50%, #BE123C 100%);
+  border-bottom: 1px solid rgba(255,255,255,.15);
+  border-radius: 26px 26px 0 0;
+}
+.sheet.ctx-sheet .sheet-header .sheet-name{ color:#fff; }
+.sheet.ctx-sheet .sheet-header .sheet-meta{ color:rgba(255,255,255,.85); }
+.sheet.ctx-sheet .sheet-header .sheet-close{ background: rgba(255,255,255,.2); color: #fff; }
+.sheet.ctx-sheet .sheet-handle{ background: rgba(255,255,255,.5); margin-top: 12px; position:relative; z-index:5; }
+.sheet.ctx-sheet .sheet-avatar{ box-shadow: 0 8px 18px -6px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.3); }
+.sheet.ctx-sheet .sheet-body{ background: var(--surface); border-radius: 22px 22px 0 0; margin-top: -22px; padding-top: 28px; position: relative; z-index: 2; }
+
+/* Filter bar di tab Pelanggan & Rute */
+.filter-bar-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  padding:10px 12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+}
+.filter-bar-card select{
+  flex:1; min-width:120px; padding:9px 12px; border:1.5px solid var(--border);
+  border-radius:10px; background:var(--surface); font-size:12px; font-weight:600;
+  color:var(--text); appearance:auto;
+}
+.filter-bar-card select:focus{ border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft); }
+
 @media (min-width:720px){
   :root{ --app-max:100%; --app-pad:24px; }
   .main{ padding:20px var(--app-pad) calc(env(safe-area-inset-bottom,0px) + 90px); }
@@ -524,10 +599,10 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
 
 <div class="overlay" id="overlay"></div>
 
-<div class="sheet" id="ctxSheet">
+<div class="sheet ctx-sheet" id="ctxSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-header">
-    <div class="sheet-avatar" style="background:linear-gradient(135deg,#14B8A6,#0E7490);"><i class="fa-solid fa-user-gear"></i></div>
+    <div class="sheet-avatar" style="background:linear-gradient(135deg,#F87171,#E11D48);"><i class="fa-solid fa-user-gear"></i></div>
     <div class="sheet-info"><div class="sheet-name">Mode Kerja</div><div class="sheet-meta">TKU · YL · Kategori · Jadwal</div></div>
     <button class="sheet-close" data-close><i class="fa-solid fa-xmark"></i></button>
   </div>
@@ -1016,13 +1091,13 @@ const ADMIN_PASSWORD = 'Yakult2027';
 /* ============ CONSTANTS ============ */
 const HARGA = { om:2130, os:2130, yo:2040, yt:2460 };
 const CATEGORIES = [
-  { key:'rumah',   label:'RUMAH',   icon:'fa-house',         color:'#10B981' },
-  { key:'pasar',   label:'PASAR',   icon:'fa-store',         color:'#F59E0B' },
-  { key:'sekolah', label:'SEKOLAH', icon:'fa-school',        color:'#3B82F6' },
-  { key:'kantor',  label:'KANTOR',  icon:'fa-building',      color:'#8B5CF6' },
-  { key:'ruko',    label:'RUKO',    icon:'fa-shop',          color:'#EC4899' },
-  { key:'toko',    label:'TOKO',    icon:'fa-cart-shopping', color:'#EF4444' },
-  { key:'lain',    label:'LAIN',    icon:'fa-ellipsis',      color:'#64748B' }
+  { key:'rumah',   label:'RUMAH',   icon:'fa-house',         color:'#F59E0B', soft:'#FEF3C7', text:'#92400E' },
+  { key:'sekolah', label:'SEKOLAH', icon:'fa-school',        color:'#3B82F6', soft:'#DBEAFE', text:'#1E40AF' },
+  { key:'kantor',  label:'KANTOR',  icon:'fa-building',      color:'#10B981', soft:'#D1FAE5', text:'#065F46' },
+  { key:'pasar',   label:'PASAR',   icon:'fa-store',         color:'#EC4899', soft:'#FCE7F3', text:'#9D174D' },
+  { key:'ruko',    label:'RUKO',    icon:'fa-shop',          color:'#14B8A6', soft:'#CCFBF1', text:'#115E59' },
+  { key:'toko',    label:'TOKO',    icon:'fa-cart-shopping', color:'#94A3B8', soft:'#F8FAFC', text:'#334155' },
+  { key:'lain',    label:'LAIN',    icon:'fa-ellipsis',      color:'#64748B', soft:'#F1F5F9', text:'#334155' }
 ];
 const DAYS = [
   { key:'sen', label:'Senin',  short:'Sen', js:1 },
@@ -1084,7 +1159,8 @@ const state = {
   mutasiDays:[], mutasiSelected: new Set(),
   customers:[], visits:[], drafts:[],
   editingCustomer:null, activeCustomer:null,
-  custFilter:'all', custView:'list',
+  custFilter:'all', custFilterTku:'', custFilterYl:'', custView:'list',
+  routeFilterTku:'', routeFilterYl:'',
   pendingGPS:null, pendingPhoto:null,
   visitGPS:null, visitPhoto:null,
   visitStatus:'beli', visitPayment:'cash',
@@ -1267,6 +1343,7 @@ function renderMain(){
   if(t === 'kunjungan') postKunjungan();
   if(t === 'pelanggan') postPelanggan();
   if(t === 'analisis') postAnalisis();
+  if(t === 'rute') postRute();
 }
 
 /* ============ TAB: KUNJUNGAN ============ */
@@ -1297,9 +1374,13 @@ function kunjunganHTML(){
     <div class="form-field" style="margin-bottom:0;"><input type="text" class="form-input" id="custSearch" placeholder="🔍 Cari pelanggan..."></div>
     <div class="filter-row" id="filterRow"></div>
     <div id="custList"></div>
-    <button class="fab-sync" data-action="sync-now" id="fabSync" title="Submit ke Cloud">
-      <span class="fab-sync-icon">🚀</span>
+    <button class="fab-pull" data-action="open-pull" title="Tarik Data dari Cloud">
+      <i class="fa-solid fa-cloud-arrow-down"></i>
     </button>
+    <button class="fab-sync" data-action="sync-now" id="fabSync" title="Submit ke Cloud">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+    </button>
+    <button class="fab-add" data-action="add-cust-from-kunjungan"><i class="fa-solid fa-plus"></i></button>
   `;
 }
 function postKunjungan(){
@@ -1356,7 +1437,7 @@ function renderCustList(){
       </div>
       <div class="cust-info">
         <div class="cust-name">${c.name}</div>
-        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span><span style="color:${ses.color};font-weight:700;">${ses.label}</span></div>
+        <div class="cust-meta"><span class="cust-cat" style="background:${cat.soft}; color:${cat.text}; border-color:${cat.color}44;"><i class="fa-solid ${cat.icon}" style="margin-right:3px;"></i>${cat.label}</span><span style="color:${ses.color};font-weight:700;">${ses.label}</span></div>
         <div class="cust-addr"><i class="fa-solid fa-location-dot"></i>${c.address || '— alamat belum diisi —'}</div>
         ${statusTxt?`<div class="cust-status">${statusTxt}</div>`:''}
       </div>
@@ -1372,39 +1453,95 @@ function pelangganHTML(){
       <button class="${state.custView==='list'?'active':''}" data-custview="list"><i class="fa-solid fa-list"></i> List</button>
       <button class="${state.custView==='map'?'active':''}" data-custview="map"><i class="fa-solid fa-map-location-dot"></i> Peta</button>
     </div>
+    <div class="filter-bar-card">
+      <select id="filterTku">
+        <option value="">🏢 Semua TKU</option>
+        ${TKU_ORDER.map(k=>`<option value="${k}">${TKU_DATA[k].center}</option>`).join('')}
+      </select>
+      <select id="filterYl">
+        <option value="">👤 Semua YL</option>
+      </select>
+    </div>
     ${state.custView === 'list' ? `
       <div class="form-field" style="margin-bottom:0;"><input type="text" class="form-input" id="allSearch" placeholder="🔍 Cari pelanggan..."></div>
       <div class="filter-row" id="allFilter"></div>
       <div id="allList"></div>
+      <div class="action-bar" style="margin-top:8px;">
+        <button class="btn-primary" style="flex:1;" data-action="route-from-filter">
+          <i class="fa-solid fa-route"></i><span>Hitung Rute dari Filter Ini</span>
+        </button>
+      </div>
     ` : `
       <div id="mapContainer"></div>
       <div style="font-size:10.5px; color:var(--text-dim); text-align:center; margin-top:8px;">Tap marker untuk lihat pelanggan</div>
+      <div class="action-bar" style="margin-top:12px;">
+        <button class="btn-primary" style="flex:1;" data-action="route-from-filter">
+          <i class="fa-solid fa-route"></i><span>Hitung Rute dari Filter Ini</span>
+        </button>
+      </div>
     `}
+    <button class="fab-pull" data-action="open-pull" title="Tarik Data dari Cloud">
+      <i class="fa-solid fa-cloud-arrow-down"></i>
+    </button>
     <button class="fab-sync" data-action="sync-now" id="fabSync" title="Submit ke Cloud">
-      <span class="fab-sync-icon">🚀</span>
+      <i class="fa-solid fa-cloud-arrow-up"></i>
     </button>
     <button class="fab" data-action="add-cust"><i class="fa-solid fa-plus"></i></button>
   `;
 }
+function getFilteredCustomers(){
+  let list = [...state.customers];
+  if(state.custFilterTku) list = list.filter(c => c.tku === state.custFilterTku);
+  if(state.custFilterYl) list = list.filter(c => c.createdBy === state.custFilterYl);
+  return list;
+}
 function postPelanggan(){
+  const selTku = $('filterTku');
+  const selYl = $('filterYl');
+  if(selTku){
+    selTku.value = state.custFilterTku || '';
+    if(state.custFilterTku){
+      const yls = TKU_DATA[state.custFilterTku].yl;
+      selYl.innerHTML = '<option value="">👤 Semua YL</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
+      selYl.value = state.custFilterYl || '';
+    }
+    selTku.onchange = (e) => {
+      state.custFilterTku = e.target.value;
+      state.custFilterYl = '';
+      if(!e.target.value){
+        selYl.innerHTML = '<option value="">👤 Semua YL</option>';
+      } else {
+        const yls = TKU_DATA[e.target.value].yl;
+        selYl.innerHTML = '<option value="">👤 Semua YL</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
+      }
+      renderAllFilter(); renderAllList();
+      if(state.custView === 'map') renderMap();
+    };
+    selYl.onchange = (e) => {
+      state.custFilterYl = e.target.value;
+      renderAllFilter(); renderAllList();
+      if(state.custView === 'map') renderMap();
+    };
+  }
   if(state.custView === 'list'){ renderAllFilter(); renderAllList(); }
   else renderMap();
 }
 function renderAllFilter(){
   const r = $('allFilter'); if(!r) return;
-  const c = {}; CATEGORIES.forEach(x=>c[x.key] = state.customers.filter(y=>y.category===x.key).length);
-  r.innerHTML = `<div class="filter-chip ${state.custFilter==='all'?'active':''}" data-filter="all">Semua (${state.customers.length})</div>` +
+  const baseList = getFilteredCustomers();
+  const c = {}; CATEGORIES.forEach(x=>c[x.key] = baseList.filter(y=>y.category===x.key).length);
+  r.innerHTML = `<div class="filter-chip ${state.custFilter==='all'?'active':''}" data-filter="all">Semua (${baseList.length})</div>` +
     CATEGORIES.map(x=>`<div class="filter-chip ${state.custFilter===x.key?'active':''}" data-filter="${x.key}">${x.label} (${c[x.key]})</div>`).join('');
 }
 function renderAllList(){
   const w = $('allList'); if(!w) return;
   const q = ($('allSearch')?.value || '').toLowerCase();
-  let list = [...state.customers];
+  let list = getFilteredCustomers();
   if(state.custFilter !== 'all') list = list.filter(c => c.category === state.custFilter);
   if(q) list = list.filter(c => c.name.toLowerCase().includes(q) || (c.address||'').toLowerCase().includes(q));
   list.sort((a,b)=>a.name.localeCompare(b.name));
   if(list.length === 0){
-    w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-users"></i><div class="empty-state-title">${q?'Tidak ditemukan':'Belum ada pelanggan'}</div><div class="empty-state-desc">Tap + di kanan bawah untuk tambah pelanggan baru.</div></div>`;
+    w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-users"></i><div class="empty-state-title">${q||state.custFilterTku||state.custFilterYl?'Tidak ditemukan':'Belum ada pelanggan'}</div><div class="empty-state-desc">${state.custFilterTku||state.custFilterYl?'Coba ubah filter TKU/YL':'Tap + di kanan bawah untuk tambah pelanggan baru.'}</div></div>`;
     return;
   }
   w.innerHTML = list.map(c => {
@@ -1419,7 +1556,7 @@ function renderAllList(){
       </div>
       <div class="cust-info">
         <div class="cust-name">${c.name}</div>
-        <div class="cust-meta"><span class="cust-cat" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span><span style="color:${ses.color};font-weight:700;">${ses.label}</span> · ${daysShortLabel(c.blockingDays)}</div>
+        <div class="cust-meta"><span class="cust-cat" style="background:${cat.soft}; color:${cat.text}; border-color:${cat.color}44;"><i class="fa-solid ${cat.icon}" style="margin-right:3px;"></i>${cat.label}</span><span style="color:${ses.color};font-weight:700;">${ses.label}</span> · ${daysShortLabel(c.blockingDays)}</div>
         <div class="cust-addr"><i class="fa-solid fa-location-dot"></i>${c.address || '— alamat belum diisi —'}</div>
       </div>
       <i class="fa-solid fa-chevron-right cust-action"></i>
@@ -1433,7 +1570,7 @@ function renderMap(){
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(map);
     state.mapInstance = map;
     const pts = [];
-    state.customers.forEach(c => {
+    getFilteredCustomers().forEach(c => {
       if(!c.lat || !c.lng) return;
       const cat = catInfo(c.category);
       pts.push([c.lat, c.lng]);
@@ -1479,14 +1616,52 @@ function migrasiTabHTML(){
 function ruteHTML(){
   return `
     <div class="form-card">
-      <div class="field-label"><i class="fa-solid fa-route"></i> Rute Optimal Hari Ini</div>
-      <div style="font-size:11.5px; color:var(--text-mute); line-height:1.5;">Urutan kunjungan dari pelanggan terdekat ke terjauh (berdasarkan lokasi Anda saat ini).</div>
+      <div class="field-label"><i class="fa-solid fa-route"></i> Rute Optimal</div>
+      <div style="font-size:11.5px; color:var(--text-mute); line-height:1.5; margin-bottom:12px;">
+        Pilih TKU + YL, atau langsung hitung semua pelanggan hari ini.
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:10px;">
+        <select id="routeTku" class="form-input" style="flex:1; appearance:auto; background:var(--surface); font-size:12px; padding:10px 12px;">
+          <option value="">🏢 Semua TKU</option>
+          ${TKU_ORDER.map(k=>`<option value="${k}">${TKU_DATA[k].center}</option>`).join('')}
+        </select>
+        <select id="routeYl" class="form-input" style="flex:1; appearance:auto; background:var(--surface); font-size:12px; padding:10px 12px;">
+          <option value="">👤 Semua YL</option>
+        </select>
+      </div>
       <div class="action-bar" style="margin-top:0;">
-        <button class="btn-primary" style="flex:1;" data-action="calc-route"><i class="fa-solid fa-play"></i><span>Hitung Rute</span></button>
+        <button class="btn-primary" style="flex:1;" data-action="calc-route">
+          <i class="fa-solid fa-play"></i><span>Hitung Rute</span>
+        </button>
       </div>
     </div>
     <div id="routeResult"></div>
   `;
+}
+
+function postRute(){
+  const selTku = $('routeTku');
+  const selYl = $('routeYl');
+  if(!selTku) return;
+  selTku.value = state.routeFilterTku || '';
+  if(state.routeFilterTku){
+    const yls = TKU_DATA[state.routeFilterTku].yl;
+    selYl.innerHTML = '<option value="">👤 Semua YL</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
+    selYl.value = state.routeFilterYl || '';
+  }
+  selTku.onchange = (e) => {
+    state.routeFilterTku = e.target.value;
+    state.routeFilterYl = '';
+    if(!e.target.value){
+      selYl.innerHTML = '<option value="">👤 Semua YL</option>';
+    } else {
+      const yls = TKU_DATA[e.target.value].yl;
+      selYl.innerHTML = '<option value="">👤 Semua YL</option>' + yls.map(y=>`<option value="${y}">${y}</option>`).join('');
+    }
+  };
+  selYl.onchange = (e) => {
+    state.routeFilterYl = e.target.value;
+  };
 }
 
 /* ============ TAB: ANALISIS ============ */
@@ -1585,8 +1760,8 @@ function setHTML(){
       </div>
     </div>
     <div class="form-card" style="text-align:center; padding:14px;">
-      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v3.1</div>
-      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">GAS + Firebase · Foto Queue · Route Map</div>
+      <div style="font-family:'Poppins'; font-size:13px; font-weight:700;">Y-Cust v3.2</div>
+      <div style="font-size:10.5px; color:var(--text-dim); margin-top:3px;">GAS + Firebase · Filter Rute · Soft Colors</div>
     </div>
   `;
 }
@@ -1613,8 +1788,9 @@ function openSheet(id){
   const overlay = $('overlay');
   const sheetEl = $(id);
   overlay.classList.remove('visit-mode');
-  $$('.sheet').forEach(s => s.classList.remove('visit-sheet'));
+  $$('.sheet').forEach(s => s.classList.remove('visit-sheet','ctx-sheet'));
   if(id === 'visitSheet'){ overlay.classList.add('visit-mode'); sheetEl.classList.add('visit-sheet'); }
+  if(id === 'ctxSheet'){ sheetEl.classList.add('ctx-sheet'); }
   overlay.classList.add('open');
   void sheetEl.offsetWidth;
   sheetEl.classList.add('open');
@@ -1912,10 +2088,19 @@ async function saveVisit(){
 let _routeMap = null, _routeInlineMap = null;
 
 async function calcRoute(){
-  const list = getCustomersForToday().filter(c => !hasVisitedToday(c.id) && c.lat && c.lng);
+  const tkuFilter = $('routeTku')?.value || '';
+  const ylFilter = $('routeYl')?.value || '';
+  let baseList = state.customers.filter(c => c.active !== false && c.lat && c.lng);
+  if(tkuFilter) baseList = baseList.filter(c => c.tku === tkuFilter);
+  if(ylFilter) baseList = baseList.filter(c => c.createdBy === ylFilter);
+  if(!tkuFilter && !ylFilter){
+    baseList = baseList.filter(c => (c.blockingDays||[]).includes(todayDayKey()) && !hasVisitedToday(c.id));
+  }
+  const list = baseList;
+  
   const w = $('routeResult');
   if(list.length === 0){
-    w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-route"></i><div class="empty-state-title">Tidak ada pelanggan</div><div class="empty-state-desc">Semua pelanggan hari ini sudah dikunjungi atau belum punya lokasi GPS.</div></div>`;
+    w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-route"></i><div class="empty-state-title">Tidak ada pelanggan</div><div class="empty-state-desc">Filter tidak menemukan pelanggan dengan GPS, atau semua sudah dikunjungi.</div></div>`;
     return;
   }
   w.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner spin"></i><div class="empty-state-title">Menghitung rute...</div><div class="empty-state-desc">Mengambil lokasi Anda saat ini</div></div>`;
@@ -2015,15 +2200,27 @@ async function pullCustomersFromCloud(opts = {}){
   if(!firebaseReady || !firestoreDB) throw new Error('Firestore belum siap');
   const { tku, yl } = opts;
   let query = firestoreDB.collection('customers');
-  if(tku) query = query.where('tku', '==', tku);
-  if(yl) query = query.where('createdBy', '==', yl);
+  
+  // Pakai 1 filter aja biar gak butuh composite index
+  if(tku){
+    query = query.where('tku', '==', tku);
+  } else if(yl){
+    query = query.where('createdBy', '==', yl);
+  }
+  
   const snap = await query.get();
   let pulled = 0, merged = 0;
   const existingIds = new Set(state.customers.map(c => c.id));
+  
   for(const doc of snap.docs){
     const data = doc.data();
+    
+    // Filter client-side untuk YL (kalau tku yang jadi primary filter)
+    if(tku && yl && data.createdBy !== yl) continue;
+    
     pulled++;
     if(existingIds.has(data.id)) continue;
+    
     const rec = {
       id: data.id,
       name: data.name,
@@ -2056,16 +2253,31 @@ async function pullVisitsFromCloud(opts = {}){
   if(!firebaseReady || !firestoreDB) throw new Error('Firestore belum siap');
   const { tku, yl, dateFrom } = opts;
   let query = firestoreDB.collection('visits');
-  if(tku) query = query.where('tku', '==', tku);
-  if(yl) query = query.where('yl', '==', yl);
-  if(dateFrom) query = query.where('date', '>=', dateFrom);
+  
+  // Cuma pakai 1 filter utama
+  if(dateFrom){
+    query = query.where('date', '>=', dateFrom);
+  } else if(tku){
+    query = query.where('tku', '==', tku);
+  } else if(yl){
+    query = query.where('yl', '==', yl);
+  }
+  
   const snap = await query.get();
   let pulled = 0, merged = 0;
   const existingIds = new Set(state.visits.map(v => v.id));
+  
   for(const doc of snap.docs){
     const data = doc.data();
+    
+    // Filter client-side
+    if(tku && data.tku !== tku) continue;
+    if(yl && data.yl !== yl) continue;
+    if(dateFrom && data.date < dateFrom) continue;
+    
     pulled++;
     if(existingIds.has(data.id)) continue;
+    
     const rec = {
       id: data.id,
       customerId: data.customerId,
@@ -2838,6 +3050,19 @@ document.addEventListener('click', async e => {
   if(t.closest('[data-action="open-pull"]')){ haptic(10); openPullSheet(); return; }
   if(t.closest('[data-action="execute-mutasi"]')){ await executeMutasi(); return; }
   if(t.closest('[data-action="pull-cloud"]')){ await executePull(); return; }
+  if(t.closest('[data-action="add-cust-from-kunjungan"]')){ haptic(12); openCustForm(null); return; }
+  if(t.closest('[data-action="route-from-filter"]')){
+    haptic(12);
+    if(!state.custFilterTku && !state.custFilterYl){ showToast('Pilih TKU atau YL dulu di filter'); return; }
+    state.routeFilterTku = state.custFilterTku || '';
+    state.routeFilterYl = state.custFilterYl || '';
+    state.activeTab = 'rute';
+    $$('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab === 'rute'));
+    renderMain();
+    setTimeout(()=>calcRoute(), 400);
+    showToast('📍 Menghitung rute dari filter...');
+    return;
+  }
   if(t.closest('[data-action="toggle-inline-map"]')){
     const box = $('inlineRouteMap');
     const btn = $('btnToggleInlineMap');
