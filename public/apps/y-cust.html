@@ -639,9 +639,10 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 22px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 12px 36px -14px rgba(13,148,136,.3);
   position: relative;
+  z-index: 20;
 }
 
 .filter-fullpremium-header{
@@ -653,6 +654,7 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   color: #fff;
   position: relative;
   overflow: hidden;
+  border-radius: 22px 22px 0 0;
 }
 .filter-fullpremium-header::before{
   content: '';
@@ -716,6 +718,7 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  overflow: visible;
 }
 
 /* Trigger full width */
@@ -732,7 +735,8 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   cursor: pointer;
   transition: all .22s cubic-bezier(.2,.8,.2,1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 100;
 }
 .filter-fullpremium-trigger:hover{
   border-color: var(--brand-soft);
@@ -812,7 +816,7 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   border-radius: 16px;
   box-shadow: 0 24px 60px -16px rgba(13,148,136,.35);
   padding: 6px;
-  z-index: 9999;
+  z-index: 99999;
   max-height: 300px;
   overflow-y: auto;
   opacity: 0;
@@ -820,6 +824,7 @@ textarea.field-soft-input{ resize:none; min-height:44px; font-family:inherit; li
   transform: translateY(-6px);
   transition: all .22s cubic-bezier(.2,.9,.3,1.1);
   pointer-events: none;
+  min-width: 200px;
 }
 .filter-fullpremium-menu.open{
   opacity: 1;
@@ -1780,7 +1785,7 @@ function pelangganHTML(){
         </button>
       </div>
       <div class="filter-fullpremium-body">
-        <div style="position:relative;">
+        <div style="position:relative;z-index:100;">
           <button type="button" class="filter-fullpremium-trigger" data-filter-dd="tku" id="filterTkuWrap">
             <div class="filter-fullpremium-trigger-icon">
               <i class="fa-solid fa-store"></i>
